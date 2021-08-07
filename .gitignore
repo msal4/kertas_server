@@ -1,0 +1,7 @@
+vim-markdown-preview.html
+dbml-error.log
+.DS_Store
+
+.idea/
+.vscode/
+.env
