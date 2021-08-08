@@ -327,12 +327,12 @@ func (asq *AssignmentSubmissionQuery) WithAssignment(opts ...func(*AssignmentQue
 // Example:
 //
 //	var v []struct {
-//		CreateTime time.Time `json:"create_time,omitempty"`
+//		CreatedAt time.Time `json:"created_at,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
 //	client.AssignmentSubmission.Query().
-//		GroupBy(assignmentsubmission.FieldCreateTime).
+//		GroupBy(assignmentsubmission.FieldCreatedAt).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
 //
@@ -354,11 +354,11 @@ func (asq *AssignmentSubmissionQuery) GroupBy(field string, fields ...string) *A
 // Example:
 //
 //	var v []struct {
-//		CreateTime time.Time `json:"create_time,omitempty"`
+//		CreatedAt time.Time `json:"created_at,omitempty"`
 //	}
 //
 //	client.AssignmentSubmission.Query().
-//		Select(assignmentsubmission.FieldCreateTime).
+//		Select(assignmentsubmission.FieldCreatedAt).
 //		Scan(ctx, &v)
 //
 func (asq *AssignmentSubmissionQuery) Select(fields ...string) *AssignmentSubmissionSelect {

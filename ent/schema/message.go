@@ -5,7 +5,6 @@ import (
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
 	"entgo.io/ent/schema/index"
-	"entgo.io/ent/schema/mixin"
 )
 
 // Message holds the schema definition for the Message entity.
@@ -24,7 +23,7 @@ func (Message) Fields() []ent.Field {
 
 func (Message) Mixin() []ent.Mixin {
 	return []ent.Mixin{
-		mixin.Time{},
+		TimeMixin{},
 	}
 }
 

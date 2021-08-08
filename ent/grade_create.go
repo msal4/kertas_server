@@ -22,30 +22,30 @@ type GradeCreate struct {
 	hooks    []Hook
 }
 
-// SetCreateTime sets the "create_time" field.
-func (gc *GradeCreate) SetCreateTime(t time.Time) *GradeCreate {
-	gc.mutation.SetCreateTime(t)
+// SetCreatedAt sets the "created_at" field.
+func (gc *GradeCreate) SetCreatedAt(t time.Time) *GradeCreate {
+	gc.mutation.SetCreatedAt(t)
 	return gc
 }
 
-// SetNillableCreateTime sets the "create_time" field if the given value is not nil.
-func (gc *GradeCreate) SetNillableCreateTime(t *time.Time) *GradeCreate {
+// SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
+func (gc *GradeCreate) SetNillableCreatedAt(t *time.Time) *GradeCreate {
 	if t != nil {
-		gc.SetCreateTime(*t)
+		gc.SetCreatedAt(*t)
 	}
 	return gc
 }
 
-// SetUpdateTime sets the "update_time" field.
-func (gc *GradeCreate) SetUpdateTime(t time.Time) *GradeCreate {
-	gc.mutation.SetUpdateTime(t)
+// SetUpdatedAt sets the "updated_at" field.
+func (gc *GradeCreate) SetUpdatedAt(t time.Time) *GradeCreate {
+	gc.mutation.SetUpdatedAt(t)
 	return gc
 }
 
-// SetNillableUpdateTime sets the "update_time" field if the given value is not nil.
-func (gc *GradeCreate) SetNillableUpdateTime(t *time.Time) *GradeCreate {
+// SetNillableUpdatedAt sets the "updated_at" field if the given value is not nil.
+func (gc *GradeCreate) SetNillableUpdatedAt(t *time.Time) *GradeCreate {
 	if t != nil {
-		gc.SetUpdateTime(*t)
+		gc.SetUpdatedAt(*t)
 	}
 	return gc
 }
@@ -149,23 +149,23 @@ func (gc *GradeCreate) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (gc *GradeCreate) defaults() {
-	if _, ok := gc.mutation.CreateTime(); !ok {
-		v := grade.DefaultCreateTime()
-		gc.mutation.SetCreateTime(v)
+	if _, ok := gc.mutation.CreatedAt(); !ok {
+		v := grade.DefaultCreatedAt()
+		gc.mutation.SetCreatedAt(v)
 	}
-	if _, ok := gc.mutation.UpdateTime(); !ok {
-		v := grade.DefaultUpdateTime()
-		gc.mutation.SetUpdateTime(v)
+	if _, ok := gc.mutation.UpdatedAt(); !ok {
+		v := grade.DefaultUpdatedAt()
+		gc.mutation.SetUpdatedAt(v)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
 func (gc *GradeCreate) check() error {
-	if _, ok := gc.mutation.CreateTime(); !ok {
-		return &ValidationError{Name: "create_time", err: errors.New(`ent: missing required field "create_time"`)}
+	if _, ok := gc.mutation.CreatedAt(); !ok {
+		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "created_at"`)}
 	}
-	if _, ok := gc.mutation.UpdateTime(); !ok {
-		return &ValidationError{Name: "update_time", err: errors.New(`ent: missing required field "update_time"`)}
+	if _, ok := gc.mutation.UpdatedAt(); !ok {
+		return &ValidationError{Name: "updated_at", err: errors.New(`ent: missing required field "updated_at"`)}
 	}
 	if _, ok := gc.mutation.ExamGrade(); !ok {
 		return &ValidationError{Name: "exam_grade", err: errors.New(`ent: missing required field "exam_grade"`)}
@@ -208,21 +208,21 @@ func (gc *GradeCreate) createSpec() (*Grade, *sqlgraph.CreateSpec) {
 			},
 		}
 	)
-	if value, ok := gc.mutation.CreateTime(); ok {
+	if value, ok := gc.mutation.CreatedAt(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
 			Type:   field.TypeTime,
 			Value:  value,
-			Column: grade.FieldCreateTime,
+			Column: grade.FieldCreatedAt,
 		})
-		_node.CreateTime = value
+		_node.CreatedAt = value
 	}
-	if value, ok := gc.mutation.UpdateTime(); ok {
+	if value, ok := gc.mutation.UpdatedAt(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
 			Type:   field.TypeTime,
 			Value:  value,
-			Column: grade.FieldUpdateTime,
+			Column: grade.FieldUpdatedAt,
 		})
-		_node.UpdateTime = value
+		_node.UpdatedAt = value
 	}
 	if value, ok := gc.mutation.ExamGrade(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{

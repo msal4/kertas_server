@@ -206,9 +206,9 @@ func (gu *GroupUpdate) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (gu *GroupUpdate) defaults() {
-	if _, ok := gu.mutation.UpdateTime(); !ok {
-		v := group.UpdateDefaultUpdateTime()
-		gu.mutation.SetUpdateTime(v)
+	if _, ok := gu.mutation.UpdatedAt(); !ok {
+		v := group.UpdateDefaultUpdatedAt()
+		gu.mutation.SetUpdatedAt(v)
 	}
 }
 
@@ -245,11 +245,11 @@ func (gu *GroupUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			}
 		}
 	}
-	if value, ok := gu.mutation.UpdateTime(); ok {
+	if value, ok := gu.mutation.UpdatedAt(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeTime,
 			Value:  value,
-			Column: group.FieldUpdateTime,
+			Column: group.FieldUpdatedAt,
 		})
 	}
 	if value, ok := gu.mutation.Name(); ok {
@@ -571,9 +571,9 @@ func (guo *GroupUpdateOne) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (guo *GroupUpdateOne) defaults() {
-	if _, ok := guo.mutation.UpdateTime(); !ok {
-		v := group.UpdateDefaultUpdateTime()
-		guo.mutation.SetUpdateTime(v)
+	if _, ok := guo.mutation.UpdatedAt(); !ok {
+		v := group.UpdateDefaultUpdatedAt()
+		guo.mutation.SetUpdatedAt(v)
 	}
 }
 
@@ -627,11 +627,11 @@ func (guo *GroupUpdateOne) sqlSave(ctx context.Context) (_node *Group, err error
 			}
 		}
 	}
-	if value, ok := guo.mutation.UpdateTime(); ok {
+	if value, ok := guo.mutation.UpdatedAt(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeTime,
 			Value:  value,
-			Column: group.FieldUpdateTime,
+			Column: group.FieldUpdatedAt,
 		})
 	}
 	if value, ok := guo.mutation.Name(); ok {

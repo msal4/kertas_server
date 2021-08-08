@@ -327,12 +327,12 @@ func (tpq *TuitionPaymentQuery) WithStage(opts ...func(*StageQuery)) *TuitionPay
 // Example:
 //
 //	var v []struct {
-//		CreateTime time.Time `json:"create_time,omitempty"`
+//		CreatedAt time.Time `json:"created_at,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
 //	client.TuitionPayment.Query().
-//		GroupBy(tuitionpayment.FieldCreateTime).
+//		GroupBy(tuitionpayment.FieldCreatedAt).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
 //
@@ -354,11 +354,11 @@ func (tpq *TuitionPaymentQuery) GroupBy(field string, fields ...string) *Tuition
 // Example:
 //
 //	var v []struct {
-//		CreateTime time.Time `json:"create_time,omitempty"`
+//		CreatedAt time.Time `json:"created_at,omitempty"`
 //	}
 //
 //	client.TuitionPayment.Query().
-//		Select(tuitionpayment.FieldCreateTime).
+//		Select(tuitionpayment.FieldCreatedAt).
 //		Scan(ctx, &v)
 //
 func (tpq *TuitionPaymentQuery) Select(fields ...string) *TuitionPaymentSelect {

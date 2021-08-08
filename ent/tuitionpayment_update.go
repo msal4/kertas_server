@@ -144,9 +144,9 @@ func (tpu *TuitionPaymentUpdate) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (tpu *TuitionPaymentUpdate) defaults() {
-	if _, ok := tpu.mutation.UpdateTime(); !ok {
-		v := tuitionpayment.UpdateDefaultUpdateTime()
-		tpu.mutation.SetUpdateTime(v)
+	if _, ok := tpu.mutation.UpdatedAt(); !ok {
+		v := tuitionpayment.UpdateDefaultUpdatedAt()
+		tpu.mutation.SetUpdatedAt(v)
 	}
 }
 
@@ -179,11 +179,11 @@ func (tpu *TuitionPaymentUpdate) sqlSave(ctx context.Context) (n int, err error)
 			}
 		}
 	}
-	if value, ok := tpu.mutation.UpdateTime(); ok {
+	if value, ok := tpu.mutation.UpdatedAt(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeTime,
 			Value:  value,
-			Column: tuitionpayment.FieldUpdateTime,
+			Column: tuitionpayment.FieldUpdatedAt,
 		})
 	}
 	if value, ok := tpu.mutation.PaidAmount(); ok {
@@ -411,9 +411,9 @@ func (tpuo *TuitionPaymentUpdateOne) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (tpuo *TuitionPaymentUpdateOne) defaults() {
-	if _, ok := tpuo.mutation.UpdateTime(); !ok {
-		v := tuitionpayment.UpdateDefaultUpdateTime()
-		tpuo.mutation.SetUpdateTime(v)
+	if _, ok := tpuo.mutation.UpdatedAt(); !ok {
+		v := tuitionpayment.UpdateDefaultUpdatedAt()
+		tpuo.mutation.SetUpdatedAt(v)
 	}
 }
 
@@ -463,11 +463,11 @@ func (tpuo *TuitionPaymentUpdateOne) sqlSave(ctx context.Context) (_node *Tuitio
 			}
 		}
 	}
-	if value, ok := tpuo.mutation.UpdateTime(); ok {
+	if value, ok := tpuo.mutation.UpdatedAt(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeTime,
 			Value:  value,
-			Column: tuitionpayment.FieldUpdateTime,
+			Column: tuitionpayment.FieldUpdatedAt,
 		})
 	}
 	if value, ok := tpuo.mutation.PaidAmount(); ok {

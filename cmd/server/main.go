@@ -10,7 +10,7 @@ import (
 )
 
 func main() {
-	client, err := ent.Open(dialect.Postgres, "postgres://postgres@localhost:5432/school_rewrite?sslmode=disable")
+	client, err := ent.Open(dialect.Postgres, "postgres://postgres@localhost:5432/school?sslmode=disable")
 	if err != nil {
 		log.Fatalf("failed establishing connection: %v", err)
 	}

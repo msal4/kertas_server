@@ -27,30 +27,30 @@ type ClassCreate struct {
 	hooks    []Hook
 }
 
-// SetCreateTime sets the "create_time" field.
-func (cc *ClassCreate) SetCreateTime(t time.Time) *ClassCreate {
-	cc.mutation.SetCreateTime(t)
+// SetCreatedAt sets the "created_at" field.
+func (cc *ClassCreate) SetCreatedAt(t time.Time) *ClassCreate {
+	cc.mutation.SetCreatedAt(t)
 	return cc
 }
 
-// SetNillableCreateTime sets the "create_time" field if the given value is not nil.
-func (cc *ClassCreate) SetNillableCreateTime(t *time.Time) *ClassCreate {
+// SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
+func (cc *ClassCreate) SetNillableCreatedAt(t *time.Time) *ClassCreate {
 	if t != nil {
-		cc.SetCreateTime(*t)
+		cc.SetCreatedAt(*t)
 	}
 	return cc
 }
 
-// SetUpdateTime sets the "update_time" field.
-func (cc *ClassCreate) SetUpdateTime(t time.Time) *ClassCreate {
-	cc.mutation.SetUpdateTime(t)
+// SetUpdatedAt sets the "updated_at" field.
+func (cc *ClassCreate) SetUpdatedAt(t time.Time) *ClassCreate {
+	cc.mutation.SetUpdatedAt(t)
 	return cc
 }
 
-// SetNillableUpdateTime sets the "update_time" field if the given value is not nil.
-func (cc *ClassCreate) SetNillableUpdateTime(t *time.Time) *ClassCreate {
+// SetNillableUpdatedAt sets the "updated_at" field if the given value is not nil.
+func (cc *ClassCreate) SetNillableUpdatedAt(t *time.Time) *ClassCreate {
 	if t != nil {
-		cc.SetUpdateTime(*t)
+		cc.SetUpdatedAt(*t)
 	}
 	return cc
 }
@@ -224,13 +224,13 @@ func (cc *ClassCreate) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (cc *ClassCreate) defaults() {
-	if _, ok := cc.mutation.CreateTime(); !ok {
-		v := class.DefaultCreateTime()
-		cc.mutation.SetCreateTime(v)
+	if _, ok := cc.mutation.CreatedAt(); !ok {
+		v := class.DefaultCreatedAt()
+		cc.mutation.SetCreatedAt(v)
 	}
-	if _, ok := cc.mutation.UpdateTime(); !ok {
-		v := class.DefaultUpdateTime()
-		cc.mutation.SetUpdateTime(v)
+	if _, ok := cc.mutation.UpdatedAt(); !ok {
+		v := class.DefaultUpdatedAt()
+		cc.mutation.SetUpdatedAt(v)
 	}
 	if _, ok := cc.mutation.Status(); !ok {
 		v := class.DefaultStatus
@@ -240,11 +240,11 @@ func (cc *ClassCreate) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (cc *ClassCreate) check() error {
-	if _, ok := cc.mutation.CreateTime(); !ok {
-		return &ValidationError{Name: "create_time", err: errors.New(`ent: missing required field "create_time"`)}
+	if _, ok := cc.mutation.CreatedAt(); !ok {
+		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "created_at"`)}
 	}
-	if _, ok := cc.mutation.UpdateTime(); !ok {
-		return &ValidationError{Name: "update_time", err: errors.New(`ent: missing required field "update_time"`)}
+	if _, ok := cc.mutation.UpdatedAt(); !ok {
+		return &ValidationError{Name: "updated_at", err: errors.New(`ent: missing required field "updated_at"`)}
 	}
 	if _, ok := cc.mutation.Name(); !ok {
 		return &ValidationError{Name: "name", err: errors.New(`ent: missing required field "name"`)}
@@ -298,21 +298,21 @@ func (cc *ClassCreate) createSpec() (*Class, *sqlgraph.CreateSpec) {
 			},
 		}
 	)
-	if value, ok := cc.mutation.CreateTime(); ok {
+	if value, ok := cc.mutation.CreatedAt(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
 			Type:   field.TypeTime,
 			Value:  value,
-			Column: class.FieldCreateTime,
+			Column: class.FieldCreatedAt,
 		})
-		_node.CreateTime = value
+		_node.CreatedAt = value
 	}
-	if value, ok := cc.mutation.UpdateTime(); ok {
+	if value, ok := cc.mutation.UpdatedAt(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
 			Type:   field.TypeTime,
 			Value:  value,
-			Column: class.FieldUpdateTime,
+			Column: class.FieldUpdatedAt,
 		})
-		_node.UpdateTime = value
+		_node.UpdatedAt = value
 	}
 	if value, ok := cc.mutation.Name(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{

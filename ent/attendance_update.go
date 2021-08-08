@@ -144,9 +144,9 @@ func (au *AttendanceUpdate) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (au *AttendanceUpdate) defaults() {
-	if _, ok := au.mutation.UpdateTime(); !ok {
-		v := attendance.UpdateDefaultUpdateTime()
-		au.mutation.SetUpdateTime(v)
+	if _, ok := au.mutation.UpdatedAt(); !ok {
+		v := attendance.UpdateDefaultUpdatedAt()
+		au.mutation.SetUpdatedAt(v)
 	}
 }
 
@@ -184,11 +184,11 @@ func (au *AttendanceUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			}
 		}
 	}
-	if value, ok := au.mutation.UpdateTime(); ok {
+	if value, ok := au.mutation.UpdatedAt(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeTime,
 			Value:  value,
-			Column: attendance.FieldUpdateTime,
+			Column: attendance.FieldUpdatedAt,
 		})
 	}
 	if value, ok := au.mutation.Date(); ok {
@@ -415,9 +415,9 @@ func (auo *AttendanceUpdateOne) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (auo *AttendanceUpdateOne) defaults() {
-	if _, ok := auo.mutation.UpdateTime(); !ok {
-		v := attendance.UpdateDefaultUpdateTime()
-		auo.mutation.SetUpdateTime(v)
+	if _, ok := auo.mutation.UpdatedAt(); !ok {
+		v := attendance.UpdateDefaultUpdatedAt()
+		auo.mutation.SetUpdatedAt(v)
 	}
 }
 
@@ -472,11 +472,11 @@ func (auo *AttendanceUpdateOne) sqlSave(ctx context.Context) (_node *Attendance,
 			}
 		}
 	}
-	if value, ok := auo.mutation.UpdateTime(); ok {
+	if value, ok := auo.mutation.UpdatedAt(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeTime,
 			Value:  value,
-			Column: attendance.FieldUpdateTime,
+			Column: attendance.FieldUpdatedAt,
 		})
 	}
 	if value, ok := auo.mutation.Date(); ok {

@@ -22,30 +22,30 @@ type AttendanceCreate struct {
 	hooks    []Hook
 }
 
-// SetCreateTime sets the "create_time" field.
-func (ac *AttendanceCreate) SetCreateTime(t time.Time) *AttendanceCreate {
-	ac.mutation.SetCreateTime(t)
+// SetCreatedAt sets the "created_at" field.
+func (ac *AttendanceCreate) SetCreatedAt(t time.Time) *AttendanceCreate {
+	ac.mutation.SetCreatedAt(t)
 	return ac
 }
 
-// SetNillableCreateTime sets the "create_time" field if the given value is not nil.
-func (ac *AttendanceCreate) SetNillableCreateTime(t *time.Time) *AttendanceCreate {
+// SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
+func (ac *AttendanceCreate) SetNillableCreatedAt(t *time.Time) *AttendanceCreate {
 	if t != nil {
-		ac.SetCreateTime(*t)
+		ac.SetCreatedAt(*t)
 	}
 	return ac
 }
 
-// SetUpdateTime sets the "update_time" field.
-func (ac *AttendanceCreate) SetUpdateTime(t time.Time) *AttendanceCreate {
-	ac.mutation.SetUpdateTime(t)
+// SetUpdatedAt sets the "updated_at" field.
+func (ac *AttendanceCreate) SetUpdatedAt(t time.Time) *AttendanceCreate {
+	ac.mutation.SetUpdatedAt(t)
 	return ac
 }
 
-// SetNillableUpdateTime sets the "update_time" field if the given value is not nil.
-func (ac *AttendanceCreate) SetNillableUpdateTime(t *time.Time) *AttendanceCreate {
+// SetNillableUpdatedAt sets the "updated_at" field if the given value is not nil.
+func (ac *AttendanceCreate) SetNillableUpdatedAt(t *time.Time) *AttendanceCreate {
 	if t != nil {
-		ac.SetUpdateTime(*t)
+		ac.SetUpdatedAt(*t)
 	}
 	return ac
 }
@@ -155,23 +155,23 @@ func (ac *AttendanceCreate) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (ac *AttendanceCreate) defaults() {
-	if _, ok := ac.mutation.CreateTime(); !ok {
-		v := attendance.DefaultCreateTime()
-		ac.mutation.SetCreateTime(v)
+	if _, ok := ac.mutation.CreatedAt(); !ok {
+		v := attendance.DefaultCreatedAt()
+		ac.mutation.SetCreatedAt(v)
 	}
-	if _, ok := ac.mutation.UpdateTime(); !ok {
-		v := attendance.DefaultUpdateTime()
-		ac.mutation.SetUpdateTime(v)
+	if _, ok := ac.mutation.UpdatedAt(); !ok {
+		v := attendance.DefaultUpdatedAt()
+		ac.mutation.SetUpdatedAt(v)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
 func (ac *AttendanceCreate) check() error {
-	if _, ok := ac.mutation.CreateTime(); !ok {
-		return &ValidationError{Name: "create_time", err: errors.New(`ent: missing required field "create_time"`)}
+	if _, ok := ac.mutation.CreatedAt(); !ok {
+		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "created_at"`)}
 	}
-	if _, ok := ac.mutation.UpdateTime(); !ok {
-		return &ValidationError{Name: "update_time", err: errors.New(`ent: missing required field "update_time"`)}
+	if _, ok := ac.mutation.UpdatedAt(); !ok {
+		return &ValidationError{Name: "updated_at", err: errors.New(`ent: missing required field "updated_at"`)}
 	}
 	if _, ok := ac.mutation.Date(); !ok {
 		return &ValidationError{Name: "date", err: errors.New(`ent: missing required field "date"`)}
@@ -217,21 +217,21 @@ func (ac *AttendanceCreate) createSpec() (*Attendance, *sqlgraph.CreateSpec) {
 			},
 		}
 	)
-	if value, ok := ac.mutation.CreateTime(); ok {
+	if value, ok := ac.mutation.CreatedAt(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
 			Type:   field.TypeTime,
 			Value:  value,
-			Column: attendance.FieldCreateTime,
+			Column: attendance.FieldCreatedAt,
 		})
-		_node.CreateTime = value
+		_node.CreatedAt = value
 	}
-	if value, ok := ac.mutation.UpdateTime(); ok {
+	if value, ok := ac.mutation.UpdatedAt(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
 			Type:   field.TypeTime,
 			Value:  value,
-			Column: attendance.FieldUpdateTime,
+			Column: attendance.FieldUpdatedAt,
 		})
-		_node.UpdateTime = value
+		_node.UpdatedAt = value
 	}
 	if value, ok := ac.mutation.Date(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{

@@ -472,12 +472,12 @@ func (cq *ClassQuery) WithSchedules(opts ...func(*ScheduleQuery)) *ClassQuery {
 // Example:
 //
 //	var v []struct {
-//		CreateTime time.Time `json:"create_time,omitempty"`
+//		CreatedAt time.Time `json:"created_at,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
 //	client.Class.Query().
-//		GroupBy(class.FieldCreateTime).
+//		GroupBy(class.FieldCreatedAt).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
 //
@@ -499,11 +499,11 @@ func (cq *ClassQuery) GroupBy(field string, fields ...string) *ClassGroupBy {
 // Example:
 //
 //	var v []struct {
-//		CreateTime time.Time `json:"create_time,omitempty"`
+//		CreatedAt time.Time `json:"created_at,omitempty"`
 //	}
 //
 //	client.Class.Query().
-//		Select(class.FieldCreateTime).
+//		Select(class.FieldCreatedAt).
 //		Scan(ctx, &v)
 //
 func (cq *ClassQuery) Select(fields ...string) *ClassSelect {

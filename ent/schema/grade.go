@@ -5,7 +5,6 @@ import (
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
 	"entgo.io/ent/schema/index"
-	"entgo.io/ent/schema/mixin"
 )
 
 // Grade holds the schema definition for the Grade entity.
@@ -22,7 +21,7 @@ func (Grade) Fields() []ent.Field {
 
 func (Grade) Mixin() []ent.Mixin {
 	return []ent.Mixin{
-		mixin.Time{},
+		TimeMixin{},
 	}
 }
 

@@ -16,6 +16,7 @@ import (
 	"github.com/msal4/hassah_school_server/ent/schema"
 	"github.com/msal4/hassah_school_server/ent/school"
 	"github.com/msal4/hassah_school_server/ent/stage"
+	"github.com/msal4/hassah_school_server/ent/timemixin"
 	"github.com/msal4/hassah_school_server/ent/tuitionpayment"
 	"github.com/msal4/hassah_school_server/ent/user"
 )
@@ -29,16 +30,16 @@ func init() {
 	_ = assignmentMixinFields0
 	assignmentFields := schema.Assignment{}.Fields()
 	_ = assignmentFields
-	// assignmentDescCreateTime is the schema descriptor for create_time field.
-	assignmentDescCreateTime := assignmentMixinFields0[0].Descriptor()
-	// assignment.DefaultCreateTime holds the default value on creation for the create_time field.
-	assignment.DefaultCreateTime = assignmentDescCreateTime.Default.(func() time.Time)
-	// assignmentDescUpdateTime is the schema descriptor for update_time field.
-	assignmentDescUpdateTime := assignmentMixinFields0[1].Descriptor()
-	// assignment.DefaultUpdateTime holds the default value on creation for the update_time field.
-	assignment.DefaultUpdateTime = assignmentDescUpdateTime.Default.(func() time.Time)
-	// assignment.UpdateDefaultUpdateTime holds the default value on update for the update_time field.
-	assignment.UpdateDefaultUpdateTime = assignmentDescUpdateTime.UpdateDefault.(func() time.Time)
+	// assignmentDescCreatedAt is the schema descriptor for created_at field.
+	assignmentDescCreatedAt := assignmentMixinFields0[0].Descriptor()
+	// assignment.DefaultCreatedAt holds the default value on creation for the created_at field.
+	assignment.DefaultCreatedAt = assignmentDescCreatedAt.Default.(func() time.Time)
+	// assignmentDescUpdatedAt is the schema descriptor for updated_at field.
+	assignmentDescUpdatedAt := assignmentMixinFields0[1].Descriptor()
+	// assignment.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	assignment.DefaultUpdatedAt = assignmentDescUpdatedAt.Default.(func() time.Time)
+	// assignment.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	assignment.UpdateDefaultUpdatedAt = assignmentDescUpdatedAt.UpdateDefault.(func() time.Time)
 	// assignmentDescName is the schema descriptor for name field.
 	assignmentDescName := assignmentFields[0].Descriptor()
 	// assignment.NameValidator is a validator for the "name" field. It is called by the builders before save.
@@ -52,46 +53,46 @@ func init() {
 	_ = assignmentsubmissionMixinFields0
 	assignmentsubmissionFields := schema.AssignmentSubmission{}.Fields()
 	_ = assignmentsubmissionFields
-	// assignmentsubmissionDescCreateTime is the schema descriptor for create_time field.
-	assignmentsubmissionDescCreateTime := assignmentsubmissionMixinFields0[0].Descriptor()
-	// assignmentsubmission.DefaultCreateTime holds the default value on creation for the create_time field.
-	assignmentsubmission.DefaultCreateTime = assignmentsubmissionDescCreateTime.Default.(func() time.Time)
-	// assignmentsubmissionDescUpdateTime is the schema descriptor for update_time field.
-	assignmentsubmissionDescUpdateTime := assignmentsubmissionMixinFields0[1].Descriptor()
-	// assignmentsubmission.DefaultUpdateTime holds the default value on creation for the update_time field.
-	assignmentsubmission.DefaultUpdateTime = assignmentsubmissionDescUpdateTime.Default.(func() time.Time)
-	// assignmentsubmission.UpdateDefaultUpdateTime holds the default value on update for the update_time field.
-	assignmentsubmission.UpdateDefaultUpdateTime = assignmentsubmissionDescUpdateTime.UpdateDefault.(func() time.Time)
+	// assignmentsubmissionDescCreatedAt is the schema descriptor for created_at field.
+	assignmentsubmissionDescCreatedAt := assignmentsubmissionMixinFields0[0].Descriptor()
+	// assignmentsubmission.DefaultCreatedAt holds the default value on creation for the created_at field.
+	assignmentsubmission.DefaultCreatedAt = assignmentsubmissionDescCreatedAt.Default.(func() time.Time)
+	// assignmentsubmissionDescUpdatedAt is the schema descriptor for updated_at field.
+	assignmentsubmissionDescUpdatedAt := assignmentsubmissionMixinFields0[1].Descriptor()
+	// assignmentsubmission.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	assignmentsubmission.DefaultUpdatedAt = assignmentsubmissionDescUpdatedAt.Default.(func() time.Time)
+	// assignmentsubmission.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	assignmentsubmission.UpdateDefaultUpdatedAt = assignmentsubmissionDescUpdatedAt.UpdateDefault.(func() time.Time)
 	attendanceMixin := schema.Attendance{}.Mixin()
 	attendanceMixinFields0 := attendanceMixin[0].Fields()
 	_ = attendanceMixinFields0
 	attendanceFields := schema.Attendance{}.Fields()
 	_ = attendanceFields
-	// attendanceDescCreateTime is the schema descriptor for create_time field.
-	attendanceDescCreateTime := attendanceMixinFields0[0].Descriptor()
-	// attendance.DefaultCreateTime holds the default value on creation for the create_time field.
-	attendance.DefaultCreateTime = attendanceDescCreateTime.Default.(func() time.Time)
-	// attendanceDescUpdateTime is the schema descriptor for update_time field.
-	attendanceDescUpdateTime := attendanceMixinFields0[1].Descriptor()
-	// attendance.DefaultUpdateTime holds the default value on creation for the update_time field.
-	attendance.DefaultUpdateTime = attendanceDescUpdateTime.Default.(func() time.Time)
-	// attendance.UpdateDefaultUpdateTime holds the default value on update for the update_time field.
-	attendance.UpdateDefaultUpdateTime = attendanceDescUpdateTime.UpdateDefault.(func() time.Time)
+	// attendanceDescCreatedAt is the schema descriptor for created_at field.
+	attendanceDescCreatedAt := attendanceMixinFields0[0].Descriptor()
+	// attendance.DefaultCreatedAt holds the default value on creation for the created_at field.
+	attendance.DefaultCreatedAt = attendanceDescCreatedAt.Default.(func() time.Time)
+	// attendanceDescUpdatedAt is the schema descriptor for updated_at field.
+	attendanceDescUpdatedAt := attendanceMixinFields0[1].Descriptor()
+	// attendance.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	attendance.DefaultUpdatedAt = attendanceDescUpdatedAt.Default.(func() time.Time)
+	// attendance.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	attendance.UpdateDefaultUpdatedAt = attendanceDescUpdatedAt.UpdateDefault.(func() time.Time)
 	classMixin := schema.Class{}.Mixin()
 	classMixinFields0 := classMixin[0].Fields()
 	_ = classMixinFields0
 	classFields := schema.Class{}.Fields()
 	_ = classFields
-	// classDescCreateTime is the schema descriptor for create_time field.
-	classDescCreateTime := classMixinFields0[0].Descriptor()
-	// class.DefaultCreateTime holds the default value on creation for the create_time field.
-	class.DefaultCreateTime = classDescCreateTime.Default.(func() time.Time)
-	// classDescUpdateTime is the schema descriptor for update_time field.
-	classDescUpdateTime := classMixinFields0[1].Descriptor()
-	// class.DefaultUpdateTime holds the default value on creation for the update_time field.
-	class.DefaultUpdateTime = classDescUpdateTime.Default.(func() time.Time)
-	// class.UpdateDefaultUpdateTime holds the default value on update for the update_time field.
-	class.UpdateDefaultUpdateTime = classDescUpdateTime.UpdateDefault.(func() time.Time)
+	// classDescCreatedAt is the schema descriptor for created_at field.
+	classDescCreatedAt := classMixinFields0[0].Descriptor()
+	// class.DefaultCreatedAt holds the default value on creation for the created_at field.
+	class.DefaultCreatedAt = classDescCreatedAt.Default.(func() time.Time)
+	// classDescUpdatedAt is the schema descriptor for updated_at field.
+	classDescUpdatedAt := classMixinFields0[1].Descriptor()
+	// class.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	class.DefaultUpdatedAt = classDescUpdatedAt.Default.(func() time.Time)
+	// class.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	class.UpdateDefaultUpdatedAt = classDescUpdatedAt.UpdateDefault.(func() time.Time)
 	// classDescName is the schema descriptor for name field.
 	classDescName := classFields[0].Descriptor()
 	// class.NameValidator is a validator for the "name" field. It is called by the builders before save.
@@ -101,16 +102,16 @@ func init() {
 	_ = gradeMixinFields0
 	gradeFields := schema.Grade{}.Fields()
 	_ = gradeFields
-	// gradeDescCreateTime is the schema descriptor for create_time field.
-	gradeDescCreateTime := gradeMixinFields0[0].Descriptor()
-	// grade.DefaultCreateTime holds the default value on creation for the create_time field.
-	grade.DefaultCreateTime = gradeDescCreateTime.Default.(func() time.Time)
-	// gradeDescUpdateTime is the schema descriptor for update_time field.
-	gradeDescUpdateTime := gradeMixinFields0[1].Descriptor()
-	// grade.DefaultUpdateTime holds the default value on creation for the update_time field.
-	grade.DefaultUpdateTime = gradeDescUpdateTime.Default.(func() time.Time)
-	// grade.UpdateDefaultUpdateTime holds the default value on update for the update_time field.
-	grade.UpdateDefaultUpdateTime = gradeDescUpdateTime.UpdateDefault.(func() time.Time)
+	// gradeDescCreatedAt is the schema descriptor for created_at field.
+	gradeDescCreatedAt := gradeMixinFields0[0].Descriptor()
+	// grade.DefaultCreatedAt holds the default value on creation for the created_at field.
+	grade.DefaultCreatedAt = gradeDescCreatedAt.Default.(func() time.Time)
+	// gradeDescUpdatedAt is the schema descriptor for updated_at field.
+	gradeDescUpdatedAt := gradeMixinFields0[1].Descriptor()
+	// grade.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	grade.DefaultUpdatedAt = gradeDescUpdatedAt.Default.(func() time.Time)
+	// grade.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	grade.UpdateDefaultUpdatedAt = gradeDescUpdatedAt.UpdateDefault.(func() time.Time)
 	// gradeDescExamGrade is the schema descriptor for exam_grade field.
 	gradeDescExamGrade := gradeFields[0].Descriptor()
 	// grade.ExamGradeValidator is a validator for the "exam_grade" field. It is called by the builders before save.
@@ -120,31 +121,31 @@ func init() {
 	_ = groupMixinFields0
 	groupFields := schema.Group{}.Fields()
 	_ = groupFields
-	// groupDescCreateTime is the schema descriptor for create_time field.
-	groupDescCreateTime := groupMixinFields0[0].Descriptor()
-	// group.DefaultCreateTime holds the default value on creation for the create_time field.
-	group.DefaultCreateTime = groupDescCreateTime.Default.(func() time.Time)
-	// groupDescUpdateTime is the schema descriptor for update_time field.
-	groupDescUpdateTime := groupMixinFields0[1].Descriptor()
-	// group.DefaultUpdateTime holds the default value on creation for the update_time field.
-	group.DefaultUpdateTime = groupDescUpdateTime.Default.(func() time.Time)
-	// group.UpdateDefaultUpdateTime holds the default value on update for the update_time field.
-	group.UpdateDefaultUpdateTime = groupDescUpdateTime.UpdateDefault.(func() time.Time)
+	// groupDescCreatedAt is the schema descriptor for created_at field.
+	groupDescCreatedAt := groupMixinFields0[0].Descriptor()
+	// group.DefaultCreatedAt holds the default value on creation for the created_at field.
+	group.DefaultCreatedAt = groupDescCreatedAt.Default.(func() time.Time)
+	// groupDescUpdatedAt is the schema descriptor for updated_at field.
+	groupDescUpdatedAt := groupMixinFields0[1].Descriptor()
+	// group.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	group.DefaultUpdatedAt = groupDescUpdatedAt.Default.(func() time.Time)
+	// group.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	group.UpdateDefaultUpdatedAt = groupDescUpdatedAt.UpdateDefault.(func() time.Time)
 	messageMixin := schema.Message{}.Mixin()
 	messageMixinFields0 := messageMixin[0].Fields()
 	_ = messageMixinFields0
 	messageFields := schema.Message{}.Fields()
 	_ = messageFields
-	// messageDescCreateTime is the schema descriptor for create_time field.
-	messageDescCreateTime := messageMixinFields0[0].Descriptor()
-	// message.DefaultCreateTime holds the default value on creation for the create_time field.
-	message.DefaultCreateTime = messageDescCreateTime.Default.(func() time.Time)
-	// messageDescUpdateTime is the schema descriptor for update_time field.
-	messageDescUpdateTime := messageMixinFields0[1].Descriptor()
-	// message.DefaultUpdateTime holds the default value on creation for the update_time field.
-	message.DefaultUpdateTime = messageDescUpdateTime.Default.(func() time.Time)
-	// message.UpdateDefaultUpdateTime holds the default value on update for the update_time field.
-	message.UpdateDefaultUpdateTime = messageDescUpdateTime.UpdateDefault.(func() time.Time)
+	// messageDescCreatedAt is the schema descriptor for created_at field.
+	messageDescCreatedAt := messageMixinFields0[0].Descriptor()
+	// message.DefaultCreatedAt holds the default value on creation for the created_at field.
+	message.DefaultCreatedAt = messageDescCreatedAt.Default.(func() time.Time)
+	// messageDescUpdatedAt is the schema descriptor for updated_at field.
+	messageDescUpdatedAt := messageMixinFields0[1].Descriptor()
+	// message.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	message.DefaultUpdatedAt = messageDescUpdatedAt.Default.(func() time.Time)
+	// message.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	message.UpdateDefaultUpdatedAt = messageDescUpdatedAt.UpdateDefault.(func() time.Time)
 	scheduleFields := schema.Schedule{}.Fields()
 	_ = scheduleFields
 	// scheduleDescWeekday is the schema descriptor for weekday field.
@@ -160,16 +161,16 @@ func init() {
 	_ = schoolMixinFields0
 	schoolFields := schema.School{}.Fields()
 	_ = schoolFields
-	// schoolDescCreateTime is the schema descriptor for create_time field.
-	schoolDescCreateTime := schoolMixinFields0[0].Descriptor()
-	// school.DefaultCreateTime holds the default value on creation for the create_time field.
-	school.DefaultCreateTime = schoolDescCreateTime.Default.(func() time.Time)
-	// schoolDescUpdateTime is the schema descriptor for update_time field.
-	schoolDescUpdateTime := schoolMixinFields0[1].Descriptor()
-	// school.DefaultUpdateTime holds the default value on creation for the update_time field.
-	school.DefaultUpdateTime = schoolDescUpdateTime.Default.(func() time.Time)
-	// school.UpdateDefaultUpdateTime holds the default value on update for the update_time field.
-	school.UpdateDefaultUpdateTime = schoolDescUpdateTime.UpdateDefault.(func() time.Time)
+	// schoolDescCreatedAt is the schema descriptor for created_at field.
+	schoolDescCreatedAt := schoolMixinFields0[0].Descriptor()
+	// school.DefaultCreatedAt holds the default value on creation for the created_at field.
+	school.DefaultCreatedAt = schoolDescCreatedAt.Default.(func() time.Time)
+	// schoolDescUpdatedAt is the schema descriptor for updated_at field.
+	schoolDescUpdatedAt := schoolMixinFields0[1].Descriptor()
+	// school.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	school.DefaultUpdatedAt = schoolDescUpdatedAt.Default.(func() time.Time)
+	// school.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	school.UpdateDefaultUpdatedAt = schoolDescUpdatedAt.UpdateDefault.(func() time.Time)
 	// schoolDescName is the schema descriptor for name field.
 	schoolDescName := schoolFields[0].Descriptor()
 	// school.NameValidator is a validator for the "name" field. It is called by the builders before save.
@@ -183,50 +184,62 @@ func init() {
 	_ = stageMixinFields0
 	stageFields := schema.Stage{}.Fields()
 	_ = stageFields
-	// stageDescCreateTime is the schema descriptor for create_time field.
-	stageDescCreateTime := stageMixinFields0[0].Descriptor()
-	// stage.DefaultCreateTime holds the default value on creation for the create_time field.
-	stage.DefaultCreateTime = stageDescCreateTime.Default.(func() time.Time)
-	// stageDescUpdateTime is the schema descriptor for update_time field.
-	stageDescUpdateTime := stageMixinFields0[1].Descriptor()
-	// stage.DefaultUpdateTime holds the default value on creation for the update_time field.
-	stage.DefaultUpdateTime = stageDescUpdateTime.Default.(func() time.Time)
-	// stage.UpdateDefaultUpdateTime holds the default value on update for the update_time field.
-	stage.UpdateDefaultUpdateTime = stageDescUpdateTime.UpdateDefault.(func() time.Time)
+	// stageDescCreatedAt is the schema descriptor for created_at field.
+	stageDescCreatedAt := stageMixinFields0[0].Descriptor()
+	// stage.DefaultCreatedAt holds the default value on creation for the created_at field.
+	stage.DefaultCreatedAt = stageDescCreatedAt.Default.(func() time.Time)
+	// stageDescUpdatedAt is the schema descriptor for updated_at field.
+	stageDescUpdatedAt := stageMixinFields0[1].Descriptor()
+	// stage.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	stage.DefaultUpdatedAt = stageDescUpdatedAt.Default.(func() time.Time)
+	// stage.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	stage.UpdateDefaultUpdatedAt = stageDescUpdatedAt.UpdateDefault.(func() time.Time)
 	// stageDescName is the schema descriptor for name field.
 	stageDescName := stageFields[0].Descriptor()
 	// stage.NameValidator is a validator for the "name" field. It is called by the builders before save.
 	stage.NameValidator = stageDescName.Validators[0].(func(string) error)
+	timemixinFields := schema.TimeMixin{}.Fields()
+	_ = timemixinFields
+	// timemixinDescCreatedAt is the schema descriptor for created_at field.
+	timemixinDescCreatedAt := timemixinFields[0].Descriptor()
+	// timemixin.DefaultCreatedAt holds the default value on creation for the created_at field.
+	timemixin.DefaultCreatedAt = timemixinDescCreatedAt.Default.(func() time.Time)
+	// timemixinDescUpdatedAt is the schema descriptor for updated_at field.
+	timemixinDescUpdatedAt := timemixinFields[1].Descriptor()
+	// timemixin.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	timemixin.DefaultUpdatedAt = timemixinDescUpdatedAt.Default.(func() time.Time)
+	// timemixin.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	timemixin.UpdateDefaultUpdatedAt = timemixinDescUpdatedAt.UpdateDefault.(func() time.Time)
 	tuitionpaymentMixin := schema.TuitionPayment{}.Mixin()
 	tuitionpaymentMixinFields0 := tuitionpaymentMixin[0].Fields()
 	_ = tuitionpaymentMixinFields0
 	tuitionpaymentFields := schema.TuitionPayment{}.Fields()
 	_ = tuitionpaymentFields
-	// tuitionpaymentDescCreateTime is the schema descriptor for create_time field.
-	tuitionpaymentDescCreateTime := tuitionpaymentMixinFields0[0].Descriptor()
-	// tuitionpayment.DefaultCreateTime holds the default value on creation for the create_time field.
-	tuitionpayment.DefaultCreateTime = tuitionpaymentDescCreateTime.Default.(func() time.Time)
-	// tuitionpaymentDescUpdateTime is the schema descriptor for update_time field.
-	tuitionpaymentDescUpdateTime := tuitionpaymentMixinFields0[1].Descriptor()
-	// tuitionpayment.DefaultUpdateTime holds the default value on creation for the update_time field.
-	tuitionpayment.DefaultUpdateTime = tuitionpaymentDescUpdateTime.Default.(func() time.Time)
-	// tuitionpayment.UpdateDefaultUpdateTime holds the default value on update for the update_time field.
-	tuitionpayment.UpdateDefaultUpdateTime = tuitionpaymentDescUpdateTime.UpdateDefault.(func() time.Time)
+	// tuitionpaymentDescCreatedAt is the schema descriptor for created_at field.
+	tuitionpaymentDescCreatedAt := tuitionpaymentMixinFields0[0].Descriptor()
+	// tuitionpayment.DefaultCreatedAt holds the default value on creation for the created_at field.
+	tuitionpayment.DefaultCreatedAt = tuitionpaymentDescCreatedAt.Default.(func() time.Time)
+	// tuitionpaymentDescUpdatedAt is the schema descriptor for updated_at field.
+	tuitionpaymentDescUpdatedAt := tuitionpaymentMixinFields0[1].Descriptor()
+	// tuitionpayment.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	tuitionpayment.DefaultUpdatedAt = tuitionpaymentDescUpdatedAt.Default.(func() time.Time)
+	// tuitionpayment.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	tuitionpayment.UpdateDefaultUpdatedAt = tuitionpaymentDescUpdatedAt.UpdateDefault.(func() time.Time)
 	userMixin := schema.User{}.Mixin()
 	userMixinFields0 := userMixin[0].Fields()
 	_ = userMixinFields0
 	userFields := schema.User{}.Fields()
 	_ = userFields
-	// userDescCreateTime is the schema descriptor for create_time field.
-	userDescCreateTime := userMixinFields0[0].Descriptor()
-	// user.DefaultCreateTime holds the default value on creation for the create_time field.
-	user.DefaultCreateTime = userDescCreateTime.Default.(func() time.Time)
-	// userDescUpdateTime is the schema descriptor for update_time field.
-	userDescUpdateTime := userMixinFields0[1].Descriptor()
-	// user.DefaultUpdateTime holds the default value on creation for the update_time field.
-	user.DefaultUpdateTime = userDescUpdateTime.Default.(func() time.Time)
-	// user.UpdateDefaultUpdateTime holds the default value on update for the update_time field.
-	user.UpdateDefaultUpdateTime = userDescUpdateTime.UpdateDefault.(func() time.Time)
+	// userDescCreatedAt is the schema descriptor for created_at field.
+	userDescCreatedAt := userMixinFields0[0].Descriptor()
+	// user.DefaultCreatedAt holds the default value on creation for the created_at field.
+	user.DefaultCreatedAt = userDescCreatedAt.Default.(func() time.Time)
+	// userDescUpdatedAt is the schema descriptor for updated_at field.
+	userDescUpdatedAt := userMixinFields0[1].Descriptor()
+	// user.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	user.DefaultUpdatedAt = userDescUpdatedAt.Default.(func() time.Time)
+	// user.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	user.UpdateDefaultUpdatedAt = userDescUpdatedAt.UpdateDefault.(func() time.Time)
 	// userDescName is the schema descriptor for name field.
 	userDescName := userFields[0].Descriptor()
 	// user.NameValidator is a validator for the "name" field. It is called by the builders before save.

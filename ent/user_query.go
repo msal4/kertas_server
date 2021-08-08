@@ -544,12 +544,12 @@ func (uq *UserQuery) WithGrades(opts ...func(*GradeQuery)) *UserQuery {
 // Example:
 //
 //	var v []struct {
-//		CreateTime time.Time `json:"create_time,omitempty"`
+//		CreatedAt time.Time `json:"created_at,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
 //	client.User.Query().
-//		GroupBy(user.FieldCreateTime).
+//		GroupBy(user.FieldCreatedAt).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
 //
@@ -571,11 +571,11 @@ func (uq *UserQuery) GroupBy(field string, fields ...string) *UserGroupBy {
 // Example:
 //
 //	var v []struct {
-//		CreateTime time.Time `json:"create_time,omitempty"`
+//		CreatedAt time.Time `json:"created_at,omitempty"`
 //	}
 //
 //	client.User.Query().
-//		Select(user.FieldCreateTime).
+//		Select(user.FieldCreatedAt).
 //		Scan(ctx, &v)
 //
 func (uq *UserQuery) Select(fields ...string) *UserSelect {

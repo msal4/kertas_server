@@ -18,10 +18,10 @@ type Grade struct {
 	config `json:"-"`
 	// ID of the ent.
 	ID int `json:"id,omitempty"`
-	// CreateTime holds the value of the "create_time" field.
-	CreateTime time.Time `json:"create_time,omitempty"`
-	// UpdateTime holds the value of the "update_time" field.
-	UpdateTime time.Time `json:"update_time,omitempty"`
+	// CreatedAt holds the value of the "created_at" field.
+	CreatedAt time.Time `json:"created_at,omitempty"`
+	// UpdatedAt holds the value of the "updated_at" field.
+	UpdatedAt time.Time `json:"updated_at,omitempty"`
 	// ExamGrade holds the value of the "exam_grade" field.
 	ExamGrade float64 `json:"exam_grade,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
@@ -79,7 +79,7 @@ func (*Grade) scanValues(columns []string) ([]interface{}, error) {
 			values[i] = new(sql.NullFloat64)
 		case grade.FieldID:
 			values[i] = new(sql.NullInt64)
-		case grade.FieldCreateTime, grade.FieldUpdateTime:
+		case grade.FieldCreatedAt, grade.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
 		case grade.ForeignKeys[0]: // assignment_grades
 			values[i] = new(sql.NullInt64)
@@ -106,17 +106,17 @@ func (gr *Grade) assignValues(columns []string, values []interface{}) error {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
 			gr.ID = int(value.Int64)
-		case grade.FieldCreateTime:
+		case grade.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
-				return fmt.Errorf("unexpected type %T for field create_time", values[i])
+				return fmt.Errorf("unexpected type %T for field created_at", values[i])
 			} else if value.Valid {
-				gr.CreateTime = value.Time
+				gr.CreatedAt = value.Time
 			}
-		case grade.FieldUpdateTime:
+		case grade.FieldUpdatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
-				return fmt.Errorf("unexpected type %T for field update_time", values[i])
+				return fmt.Errorf("unexpected type %T for field updated_at", values[i])
 			} else if value.Valid {
-				gr.UpdateTime = value.Time
+				gr.UpdatedAt = value.Time
 			}
 		case grade.FieldExamGrade:
 			if value, ok := values[i].(*sql.NullFloat64); !ok {
@@ -176,10 +176,10 @@ func (gr *Grade) String() string {
 	var builder strings.Builder
 	builder.WriteString("Grade(")
 	builder.WriteString(fmt.Sprintf("id=%v", gr.ID))
-	builder.WriteString(", create_time=")
-	builder.WriteString(gr.CreateTime.Format(time.ANSIC))
-	builder.WriteString(", update_time=")
-	builder.WriteString(gr.UpdateTime.Format(time.ANSIC))
+	builder.WriteString(", created_at=")
+	builder.WriteString(gr.CreatedAt.Format(time.ANSIC))
+	builder.WriteString(", updated_at=")
+	builder.WriteString(gr.UpdatedAt.Format(time.ANSIC))
 	builder.WriteString(", exam_grade=")
 	builder.WriteString(fmt.Sprintf("%v", gr.ExamGrade))
 	builder.WriteByte(')')

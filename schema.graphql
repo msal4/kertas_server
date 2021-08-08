@@ -1,0 +1,59 @@
+scalar Cursor
+scalar Time
+
+interface Node {
+  id: ID!
+}
+
+enum OrderDirection {
+    ASC
+    DESC
+}
+
+enum SchoolOrderField {
+    NAME
+    CREATED_AT
+    UPDATED_AT
+}
+
+input SchoolOrder {
+    field: SchoolOrderField
+    direction: OrderDirection!
+}
+
+type PageInfo {
+  hasNextPage: Boolean!
+  hasPreviousPage: Boolean!
+  startCursor: Cursor
+  endCursor: Cursor
+}
+
+enum Status {
+  DELETED
+  DISABLED
+  ACTIVE
+}
+
+type School implements Node {
+  id: ID!
+  status: Status!
+  name: String!
+  image: String
+  createdAt: Time!
+  updatedAt: Time!
+}
+
+type SchoolEdge {
+  node: School
+  cursor: Cursor!
+}
+
+type SchoolConnection {
+  totalCount: Int!
+  pageInfo: PageInfo!
+  edges: [SchoolEdge]
+}
+
+type Query {
+    schools(after: Cursor, first: Int, before: Cursor, last: Int, orderBy: SchoolOrder): SchoolConnection
+}

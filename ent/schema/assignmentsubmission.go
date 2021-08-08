@@ -5,7 +5,6 @@ import (
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
 	"entgo.io/ent/schema/index"
-	"entgo.io/ent/schema/mixin"
 )
 
 // AssignmentSubmission holds the schema definition for the AssignmentSubmission entity.
@@ -23,7 +22,7 @@ func (AssignmentSubmission) Fields() []ent.Field {
 
 func (AssignmentSubmission) Mixin() []ent.Mixin {
 	return []ent.Mixin{
-		mixin.Time{},
+		TimeMixin{},
 	}
 }
 

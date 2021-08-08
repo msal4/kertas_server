@@ -327,12 +327,12 @@ func (aq *AttendanceQuery) WithStudent(opts ...func(*UserQuery)) *AttendanceQuer
 // Example:
 //
 //	var v []struct {
-//		CreateTime time.Time `json:"create_time,omitempty"`
+//		CreatedAt time.Time `json:"created_at,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
 //	client.Attendance.Query().
-//		GroupBy(attendance.FieldCreateTime).
+//		GroupBy(attendance.FieldCreatedAt).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
 //
@@ -354,11 +354,11 @@ func (aq *AttendanceQuery) GroupBy(field string, fields ...string) *AttendanceGr
 // Example:
 //
 //	var v []struct {
-//		CreateTime time.Time `json:"create_time,omitempty"`
+//		CreatedAt time.Time `json:"created_at,omitempty"`
 //	}
 //
 //	client.Attendance.Query().
-//		Select(attendance.FieldCreateTime).
+//		Select(attendance.FieldCreatedAt).
 //		Scan(ctx, &v)
 //
 func (aq *AttendanceQuery) Select(fields ...string) *AttendanceSelect {

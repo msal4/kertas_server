@@ -29,30 +29,30 @@ type UserCreate struct {
 	hooks    []Hook
 }
 
-// SetCreateTime sets the "create_time" field.
-func (uc *UserCreate) SetCreateTime(t time.Time) *UserCreate {
-	uc.mutation.SetCreateTime(t)
+// SetCreatedAt sets the "created_at" field.
+func (uc *UserCreate) SetCreatedAt(t time.Time) *UserCreate {
+	uc.mutation.SetCreatedAt(t)
 	return uc
 }
 
-// SetNillableCreateTime sets the "create_time" field if the given value is not nil.
-func (uc *UserCreate) SetNillableCreateTime(t *time.Time) *UserCreate {
+// SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
+func (uc *UserCreate) SetNillableCreatedAt(t *time.Time) *UserCreate {
 	if t != nil {
-		uc.SetCreateTime(*t)
+		uc.SetCreatedAt(*t)
 	}
 	return uc
 }
 
-// SetUpdateTime sets the "update_time" field.
-func (uc *UserCreate) SetUpdateTime(t time.Time) *UserCreate {
-	uc.mutation.SetUpdateTime(t)
+// SetUpdatedAt sets the "updated_at" field.
+func (uc *UserCreate) SetUpdatedAt(t time.Time) *UserCreate {
+	uc.mutation.SetUpdatedAt(t)
 	return uc
 }
 
-// SetNillableUpdateTime sets the "update_time" field if the given value is not nil.
-func (uc *UserCreate) SetNillableUpdateTime(t *time.Time) *UserCreate {
+// SetNillableUpdatedAt sets the "updated_at" field if the given value is not nil.
+func (uc *UserCreate) SetNillableUpdatedAt(t *time.Time) *UserCreate {
 	if t != nil {
-		uc.SetUpdateTime(*t)
+		uc.SetUpdatedAt(*t)
 	}
 	return uc
 }
@@ -336,13 +336,13 @@ func (uc *UserCreate) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (uc *UserCreate) defaults() {
-	if _, ok := uc.mutation.CreateTime(); !ok {
-		v := user.DefaultCreateTime()
-		uc.mutation.SetCreateTime(v)
+	if _, ok := uc.mutation.CreatedAt(); !ok {
+		v := user.DefaultCreatedAt()
+		uc.mutation.SetCreatedAt(v)
 	}
-	if _, ok := uc.mutation.UpdateTime(); !ok {
-		v := user.DefaultUpdateTime()
-		uc.mutation.SetUpdateTime(v)
+	if _, ok := uc.mutation.UpdatedAt(); !ok {
+		v := user.DefaultUpdatedAt()
+		uc.mutation.SetUpdatedAt(v)
 	}
 	if _, ok := uc.mutation.TokenVersion(); !ok {
 		v := user.DefaultTokenVersion
@@ -360,11 +360,11 @@ func (uc *UserCreate) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (uc *UserCreate) check() error {
-	if _, ok := uc.mutation.CreateTime(); !ok {
-		return &ValidationError{Name: "create_time", err: errors.New(`ent: missing required field "create_time"`)}
+	if _, ok := uc.mutation.CreatedAt(); !ok {
+		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "created_at"`)}
 	}
-	if _, ok := uc.mutation.UpdateTime(); !ok {
-		return &ValidationError{Name: "update_time", err: errors.New(`ent: missing required field "update_time"`)}
+	if _, ok := uc.mutation.UpdatedAt(); !ok {
+		return &ValidationError{Name: "updated_at", err: errors.New(`ent: missing required field "updated_at"`)}
 	}
 	if _, ok := uc.mutation.Name(); !ok {
 		return &ValidationError{Name: "name", err: errors.New(`ent: missing required field "name"`)}
@@ -444,21 +444,21 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 			},
 		}
 	)
-	if value, ok := uc.mutation.CreateTime(); ok {
+	if value, ok := uc.mutation.CreatedAt(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
 			Type:   field.TypeTime,
 			Value:  value,
-			Column: user.FieldCreateTime,
+			Column: user.FieldCreatedAt,
 		})
-		_node.CreateTime = value
+		_node.CreatedAt = value
 	}
-	if value, ok := uc.mutation.UpdateTime(); ok {
+	if value, ok := uc.mutation.UpdatedAt(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
 			Type:   field.TypeTime,
 			Value:  value,
-			Column: user.FieldUpdateTime,
+			Column: user.FieldUpdatedAt,
 		})
-		_node.UpdateTime = value
+		_node.UpdatedAt = value
 	}
 	if value, ok := uc.mutation.Name(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{

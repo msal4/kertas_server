@@ -195,9 +195,9 @@ func (su *SchoolUpdate) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (su *SchoolUpdate) defaults() {
-	if _, ok := su.mutation.UpdateTime(); !ok {
-		v := school.UpdateDefaultUpdateTime()
-		su.mutation.SetUpdateTime(v)
+	if _, ok := su.mutation.UpdatedAt(); !ok {
+		v := school.UpdateDefaultUpdatedAt()
+		su.mutation.SetUpdatedAt(v)
 	}
 }
 
@@ -239,11 +239,11 @@ func (su *SchoolUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			}
 		}
 	}
-	if value, ok := su.mutation.UpdateTime(); ok {
+	if value, ok := su.mutation.UpdatedAt(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeTime,
 			Value:  value,
-			Column: school.FieldUpdateTime,
+			Column: school.FieldUpdatedAt,
 		})
 	}
 	if value, ok := su.mutation.Name(); ok {
@@ -567,9 +567,9 @@ func (suo *SchoolUpdateOne) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (suo *SchoolUpdateOne) defaults() {
-	if _, ok := suo.mutation.UpdateTime(); !ok {
-		v := school.UpdateDefaultUpdateTime()
-		suo.mutation.SetUpdateTime(v)
+	if _, ok := suo.mutation.UpdatedAt(); !ok {
+		v := school.UpdateDefaultUpdatedAt()
+		suo.mutation.SetUpdatedAt(v)
 	}
 }
 
@@ -628,11 +628,11 @@ func (suo *SchoolUpdateOne) sqlSave(ctx context.Context) (_node *School, err err
 			}
 		}
 	}
-	if value, ok := suo.mutation.UpdateTime(); ok {
+	if value, ok := suo.mutation.UpdatedAt(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeTime,
 			Value:  value,
-			Column: school.FieldUpdateTime,
+			Column: school.FieldUpdatedAt,
 		})
 	}
 	if value, ok := suo.mutation.Name(); ok {

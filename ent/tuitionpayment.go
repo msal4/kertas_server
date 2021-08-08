@@ -18,10 +18,10 @@ type TuitionPayment struct {
 	config `json:"-"`
 	// ID of the ent.
 	ID int `json:"id,omitempty"`
-	// CreateTime holds the value of the "create_time" field.
-	CreateTime time.Time `json:"create_time,omitempty"`
-	// UpdateTime holds the value of the "update_time" field.
-	UpdateTime time.Time `json:"update_time,omitempty"`
+	// CreatedAt holds the value of the "created_at" field.
+	CreatedAt time.Time `json:"created_at,omitempty"`
+	// UpdatedAt holds the value of the "updated_at" field.
+	UpdatedAt time.Time `json:"updated_at,omitempty"`
 	// PaidAmount holds the value of the "paid_amount" field.
 	PaidAmount int `json:"paid_amount,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
@@ -77,7 +77,7 @@ func (*TuitionPayment) scanValues(columns []string) ([]interface{}, error) {
 		switch columns[i] {
 		case tuitionpayment.FieldID, tuitionpayment.FieldPaidAmount:
 			values[i] = new(sql.NullInt64)
-		case tuitionpayment.FieldCreateTime, tuitionpayment.FieldUpdateTime:
+		case tuitionpayment.FieldCreatedAt, tuitionpayment.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
 		case tuitionpayment.ForeignKeys[0]: // stage_payments
 			values[i] = new(sql.NullInt64)
@@ -104,17 +104,17 @@ func (tp *TuitionPayment) assignValues(columns []string, values []interface{}) e
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
 			tp.ID = int(value.Int64)
-		case tuitionpayment.FieldCreateTime:
+		case tuitionpayment.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
-				return fmt.Errorf("unexpected type %T for field create_time", values[i])
+				return fmt.Errorf("unexpected type %T for field created_at", values[i])
 			} else if value.Valid {
-				tp.CreateTime = value.Time
+				tp.CreatedAt = value.Time
 			}
-		case tuitionpayment.FieldUpdateTime:
+		case tuitionpayment.FieldUpdatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
-				return fmt.Errorf("unexpected type %T for field update_time", values[i])
+				return fmt.Errorf("unexpected type %T for field updated_at", values[i])
 			} else if value.Valid {
-				tp.UpdateTime = value.Time
+				tp.UpdatedAt = value.Time
 			}
 		case tuitionpayment.FieldPaidAmount:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
@@ -174,10 +174,10 @@ func (tp *TuitionPayment) String() string {
 	var builder strings.Builder
 	builder.WriteString("TuitionPayment(")
 	builder.WriteString(fmt.Sprintf("id=%v", tp.ID))
-	builder.WriteString(", create_time=")
-	builder.WriteString(tp.CreateTime.Format(time.ANSIC))
-	builder.WriteString(", update_time=")
-	builder.WriteString(tp.UpdateTime.Format(time.ANSIC))
+	builder.WriteString(", created_at=")
+	builder.WriteString(tp.CreatedAt.Format(time.ANSIC))
+	builder.WriteString(", updated_at=")
+	builder.WriteString(tp.UpdatedAt.Format(time.ANSIC))
 	builder.WriteString(", paid_amount=")
 	builder.WriteString(fmt.Sprintf("%v", tp.PaidAmount))
 	builder.WriteByte(')')

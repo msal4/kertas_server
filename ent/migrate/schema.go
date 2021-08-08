@@ -11,8 +11,8 @@ var (
 	// AssignmentsColumns holds the columns for the "assignments" table.
 	AssignmentsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "create_time", Type: field.TypeTime},
-		{Name: "update_time", Type: field.TypeTime},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
 		{Name: "name", Type: field.TypeString},
 		{Name: "description", Type: field.TypeString, Nullable: true},
 		{Name: "is_exam", Type: field.TypeBool, Default: false},
@@ -38,8 +38,8 @@ var (
 	// AssignmentSubmissionsColumns holds the columns for the "assignment_submissions" table.
 	AssignmentSubmissionsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "create_time", Type: field.TypeTime},
-		{Name: "update_time", Type: field.TypeTime},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
 		{Name: "files", Type: field.TypeJSON},
 		{Name: "submitted_at", Type: field.TypeTime, Nullable: true},
 		{Name: "assignment_submissions", Type: field.TypeInt, Nullable: true},
@@ -80,8 +80,8 @@ var (
 	// AttendancesColumns holds the columns for the "attendances" table.
 	AttendancesColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "create_time", Type: field.TypeTime},
-		{Name: "update_time", Type: field.TypeTime},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
 		{Name: "date", Type: field.TypeTime, SchemaType: map[string]string{"postgres": "date"}},
 		{Name: "state", Type: field.TypeEnum, Enums: []string{"present", "absent", "excused_absence", "sick"}},
 		{Name: "class_attendances", Type: field.TypeInt, Nullable: true},
@@ -127,10 +127,10 @@ var (
 	// ClassesColumns holds the columns for the "classes" table.
 	ClassesColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "create_time", Type: field.TypeTime},
-		{Name: "update_time", Type: field.TypeTime},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
 		{Name: "name", Type: field.TypeString},
-		{Name: "status", Type: field.TypeEnum, Enums: []string{"deleted", "disabled", "active"}, Default: "active"},
+		{Name: "status", Type: field.TypeEnum, Enums: []string{"DELETED", "DISABLED", "ACTIVE"}, Default: "ACTIVE"},
 		{Name: "stage_classes", Type: field.TypeInt, Nullable: true},
 		{Name: "user_classes", Type: field.TypeInt, Nullable: true},
 	}
@@ -174,8 +174,8 @@ var (
 	// GradesColumns holds the columns for the "grades" table.
 	GradesColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "create_time", Type: field.TypeTime},
-		{Name: "update_time", Type: field.TypeTime},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
 		{Name: "exam_grade", Type: field.TypeFloat64},
 		{Name: "assignment_grades", Type: field.TypeInt, Nullable: true},
 		{Name: "user_grades", Type: field.TypeInt, Nullable: true},
@@ -210,11 +210,11 @@ var (
 	// GroupsColumns holds the columns for the "groups" table.
 	GroupsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "create_time", Type: field.TypeTime},
-		{Name: "update_time", Type: field.TypeTime},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
 		{Name: "name", Type: field.TypeString, Nullable: true},
 		{Name: "type", Type: field.TypeEnum, Enums: []string{"private", "shared"}, Default: "shared"},
-		{Name: "status", Type: field.TypeEnum, Enums: []string{"deleted", "disabled", "active"}, Default: "active"},
+		{Name: "status", Type: field.TypeEnum, Enums: []string{"DELETED", "DISABLED", "ACTIVE"}, Default: "ACTIVE"},
 		{Name: "class_group", Type: field.TypeInt, Unique: true, Nullable: true},
 	}
 	// GroupsTable holds the schema information for the "groups" table.
@@ -251,8 +251,8 @@ var (
 	// MessagesColumns holds the columns for the "messages" table.
 	MessagesColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "create_time", Type: field.TypeTime},
-		{Name: "update_time", Type: field.TypeTime},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
 		{Name: "content", Type: field.TypeString, Nullable: true},
 		{Name: "attachment", Type: field.TypeString, Nullable: true},
 		{Name: "deleted_at", Type: field.TypeTime, Nullable: true},
@@ -333,11 +333,11 @@ var (
 	// SchoolsColumns holds the columns for the "schools" table.
 	SchoolsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "create_time", Type: field.TypeTime},
-		{Name: "update_time", Type: field.TypeTime},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
 		{Name: "name", Type: field.TypeString},
 		{Name: "image", Type: field.TypeString},
-		{Name: "status", Type: field.TypeEnum, Enums: []string{"deleted", "disabled", "active"}, Default: "active"},
+		{Name: "status", Type: field.TypeEnum, Enums: []string{"DELETED", "DISABLED", "ACTIVE"}, Default: "ACTIVE"},
 	}
 	// SchoolsTable holds the schema information for the "schools" table.
 	SchoolsTable = &schema.Table{
@@ -355,11 +355,11 @@ var (
 	// StagesColumns holds the columns for the "stages" table.
 	StagesColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "create_time", Type: field.TypeTime},
-		{Name: "update_time", Type: field.TypeTime},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
 		{Name: "name", Type: field.TypeString},
 		{Name: "tuition_amount", Type: field.TypeInt},
-		{Name: "status", Type: field.TypeEnum, Enums: []string{"deleted", "disabled", "active"}, Default: "active"},
+		{Name: "status", Type: field.TypeEnum, Enums: []string{"DELETED", "DISABLED", "ACTIVE"}, Default: "ACTIVE"},
 		{Name: "school_stages", Type: field.TypeInt, Nullable: true},
 	}
 	// StagesTable holds the schema information for the "stages" table.
@@ -388,11 +388,23 @@ var (
 			},
 		},
 	}
+	// TimeMixinsColumns holds the columns for the "time_mixins" table.
+	TimeMixinsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
+	}
+	// TimeMixinsTable holds the schema information for the "time_mixins" table.
+	TimeMixinsTable = &schema.Table{
+		Name:       "time_mixins",
+		Columns:    TimeMixinsColumns,
+		PrimaryKey: []*schema.Column{TimeMixinsColumns[0]},
+	}
 	// TuitionPaymentsColumns holds the columns for the "tuition_payments" table.
 	TuitionPaymentsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "create_time", Type: field.TypeTime},
-		{Name: "update_time", Type: field.TypeTime},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
 		{Name: "paid_amount", Type: field.TypeInt},
 		{Name: "stage_payments", Type: field.TypeInt, Nullable: true},
 		{Name: "user_payments", Type: field.TypeInt, Nullable: true},
@@ -432,8 +444,8 @@ var (
 	// UsersColumns holds the columns for the "users" table.
 	UsersColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "create_time", Type: field.TypeTime},
-		{Name: "update_time", Type: field.TypeTime},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
 		{Name: "name", Type: field.TypeString},
 		{Name: "username", Type: field.TypeString, Unique: true},
 		{Name: "password", Type: field.TypeString},
@@ -441,7 +453,7 @@ var (
 		{Name: "image", Type: field.TypeString, Nullable: true},
 		{Name: "token_version", Type: field.TypeInt, Default: 0},
 		{Name: "role", Type: field.TypeEnum, Enums: []string{"super_admin", "school_admin", "teacher", "student"}, Default: "student"},
-		{Name: "status", Type: field.TypeEnum, Enums: []string{"deleted", "disabled", "active"}, Default: "active"},
+		{Name: "status", Type: field.TypeEnum, Enums: []string{"DELETED", "DISABLED", "ACTIVE"}, Default: "ACTIVE"},
 		{Name: "school_users", Type: field.TypeInt, Nullable: true},
 		{Name: "stage_students", Type: field.TypeInt, Nullable: true},
 	}
@@ -499,6 +511,7 @@ var (
 		SchedulesTable,
 		SchoolsTable,
 		StagesTable,
+		TimeMixinsTable,
 		TuitionPaymentsTable,
 		UsersTable,
 	}

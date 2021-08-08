@@ -23,30 +23,30 @@ type AssignmentCreate struct {
 	hooks    []Hook
 }
 
-// SetCreateTime sets the "create_time" field.
-func (ac *AssignmentCreate) SetCreateTime(t time.Time) *AssignmentCreate {
-	ac.mutation.SetCreateTime(t)
+// SetCreatedAt sets the "created_at" field.
+func (ac *AssignmentCreate) SetCreatedAt(t time.Time) *AssignmentCreate {
+	ac.mutation.SetCreatedAt(t)
 	return ac
 }
 
-// SetNillableCreateTime sets the "create_time" field if the given value is not nil.
-func (ac *AssignmentCreate) SetNillableCreateTime(t *time.Time) *AssignmentCreate {
+// SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
+func (ac *AssignmentCreate) SetNillableCreatedAt(t *time.Time) *AssignmentCreate {
 	if t != nil {
-		ac.SetCreateTime(*t)
+		ac.SetCreatedAt(*t)
 	}
 	return ac
 }
 
-// SetUpdateTime sets the "update_time" field.
-func (ac *AssignmentCreate) SetUpdateTime(t time.Time) *AssignmentCreate {
-	ac.mutation.SetUpdateTime(t)
+// SetUpdatedAt sets the "updated_at" field.
+func (ac *AssignmentCreate) SetUpdatedAt(t time.Time) *AssignmentCreate {
+	ac.mutation.SetUpdatedAt(t)
 	return ac
 }
 
-// SetNillableUpdateTime sets the "update_time" field if the given value is not nil.
-func (ac *AssignmentCreate) SetNillableUpdateTime(t *time.Time) *AssignmentCreate {
+// SetNillableUpdatedAt sets the "updated_at" field if the given value is not nil.
+func (ac *AssignmentCreate) SetNillableUpdatedAt(t *time.Time) *AssignmentCreate {
 	if t != nil {
-		ac.SetUpdateTime(*t)
+		ac.SetUpdatedAt(*t)
 	}
 	return ac
 }
@@ -231,13 +231,13 @@ func (ac *AssignmentCreate) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (ac *AssignmentCreate) defaults() {
-	if _, ok := ac.mutation.CreateTime(); !ok {
-		v := assignment.DefaultCreateTime()
-		ac.mutation.SetCreateTime(v)
+	if _, ok := ac.mutation.CreatedAt(); !ok {
+		v := assignment.DefaultCreatedAt()
+		ac.mutation.SetCreatedAt(v)
 	}
-	if _, ok := ac.mutation.UpdateTime(); !ok {
-		v := assignment.DefaultUpdateTime()
-		ac.mutation.SetUpdateTime(v)
+	if _, ok := ac.mutation.UpdatedAt(); !ok {
+		v := assignment.DefaultUpdatedAt()
+		ac.mutation.SetUpdatedAt(v)
 	}
 	if _, ok := ac.mutation.IsExam(); !ok {
 		v := assignment.DefaultIsExam
@@ -247,11 +247,11 @@ func (ac *AssignmentCreate) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (ac *AssignmentCreate) check() error {
-	if _, ok := ac.mutation.CreateTime(); !ok {
-		return &ValidationError{Name: "create_time", err: errors.New(`ent: missing required field "create_time"`)}
+	if _, ok := ac.mutation.CreatedAt(); !ok {
+		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "created_at"`)}
 	}
-	if _, ok := ac.mutation.UpdateTime(); !ok {
-		return &ValidationError{Name: "update_time", err: errors.New(`ent: missing required field "update_time"`)}
+	if _, ok := ac.mutation.UpdatedAt(); !ok {
+		return &ValidationError{Name: "updated_at", err: errors.New(`ent: missing required field "updated_at"`)}
 	}
 	if _, ok := ac.mutation.Name(); !ok {
 		return &ValidationError{Name: "name", err: errors.New(`ent: missing required field "name"`)}
@@ -297,21 +297,21 @@ func (ac *AssignmentCreate) createSpec() (*Assignment, *sqlgraph.CreateSpec) {
 			},
 		}
 	)
-	if value, ok := ac.mutation.CreateTime(); ok {
+	if value, ok := ac.mutation.CreatedAt(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
 			Type:   field.TypeTime,
 			Value:  value,
-			Column: assignment.FieldCreateTime,
+			Column: assignment.FieldCreatedAt,
 		})
-		_node.CreateTime = value
+		_node.CreatedAt = value
 	}
-	if value, ok := ac.mutation.UpdateTime(); ok {
+	if value, ok := ac.mutation.UpdatedAt(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
 			Type:   field.TypeTime,
 			Value:  value,
-			Column: assignment.FieldUpdateTime,
+			Column: assignment.FieldUpdatedAt,
 		})
-		_node.UpdateTime = value
+		_node.UpdatedAt = value
 	}
 	if value, ok := ac.mutation.Name(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{

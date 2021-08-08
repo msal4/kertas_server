@@ -462,9 +462,9 @@ func (uu *UserUpdate) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (uu *UserUpdate) defaults() {
-	if _, ok := uu.mutation.UpdateTime(); !ok {
-		v := user.UpdateDefaultUpdateTime()
-		uu.mutation.SetUpdateTime(v)
+	if _, ok := uu.mutation.UpdatedAt(); !ok {
+		v := user.UpdateDefaultUpdatedAt()
+		uu.mutation.SetUpdatedAt(v)
 	}
 }
 
@@ -521,11 +521,11 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			}
 		}
 	}
-	if value, ok := uu.mutation.UpdateTime(); ok {
+	if value, ok := uu.mutation.UpdatedAt(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeTime,
 			Value:  value,
-			Column: user.FieldUpdateTime,
+			Column: user.FieldUpdatedAt,
 		})
 	}
 	if value, ok := uu.mutation.Name(); ok {
@@ -1444,9 +1444,9 @@ func (uuo *UserUpdateOne) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (uuo *UserUpdateOne) defaults() {
-	if _, ok := uuo.mutation.UpdateTime(); !ok {
-		v := user.UpdateDefaultUpdateTime()
-		uuo.mutation.SetUpdateTime(v)
+	if _, ok := uuo.mutation.UpdatedAt(); !ok {
+		v := user.UpdateDefaultUpdatedAt()
+		uuo.mutation.SetUpdatedAt(v)
 	}
 }
 
@@ -1520,11 +1520,11 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 			}
 		}
 	}
-	if value, ok := uuo.mutation.UpdateTime(); ok {
+	if value, ok := uuo.mutation.UpdatedAt(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeTime,
 			Value:  value,
-			Column: user.FieldUpdateTime,
+			Column: user.FieldUpdatedAt,
 		})
 	}
 	if value, ok := uuo.mutation.Name(); ok {

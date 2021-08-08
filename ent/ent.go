@@ -18,6 +18,7 @@ import (
 	"github.com/msal4/hassah_school_server/ent/schedule"
 	"github.com/msal4/hassah_school_server/ent/school"
 	"github.com/msal4/hassah_school_server/ent/stage"
+	"github.com/msal4/hassah_school_server/ent/timemixin"
 	"github.com/msal4/hassah_school_server/ent/tuitionpayment"
 	"github.com/msal4/hassah_school_server/ent/user"
 )
@@ -50,6 +51,7 @@ func columnChecker(table string) func(string) error {
 		schedule.Table:             schedule.ValidColumn,
 		school.Table:               school.ValidColumn,
 		stage.Table:                stage.ValidColumn,
+		timemixin.Table:            timemixin.ValidColumn,
 		tuitionpayment.Table:       tuitionpayment.ValidColumn,
 		user.Table:                 user.ValidColumn,
 	}

@@ -4,8 +4,11 @@ package group
 
 import (
 	"fmt"
+	"io"
+	"strconv"
 	"time"
 
+	"github.com/99designs/gqlgen/graphql"
 	"github.com/msal4/hassah_school_server/ent/schema"
 )
 
@@ -14,10 +17,10 @@ const (
 	Label = "group"
 	// FieldID holds the string denoting the id field in the database.
 	FieldID = "id"
-	// FieldCreateTime holds the string denoting the create_time field in the database.
-	FieldCreateTime = "create_time"
-	// FieldUpdateTime holds the string denoting the update_time field in the database.
-	FieldUpdateTime = "update_time"
+	// FieldCreatedAt holds the string denoting the created_at field in the database.
+	FieldCreatedAt = "created_at"
+	// FieldUpdatedAt holds the string denoting the updated_at field in the database.
+	FieldUpdatedAt = "updated_at"
 	// FieldName holds the string denoting the name field in the database.
 	FieldName = "name"
 	// FieldType holds the string denoting the type field in the database.
@@ -49,8 +52,8 @@ const (
 // Columns holds all SQL columns for group fields.
 var Columns = []string{
 	FieldID,
-	FieldCreateTime,
-	FieldUpdateTime,
+	FieldCreatedAt,
+	FieldUpdatedAt,
 	FieldName,
 	FieldType,
 	FieldStatus,
@@ -78,12 +81,12 @@ func ValidColumn(column string) bool {
 }
 
 var (
-	// DefaultCreateTime holds the default value on creation for the "create_time" field.
-	DefaultCreateTime func() time.Time
-	// DefaultUpdateTime holds the default value on creation for the "update_time" field.
-	DefaultUpdateTime func() time.Time
-	// UpdateDefaultUpdateTime holds the default value on update for the "update_time" field.
-	UpdateDefaultUpdateTime func() time.Time
+	// DefaultCreatedAt holds the default value on creation for the "created_at" field.
+	DefaultCreatedAt func() time.Time
+	// DefaultUpdatedAt holds the default value on creation for the "updated_at" field.
+	DefaultUpdatedAt func() time.Time
+	// UpdateDefaultUpdatedAt holds the default value on update for the "updated_at" field.
+	UpdateDefaultUpdatedAt func() time.Time
 )
 
 // Type defines the type for the "type" enum field.
@@ -112,14 +115,39 @@ func TypeValidator(_type Type) error {
 	}
 }
 
-const DefaultStatus schema.Status = "active"
+const DefaultStatus schema.Status = "ACTIVE"
 
 // StatusValidator is a validator for the "status" field enum values. It is called by the builders before save.
 func StatusValidator(s schema.Status) error {
 	switch s {
-	case "deleted", "disabled", "active":
+	case "DELETED", "DISABLED", "ACTIVE":
 		return nil
 	default:
 		return fmt.Errorf("group: invalid enum value for status field: %q", s)
 	}
 }
+
+// MarshalGQL implements graphql.Marshaler interface.
+func (_type Type) MarshalGQL(w io.Writer) {
+	io.WriteString(w, strconv.Quote(_type.String()))
+}
+
+// UnmarshalGQL implements graphql.Unmarshaler interface.
+func (_type *Type) UnmarshalGQL(val interface{}) error {
+	str, ok := val.(string)
+	if !ok {
+		return fmt.Errorf("enum %T must be a string", val)
+	}
+	*_type = Type(str)
+	if err := TypeValidator(*_type); err != nil {
+		return fmt.Errorf("%s is not a valid Type", str)
+	}
+	return nil
+}
+
+var (
+	// schema.Status must implement graphql.Marshaler.
+	_ graphql.Marshaler = schema.Status("")
+	// schema.Status must implement graphql.Unmarshaler.
+	_ graphql.Unmarshaler = (*schema.Status)(nil)
+)

@@ -6,7 +6,6 @@ import (
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
 	"entgo.io/ent/schema/index"
-	"entgo.io/ent/schema/mixin"
 )
 
 // Stage holds the schema definition for the Stage entity.
@@ -25,7 +24,7 @@ func (Stage) Fields() []ent.Field {
 
 func (Stage) Mixin() []ent.Mixin {
 	return []ent.Mixin{
-		mixin.Time{},
+		TimeMixin{},
 	}
 }
 

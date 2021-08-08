@@ -5,7 +5,6 @@ import (
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
 	"entgo.io/ent/schema/index"
-	"entgo.io/ent/schema/mixin"
 )
 
 // TuitionPayment holds the schema definition for the TuitionPayment entity.
@@ -22,7 +21,7 @@ func (TuitionPayment) Fields() []ent.Field {
 
 func (TuitionPayment) Mixin() []ent.Mixin {
 	return []ent.Mixin{
-		mixin.Time{},
+		TimeMixin{},
 	}
 }
 

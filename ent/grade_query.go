@@ -327,12 +327,12 @@ func (gq *GradeQuery) WithExam(opts ...func(*AssignmentQuery)) *GradeQuery {
 // Example:
 //
 //	var v []struct {
-//		CreateTime time.Time `json:"create_time,omitempty"`
+//		CreatedAt time.Time `json:"created_at,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
 //	client.Grade.Query().
-//		GroupBy(grade.FieldCreateTime).
+//		GroupBy(grade.FieldCreatedAt).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
 //
@@ -354,11 +354,11 @@ func (gq *GradeQuery) GroupBy(field string, fields ...string) *GradeGroupBy {
 // Example:
 //
 //	var v []struct {
-//		CreateTime time.Time `json:"create_time,omitempty"`
+//		CreatedAt time.Time `json:"created_at,omitempty"`
 //	}
 //
 //	client.Grade.Query().
-//		Select(grade.FieldCreateTime).
+//		Select(grade.FieldCreatedAt).
 //		Scan(ctx, &v)
 //
 func (gq *GradeQuery) Select(fields ...string) *GradeSelect {

@@ -1,0 +1,20 @@
+schema:
+  - schema.graphql 
+
+resolver:
+  layout: follow-schema
+  dir: ./graph
+
+autobind:
+  - github.com/msal4/hassah_school_server/ent
+
+models:
+  ID:
+    model:
+      - github.com/99designs/gqlgen/graphql.IntID
+  Node:
+    model:
+      - github.com/msal4/hassah_school_server/ent.Noder
+  Status:
+    model:
+      - github.com/msal4/hassah_school_server/ent/schema.Status

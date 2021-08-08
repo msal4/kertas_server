@@ -23,30 +23,30 @@ type GroupCreate struct {
 	hooks    []Hook
 }
 
-// SetCreateTime sets the "create_time" field.
-func (gc *GroupCreate) SetCreateTime(t time.Time) *GroupCreate {
-	gc.mutation.SetCreateTime(t)
+// SetCreatedAt sets the "created_at" field.
+func (gc *GroupCreate) SetCreatedAt(t time.Time) *GroupCreate {
+	gc.mutation.SetCreatedAt(t)
 	return gc
 }
 
-// SetNillableCreateTime sets the "create_time" field if the given value is not nil.
-func (gc *GroupCreate) SetNillableCreateTime(t *time.Time) *GroupCreate {
+// SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
+func (gc *GroupCreate) SetNillableCreatedAt(t *time.Time) *GroupCreate {
 	if t != nil {
-		gc.SetCreateTime(*t)
+		gc.SetCreatedAt(*t)
 	}
 	return gc
 }
 
-// SetUpdateTime sets the "update_time" field.
-func (gc *GroupCreate) SetUpdateTime(t time.Time) *GroupCreate {
-	gc.mutation.SetUpdateTime(t)
+// SetUpdatedAt sets the "updated_at" field.
+func (gc *GroupCreate) SetUpdatedAt(t time.Time) *GroupCreate {
+	gc.mutation.SetUpdatedAt(t)
 	return gc
 }
 
-// SetNillableUpdateTime sets the "update_time" field if the given value is not nil.
-func (gc *GroupCreate) SetNillableUpdateTime(t *time.Time) *GroupCreate {
+// SetNillableUpdatedAt sets the "updated_at" field if the given value is not nil.
+func (gc *GroupCreate) SetNillableUpdatedAt(t *time.Time) *GroupCreate {
 	if t != nil {
-		gc.SetUpdateTime(*t)
+		gc.SetUpdatedAt(*t)
 	}
 	return gc
 }
@@ -198,13 +198,13 @@ func (gc *GroupCreate) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (gc *GroupCreate) defaults() {
-	if _, ok := gc.mutation.CreateTime(); !ok {
-		v := group.DefaultCreateTime()
-		gc.mutation.SetCreateTime(v)
+	if _, ok := gc.mutation.CreatedAt(); !ok {
+		v := group.DefaultCreatedAt()
+		gc.mutation.SetCreatedAt(v)
 	}
-	if _, ok := gc.mutation.UpdateTime(); !ok {
-		v := group.DefaultUpdateTime()
-		gc.mutation.SetUpdateTime(v)
+	if _, ok := gc.mutation.UpdatedAt(); !ok {
+		v := group.DefaultUpdatedAt()
+		gc.mutation.SetUpdatedAt(v)
 	}
 	if _, ok := gc.mutation.GetType(); !ok {
 		v := group.DefaultType
@@ -218,11 +218,11 @@ func (gc *GroupCreate) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (gc *GroupCreate) check() error {
-	if _, ok := gc.mutation.CreateTime(); !ok {
-		return &ValidationError{Name: "create_time", err: errors.New(`ent: missing required field "create_time"`)}
+	if _, ok := gc.mutation.CreatedAt(); !ok {
+		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "created_at"`)}
 	}
-	if _, ok := gc.mutation.UpdateTime(); !ok {
-		return &ValidationError{Name: "update_time", err: errors.New(`ent: missing required field "update_time"`)}
+	if _, ok := gc.mutation.UpdatedAt(); !ok {
+		return &ValidationError{Name: "updated_at", err: errors.New(`ent: missing required field "updated_at"`)}
 	}
 	if _, ok := gc.mutation.GetType(); !ok {
 		return &ValidationError{Name: "type", err: errors.New(`ent: missing required field "type"`)}
@@ -267,21 +267,21 @@ func (gc *GroupCreate) createSpec() (*Group, *sqlgraph.CreateSpec) {
 			},
 		}
 	)
-	if value, ok := gc.mutation.CreateTime(); ok {
+	if value, ok := gc.mutation.CreatedAt(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
 			Type:   field.TypeTime,
 			Value:  value,
-			Column: group.FieldCreateTime,
+			Column: group.FieldCreatedAt,
 		})
-		_node.CreateTime = value
+		_node.CreatedAt = value
 	}
-	if value, ok := gc.mutation.UpdateTime(); ok {
+	if value, ok := gc.mutation.UpdatedAt(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
 			Type:   field.TypeTime,
 			Value:  value,
-			Column: group.FieldUpdateTime,
+			Column: group.FieldUpdatedAt,
 		})
-		_node.UpdateTime = value
+		_node.UpdatedAt = value
 	}
 	if value, ok := gc.mutation.Name(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{

@@ -327,12 +327,12 @@ func (mq *MessageQuery) WithOwner(opts ...func(*UserQuery)) *MessageQuery {
 // Example:
 //
 //	var v []struct {
-//		CreateTime time.Time `json:"create_time,omitempty"`
+//		CreatedAt time.Time `json:"created_at,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
 //	client.Message.Query().
-//		GroupBy(message.FieldCreateTime).
+//		GroupBy(message.FieldCreatedAt).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
 //
@@ -354,11 +354,11 @@ func (mq *MessageQuery) GroupBy(field string, fields ...string) *MessageGroupBy 
 // Example:
 //
 //	var v []struct {
-//		CreateTime time.Time `json:"create_time,omitempty"`
+//		CreatedAt time.Time `json:"created_at,omitempty"`
 //	}
 //
 //	client.Message.Query().
-//		Select(message.FieldCreateTime).
+//		Select(message.FieldCreatedAt).
 //		Scan(ctx, &v)
 //
 func (mq *MessageQuery) Select(fields ...string) *MessageSelect {

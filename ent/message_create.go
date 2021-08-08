@@ -22,30 +22,30 @@ type MessageCreate struct {
 	hooks    []Hook
 }
 
-// SetCreateTime sets the "create_time" field.
-func (mc *MessageCreate) SetCreateTime(t time.Time) *MessageCreate {
-	mc.mutation.SetCreateTime(t)
+// SetCreatedAt sets the "created_at" field.
+func (mc *MessageCreate) SetCreatedAt(t time.Time) *MessageCreate {
+	mc.mutation.SetCreatedAt(t)
 	return mc
 }
 
-// SetNillableCreateTime sets the "create_time" field if the given value is not nil.
-func (mc *MessageCreate) SetNillableCreateTime(t *time.Time) *MessageCreate {
+// SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
+func (mc *MessageCreate) SetNillableCreatedAt(t *time.Time) *MessageCreate {
 	if t != nil {
-		mc.SetCreateTime(*t)
+		mc.SetCreatedAt(*t)
 	}
 	return mc
 }
 
-// SetUpdateTime sets the "update_time" field.
-func (mc *MessageCreate) SetUpdateTime(t time.Time) *MessageCreate {
-	mc.mutation.SetUpdateTime(t)
+// SetUpdatedAt sets the "updated_at" field.
+func (mc *MessageCreate) SetUpdatedAt(t time.Time) *MessageCreate {
+	mc.mutation.SetUpdatedAt(t)
 	return mc
 }
 
-// SetNillableUpdateTime sets the "update_time" field if the given value is not nil.
-func (mc *MessageCreate) SetNillableUpdateTime(t *time.Time) *MessageCreate {
+// SetNillableUpdatedAt sets the "updated_at" field if the given value is not nil.
+func (mc *MessageCreate) SetNillableUpdatedAt(t *time.Time) *MessageCreate {
 	if t != nil {
-		mc.SetUpdateTime(*t)
+		mc.SetUpdatedAt(*t)
 	}
 	return mc
 }
@@ -185,23 +185,23 @@ func (mc *MessageCreate) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (mc *MessageCreate) defaults() {
-	if _, ok := mc.mutation.CreateTime(); !ok {
-		v := message.DefaultCreateTime()
-		mc.mutation.SetCreateTime(v)
+	if _, ok := mc.mutation.CreatedAt(); !ok {
+		v := message.DefaultCreatedAt()
+		mc.mutation.SetCreatedAt(v)
 	}
-	if _, ok := mc.mutation.UpdateTime(); !ok {
-		v := message.DefaultUpdateTime()
-		mc.mutation.SetUpdateTime(v)
+	if _, ok := mc.mutation.UpdatedAt(); !ok {
+		v := message.DefaultUpdatedAt()
+		mc.mutation.SetUpdatedAt(v)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
 func (mc *MessageCreate) check() error {
-	if _, ok := mc.mutation.CreateTime(); !ok {
-		return &ValidationError{Name: "create_time", err: errors.New(`ent: missing required field "create_time"`)}
+	if _, ok := mc.mutation.CreatedAt(); !ok {
+		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "created_at"`)}
 	}
-	if _, ok := mc.mutation.UpdateTime(); !ok {
-		return &ValidationError{Name: "update_time", err: errors.New(`ent: missing required field "update_time"`)}
+	if _, ok := mc.mutation.UpdatedAt(); !ok {
+		return &ValidationError{Name: "updated_at", err: errors.New(`ent: missing required field "updated_at"`)}
 	}
 	if _, ok := mc.mutation.GroupID(); !ok {
 		return &ValidationError{Name: "group", err: errors.New("ent: missing required edge \"group\"")}
@@ -236,21 +236,21 @@ func (mc *MessageCreate) createSpec() (*Message, *sqlgraph.CreateSpec) {
 			},
 		}
 	)
-	if value, ok := mc.mutation.CreateTime(); ok {
+	if value, ok := mc.mutation.CreatedAt(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
 			Type:   field.TypeTime,
 			Value:  value,
-			Column: message.FieldCreateTime,
+			Column: message.FieldCreatedAt,
 		})
-		_node.CreateTime = value
+		_node.CreatedAt = value
 	}
-	if value, ok := mc.mutation.UpdateTime(); ok {
+	if value, ok := mc.mutation.UpdatedAt(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
 			Type:   field.TypeTime,
 			Value:  value,
-			Column: message.FieldUpdateTime,
+			Column: message.FieldUpdatedAt,
 		})
-		_node.UpdateTime = value
+		_node.UpdatedAt = value
 	}
 	if value, ok := mc.mutation.Content(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{

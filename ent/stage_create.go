@@ -25,30 +25,30 @@ type StageCreate struct {
 	hooks    []Hook
 }
 
-// SetCreateTime sets the "create_time" field.
-func (sc *StageCreate) SetCreateTime(t time.Time) *StageCreate {
-	sc.mutation.SetCreateTime(t)
+// SetCreatedAt sets the "created_at" field.
+func (sc *StageCreate) SetCreatedAt(t time.Time) *StageCreate {
+	sc.mutation.SetCreatedAt(t)
 	return sc
 }
 
-// SetNillableCreateTime sets the "create_time" field if the given value is not nil.
-func (sc *StageCreate) SetNillableCreateTime(t *time.Time) *StageCreate {
+// SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
+func (sc *StageCreate) SetNillableCreatedAt(t *time.Time) *StageCreate {
 	if t != nil {
-		sc.SetCreateTime(*t)
+		sc.SetCreatedAt(*t)
 	}
 	return sc
 }
 
-// SetUpdateTime sets the "update_time" field.
-func (sc *StageCreate) SetUpdateTime(t time.Time) *StageCreate {
-	sc.mutation.SetUpdateTime(t)
+// SetUpdatedAt sets the "updated_at" field.
+func (sc *StageCreate) SetUpdatedAt(t time.Time) *StageCreate {
+	sc.mutation.SetUpdatedAt(t)
 	return sc
 }
 
-// SetNillableUpdateTime sets the "update_time" field if the given value is not nil.
-func (sc *StageCreate) SetNillableUpdateTime(t *time.Time) *StageCreate {
+// SetNillableUpdatedAt sets the "updated_at" field if the given value is not nil.
+func (sc *StageCreate) SetNillableUpdatedAt(t *time.Time) *StageCreate {
 	if t != nil {
-		sc.SetUpdateTime(*t)
+		sc.SetUpdatedAt(*t)
 	}
 	return sc
 }
@@ -214,13 +214,13 @@ func (sc *StageCreate) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (sc *StageCreate) defaults() {
-	if _, ok := sc.mutation.CreateTime(); !ok {
-		v := stage.DefaultCreateTime()
-		sc.mutation.SetCreateTime(v)
+	if _, ok := sc.mutation.CreatedAt(); !ok {
+		v := stage.DefaultCreatedAt()
+		sc.mutation.SetCreatedAt(v)
 	}
-	if _, ok := sc.mutation.UpdateTime(); !ok {
-		v := stage.DefaultUpdateTime()
-		sc.mutation.SetUpdateTime(v)
+	if _, ok := sc.mutation.UpdatedAt(); !ok {
+		v := stage.DefaultUpdatedAt()
+		sc.mutation.SetUpdatedAt(v)
 	}
 	if _, ok := sc.mutation.Status(); !ok {
 		v := stage.DefaultStatus
@@ -230,11 +230,11 @@ func (sc *StageCreate) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (sc *StageCreate) check() error {
-	if _, ok := sc.mutation.CreateTime(); !ok {
-		return &ValidationError{Name: "create_time", err: errors.New(`ent: missing required field "create_time"`)}
+	if _, ok := sc.mutation.CreatedAt(); !ok {
+		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "created_at"`)}
 	}
-	if _, ok := sc.mutation.UpdateTime(); !ok {
-		return &ValidationError{Name: "update_time", err: errors.New(`ent: missing required field "update_time"`)}
+	if _, ok := sc.mutation.UpdatedAt(); !ok {
+		return &ValidationError{Name: "updated_at", err: errors.New(`ent: missing required field "updated_at"`)}
 	}
 	if _, ok := sc.mutation.Name(); !ok {
 		return &ValidationError{Name: "name", err: errors.New(`ent: missing required field "name"`)}
@@ -282,21 +282,21 @@ func (sc *StageCreate) createSpec() (*Stage, *sqlgraph.CreateSpec) {
 			},
 		}
 	)
-	if value, ok := sc.mutation.CreateTime(); ok {
+	if value, ok := sc.mutation.CreatedAt(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
 			Type:   field.TypeTime,
 			Value:  value,
-			Column: stage.FieldCreateTime,
+			Column: stage.FieldCreatedAt,
 		})
-		_node.CreateTime = value
+		_node.CreatedAt = value
 	}
-	if value, ok := sc.mutation.UpdateTime(); ok {
+	if value, ok := sc.mutation.UpdatedAt(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
 			Type:   field.TypeTime,
 			Value:  value,
-			Column: stage.FieldUpdateTime,
+			Column: stage.FieldUpdatedAt,
 		})
-		_node.UpdateTime = value
+		_node.UpdatedAt = value
 	}
 	if value, ok := sc.mutation.Name(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{

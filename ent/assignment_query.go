@@ -364,12 +364,12 @@ func (aq *AssignmentQuery) WithGrades(opts ...func(*GradeQuery)) *AssignmentQuer
 // Example:
 //
 //	var v []struct {
-//		CreateTime time.Time `json:"create_time,omitempty"`
+//		CreatedAt time.Time `json:"created_at,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
 //	client.Assignment.Query().
-//		GroupBy(assignment.FieldCreateTime).
+//		GroupBy(assignment.FieldCreatedAt).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
 //
@@ -391,11 +391,11 @@ func (aq *AssignmentQuery) GroupBy(field string, fields ...string) *AssignmentGr
 // Example:
 //
 //	var v []struct {
-//		CreateTime time.Time `json:"create_time,omitempty"`
+//		CreatedAt time.Time `json:"created_at,omitempty"`
 //	}
 //
 //	client.Assignment.Query().
-//		Select(assignment.FieldCreateTime).
+//		Select(assignment.FieldCreatedAt).
 //		Scan(ctx, &v)
 //
 func (aq *AssignmentQuery) Select(fields ...string) *AssignmentSelect {

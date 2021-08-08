@@ -22,30 +22,30 @@ type AssignmentSubmissionCreate struct {
 	hooks    []Hook
 }
 
-// SetCreateTime sets the "create_time" field.
-func (asc *AssignmentSubmissionCreate) SetCreateTime(t time.Time) *AssignmentSubmissionCreate {
-	asc.mutation.SetCreateTime(t)
+// SetCreatedAt sets the "created_at" field.
+func (asc *AssignmentSubmissionCreate) SetCreatedAt(t time.Time) *AssignmentSubmissionCreate {
+	asc.mutation.SetCreatedAt(t)
 	return asc
 }
 
-// SetNillableCreateTime sets the "create_time" field if the given value is not nil.
-func (asc *AssignmentSubmissionCreate) SetNillableCreateTime(t *time.Time) *AssignmentSubmissionCreate {
+// SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
+func (asc *AssignmentSubmissionCreate) SetNillableCreatedAt(t *time.Time) *AssignmentSubmissionCreate {
 	if t != nil {
-		asc.SetCreateTime(*t)
+		asc.SetCreatedAt(*t)
 	}
 	return asc
 }
 
-// SetUpdateTime sets the "update_time" field.
-func (asc *AssignmentSubmissionCreate) SetUpdateTime(t time.Time) *AssignmentSubmissionCreate {
-	asc.mutation.SetUpdateTime(t)
+// SetUpdatedAt sets the "updated_at" field.
+func (asc *AssignmentSubmissionCreate) SetUpdatedAt(t time.Time) *AssignmentSubmissionCreate {
+	asc.mutation.SetUpdatedAt(t)
 	return asc
 }
 
-// SetNillableUpdateTime sets the "update_time" field if the given value is not nil.
-func (asc *AssignmentSubmissionCreate) SetNillableUpdateTime(t *time.Time) *AssignmentSubmissionCreate {
+// SetNillableUpdatedAt sets the "updated_at" field if the given value is not nil.
+func (asc *AssignmentSubmissionCreate) SetNillableUpdatedAt(t *time.Time) *AssignmentSubmissionCreate {
 	if t != nil {
-		asc.SetUpdateTime(*t)
+		asc.SetUpdatedAt(*t)
 	}
 	return asc
 }
@@ -163,23 +163,23 @@ func (asc *AssignmentSubmissionCreate) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (asc *AssignmentSubmissionCreate) defaults() {
-	if _, ok := asc.mutation.CreateTime(); !ok {
-		v := assignmentsubmission.DefaultCreateTime()
-		asc.mutation.SetCreateTime(v)
+	if _, ok := asc.mutation.CreatedAt(); !ok {
+		v := assignmentsubmission.DefaultCreatedAt()
+		asc.mutation.SetCreatedAt(v)
 	}
-	if _, ok := asc.mutation.UpdateTime(); !ok {
-		v := assignmentsubmission.DefaultUpdateTime()
-		asc.mutation.SetUpdateTime(v)
+	if _, ok := asc.mutation.UpdatedAt(); !ok {
+		v := assignmentsubmission.DefaultUpdatedAt()
+		asc.mutation.SetUpdatedAt(v)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
 func (asc *AssignmentSubmissionCreate) check() error {
-	if _, ok := asc.mutation.CreateTime(); !ok {
-		return &ValidationError{Name: "create_time", err: errors.New(`ent: missing required field "create_time"`)}
+	if _, ok := asc.mutation.CreatedAt(); !ok {
+		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "created_at"`)}
 	}
-	if _, ok := asc.mutation.UpdateTime(); !ok {
-		return &ValidationError{Name: "update_time", err: errors.New(`ent: missing required field "update_time"`)}
+	if _, ok := asc.mutation.UpdatedAt(); !ok {
+		return &ValidationError{Name: "updated_at", err: errors.New(`ent: missing required field "updated_at"`)}
 	}
 	if _, ok := asc.mutation.Files(); !ok {
 		return &ValidationError{Name: "files", err: errors.New(`ent: missing required field "files"`)}
@@ -217,21 +217,21 @@ func (asc *AssignmentSubmissionCreate) createSpec() (*AssignmentSubmission, *sql
 			},
 		}
 	)
-	if value, ok := asc.mutation.CreateTime(); ok {
+	if value, ok := asc.mutation.CreatedAt(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
 			Type:   field.TypeTime,
 			Value:  value,
-			Column: assignmentsubmission.FieldCreateTime,
+			Column: assignmentsubmission.FieldCreatedAt,
 		})
-		_node.CreateTime = value
+		_node.CreatedAt = value
 	}
-	if value, ok := asc.mutation.UpdateTime(); ok {
+	if value, ok := asc.mutation.UpdatedAt(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
 			Type:   field.TypeTime,
 			Value:  value,
-			Column: assignmentsubmission.FieldUpdateTime,
+			Column: assignmentsubmission.FieldUpdatedAt,
 		})
-		_node.UpdateTime = value
+		_node.UpdatedAt = value
 	}
 	if value, ok := asc.mutation.Files(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{

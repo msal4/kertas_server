@@ -93,17 +93,17 @@ func IDLTE(id int) predicate.TuitionPayment {
 	})
 }
 
-// CreateTime applies equality check predicate on the "create_time" field. It's identical to CreateTimeEQ.
-func CreateTime(v time.Time) predicate.TuitionPayment {
+// CreatedAt applies equality check predicate on the "created_at" field. It's identical to CreatedAtEQ.
+func CreatedAt(v time.Time) predicate.TuitionPayment {
 	return predicate.TuitionPayment(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldCreateTime), v))
+		s.Where(sql.EQ(s.C(FieldCreatedAt), v))
 	})
 }
 
-// UpdateTime applies equality check predicate on the "update_time" field. It's identical to UpdateTimeEQ.
-func UpdateTime(v time.Time) predicate.TuitionPayment {
+// UpdatedAt applies equality check predicate on the "updated_at" field. It's identical to UpdatedAtEQ.
+func UpdatedAt(v time.Time) predicate.TuitionPayment {
 	return predicate.TuitionPayment(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldUpdateTime), v))
+		s.Where(sql.EQ(s.C(FieldUpdatedAt), v))
 	})
 }
 
@@ -114,22 +114,22 @@ func PaidAmount(v int) predicate.TuitionPayment {
 	})
 }
 
-// CreateTimeEQ applies the EQ predicate on the "create_time" field.
-func CreateTimeEQ(v time.Time) predicate.TuitionPayment {
+// CreatedAtEQ applies the EQ predicate on the "created_at" field.
+func CreatedAtEQ(v time.Time) predicate.TuitionPayment {
 	return predicate.TuitionPayment(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldCreateTime), v))
+		s.Where(sql.EQ(s.C(FieldCreatedAt), v))
 	})
 }
 
-// CreateTimeNEQ applies the NEQ predicate on the "create_time" field.
-func CreateTimeNEQ(v time.Time) predicate.TuitionPayment {
+// CreatedAtNEQ applies the NEQ predicate on the "created_at" field.
+func CreatedAtNEQ(v time.Time) predicate.TuitionPayment {
 	return predicate.TuitionPayment(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldCreateTime), v))
+		s.Where(sql.NEQ(s.C(FieldCreatedAt), v))
 	})
 }
 
-// CreateTimeIn applies the In predicate on the "create_time" field.
-func CreateTimeIn(vs ...time.Time) predicate.TuitionPayment {
+// CreatedAtIn applies the In predicate on the "created_at" field.
+func CreatedAtIn(vs ...time.Time) predicate.TuitionPayment {
 	v := make([]interface{}, len(vs))
 	for i := range v {
 		v[i] = vs[i]
@@ -141,12 +141,12 @@ func CreateTimeIn(vs ...time.Time) predicate.TuitionPayment {
 			s.Where(sql.False())
 			return
 		}
-		s.Where(sql.In(s.C(FieldCreateTime), v...))
+		s.Where(sql.In(s.C(FieldCreatedAt), v...))
 	})
 }
 
-// CreateTimeNotIn applies the NotIn predicate on the "create_time" field.
-func CreateTimeNotIn(vs ...time.Time) predicate.TuitionPayment {
+// CreatedAtNotIn applies the NotIn predicate on the "created_at" field.
+func CreatedAtNotIn(vs ...time.Time) predicate.TuitionPayment {
 	v := make([]interface{}, len(vs))
 	for i := range v {
 		v[i] = vs[i]
@@ -158,54 +158,54 @@ func CreateTimeNotIn(vs ...time.Time) predicate.TuitionPayment {
 			s.Where(sql.False())
 			return
 		}
-		s.Where(sql.NotIn(s.C(FieldCreateTime), v...))
+		s.Where(sql.NotIn(s.C(FieldCreatedAt), v...))
 	})
 }
 
-// CreateTimeGT applies the GT predicate on the "create_time" field.
-func CreateTimeGT(v time.Time) predicate.TuitionPayment {
+// CreatedAtGT applies the GT predicate on the "created_at" field.
+func CreatedAtGT(v time.Time) predicate.TuitionPayment {
 	return predicate.TuitionPayment(func(s *sql.Selector) {
-		s.Where(sql.GT(s.C(FieldCreateTime), v))
+		s.Where(sql.GT(s.C(FieldCreatedAt), v))
 	})
 }
 
-// CreateTimeGTE applies the GTE predicate on the "create_time" field.
-func CreateTimeGTE(v time.Time) predicate.TuitionPayment {
+// CreatedAtGTE applies the GTE predicate on the "created_at" field.
+func CreatedAtGTE(v time.Time) predicate.TuitionPayment {
 	return predicate.TuitionPayment(func(s *sql.Selector) {
-		s.Where(sql.GTE(s.C(FieldCreateTime), v))
+		s.Where(sql.GTE(s.C(FieldCreatedAt), v))
 	})
 }
 
-// CreateTimeLT applies the LT predicate on the "create_time" field.
-func CreateTimeLT(v time.Time) predicate.TuitionPayment {
+// CreatedAtLT applies the LT predicate on the "created_at" field.
+func CreatedAtLT(v time.Time) predicate.TuitionPayment {
 	return predicate.TuitionPayment(func(s *sql.Selector) {
-		s.Where(sql.LT(s.C(FieldCreateTime), v))
+		s.Where(sql.LT(s.C(FieldCreatedAt), v))
 	})
 }
 
-// CreateTimeLTE applies the LTE predicate on the "create_time" field.
-func CreateTimeLTE(v time.Time) predicate.TuitionPayment {
+// CreatedAtLTE applies the LTE predicate on the "created_at" field.
+func CreatedAtLTE(v time.Time) predicate.TuitionPayment {
 	return predicate.TuitionPayment(func(s *sql.Selector) {
-		s.Where(sql.LTE(s.C(FieldCreateTime), v))
+		s.Where(sql.LTE(s.C(FieldCreatedAt), v))
 	})
 }
 
-// UpdateTimeEQ applies the EQ predicate on the "update_time" field.
-func UpdateTimeEQ(v time.Time) predicate.TuitionPayment {
+// UpdatedAtEQ applies the EQ predicate on the "updated_at" field.
+func UpdatedAtEQ(v time.Time) predicate.TuitionPayment {
 	return predicate.TuitionPayment(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldUpdateTime), v))
+		s.Where(sql.EQ(s.C(FieldUpdatedAt), v))
 	})
 }
 
-// UpdateTimeNEQ applies the NEQ predicate on the "update_time" field.
-func UpdateTimeNEQ(v time.Time) predicate.TuitionPayment {
+// UpdatedAtNEQ applies the NEQ predicate on the "updated_at" field.
+func UpdatedAtNEQ(v time.Time) predicate.TuitionPayment {
 	return predicate.TuitionPayment(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldUpdateTime), v))
+		s.Where(sql.NEQ(s.C(FieldUpdatedAt), v))
 	})
 }
 
-// UpdateTimeIn applies the In predicate on the "update_time" field.
-func UpdateTimeIn(vs ...time.Time) predicate.TuitionPayment {
+// UpdatedAtIn applies the In predicate on the "updated_at" field.
+func UpdatedAtIn(vs ...time.Time) predicate.TuitionPayment {
 	v := make([]interface{}, len(vs))
 	for i := range v {
 		v[i] = vs[i]
@@ -217,12 +217,12 @@ func UpdateTimeIn(vs ...time.Time) predicate.TuitionPayment {
 			s.Where(sql.False())
 			return
 		}
-		s.Where(sql.In(s.C(FieldUpdateTime), v...))
+		s.Where(sql.In(s.C(FieldUpdatedAt), v...))
 	})
 }
 
-// UpdateTimeNotIn applies the NotIn predicate on the "update_time" field.
-func UpdateTimeNotIn(vs ...time.Time) predicate.TuitionPayment {
+// UpdatedAtNotIn applies the NotIn predicate on the "updated_at" field.
+func UpdatedAtNotIn(vs ...time.Time) predicate.TuitionPayment {
 	v := make([]interface{}, len(vs))
 	for i := range v {
 		v[i] = vs[i]
@@ -234,35 +234,35 @@ func UpdateTimeNotIn(vs ...time.Time) predicate.TuitionPayment {
 			s.Where(sql.False())
 			return
 		}
-		s.Where(sql.NotIn(s.C(FieldUpdateTime), v...))
+		s.Where(sql.NotIn(s.C(FieldUpdatedAt), v...))
 	})
 }
 
-// UpdateTimeGT applies the GT predicate on the "update_time" field.
-func UpdateTimeGT(v time.Time) predicate.TuitionPayment {
+// UpdatedAtGT applies the GT predicate on the "updated_at" field.
+func UpdatedAtGT(v time.Time) predicate.TuitionPayment {
 	return predicate.TuitionPayment(func(s *sql.Selector) {
-		s.Where(sql.GT(s.C(FieldUpdateTime), v))
+		s.Where(sql.GT(s.C(FieldUpdatedAt), v))
 	})
 }
 
-// UpdateTimeGTE applies the GTE predicate on the "update_time" field.
-func UpdateTimeGTE(v time.Time) predicate.TuitionPayment {
+// UpdatedAtGTE applies the GTE predicate on the "updated_at" field.
+func UpdatedAtGTE(v time.Time) predicate.TuitionPayment {
 	return predicate.TuitionPayment(func(s *sql.Selector) {
-		s.Where(sql.GTE(s.C(FieldUpdateTime), v))
+		s.Where(sql.GTE(s.C(FieldUpdatedAt), v))
 	})
 }
 
-// UpdateTimeLT applies the LT predicate on the "update_time" field.
-func UpdateTimeLT(v time.Time) predicate.TuitionPayment {
+// UpdatedAtLT applies the LT predicate on the "updated_at" field.
+func UpdatedAtLT(v time.Time) predicate.TuitionPayment {
 	return predicate.TuitionPayment(func(s *sql.Selector) {
-		s.Where(sql.LT(s.C(FieldUpdateTime), v))
+		s.Where(sql.LT(s.C(FieldUpdatedAt), v))
 	})
 }
 
-// UpdateTimeLTE applies the LTE predicate on the "update_time" field.
-func UpdateTimeLTE(v time.Time) predicate.TuitionPayment {
+// UpdatedAtLTE applies the LTE predicate on the "updated_at" field.
+func UpdatedAtLTE(v time.Time) predicate.TuitionPayment {
 	return predicate.TuitionPayment(func(s *sql.Selector) {
-		s.Where(sql.LTE(s.C(FieldUpdateTime), v))
+		s.Where(sql.LTE(s.C(FieldUpdatedAt), v))
 	})
 }
 

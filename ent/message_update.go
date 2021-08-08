@@ -192,9 +192,9 @@ func (mu *MessageUpdate) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (mu *MessageUpdate) defaults() {
-	if _, ok := mu.mutation.UpdateTime(); !ok {
-		v := message.UpdateDefaultUpdateTime()
-		mu.mutation.SetUpdateTime(v)
+	if _, ok := mu.mutation.UpdatedAt(); !ok {
+		v := message.UpdateDefaultUpdatedAt()
+		mu.mutation.SetUpdatedAt(v)
 	}
 }
 
@@ -227,11 +227,11 @@ func (mu *MessageUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			}
 		}
 	}
-	if value, ok := mu.mutation.UpdateTime(); ok {
+	if value, ok := mu.mutation.UpdatedAt(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeTime,
 			Value:  value,
-			Column: message.FieldUpdateTime,
+			Column: message.FieldUpdatedAt,
 		})
 	}
 	if value, ok := mu.mutation.Content(); ok {
@@ -531,9 +531,9 @@ func (muo *MessageUpdateOne) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (muo *MessageUpdateOne) defaults() {
-	if _, ok := muo.mutation.UpdateTime(); !ok {
-		v := message.UpdateDefaultUpdateTime()
-		muo.mutation.SetUpdateTime(v)
+	if _, ok := muo.mutation.UpdatedAt(); !ok {
+		v := message.UpdateDefaultUpdatedAt()
+		muo.mutation.SetUpdatedAt(v)
 	}
 }
 
@@ -583,11 +583,11 @@ func (muo *MessageUpdateOne) sqlSave(ctx context.Context) (_node *Message, err e
 			}
 		}
 	}
-	if value, ok := muo.mutation.UpdateTime(); ok {
+	if value, ok := muo.mutation.UpdatedAt(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeTime,
 			Value:  value,
-			Column: message.FieldUpdateTime,
+			Column: message.FieldUpdatedAt,
 		})
 	}
 	if value, ok := muo.mutation.Content(); ok {

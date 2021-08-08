@@ -6,7 +6,6 @@ import (
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
 	"entgo.io/ent/schema/index"
-	"entgo.io/ent/schema/mixin"
 )
 
 const (
@@ -28,13 +27,13 @@ func (User) Fields() []ent.Field {
 		field.String("image").Optional(),
 		field.Int("token_version").Default(0),
 		field.Enum("role").Values("super_admin", "school_admin", "teacher", "student").Default("student"),
-		field.Enum("status").GoType(Status("")).Default("active"),
+		field.Enum("status").GoType(Status("")).Default(StatusActive.String()),
 	}
 }
 
 func (User) Mixin() []ent.Mixin {
 	return []ent.Mixin{
-		mixin.Time{},
+		TimeMixin{},
 	}
 }
 

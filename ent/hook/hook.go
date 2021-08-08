@@ -139,6 +139,19 @@ func (f StageFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error
 	return f(ctx, mv)
 }
 
+// The TimeMixinFunc type is an adapter to allow the use of ordinary
+// function as TimeMixin mutator.
+type TimeMixinFunc func(context.Context, *ent.TimeMixinMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f TimeMixinFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	mv, ok := m.(*ent.TimeMixinMutation)
+	if !ok {
+		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.TimeMixinMutation", m)
+	}
+	return f(ctx, mv)
+}
+
 // The TuitionPaymentFunc type is an adapter to allow the use of ordinary
 // function as TuitionPayment mutator.
 type TuitionPaymentFunc func(context.Context, *ent.TuitionPaymentMutation) (ent.Value, error)

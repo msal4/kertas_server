@@ -32,6 +32,8 @@ type Tx struct {
 	School *SchoolClient
 	// Stage is the client for interacting with the Stage builders.
 	Stage *StageClient
+	// TimeMixin is the client for interacting with the TimeMixin builders.
+	TimeMixin *TimeMixinClient
 	// TuitionPayment is the client for interacting with the TuitionPayment builders.
 	TuitionPayment *TuitionPaymentClient
 	// User is the client for interacting with the User builders.
@@ -181,6 +183,7 @@ func (tx *Tx) init() {
 	tx.Schedule = NewScheduleClient(tx.config)
 	tx.School = NewSchoolClient(tx.config)
 	tx.Stage = NewStageClient(tx.config)
+	tx.TimeMixin = NewTimeMixinClient(tx.config)
 	tx.TuitionPayment = NewTuitionPaymentClient(tx.config)
 	tx.User = NewUserClient(tx.config)
 }

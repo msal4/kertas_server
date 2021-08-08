@@ -22,30 +22,30 @@ type TuitionPaymentCreate struct {
 	hooks    []Hook
 }
 
-// SetCreateTime sets the "create_time" field.
-func (tpc *TuitionPaymentCreate) SetCreateTime(t time.Time) *TuitionPaymentCreate {
-	tpc.mutation.SetCreateTime(t)
+// SetCreatedAt sets the "created_at" field.
+func (tpc *TuitionPaymentCreate) SetCreatedAt(t time.Time) *TuitionPaymentCreate {
+	tpc.mutation.SetCreatedAt(t)
 	return tpc
 }
 
-// SetNillableCreateTime sets the "create_time" field if the given value is not nil.
-func (tpc *TuitionPaymentCreate) SetNillableCreateTime(t *time.Time) *TuitionPaymentCreate {
+// SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
+func (tpc *TuitionPaymentCreate) SetNillableCreatedAt(t *time.Time) *TuitionPaymentCreate {
 	if t != nil {
-		tpc.SetCreateTime(*t)
+		tpc.SetCreatedAt(*t)
 	}
 	return tpc
 }
 
-// SetUpdateTime sets the "update_time" field.
-func (tpc *TuitionPaymentCreate) SetUpdateTime(t time.Time) *TuitionPaymentCreate {
-	tpc.mutation.SetUpdateTime(t)
+// SetUpdatedAt sets the "updated_at" field.
+func (tpc *TuitionPaymentCreate) SetUpdatedAt(t time.Time) *TuitionPaymentCreate {
+	tpc.mutation.SetUpdatedAt(t)
 	return tpc
 }
 
-// SetNillableUpdateTime sets the "update_time" field if the given value is not nil.
-func (tpc *TuitionPaymentCreate) SetNillableUpdateTime(t *time.Time) *TuitionPaymentCreate {
+// SetNillableUpdatedAt sets the "updated_at" field if the given value is not nil.
+func (tpc *TuitionPaymentCreate) SetNillableUpdatedAt(t *time.Time) *TuitionPaymentCreate {
 	if t != nil {
-		tpc.SetUpdateTime(*t)
+		tpc.SetUpdatedAt(*t)
 	}
 	return tpc
 }
@@ -149,23 +149,23 @@ func (tpc *TuitionPaymentCreate) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (tpc *TuitionPaymentCreate) defaults() {
-	if _, ok := tpc.mutation.CreateTime(); !ok {
-		v := tuitionpayment.DefaultCreateTime()
-		tpc.mutation.SetCreateTime(v)
+	if _, ok := tpc.mutation.CreatedAt(); !ok {
+		v := tuitionpayment.DefaultCreatedAt()
+		tpc.mutation.SetCreatedAt(v)
 	}
-	if _, ok := tpc.mutation.UpdateTime(); !ok {
-		v := tuitionpayment.DefaultUpdateTime()
-		tpc.mutation.SetUpdateTime(v)
+	if _, ok := tpc.mutation.UpdatedAt(); !ok {
+		v := tuitionpayment.DefaultUpdatedAt()
+		tpc.mutation.SetUpdatedAt(v)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
 func (tpc *TuitionPaymentCreate) check() error {
-	if _, ok := tpc.mutation.CreateTime(); !ok {
-		return &ValidationError{Name: "create_time", err: errors.New(`ent: missing required field "create_time"`)}
+	if _, ok := tpc.mutation.CreatedAt(); !ok {
+		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "created_at"`)}
 	}
-	if _, ok := tpc.mutation.UpdateTime(); !ok {
-		return &ValidationError{Name: "update_time", err: errors.New(`ent: missing required field "update_time"`)}
+	if _, ok := tpc.mutation.UpdatedAt(); !ok {
+		return &ValidationError{Name: "updated_at", err: errors.New(`ent: missing required field "updated_at"`)}
 	}
 	if _, ok := tpc.mutation.PaidAmount(); !ok {
 		return &ValidationError{Name: "paid_amount", err: errors.New(`ent: missing required field "paid_amount"`)}
@@ -203,21 +203,21 @@ func (tpc *TuitionPaymentCreate) createSpec() (*TuitionPayment, *sqlgraph.Create
 			},
 		}
 	)
-	if value, ok := tpc.mutation.CreateTime(); ok {
+	if value, ok := tpc.mutation.CreatedAt(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
 			Type:   field.TypeTime,
 			Value:  value,
-			Column: tuitionpayment.FieldCreateTime,
+			Column: tuitionpayment.FieldCreatedAt,
 		})
-		_node.CreateTime = value
+		_node.CreatedAt = value
 	}
-	if value, ok := tpc.mutation.UpdateTime(); ok {
+	if value, ok := tpc.mutation.UpdatedAt(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
 			Type:   field.TypeTime,
 			Value:  value,
-			Column: tuitionpayment.FieldUpdateTime,
+			Column: tuitionpayment.FieldUpdatedAt,
 		})
-		_node.UpdateTime = value
+		_node.UpdatedAt = value
 	}
 	if value, ok := tpc.mutation.PaidAmount(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{

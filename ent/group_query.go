@@ -328,12 +328,12 @@ func (gq *GroupQuery) WithMessages(opts ...func(*MessageQuery)) *GroupQuery {
 // Example:
 //
 //	var v []struct {
-//		CreateTime time.Time `json:"create_time,omitempty"`
+//		CreatedAt time.Time `json:"created_at,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
 //	client.Group.Query().
-//		GroupBy(group.FieldCreateTime).
+//		GroupBy(group.FieldCreatedAt).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
 //
@@ -355,11 +355,11 @@ func (gq *GroupQuery) GroupBy(field string, fields ...string) *GroupGroupBy {
 // Example:
 //
 //	var v []struct {
-//		CreateTime time.Time `json:"create_time,omitempty"`
+//		CreatedAt time.Time `json:"created_at,omitempty"`
 //	}
 //
 //	client.Group.Query().
-//		Select(group.FieldCreateTime).
+//		Select(group.FieldCreatedAt).
 //		Scan(ctx, &v)
 //
 func (gq *GroupQuery) Select(fields ...string) *GroupSelect {

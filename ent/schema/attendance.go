@@ -6,7 +6,6 @@ import (
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
 	"entgo.io/ent/schema/index"
-	"entgo.io/ent/schema/mixin"
 )
 
 // Attendance holds the schema definition for the Attendance entity.
@@ -24,7 +23,7 @@ func (Attendance) Fields() []ent.Field {
 
 func (Attendance) Mixin() []ent.Mixin {
 	return []ent.Mixin{
-		mixin.Time{},
+		TimeMixin{},
 	}
 }
 

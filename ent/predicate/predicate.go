@@ -36,6 +36,9 @@ type School func(*sql.Selector)
 // Stage is the predicate function for stage builders.
 type Stage func(*sql.Selector)
 
+// TimeMixin is the predicate function for timemixin builders.
+type TimeMixin func(*sql.Selector)
+
 // TuitionPayment is the predicate function for tuitionpayment builders.
 type TuitionPayment func(*sql.Selector)
 

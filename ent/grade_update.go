@@ -144,9 +144,9 @@ func (gu *GradeUpdate) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (gu *GradeUpdate) defaults() {
-	if _, ok := gu.mutation.UpdateTime(); !ok {
-		v := grade.UpdateDefaultUpdateTime()
-		gu.mutation.SetUpdateTime(v)
+	if _, ok := gu.mutation.UpdatedAt(); !ok {
+		v := grade.UpdateDefaultUpdatedAt()
+		gu.mutation.SetUpdatedAt(v)
 	}
 }
 
@@ -184,11 +184,11 @@ func (gu *GradeUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			}
 		}
 	}
-	if value, ok := gu.mutation.UpdateTime(); ok {
+	if value, ok := gu.mutation.UpdatedAt(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeTime,
 			Value:  value,
-			Column: grade.FieldUpdateTime,
+			Column: grade.FieldUpdatedAt,
 		})
 	}
 	if value, ok := gu.mutation.ExamGrade(); ok {
@@ -416,9 +416,9 @@ func (guo *GradeUpdateOne) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (guo *GradeUpdateOne) defaults() {
-	if _, ok := guo.mutation.UpdateTime(); !ok {
-		v := grade.UpdateDefaultUpdateTime()
-		guo.mutation.SetUpdateTime(v)
+	if _, ok := guo.mutation.UpdatedAt(); !ok {
+		v := grade.UpdateDefaultUpdatedAt()
+		guo.mutation.SetUpdatedAt(v)
 	}
 }
 
@@ -473,11 +473,11 @@ func (guo *GradeUpdateOne) sqlSave(ctx context.Context) (_node *Grade, err error
 			}
 		}
 	}
-	if value, ok := guo.mutation.UpdateTime(); ok {
+	if value, ok := guo.mutation.UpdatedAt(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeTime,
 			Value:  value,
-			Column: grade.FieldUpdateTime,
+			Column: grade.FieldUpdatedAt,
 		})
 	}
 	if value, ok := guo.mutation.ExamGrade(); ok {

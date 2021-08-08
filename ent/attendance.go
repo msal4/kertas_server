@@ -18,10 +18,10 @@ type Attendance struct {
 	config `json:"-"`
 	// ID of the ent.
 	ID int `json:"id,omitempty"`
-	// CreateTime holds the value of the "create_time" field.
-	CreateTime time.Time `json:"create_time,omitempty"`
-	// UpdateTime holds the value of the "update_time" field.
-	UpdateTime time.Time `json:"update_time,omitempty"`
+	// CreatedAt holds the value of the "created_at" field.
+	CreatedAt time.Time `json:"created_at,omitempty"`
+	// UpdatedAt holds the value of the "updated_at" field.
+	UpdatedAt time.Time `json:"updated_at,omitempty"`
 	// Date holds the value of the "date" field.
 	Date time.Time `json:"date,omitempty"`
 	// State holds the value of the "state" field.
@@ -81,7 +81,7 @@ func (*Attendance) scanValues(columns []string) ([]interface{}, error) {
 			values[i] = new(sql.NullInt64)
 		case attendance.FieldState:
 			values[i] = new(sql.NullString)
-		case attendance.FieldCreateTime, attendance.FieldUpdateTime, attendance.FieldDate:
+		case attendance.FieldCreatedAt, attendance.FieldUpdatedAt, attendance.FieldDate:
 			values[i] = new(sql.NullTime)
 		case attendance.ForeignKeys[0]: // class_attendances
 			values[i] = new(sql.NullInt64)
@@ -108,17 +108,17 @@ func (a *Attendance) assignValues(columns []string, values []interface{}) error 
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
 			a.ID = int(value.Int64)
-		case attendance.FieldCreateTime:
+		case attendance.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
-				return fmt.Errorf("unexpected type %T for field create_time", values[i])
+				return fmt.Errorf("unexpected type %T for field created_at", values[i])
 			} else if value.Valid {
-				a.CreateTime = value.Time
+				a.CreatedAt = value.Time
 			}
-		case attendance.FieldUpdateTime:
+		case attendance.FieldUpdatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
-				return fmt.Errorf("unexpected type %T for field update_time", values[i])
+				return fmt.Errorf("unexpected type %T for field updated_at", values[i])
 			} else if value.Valid {
-				a.UpdateTime = value.Time
+				a.UpdatedAt = value.Time
 			}
 		case attendance.FieldDate:
 			if value, ok := values[i].(*sql.NullTime); !ok {
@@ -184,10 +184,10 @@ func (a *Attendance) String() string {
 	var builder strings.Builder
 	builder.WriteString("Attendance(")
 	builder.WriteString(fmt.Sprintf("id=%v", a.ID))
-	builder.WriteString(", create_time=")
-	builder.WriteString(a.CreateTime.Format(time.ANSIC))
-	builder.WriteString(", update_time=")
-	builder.WriteString(a.UpdateTime.Format(time.ANSIC))
+	builder.WriteString(", created_at=")
+	builder.WriteString(a.CreatedAt.Format(time.ANSIC))
+	builder.WriteString(", updated_at=")
+	builder.WriteString(a.UpdatedAt.Format(time.ANSIC))
 	builder.WriteString(", date=")
 	builder.WriteString(a.Date.Format(time.ANSIC))
 	builder.WriteString(", state=")

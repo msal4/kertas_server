@@ -20,10 +20,10 @@ type Class struct {
 	config `json:"-"`
 	// ID of the ent.
 	ID int `json:"id,omitempty"`
-	// CreateTime holds the value of the "create_time" field.
-	CreateTime time.Time `json:"create_time,omitempty"`
-	// UpdateTime holds the value of the "update_time" field.
-	UpdateTime time.Time `json:"update_time,omitempty"`
+	// CreatedAt holds the value of the "created_at" field.
+	CreatedAt time.Time `json:"created_at,omitempty"`
+	// UpdatedAt holds the value of the "updated_at" field.
+	UpdatedAt time.Time `json:"updated_at,omitempty"`
 	// Name holds the value of the "name" field.
 	Name string `json:"name,omitempty"`
 	// Status holds the value of the "status" field.
@@ -132,7 +132,7 @@ func (*Class) scanValues(columns []string) ([]interface{}, error) {
 			values[i] = new(sql.NullInt64)
 		case class.FieldName, class.FieldStatus:
 			values[i] = new(sql.NullString)
-		case class.FieldCreateTime, class.FieldUpdateTime:
+		case class.FieldCreatedAt, class.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
 		case class.ForeignKeys[0]: // stage_classes
 			values[i] = new(sql.NullInt64)
@@ -159,17 +159,17 @@ func (c *Class) assignValues(columns []string, values []interface{}) error {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
 			c.ID = int(value.Int64)
-		case class.FieldCreateTime:
+		case class.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
-				return fmt.Errorf("unexpected type %T for field create_time", values[i])
+				return fmt.Errorf("unexpected type %T for field created_at", values[i])
 			} else if value.Valid {
-				c.CreateTime = value.Time
+				c.CreatedAt = value.Time
 			}
-		case class.FieldUpdateTime:
+		case class.FieldUpdatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
-				return fmt.Errorf("unexpected type %T for field update_time", values[i])
+				return fmt.Errorf("unexpected type %T for field updated_at", values[i])
 			} else if value.Valid {
-				c.UpdateTime = value.Time
+				c.UpdatedAt = value.Time
 			}
 		case class.FieldName:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -255,10 +255,10 @@ func (c *Class) String() string {
 	var builder strings.Builder
 	builder.WriteString("Class(")
 	builder.WriteString(fmt.Sprintf("id=%v", c.ID))
-	builder.WriteString(", create_time=")
-	builder.WriteString(c.CreateTime.Format(time.ANSIC))
-	builder.WriteString(", update_time=")
-	builder.WriteString(c.UpdateTime.Format(time.ANSIC))
+	builder.WriteString(", created_at=")
+	builder.WriteString(c.CreatedAt.Format(time.ANSIC))
+	builder.WriteString(", updated_at=")
+	builder.WriteString(c.UpdatedAt.Format(time.ANSIC))
 	builder.WriteString(", name=")
 	builder.WriteString(c.Name)
 	builder.WriteString(", status=")

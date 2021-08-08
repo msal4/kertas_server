@@ -158,9 +158,9 @@ func (asu *AssignmentSubmissionUpdate) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (asu *AssignmentSubmissionUpdate) defaults() {
-	if _, ok := asu.mutation.UpdateTime(); !ok {
-		v := assignmentsubmission.UpdateDefaultUpdateTime()
-		asu.mutation.SetUpdateTime(v)
+	if _, ok := asu.mutation.UpdatedAt(); !ok {
+		v := assignmentsubmission.UpdateDefaultUpdatedAt()
+		asu.mutation.SetUpdatedAt(v)
 	}
 }
 
@@ -193,11 +193,11 @@ func (asu *AssignmentSubmissionUpdate) sqlSave(ctx context.Context) (n int, err 
 			}
 		}
 	}
-	if value, ok := asu.mutation.UpdateTime(); ok {
+	if value, ok := asu.mutation.UpdatedAt(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeTime,
 			Value:  value,
-			Column: assignmentsubmission.FieldUpdateTime,
+			Column: assignmentsubmission.FieldUpdatedAt,
 		})
 	}
 	if value, ok := asu.mutation.Files(); ok {
@@ -444,9 +444,9 @@ func (asuo *AssignmentSubmissionUpdateOne) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (asuo *AssignmentSubmissionUpdateOne) defaults() {
-	if _, ok := asuo.mutation.UpdateTime(); !ok {
-		v := assignmentsubmission.UpdateDefaultUpdateTime()
-		asuo.mutation.SetUpdateTime(v)
+	if _, ok := asuo.mutation.UpdatedAt(); !ok {
+		v := assignmentsubmission.UpdateDefaultUpdatedAt()
+		asuo.mutation.SetUpdatedAt(v)
 	}
 }
 
@@ -496,11 +496,11 @@ func (asuo *AssignmentSubmissionUpdateOne) sqlSave(ctx context.Context) (_node *
 			}
 		}
 	}
-	if value, ok := asuo.mutation.UpdateTime(); ok {
+	if value, ok := asuo.mutation.UpdatedAt(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeTime,
 			Value:  value,
-			Column: assignmentsubmission.FieldUpdateTime,
+			Column: assignmentsubmission.FieldUpdatedAt,
 		})
 	}
 	if value, ok := asuo.mutation.Files(); ok {

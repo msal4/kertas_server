@@ -17,10 +17,10 @@ type Assignment struct {
 	config `json:"-"`
 	// ID of the ent.
 	ID int `json:"id,omitempty"`
-	// CreateTime holds the value of the "create_time" field.
-	CreateTime time.Time `json:"create_time,omitempty"`
-	// UpdateTime holds the value of the "update_time" field.
-	UpdateTime time.Time `json:"update_time,omitempty"`
+	// CreatedAt holds the value of the "created_at" field.
+	CreatedAt time.Time `json:"created_at,omitempty"`
+	// UpdatedAt holds the value of the "updated_at" field.
+	UpdatedAt time.Time `json:"updated_at,omitempty"`
 	// Name holds the value of the "name" field.
 	Name string `json:"name,omitempty"`
 	// Description holds the value of the "description" field.
@@ -95,7 +95,7 @@ func (*Assignment) scanValues(columns []string) ([]interface{}, error) {
 			values[i] = new(sql.NullInt64)
 		case assignment.FieldName, assignment.FieldDescription:
 			values[i] = new(sql.NullString)
-		case assignment.FieldCreateTime, assignment.FieldUpdateTime, assignment.FieldDueDate, assignment.FieldDeletedAt:
+		case assignment.FieldCreatedAt, assignment.FieldUpdatedAt, assignment.FieldDueDate, assignment.FieldDeletedAt:
 			values[i] = new(sql.NullTime)
 		case assignment.ForeignKeys[0]: // class_assignments
 			values[i] = new(sql.NullInt64)
@@ -120,17 +120,17 @@ func (a *Assignment) assignValues(columns []string, values []interface{}) error 
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
 			a.ID = int(value.Int64)
-		case assignment.FieldCreateTime:
+		case assignment.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
-				return fmt.Errorf("unexpected type %T for field create_time", values[i])
+				return fmt.Errorf("unexpected type %T for field created_at", values[i])
 			} else if value.Valid {
-				a.CreateTime = value.Time
+				a.CreatedAt = value.Time
 			}
-		case assignment.FieldUpdateTime:
+		case assignment.FieldUpdatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
-				return fmt.Errorf("unexpected type %T for field update_time", values[i])
+				return fmt.Errorf("unexpected type %T for field updated_at", values[i])
 			} else if value.Valid {
-				a.UpdateTime = value.Time
+				a.UpdatedAt = value.Time
 			}
 		case assignment.FieldName:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -219,10 +219,10 @@ func (a *Assignment) String() string {
 	var builder strings.Builder
 	builder.WriteString("Assignment(")
 	builder.WriteString(fmt.Sprintf("id=%v", a.ID))
-	builder.WriteString(", create_time=")
-	builder.WriteString(a.CreateTime.Format(time.ANSIC))
-	builder.WriteString(", update_time=")
-	builder.WriteString(a.UpdateTime.Format(time.ANSIC))
+	builder.WriteString(", created_at=")
+	builder.WriteString(a.CreatedAt.Format(time.ANSIC))
+	builder.WriteString(", updated_at=")
+	builder.WriteString(a.UpdatedAt.Format(time.ANSIC))
 	builder.WriteString(", name=")
 	builder.WriteString(a.Name)
 	builder.WriteString(", description=")

@@ -400,12 +400,12 @@ func (sq *StageQuery) WithStudents(opts ...func(*UserQuery)) *StageQuery {
 // Example:
 //
 //	var v []struct {
-//		CreateTime time.Time `json:"create_time,omitempty"`
+//		CreatedAt time.Time `json:"created_at,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
 //	client.Stage.Query().
-//		GroupBy(stage.FieldCreateTime).
+//		GroupBy(stage.FieldCreatedAt).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
 //
@@ -427,11 +427,11 @@ func (sq *StageQuery) GroupBy(field string, fields ...string) *StageGroupBy {
 // Example:
 //
 //	var v []struct {
-//		CreateTime time.Time `json:"create_time,omitempty"`
+//		CreatedAt time.Time `json:"created_at,omitempty"`
 //	}
 //
 //	client.Stage.Query().
-//		Select(stage.FieldCreateTime).
+//		Select(stage.FieldCreatedAt).
 //		Scan(ctx, &v)
 //
 func (sq *StageQuery) Select(fields ...string) *StageSelect {

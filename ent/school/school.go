@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/99designs/gqlgen/graphql"
 	"github.com/msal4/hassah_school_server/ent/schema"
 )
 
@@ -14,10 +15,10 @@ const (
 	Label = "school"
 	// FieldID holds the string denoting the id field in the database.
 	FieldID = "id"
-	// FieldCreateTime holds the string denoting the create_time field in the database.
-	FieldCreateTime = "create_time"
-	// FieldUpdateTime holds the string denoting the update_time field in the database.
-	FieldUpdateTime = "update_time"
+	// FieldCreatedAt holds the string denoting the created_at field in the database.
+	FieldCreatedAt = "created_at"
+	// FieldUpdatedAt holds the string denoting the updated_at field in the database.
+	FieldUpdatedAt = "updated_at"
 	// FieldName holds the string denoting the name field in the database.
 	FieldName = "name"
 	// FieldImage holds the string denoting the image field in the database.
@@ -49,8 +50,8 @@ const (
 // Columns holds all SQL columns for school fields.
 var Columns = []string{
 	FieldID,
-	FieldCreateTime,
-	FieldUpdateTime,
+	FieldCreatedAt,
+	FieldUpdatedAt,
 	FieldName,
 	FieldImage,
 	FieldStatus,
@@ -67,26 +68,33 @@ func ValidColumn(column string) bool {
 }
 
 var (
-	// DefaultCreateTime holds the default value on creation for the "create_time" field.
-	DefaultCreateTime func() time.Time
-	// DefaultUpdateTime holds the default value on creation for the "update_time" field.
-	DefaultUpdateTime func() time.Time
-	// UpdateDefaultUpdateTime holds the default value on update for the "update_time" field.
-	UpdateDefaultUpdateTime func() time.Time
+	// DefaultCreatedAt holds the default value on creation for the "created_at" field.
+	DefaultCreatedAt func() time.Time
+	// DefaultUpdatedAt holds the default value on creation for the "updated_at" field.
+	DefaultUpdatedAt func() time.Time
+	// UpdateDefaultUpdatedAt holds the default value on update for the "updated_at" field.
+	UpdateDefaultUpdatedAt func() time.Time
 	// NameValidator is a validator for the "name" field. It is called by the builders before save.
 	NameValidator func(string) error
 	// ImageValidator is a validator for the "image" field. It is called by the builders before save.
 	ImageValidator func(string) error
 )
 
-const DefaultStatus schema.Status = "active"
+const DefaultStatus schema.Status = "ACTIVE"
 
 // StatusValidator is a validator for the "status" field enum values. It is called by the builders before save.
 func StatusValidator(s schema.Status) error {
 	switch s {
-	case "deleted", "disabled", "active":
+	case "DELETED", "DISABLED", "ACTIVE":
 		return nil
 	default:
 		return fmt.Errorf("school: invalid enum value for status field: %q", s)
 	}
 }
+
+var (
+	// schema.Status must implement graphql.Marshaler.
+	_ graphql.Marshaler = schema.Status("")
+	// schema.Status must implement graphql.Unmarshaler.
+	_ graphql.Unmarshaler = (*schema.Status)(nil)
+)

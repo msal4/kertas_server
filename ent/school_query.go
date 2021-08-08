@@ -327,12 +327,12 @@ func (sq *SchoolQuery) WithStages(opts ...func(*StageQuery)) *SchoolQuery {
 // Example:
 //
 //	var v []struct {
-//		CreateTime time.Time `json:"create_time,omitempty"`
+//		CreatedAt time.Time `json:"created_at,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
 //	client.School.Query().
-//		GroupBy(school.FieldCreateTime).
+//		GroupBy(school.FieldCreatedAt).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
 //
@@ -354,11 +354,11 @@ func (sq *SchoolQuery) GroupBy(field string, fields ...string) *SchoolGroupBy {
 // Example:
 //
 //	var v []struct {
-//		CreateTime time.Time `json:"create_time,omitempty"`
+//		CreatedAt time.Time `json:"created_at,omitempty"`
 //	}
 //
 //	client.School.Query().
-//		Select(school.FieldCreateTime).
+//		Select(school.FieldCreatedAt).
 //		Scan(ctx, &v)
 //
 func (sq *SchoolQuery) Select(fields ...string) *SchoolSelect {
