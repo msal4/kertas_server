@@ -12,6 +12,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/google/uuid"
 	"github.com/msal4/hassah_school_server/ent/assignment"
 	"github.com/msal4/hassah_school_server/ent/assignmentsubmission"
 	"github.com/msal4/hassah_school_server/ent/class"
@@ -159,8 +160,8 @@ func (aq *AssignmentQuery) FirstX(ctx context.Context) *Assignment {
 
 // FirstID returns the first Assignment ID from the query.
 // Returns a *NotFoundError when no Assignment ID was found.
-func (aq *AssignmentQuery) FirstID(ctx context.Context) (id int, err error) {
-	var ids []int
+func (aq *AssignmentQuery) FirstID(ctx context.Context) (id uuid.UUID, err error) {
+	var ids []uuid.UUID
 	if ids, err = aq.Limit(1).IDs(ctx); err != nil {
 		return
 	}
@@ -172,7 +173,7 @@ func (aq *AssignmentQuery) FirstID(ctx context.Context) (id int, err error) {
 }
 
 // FirstIDX is like FirstID, but panics if an error occurs.
-func (aq *AssignmentQuery) FirstIDX(ctx context.Context) int {
+func (aq *AssignmentQuery) FirstIDX(ctx context.Context) uuid.UUID {
 	id, err := aq.FirstID(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
@@ -210,8 +211,8 @@ func (aq *AssignmentQuery) OnlyX(ctx context.Context) *Assignment {
 // OnlyID is like Only, but returns the only Assignment ID in the query.
 // Returns a *NotSingularError when exactly one Assignment ID is not found.
 // Returns a *NotFoundError when no entities are found.
-func (aq *AssignmentQuery) OnlyID(ctx context.Context) (id int, err error) {
-	var ids []int
+func (aq *AssignmentQuery) OnlyID(ctx context.Context) (id uuid.UUID, err error) {
+	var ids []uuid.UUID
 	if ids, err = aq.Limit(2).IDs(ctx); err != nil {
 		return
 	}
@@ -227,7 +228,7 @@ func (aq *AssignmentQuery) OnlyID(ctx context.Context) (id int, err error) {
 }
 
 // OnlyIDX is like OnlyID, but panics if an error occurs.
-func (aq *AssignmentQuery) OnlyIDX(ctx context.Context) int {
+func (aq *AssignmentQuery) OnlyIDX(ctx context.Context) uuid.UUID {
 	id, err := aq.OnlyID(ctx)
 	if err != nil {
 		panic(err)
@@ -253,8 +254,8 @@ func (aq *AssignmentQuery) AllX(ctx context.Context) []*Assignment {
 }
 
 // IDs executes the query and returns a list of Assignment IDs.
-func (aq *AssignmentQuery) IDs(ctx context.Context) ([]int, error) {
-	var ids []int
+func (aq *AssignmentQuery) IDs(ctx context.Context) ([]uuid.UUID, error) {
+	var ids []uuid.UUID
 	if err := aq.Select(assignment.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
@@ -262,7 +263,7 @@ func (aq *AssignmentQuery) IDs(ctx context.Context) ([]int, error) {
 }
 
 // IDsX is like IDs, but panics if an error occurs.
-func (aq *AssignmentQuery) IDsX(ctx context.Context) []int {
+func (aq *AssignmentQuery) IDsX(ctx context.Context) []uuid.UUID {
 	ids, err := aq.IDs(ctx)
 	if err != nil {
 		panic(err)
@@ -457,8 +458,8 @@ func (aq *AssignmentQuery) sqlAll(ctx context.Context) ([]*Assignment, error) {
 	}
 
 	if query := aq.withClass; query != nil {
-		ids := make([]int, 0, len(nodes))
-		nodeids := make(map[int][]*Assignment)
+		ids := make([]uuid.UUID, 0, len(nodes))
+		nodeids := make(map[uuid.UUID][]*Assignment)
 		for i := range nodes {
 			if nodes[i].class_assignments == nil {
 				continue
@@ -487,7 +488,7 @@ func (aq *AssignmentQuery) sqlAll(ctx context.Context) ([]*Assignment, error) {
 
 	if query := aq.withSubmissions; query != nil {
 		fks := make([]driver.Value, 0, len(nodes))
-		nodeids := make(map[int]*Assignment)
+		nodeids := make(map[uuid.UUID]*Assignment)
 		for i := range nodes {
 			fks = append(fks, nodes[i].ID)
 			nodeids[nodes[i].ID] = nodes[i]
@@ -516,7 +517,7 @@ func (aq *AssignmentQuery) sqlAll(ctx context.Context) ([]*Assignment, error) {
 
 	if query := aq.withGrades; query != nil {
 		fks := make([]driver.Value, 0, len(nodes))
-		nodeids := make(map[int]*Assignment)
+		nodeids := make(map[uuid.UUID]*Assignment)
 		for i := range nodes {
 			fks = append(fks, nodes[i].ID)
 			nodeids[nodes[i].ID] = nodes[i]
@@ -565,7 +566,7 @@ func (aq *AssignmentQuery) querySpec() *sqlgraph.QuerySpec {
 			Table:   assignment.Table,
 			Columns: assignment.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeUUID,
 				Column: assignment.FieldID,
 			},
 		},

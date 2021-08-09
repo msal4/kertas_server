@@ -10,6 +10,7 @@ import (
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/google/uuid"
 	"github.com/msal4/hassah_school_server/ent/assignment"
 	"github.com/msal4/hassah_school_server/ent/assignmentsubmission"
 	"github.com/msal4/hassah_school_server/ent/user"
@@ -70,8 +71,14 @@ func (asc *AssignmentSubmissionCreate) SetNillableSubmittedAt(t *time.Time) *Ass
 	return asc
 }
 
+// SetID sets the "id" field.
+func (asc *AssignmentSubmissionCreate) SetID(u uuid.UUID) *AssignmentSubmissionCreate {
+	asc.mutation.SetID(u)
+	return asc
+}
+
 // SetStudentID sets the "student" edge to the User entity by ID.
-func (asc *AssignmentSubmissionCreate) SetStudentID(id int) *AssignmentSubmissionCreate {
+func (asc *AssignmentSubmissionCreate) SetStudentID(id uuid.UUID) *AssignmentSubmissionCreate {
 	asc.mutation.SetStudentID(id)
 	return asc
 }
@@ -82,7 +89,7 @@ func (asc *AssignmentSubmissionCreate) SetStudent(u *User) *AssignmentSubmission
 }
 
 // SetAssignmentID sets the "assignment" edge to the Assignment entity by ID.
-func (asc *AssignmentSubmissionCreate) SetAssignmentID(id int) *AssignmentSubmissionCreate {
+func (asc *AssignmentSubmissionCreate) SetAssignmentID(id uuid.UUID) *AssignmentSubmissionCreate {
 	asc.mutation.SetAssignmentID(id)
 	return asc
 }
@@ -171,6 +178,10 @@ func (asc *AssignmentSubmissionCreate) defaults() {
 		v := assignmentsubmission.DefaultUpdatedAt()
 		asc.mutation.SetUpdatedAt(v)
 	}
+	if _, ok := asc.mutation.ID(); !ok {
+		v := assignmentsubmission.DefaultID()
+		asc.mutation.SetID(v)
+	}
 }
 
 // check runs all checks and user-defined validators on the builder.
@@ -201,8 +212,6 @@ func (asc *AssignmentSubmissionCreate) sqlSave(ctx context.Context) (*Assignment
 		}
 		return nil, err
 	}
-	id := _spec.ID.Value.(int64)
-	_node.ID = int(id)
 	return _node, nil
 }
 
@@ -212,11 +221,15 @@ func (asc *AssignmentSubmissionCreate) createSpec() (*AssignmentSubmission, *sql
 		_spec = &sqlgraph.CreateSpec{
 			Table: assignmentsubmission.Table,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeUUID,
 				Column: assignmentsubmission.FieldID,
 			},
 		}
 	)
+	if id, ok := asc.mutation.ID(); ok {
+		_node.ID = id
+		_spec.ID.Value = id
+	}
 	if value, ok := asc.mutation.CreatedAt(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
 			Type:   field.TypeTime,
@@ -258,7 +271,7 @@ func (asc *AssignmentSubmissionCreate) createSpec() (*AssignmentSubmission, *sql
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: user.FieldID,
 				},
 			},
@@ -278,7 +291,7 @@ func (asc *AssignmentSubmissionCreate) createSpec() (*AssignmentSubmission, *sql
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: assignment.FieldID,
 				},
 			},
@@ -334,10 +347,6 @@ func (ascb *AssignmentSubmissionCreateBulk) Save(ctx context.Context) ([]*Assign
 				}
 				mutation.id = &nodes[i].ID
 				mutation.done = true
-				if specs[i].ID.Value != nil {
-					id := specs[i].ID.Value.(int64)
-					nodes[i].ID = int(id)
-				}
 				return nodes[i], nil
 			})
 			for i := len(builder.hooks) - 1; i >= 0; i-- {

@@ -10,6 +10,7 @@ import (
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/google/uuid"
 	"github.com/msal4/hassah_school_server/ent/assignment"
 	"github.com/msal4/hassah_school_server/ent/attendance"
 	"github.com/msal4/hassah_school_server/ent/class"
@@ -75,8 +76,14 @@ func (cc *ClassCreate) SetNillableStatus(s *schema.Status) *ClassCreate {
 	return cc
 }
 
+// SetID sets the "id" field.
+func (cc *ClassCreate) SetID(u uuid.UUID) *ClassCreate {
+	cc.mutation.SetID(u)
+	return cc
+}
+
 // SetStageID sets the "stage" edge to the Stage entity by ID.
-func (cc *ClassCreate) SetStageID(id int) *ClassCreate {
+func (cc *ClassCreate) SetStageID(id uuid.UUID) *ClassCreate {
 	cc.mutation.SetStageID(id)
 	return cc
 }
@@ -87,7 +94,7 @@ func (cc *ClassCreate) SetStage(s *Stage) *ClassCreate {
 }
 
 // SetTeacherID sets the "teacher" edge to the User entity by ID.
-func (cc *ClassCreate) SetTeacherID(id int) *ClassCreate {
+func (cc *ClassCreate) SetTeacherID(id uuid.UUID) *ClassCreate {
 	cc.mutation.SetTeacherID(id)
 	return cc
 }
@@ -98,7 +105,7 @@ func (cc *ClassCreate) SetTeacher(u *User) *ClassCreate {
 }
 
 // SetGroupID sets the "group" edge to the Group entity by ID.
-func (cc *ClassCreate) SetGroupID(id int) *ClassCreate {
+func (cc *ClassCreate) SetGroupID(id uuid.UUID) *ClassCreate {
 	cc.mutation.SetGroupID(id)
 	return cc
 }
@@ -109,14 +116,14 @@ func (cc *ClassCreate) SetGroup(g *Group) *ClassCreate {
 }
 
 // AddAssignmentIDs adds the "assignments" edge to the Assignment entity by IDs.
-func (cc *ClassCreate) AddAssignmentIDs(ids ...int) *ClassCreate {
+func (cc *ClassCreate) AddAssignmentIDs(ids ...uuid.UUID) *ClassCreate {
 	cc.mutation.AddAssignmentIDs(ids...)
 	return cc
 }
 
 // AddAssignments adds the "assignments" edges to the Assignment entity.
 func (cc *ClassCreate) AddAssignments(a ...*Assignment) *ClassCreate {
-	ids := make([]int, len(a))
+	ids := make([]uuid.UUID, len(a))
 	for i := range a {
 		ids[i] = a[i].ID
 	}
@@ -124,14 +131,14 @@ func (cc *ClassCreate) AddAssignments(a ...*Assignment) *ClassCreate {
 }
 
 // AddAttendanceIDs adds the "attendances" edge to the Attendance entity by IDs.
-func (cc *ClassCreate) AddAttendanceIDs(ids ...int) *ClassCreate {
+func (cc *ClassCreate) AddAttendanceIDs(ids ...uuid.UUID) *ClassCreate {
 	cc.mutation.AddAttendanceIDs(ids...)
 	return cc
 }
 
 // AddAttendances adds the "attendances" edges to the Attendance entity.
 func (cc *ClassCreate) AddAttendances(a ...*Attendance) *ClassCreate {
-	ids := make([]int, len(a))
+	ids := make([]uuid.UUID, len(a))
 	for i := range a {
 		ids[i] = a[i].ID
 	}
@@ -139,14 +146,14 @@ func (cc *ClassCreate) AddAttendances(a ...*Attendance) *ClassCreate {
 }
 
 // AddScheduleIDs adds the "schedules" edge to the Schedule entity by IDs.
-func (cc *ClassCreate) AddScheduleIDs(ids ...int) *ClassCreate {
+func (cc *ClassCreate) AddScheduleIDs(ids ...uuid.UUID) *ClassCreate {
 	cc.mutation.AddScheduleIDs(ids...)
 	return cc
 }
 
 // AddSchedules adds the "schedules" edges to the Schedule entity.
 func (cc *ClassCreate) AddSchedules(s ...*Schedule) *ClassCreate {
-	ids := make([]int, len(s))
+	ids := make([]uuid.UUID, len(s))
 	for i := range s {
 		ids[i] = s[i].ID
 	}
@@ -236,6 +243,10 @@ func (cc *ClassCreate) defaults() {
 		v := class.DefaultStatus
 		cc.mutation.SetStatus(v)
 	}
+	if _, ok := cc.mutation.ID(); !ok {
+		v := class.DefaultID()
+		cc.mutation.SetID(v)
+	}
 }
 
 // check runs all checks and user-defined validators on the builder.
@@ -282,8 +293,6 @@ func (cc *ClassCreate) sqlSave(ctx context.Context) (*Class, error) {
 		}
 		return nil, err
 	}
-	id := _spec.ID.Value.(int64)
-	_node.ID = int(id)
 	return _node, nil
 }
 
@@ -293,11 +302,15 @@ func (cc *ClassCreate) createSpec() (*Class, *sqlgraph.CreateSpec) {
 		_spec = &sqlgraph.CreateSpec{
 			Table: class.Table,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeUUID,
 				Column: class.FieldID,
 			},
 		}
 	)
+	if id, ok := cc.mutation.ID(); ok {
+		_node.ID = id
+		_spec.ID.Value = id
+	}
 	if value, ok := cc.mutation.CreatedAt(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
 			Type:   field.TypeTime,
@@ -339,7 +352,7 @@ func (cc *ClassCreate) createSpec() (*Class, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: stage.FieldID,
 				},
 			},
@@ -359,7 +372,7 @@ func (cc *ClassCreate) createSpec() (*Class, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: user.FieldID,
 				},
 			},
@@ -379,7 +392,7 @@ func (cc *ClassCreate) createSpec() (*Class, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: group.FieldID,
 				},
 			},
@@ -398,7 +411,7 @@ func (cc *ClassCreate) createSpec() (*Class, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: assignment.FieldID,
 				},
 			},
@@ -417,7 +430,7 @@ func (cc *ClassCreate) createSpec() (*Class, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: attendance.FieldID,
 				},
 			},
@@ -436,7 +449,7 @@ func (cc *ClassCreate) createSpec() (*Class, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: schedule.FieldID,
 				},
 			},
@@ -491,10 +504,6 @@ func (ccb *ClassCreateBulk) Save(ctx context.Context) ([]*Class, error) {
 				}
 				mutation.id = &nodes[i].ID
 				mutation.done = true
-				if specs[i].ID.Value != nil {
-					id := specs[i].ID.Value.(int64)
-					nodes[i].ID = int(id)
-				}
 				return nodes[i], nil
 			})
 			for i := len(builder.hooks) - 1; i >= 0; i-- {

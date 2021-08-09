@@ -10,6 +10,7 @@ import (
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/google/uuid"
 	"github.com/msal4/hassah_school_server/ent/assignment"
 	"github.com/msal4/hassah_school_server/ent/grade"
 	"github.com/msal4/hassah_school_server/ent/user"
@@ -51,13 +52,19 @@ func (gc *GradeCreate) SetNillableUpdatedAt(t *time.Time) *GradeCreate {
 }
 
 // SetExamGrade sets the "exam_grade" field.
-func (gc *GradeCreate) SetExamGrade(f float64) *GradeCreate {
-	gc.mutation.SetExamGrade(f)
+func (gc *GradeCreate) SetExamGrade(i int) *GradeCreate {
+	gc.mutation.SetExamGrade(i)
+	return gc
+}
+
+// SetID sets the "id" field.
+func (gc *GradeCreate) SetID(u uuid.UUID) *GradeCreate {
+	gc.mutation.SetID(u)
 	return gc
 }
 
 // SetStudentID sets the "student" edge to the User entity by ID.
-func (gc *GradeCreate) SetStudentID(id int) *GradeCreate {
+func (gc *GradeCreate) SetStudentID(id uuid.UUID) *GradeCreate {
 	gc.mutation.SetStudentID(id)
 	return gc
 }
@@ -68,7 +75,7 @@ func (gc *GradeCreate) SetStudent(u *User) *GradeCreate {
 }
 
 // SetExamID sets the "exam" edge to the Assignment entity by ID.
-func (gc *GradeCreate) SetExamID(id int) *GradeCreate {
+func (gc *GradeCreate) SetExamID(id uuid.UUID) *GradeCreate {
 	gc.mutation.SetExamID(id)
 	return gc
 }
@@ -157,6 +164,10 @@ func (gc *GradeCreate) defaults() {
 		v := grade.DefaultUpdatedAt()
 		gc.mutation.SetUpdatedAt(v)
 	}
+	if _, ok := gc.mutation.ID(); !ok {
+		v := grade.DefaultID()
+		gc.mutation.SetID(v)
+	}
 }
 
 // check runs all checks and user-defined validators on the builder.
@@ -192,8 +203,6 @@ func (gc *GradeCreate) sqlSave(ctx context.Context) (*Grade, error) {
 		}
 		return nil, err
 	}
-	id := _spec.ID.Value.(int64)
-	_node.ID = int(id)
 	return _node, nil
 }
 
@@ -203,11 +212,15 @@ func (gc *GradeCreate) createSpec() (*Grade, *sqlgraph.CreateSpec) {
 		_spec = &sqlgraph.CreateSpec{
 			Table: grade.Table,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeUUID,
 				Column: grade.FieldID,
 			},
 		}
 	)
+	if id, ok := gc.mutation.ID(); ok {
+		_node.ID = id
+		_spec.ID.Value = id
+	}
 	if value, ok := gc.mutation.CreatedAt(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
 			Type:   field.TypeTime,
@@ -226,7 +239,7 @@ func (gc *GradeCreate) createSpec() (*Grade, *sqlgraph.CreateSpec) {
 	}
 	if value, ok := gc.mutation.ExamGrade(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeFloat64,
+			Type:   field.TypeInt,
 			Value:  value,
 			Column: grade.FieldExamGrade,
 		})
@@ -241,7 +254,7 @@ func (gc *GradeCreate) createSpec() (*Grade, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: user.FieldID,
 				},
 			},
@@ -261,7 +274,7 @@ func (gc *GradeCreate) createSpec() (*Grade, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: assignment.FieldID,
 				},
 			},
@@ -317,10 +330,6 @@ func (gcb *GradeCreateBulk) Save(ctx context.Context) ([]*Grade, error) {
 				}
 				mutation.id = &nodes[i].ID
 				mutation.done = true
-				if specs[i].ID.Value != nil {
-					id := specs[i].ID.Value.(int64)
-					nodes[i].ID = int(id)
-				}
 				return nodes[i], nil
 			})
 			for i := len(builder.hooks) - 1; i >= 0; i-- {

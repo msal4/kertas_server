@@ -12,6 +12,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/google/uuid"
 	"github.com/msal4/hassah_school_server/ent/class"
 	"github.com/msal4/hassah_school_server/ent/predicate"
 	"github.com/msal4/hassah_school_server/ent/school"
@@ -183,8 +184,8 @@ func (sq *StageQuery) FirstX(ctx context.Context) *Stage {
 
 // FirstID returns the first Stage ID from the query.
 // Returns a *NotFoundError when no Stage ID was found.
-func (sq *StageQuery) FirstID(ctx context.Context) (id int, err error) {
-	var ids []int
+func (sq *StageQuery) FirstID(ctx context.Context) (id uuid.UUID, err error) {
+	var ids []uuid.UUID
 	if ids, err = sq.Limit(1).IDs(ctx); err != nil {
 		return
 	}
@@ -196,7 +197,7 @@ func (sq *StageQuery) FirstID(ctx context.Context) (id int, err error) {
 }
 
 // FirstIDX is like FirstID, but panics if an error occurs.
-func (sq *StageQuery) FirstIDX(ctx context.Context) int {
+func (sq *StageQuery) FirstIDX(ctx context.Context) uuid.UUID {
 	id, err := sq.FirstID(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
@@ -234,8 +235,8 @@ func (sq *StageQuery) OnlyX(ctx context.Context) *Stage {
 // OnlyID is like Only, but returns the only Stage ID in the query.
 // Returns a *NotSingularError when exactly one Stage ID is not found.
 // Returns a *NotFoundError when no entities are found.
-func (sq *StageQuery) OnlyID(ctx context.Context) (id int, err error) {
-	var ids []int
+func (sq *StageQuery) OnlyID(ctx context.Context) (id uuid.UUID, err error) {
+	var ids []uuid.UUID
 	if ids, err = sq.Limit(2).IDs(ctx); err != nil {
 		return
 	}
@@ -251,7 +252,7 @@ func (sq *StageQuery) OnlyID(ctx context.Context) (id int, err error) {
 }
 
 // OnlyIDX is like OnlyID, but panics if an error occurs.
-func (sq *StageQuery) OnlyIDX(ctx context.Context) int {
+func (sq *StageQuery) OnlyIDX(ctx context.Context) uuid.UUID {
 	id, err := sq.OnlyID(ctx)
 	if err != nil {
 		panic(err)
@@ -277,8 +278,8 @@ func (sq *StageQuery) AllX(ctx context.Context) []*Stage {
 }
 
 // IDs executes the query and returns a list of Stage IDs.
-func (sq *StageQuery) IDs(ctx context.Context) ([]int, error) {
-	var ids []int
+func (sq *StageQuery) IDs(ctx context.Context) ([]uuid.UUID, error) {
+	var ids []uuid.UUID
 	if err := sq.Select(stage.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
@@ -286,7 +287,7 @@ func (sq *StageQuery) IDs(ctx context.Context) ([]int, error) {
 }
 
 // IDsX is like IDs, but panics if an error occurs.
-func (sq *StageQuery) IDsX(ctx context.Context) []int {
+func (sq *StageQuery) IDsX(ctx context.Context) []uuid.UUID {
 	ids, err := sq.IDs(ctx)
 	if err != nil {
 		panic(err)
@@ -494,8 +495,8 @@ func (sq *StageQuery) sqlAll(ctx context.Context) ([]*Stage, error) {
 	}
 
 	if query := sq.withSchool; query != nil {
-		ids := make([]int, 0, len(nodes))
-		nodeids := make(map[int][]*Stage)
+		ids := make([]uuid.UUID, 0, len(nodes))
+		nodeids := make(map[uuid.UUID][]*Stage)
 		for i := range nodes {
 			if nodes[i].school_stages == nil {
 				continue
@@ -524,7 +525,7 @@ func (sq *StageQuery) sqlAll(ctx context.Context) ([]*Stage, error) {
 
 	if query := sq.withClasses; query != nil {
 		fks := make([]driver.Value, 0, len(nodes))
-		nodeids := make(map[int]*Stage)
+		nodeids := make(map[uuid.UUID]*Stage)
 		for i := range nodes {
 			fks = append(fks, nodes[i].ID)
 			nodeids[nodes[i].ID] = nodes[i]
@@ -553,7 +554,7 @@ func (sq *StageQuery) sqlAll(ctx context.Context) ([]*Stage, error) {
 
 	if query := sq.withPayments; query != nil {
 		fks := make([]driver.Value, 0, len(nodes))
-		nodeids := make(map[int]*Stage)
+		nodeids := make(map[uuid.UUID]*Stage)
 		for i := range nodes {
 			fks = append(fks, nodes[i].ID)
 			nodeids[nodes[i].ID] = nodes[i]
@@ -582,7 +583,7 @@ func (sq *StageQuery) sqlAll(ctx context.Context) ([]*Stage, error) {
 
 	if query := sq.withStudents; query != nil {
 		fks := make([]driver.Value, 0, len(nodes))
-		nodeids := make(map[int]*Stage)
+		nodeids := make(map[uuid.UUID]*Stage)
 		for i := range nodes {
 			fks = append(fks, nodes[i].ID)
 			nodeids[nodes[i].ID] = nodes[i]
@@ -631,7 +632,7 @@ func (sq *StageQuery) querySpec() *sqlgraph.QuerySpec {
 			Table:   stage.Table,
 			Columns: stage.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeUUID,
 				Column: stage.FieldID,
 			},
 		},

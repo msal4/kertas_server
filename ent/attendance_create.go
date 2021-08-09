@@ -10,6 +10,7 @@ import (
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/google/uuid"
 	"github.com/msal4/hassah_school_server/ent/attendance"
 	"github.com/msal4/hassah_school_server/ent/class"
 	"github.com/msal4/hassah_school_server/ent/user"
@@ -62,8 +63,22 @@ func (ac *AttendanceCreate) SetState(a attendance.State) *AttendanceCreate {
 	return ac
 }
 
+// SetNillableState sets the "state" field if the given value is not nil.
+func (ac *AttendanceCreate) SetNillableState(a *attendance.State) *AttendanceCreate {
+	if a != nil {
+		ac.SetState(*a)
+	}
+	return ac
+}
+
+// SetID sets the "id" field.
+func (ac *AttendanceCreate) SetID(u uuid.UUID) *AttendanceCreate {
+	ac.mutation.SetID(u)
+	return ac
+}
+
 // SetClassID sets the "class" edge to the Class entity by ID.
-func (ac *AttendanceCreate) SetClassID(id int) *AttendanceCreate {
+func (ac *AttendanceCreate) SetClassID(id uuid.UUID) *AttendanceCreate {
 	ac.mutation.SetClassID(id)
 	return ac
 }
@@ -74,7 +89,7 @@ func (ac *AttendanceCreate) SetClass(c *Class) *AttendanceCreate {
 }
 
 // SetStudentID sets the "student" edge to the User entity by ID.
-func (ac *AttendanceCreate) SetStudentID(id int) *AttendanceCreate {
+func (ac *AttendanceCreate) SetStudentID(id uuid.UUID) *AttendanceCreate {
 	ac.mutation.SetStudentID(id)
 	return ac
 }
@@ -163,6 +178,14 @@ func (ac *AttendanceCreate) defaults() {
 		v := attendance.DefaultUpdatedAt()
 		ac.mutation.SetUpdatedAt(v)
 	}
+	if _, ok := ac.mutation.State(); !ok {
+		v := attendance.DefaultState
+		ac.mutation.SetState(v)
+	}
+	if _, ok := ac.mutation.ID(); !ok {
+		v := attendance.DefaultID()
+		ac.mutation.SetID(v)
+	}
 }
 
 // check runs all checks and user-defined validators on the builder.
@@ -201,8 +224,6 @@ func (ac *AttendanceCreate) sqlSave(ctx context.Context) (*Attendance, error) {
 		}
 		return nil, err
 	}
-	id := _spec.ID.Value.(int64)
-	_node.ID = int(id)
 	return _node, nil
 }
 
@@ -212,11 +233,15 @@ func (ac *AttendanceCreate) createSpec() (*Attendance, *sqlgraph.CreateSpec) {
 		_spec = &sqlgraph.CreateSpec{
 			Table: attendance.Table,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeUUID,
 				Column: attendance.FieldID,
 			},
 		}
 	)
+	if id, ok := ac.mutation.ID(); ok {
+		_node.ID = id
+		_spec.ID.Value = id
+	}
 	if value, ok := ac.mutation.CreatedAt(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
 			Type:   field.TypeTime,
@@ -258,7 +283,7 @@ func (ac *AttendanceCreate) createSpec() (*Attendance, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: class.FieldID,
 				},
 			},
@@ -278,7 +303,7 @@ func (ac *AttendanceCreate) createSpec() (*Attendance, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: user.FieldID,
 				},
 			},
@@ -334,10 +359,6 @@ func (acb *AttendanceCreateBulk) Save(ctx context.Context) ([]*Attendance, error
 				}
 				mutation.id = &nodes[i].ID
 				mutation.done = true
-				if specs[i].ID.Value != nil {
-					id := specs[i].ID.Value.(int64)
-					nodes[i].ID = int(id)
-				}
 				return nodes[i], nil
 			})
 			for i := len(builder.hooks) - 1; i >= 0; i-- {

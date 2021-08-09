@@ -1,11 +1,13 @@
 package schema
 
 import (
+	"entgo.io/contrib/entgql"
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/entsql"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
 	"entgo.io/ent/schema/index"
+	"github.com/google/uuid"
 )
 
 // Assignment holds the schema definition for the Assignment entity.
@@ -16,11 +18,12 @@ type Assignment struct {
 // Fields of the Assignment.
 func (Assignment) Fields() []ent.Field {
 	return []ent.Field{
-		field.String("name").NotEmpty(),
-		field.String("description").Optional(),
-		field.Bool("is_exam").Default(false),
-		field.Time("due_date"),
-		field.Int("duration").Optional(),
+		field.UUID("id", uuid.UUID{}).Default(uuid.New),
+		field.String("name").NotEmpty().Annotations(entgql.OrderField("NAME")),
+		field.String("description").Optional().Annotations(entgql.OrderField("DESCRIPTION")),
+		field.Bool("is_exam").Default(false).Annotations(entgql.OrderField("IS_EXAM")),
+		field.Time("due_date").Annotations(entgql.OrderField("DUE_DATE")),
+		field.Int("duration").Optional().Annotations(entgql.OrderField("DURATION")),
 		field.Time("deleted_at").Optional().Nillable(),
 	}
 }

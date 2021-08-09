@@ -10,6 +10,7 @@ import (
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/google/uuid"
 	"github.com/msal4/hassah_school_server/ent/assignmentsubmission"
 	"github.com/msal4/hassah_school_server/ent/attendance"
 	"github.com/msal4/hassah_school_server/ent/class"
@@ -137,14 +138,20 @@ func (uc *UserCreate) SetNillableStatus(s *schema.Status) *UserCreate {
 	return uc
 }
 
+// SetID sets the "id" field.
+func (uc *UserCreate) SetID(u uuid.UUID) *UserCreate {
+	uc.mutation.SetID(u)
+	return uc
+}
+
 // SetStageID sets the "stage" edge to the Stage entity by ID.
-func (uc *UserCreate) SetStageID(id int) *UserCreate {
+func (uc *UserCreate) SetStageID(id uuid.UUID) *UserCreate {
 	uc.mutation.SetStageID(id)
 	return uc
 }
 
 // SetNillableStageID sets the "stage" edge to the Stage entity by ID if the given value is not nil.
-func (uc *UserCreate) SetNillableStageID(id *int) *UserCreate {
+func (uc *UserCreate) SetNillableStageID(id *uuid.UUID) *UserCreate {
 	if id != nil {
 		uc = uc.SetStageID(*id)
 	}
@@ -157,13 +164,13 @@ func (uc *UserCreate) SetStage(s *Stage) *UserCreate {
 }
 
 // SetSchoolID sets the "school" edge to the School entity by ID.
-func (uc *UserCreate) SetSchoolID(id int) *UserCreate {
+func (uc *UserCreate) SetSchoolID(id uuid.UUID) *UserCreate {
 	uc.mutation.SetSchoolID(id)
 	return uc
 }
 
 // SetNillableSchoolID sets the "school" edge to the School entity by ID if the given value is not nil.
-func (uc *UserCreate) SetNillableSchoolID(id *int) *UserCreate {
+func (uc *UserCreate) SetNillableSchoolID(id *uuid.UUID) *UserCreate {
 	if id != nil {
 		uc = uc.SetSchoolID(*id)
 	}
@@ -176,14 +183,14 @@ func (uc *UserCreate) SetSchool(s *School) *UserCreate {
 }
 
 // AddClassIDs adds the "classes" edge to the Class entity by IDs.
-func (uc *UserCreate) AddClassIDs(ids ...int) *UserCreate {
+func (uc *UserCreate) AddClassIDs(ids ...uuid.UUID) *UserCreate {
 	uc.mutation.AddClassIDs(ids...)
 	return uc
 }
 
 // AddClasses adds the "classes" edges to the Class entity.
 func (uc *UserCreate) AddClasses(c ...*Class) *UserCreate {
-	ids := make([]int, len(c))
+	ids := make([]uuid.UUID, len(c))
 	for i := range c {
 		ids[i] = c[i].ID
 	}
@@ -191,14 +198,14 @@ func (uc *UserCreate) AddClasses(c ...*Class) *UserCreate {
 }
 
 // AddMessageIDs adds the "messages" edge to the Message entity by IDs.
-func (uc *UserCreate) AddMessageIDs(ids ...int) *UserCreate {
+func (uc *UserCreate) AddMessageIDs(ids ...uuid.UUID) *UserCreate {
 	uc.mutation.AddMessageIDs(ids...)
 	return uc
 }
 
 // AddMessages adds the "messages" edges to the Message entity.
 func (uc *UserCreate) AddMessages(m ...*Message) *UserCreate {
-	ids := make([]int, len(m))
+	ids := make([]uuid.UUID, len(m))
 	for i := range m {
 		ids[i] = m[i].ID
 	}
@@ -206,14 +213,14 @@ func (uc *UserCreate) AddMessages(m ...*Message) *UserCreate {
 }
 
 // AddSubmissionIDs adds the "submissions" edge to the AssignmentSubmission entity by IDs.
-func (uc *UserCreate) AddSubmissionIDs(ids ...int) *UserCreate {
+func (uc *UserCreate) AddSubmissionIDs(ids ...uuid.UUID) *UserCreate {
 	uc.mutation.AddSubmissionIDs(ids...)
 	return uc
 }
 
 // AddSubmissions adds the "submissions" edges to the AssignmentSubmission entity.
 func (uc *UserCreate) AddSubmissions(a ...*AssignmentSubmission) *UserCreate {
-	ids := make([]int, len(a))
+	ids := make([]uuid.UUID, len(a))
 	for i := range a {
 		ids[i] = a[i].ID
 	}
@@ -221,14 +228,14 @@ func (uc *UserCreate) AddSubmissions(a ...*AssignmentSubmission) *UserCreate {
 }
 
 // AddAttendanceIDs adds the "attendances" edge to the Attendance entity by IDs.
-func (uc *UserCreate) AddAttendanceIDs(ids ...int) *UserCreate {
+func (uc *UserCreate) AddAttendanceIDs(ids ...uuid.UUID) *UserCreate {
 	uc.mutation.AddAttendanceIDs(ids...)
 	return uc
 }
 
 // AddAttendances adds the "attendances" edges to the Attendance entity.
 func (uc *UserCreate) AddAttendances(a ...*Attendance) *UserCreate {
-	ids := make([]int, len(a))
+	ids := make([]uuid.UUID, len(a))
 	for i := range a {
 		ids[i] = a[i].ID
 	}
@@ -236,14 +243,14 @@ func (uc *UserCreate) AddAttendances(a ...*Attendance) *UserCreate {
 }
 
 // AddPaymentIDs adds the "payments" edge to the TuitionPayment entity by IDs.
-func (uc *UserCreate) AddPaymentIDs(ids ...int) *UserCreate {
+func (uc *UserCreate) AddPaymentIDs(ids ...uuid.UUID) *UserCreate {
 	uc.mutation.AddPaymentIDs(ids...)
 	return uc
 }
 
 // AddPayments adds the "payments" edges to the TuitionPayment entity.
 func (uc *UserCreate) AddPayments(t ...*TuitionPayment) *UserCreate {
-	ids := make([]int, len(t))
+	ids := make([]uuid.UUID, len(t))
 	for i := range t {
 		ids[i] = t[i].ID
 	}
@@ -251,14 +258,14 @@ func (uc *UserCreate) AddPayments(t ...*TuitionPayment) *UserCreate {
 }
 
 // AddGradeIDs adds the "grades" edge to the Grade entity by IDs.
-func (uc *UserCreate) AddGradeIDs(ids ...int) *UserCreate {
+func (uc *UserCreate) AddGradeIDs(ids ...uuid.UUID) *UserCreate {
 	uc.mutation.AddGradeIDs(ids...)
 	return uc
 }
 
 // AddGrades adds the "grades" edges to the Grade entity.
 func (uc *UserCreate) AddGrades(g ...*Grade) *UserCreate {
-	ids := make([]int, len(g))
+	ids := make([]uuid.UUID, len(g))
 	for i := range g {
 		ids[i] = g[i].ID
 	}
@@ -356,6 +363,10 @@ func (uc *UserCreate) defaults() {
 		v := user.DefaultStatus
 		uc.mutation.SetStatus(v)
 	}
+	if _, ok := uc.mutation.ID(); !ok {
+		v := user.DefaultID()
+		uc.mutation.SetID(v)
+	}
 }
 
 // check runs all checks and user-defined validators on the builder.
@@ -428,8 +439,6 @@ func (uc *UserCreate) sqlSave(ctx context.Context) (*User, error) {
 		}
 		return nil, err
 	}
-	id := _spec.ID.Value.(int64)
-	_node.ID = int(id)
 	return _node, nil
 }
 
@@ -439,11 +448,15 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 		_spec = &sqlgraph.CreateSpec{
 			Table: user.Table,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeUUID,
 				Column: user.FieldID,
 			},
 		}
 	)
+	if id, ok := uc.mutation.ID(); ok {
+		_node.ID = id
+		_spec.ID.Value = id
+	}
 	if value, ok := uc.mutation.CreatedAt(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
 			Type:   field.TypeTime,
@@ -533,7 +546,7 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: stage.FieldID,
 				},
 			},
@@ -553,7 +566,7 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: school.FieldID,
 				},
 			},
@@ -573,7 +586,7 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: class.FieldID,
 				},
 			},
@@ -592,7 +605,7 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: message.FieldID,
 				},
 			},
@@ -611,7 +624,7 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: assignmentsubmission.FieldID,
 				},
 			},
@@ -630,7 +643,7 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: attendance.FieldID,
 				},
 			},
@@ -649,7 +662,7 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: tuitionpayment.FieldID,
 				},
 			},
@@ -668,7 +681,7 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: grade.FieldID,
 				},
 			},
@@ -723,10 +736,6 @@ func (ucb *UserCreateBulk) Save(ctx context.Context) ([]*User, error) {
 				}
 				mutation.id = &nodes[i].ID
 				mutation.done = true
-				if specs[i].ID.Value != nil {
-					id := specs[i].ID.Value.(int64)
-					nodes[i].ID = int(id)
-				}
 				return nodes[i], nil
 			})
 			for i := len(builder.hooks) - 1; i >= 0; i-- {

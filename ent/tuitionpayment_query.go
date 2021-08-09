@@ -11,6 +11,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/google/uuid"
 	"github.com/msal4/hassah_school_server/ent/predicate"
 	"github.com/msal4/hassah_school_server/ent/stage"
 	"github.com/msal4/hassah_school_server/ent/tuitionpayment"
@@ -134,8 +135,8 @@ func (tpq *TuitionPaymentQuery) FirstX(ctx context.Context) *TuitionPayment {
 
 // FirstID returns the first TuitionPayment ID from the query.
 // Returns a *NotFoundError when no TuitionPayment ID was found.
-func (tpq *TuitionPaymentQuery) FirstID(ctx context.Context) (id int, err error) {
-	var ids []int
+func (tpq *TuitionPaymentQuery) FirstID(ctx context.Context) (id uuid.UUID, err error) {
+	var ids []uuid.UUID
 	if ids, err = tpq.Limit(1).IDs(ctx); err != nil {
 		return
 	}
@@ -147,7 +148,7 @@ func (tpq *TuitionPaymentQuery) FirstID(ctx context.Context) (id int, err error)
 }
 
 // FirstIDX is like FirstID, but panics if an error occurs.
-func (tpq *TuitionPaymentQuery) FirstIDX(ctx context.Context) int {
+func (tpq *TuitionPaymentQuery) FirstIDX(ctx context.Context) uuid.UUID {
 	id, err := tpq.FirstID(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
@@ -185,8 +186,8 @@ func (tpq *TuitionPaymentQuery) OnlyX(ctx context.Context) *TuitionPayment {
 // OnlyID is like Only, but returns the only TuitionPayment ID in the query.
 // Returns a *NotSingularError when exactly one TuitionPayment ID is not found.
 // Returns a *NotFoundError when no entities are found.
-func (tpq *TuitionPaymentQuery) OnlyID(ctx context.Context) (id int, err error) {
-	var ids []int
+func (tpq *TuitionPaymentQuery) OnlyID(ctx context.Context) (id uuid.UUID, err error) {
+	var ids []uuid.UUID
 	if ids, err = tpq.Limit(2).IDs(ctx); err != nil {
 		return
 	}
@@ -202,7 +203,7 @@ func (tpq *TuitionPaymentQuery) OnlyID(ctx context.Context) (id int, err error) 
 }
 
 // OnlyIDX is like OnlyID, but panics if an error occurs.
-func (tpq *TuitionPaymentQuery) OnlyIDX(ctx context.Context) int {
+func (tpq *TuitionPaymentQuery) OnlyIDX(ctx context.Context) uuid.UUID {
 	id, err := tpq.OnlyID(ctx)
 	if err != nil {
 		panic(err)
@@ -228,8 +229,8 @@ func (tpq *TuitionPaymentQuery) AllX(ctx context.Context) []*TuitionPayment {
 }
 
 // IDs executes the query and returns a list of TuitionPayment IDs.
-func (tpq *TuitionPaymentQuery) IDs(ctx context.Context) ([]int, error) {
-	var ids []int
+func (tpq *TuitionPaymentQuery) IDs(ctx context.Context) ([]uuid.UUID, error) {
+	var ids []uuid.UUID
 	if err := tpq.Select(tuitionpayment.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
@@ -237,7 +238,7 @@ func (tpq *TuitionPaymentQuery) IDs(ctx context.Context) ([]int, error) {
 }
 
 // IDsX is like IDs, but panics if an error occurs.
-func (tpq *TuitionPaymentQuery) IDsX(ctx context.Context) []int {
+func (tpq *TuitionPaymentQuery) IDsX(ctx context.Context) []uuid.UUID {
 	ids, err := tpq.IDs(ctx)
 	if err != nil {
 		panic(err)
@@ -419,8 +420,8 @@ func (tpq *TuitionPaymentQuery) sqlAll(ctx context.Context) ([]*TuitionPayment, 
 	}
 
 	if query := tpq.withStudent; query != nil {
-		ids := make([]int, 0, len(nodes))
-		nodeids := make(map[int][]*TuitionPayment)
+		ids := make([]uuid.UUID, 0, len(nodes))
+		nodeids := make(map[uuid.UUID][]*TuitionPayment)
 		for i := range nodes {
 			if nodes[i].user_payments == nil {
 				continue
@@ -448,8 +449,8 @@ func (tpq *TuitionPaymentQuery) sqlAll(ctx context.Context) ([]*TuitionPayment, 
 	}
 
 	if query := tpq.withStage; query != nil {
-		ids := make([]int, 0, len(nodes))
-		nodeids := make(map[int][]*TuitionPayment)
+		ids := make([]uuid.UUID, 0, len(nodes))
+		nodeids := make(map[uuid.UUID][]*TuitionPayment)
 		for i := range nodes {
 			if nodes[i].stage_payments == nil {
 				continue
@@ -498,7 +499,7 @@ func (tpq *TuitionPaymentQuery) querySpec() *sqlgraph.QuerySpec {
 			Table:   tuitionpayment.Table,
 			Columns: tuitionpayment.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeUUID,
 				Column: tuitionpayment.FieldID,
 			},
 		},

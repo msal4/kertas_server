@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"entgo.io/ent/dialect/sql"
+	"github.com/google/uuid"
 	"github.com/msal4/hassah_school_server/ent/attendance"
 	"github.com/msal4/hassah_school_server/ent/class"
 	"github.com/msal4/hassah_school_server/ent/user"
@@ -17,7 +18,7 @@ import (
 type Attendance struct {
 	config `json:"-"`
 	// ID of the ent.
-	ID int `json:"id,omitempty"`
+	ID uuid.UUID `json:"id,omitempty"`
 	// CreatedAt holds the value of the "created_at" field.
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// UpdatedAt holds the value of the "updated_at" field.
@@ -29,8 +30,8 @@ type Attendance struct {
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the AttendanceQuery when eager-loading is set.
 	Edges             AttendanceEdges `json:"edges"`
-	class_attendances *int
-	user_attendances  *int
+	class_attendances *uuid.UUID
+	user_attendances  *uuid.UUID
 }
 
 // AttendanceEdges holds the relations/edges for other nodes in the graph.
@@ -77,16 +78,16 @@ func (*Attendance) scanValues(columns []string) ([]interface{}, error) {
 	values := make([]interface{}, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case attendance.FieldID:
-			values[i] = new(sql.NullInt64)
 		case attendance.FieldState:
 			values[i] = new(sql.NullString)
 		case attendance.FieldCreatedAt, attendance.FieldUpdatedAt, attendance.FieldDate:
 			values[i] = new(sql.NullTime)
+		case attendance.FieldID:
+			values[i] = new(uuid.UUID)
 		case attendance.ForeignKeys[0]: // class_attendances
-			values[i] = new(sql.NullInt64)
+			values[i] = &sql.NullScanner{S: new(uuid.UUID)}
 		case attendance.ForeignKeys[1]: // user_attendances
-			values[i] = new(sql.NullInt64)
+			values[i] = &sql.NullScanner{S: new(uuid.UUID)}
 		default:
 			return nil, fmt.Errorf("unexpected column %q for type Attendance", columns[i])
 		}
@@ -103,11 +104,11 @@ func (a *Attendance) assignValues(columns []string, values []interface{}) error 
 	for i := range columns {
 		switch columns[i] {
 		case attendance.FieldID:
-			value, ok := values[i].(*sql.NullInt64)
-			if !ok {
-				return fmt.Errorf("unexpected type %T for field id", value)
+			if value, ok := values[i].(*uuid.UUID); !ok {
+				return fmt.Errorf("unexpected type %T for field id", values[i])
+			} else if value != nil {
+				a.ID = *value
 			}
-			a.ID = int(value.Int64)
 		case attendance.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field created_at", values[i])
@@ -133,18 +134,18 @@ func (a *Attendance) assignValues(columns []string, values []interface{}) error 
 				a.State = attendance.State(value.String)
 			}
 		case attendance.ForeignKeys[0]:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for edge-field class_attendances", value)
+			if value, ok := values[i].(*sql.NullScanner); !ok {
+				return fmt.Errorf("unexpected type %T for field class_attendances", values[i])
 			} else if value.Valid {
-				a.class_attendances = new(int)
-				*a.class_attendances = int(value.Int64)
+				a.class_attendances = new(uuid.UUID)
+				*a.class_attendances = *value.S.(*uuid.UUID)
 			}
 		case attendance.ForeignKeys[1]:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for edge-field user_attendances", value)
+			if value, ok := values[i].(*sql.NullScanner); !ok {
+				return fmt.Errorf("unexpected type %T for field user_attendances", values[i])
 			} else if value.Valid {
-				a.user_attendances = new(int)
-				*a.user_attendances = int(value.Int64)
+				a.user_attendances = new(uuid.UUID)
+				*a.user_attendances = *value.S.(*uuid.UUID)
 			}
 		}
 	}

@@ -11,6 +11,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/google/uuid"
 	"github.com/msal4/hassah_school_server/ent/assignment"
 	"github.com/msal4/hassah_school_server/ent/grade"
 	"github.com/msal4/hassah_school_server/ent/predicate"
@@ -134,8 +135,8 @@ func (gq *GradeQuery) FirstX(ctx context.Context) *Grade {
 
 // FirstID returns the first Grade ID from the query.
 // Returns a *NotFoundError when no Grade ID was found.
-func (gq *GradeQuery) FirstID(ctx context.Context) (id int, err error) {
-	var ids []int
+func (gq *GradeQuery) FirstID(ctx context.Context) (id uuid.UUID, err error) {
+	var ids []uuid.UUID
 	if ids, err = gq.Limit(1).IDs(ctx); err != nil {
 		return
 	}
@@ -147,7 +148,7 @@ func (gq *GradeQuery) FirstID(ctx context.Context) (id int, err error) {
 }
 
 // FirstIDX is like FirstID, but panics if an error occurs.
-func (gq *GradeQuery) FirstIDX(ctx context.Context) int {
+func (gq *GradeQuery) FirstIDX(ctx context.Context) uuid.UUID {
 	id, err := gq.FirstID(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
@@ -185,8 +186,8 @@ func (gq *GradeQuery) OnlyX(ctx context.Context) *Grade {
 // OnlyID is like Only, but returns the only Grade ID in the query.
 // Returns a *NotSingularError when exactly one Grade ID is not found.
 // Returns a *NotFoundError when no entities are found.
-func (gq *GradeQuery) OnlyID(ctx context.Context) (id int, err error) {
-	var ids []int
+func (gq *GradeQuery) OnlyID(ctx context.Context) (id uuid.UUID, err error) {
+	var ids []uuid.UUID
 	if ids, err = gq.Limit(2).IDs(ctx); err != nil {
 		return
 	}
@@ -202,7 +203,7 @@ func (gq *GradeQuery) OnlyID(ctx context.Context) (id int, err error) {
 }
 
 // OnlyIDX is like OnlyID, but panics if an error occurs.
-func (gq *GradeQuery) OnlyIDX(ctx context.Context) int {
+func (gq *GradeQuery) OnlyIDX(ctx context.Context) uuid.UUID {
 	id, err := gq.OnlyID(ctx)
 	if err != nil {
 		panic(err)
@@ -228,8 +229,8 @@ func (gq *GradeQuery) AllX(ctx context.Context) []*Grade {
 }
 
 // IDs executes the query and returns a list of Grade IDs.
-func (gq *GradeQuery) IDs(ctx context.Context) ([]int, error) {
-	var ids []int
+func (gq *GradeQuery) IDs(ctx context.Context) ([]uuid.UUID, error) {
+	var ids []uuid.UUID
 	if err := gq.Select(grade.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
@@ -237,7 +238,7 @@ func (gq *GradeQuery) IDs(ctx context.Context) ([]int, error) {
 }
 
 // IDsX is like IDs, but panics if an error occurs.
-func (gq *GradeQuery) IDsX(ctx context.Context) []int {
+func (gq *GradeQuery) IDsX(ctx context.Context) []uuid.UUID {
 	ids, err := gq.IDs(ctx)
 	if err != nil {
 		panic(err)
@@ -419,8 +420,8 @@ func (gq *GradeQuery) sqlAll(ctx context.Context) ([]*Grade, error) {
 	}
 
 	if query := gq.withStudent; query != nil {
-		ids := make([]int, 0, len(nodes))
-		nodeids := make(map[int][]*Grade)
+		ids := make([]uuid.UUID, 0, len(nodes))
+		nodeids := make(map[uuid.UUID][]*Grade)
 		for i := range nodes {
 			if nodes[i].user_grades == nil {
 				continue
@@ -448,8 +449,8 @@ func (gq *GradeQuery) sqlAll(ctx context.Context) ([]*Grade, error) {
 	}
 
 	if query := gq.withExam; query != nil {
-		ids := make([]int, 0, len(nodes))
-		nodeids := make(map[int][]*Grade)
+		ids := make([]uuid.UUID, 0, len(nodes))
+		nodeids := make(map[uuid.UUID][]*Grade)
 		for i := range nodes {
 			if nodes[i].assignment_grades == nil {
 				continue
@@ -498,7 +499,7 @@ func (gq *GradeQuery) querySpec() *sqlgraph.QuerySpec {
 			Table:   grade.Table,
 			Columns: grade.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeUUID,
 				Column: grade.FieldID,
 			},
 		},

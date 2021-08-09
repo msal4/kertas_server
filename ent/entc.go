@@ -11,7 +11,11 @@ import (
 )
 
 func main() {
-	ex, err := entgql.NewExtension()
+	ex, err := entgql.NewExtension(
+		entgql.WithWhereFilters(true),
+		entgql.WithSchemaPath("../ent.graphql"),
+		entgql.WithConfigPath("../gqlgen.yml"),
+	)
 	if err != nil {
 		log.Fatalf("creating engql extension: %v", err)
 	}

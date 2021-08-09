@@ -12,6 +12,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/google/uuid"
 	"github.com/msal4/hassah_school_server/ent/predicate"
 	"github.com/msal4/hassah_school_server/ent/school"
 	"github.com/msal4/hassah_school_server/ent/stage"
@@ -134,8 +135,8 @@ func (sq *SchoolQuery) FirstX(ctx context.Context) *School {
 
 // FirstID returns the first School ID from the query.
 // Returns a *NotFoundError when no School ID was found.
-func (sq *SchoolQuery) FirstID(ctx context.Context) (id int, err error) {
-	var ids []int
+func (sq *SchoolQuery) FirstID(ctx context.Context) (id uuid.UUID, err error) {
+	var ids []uuid.UUID
 	if ids, err = sq.Limit(1).IDs(ctx); err != nil {
 		return
 	}
@@ -147,7 +148,7 @@ func (sq *SchoolQuery) FirstID(ctx context.Context) (id int, err error) {
 }
 
 // FirstIDX is like FirstID, but panics if an error occurs.
-func (sq *SchoolQuery) FirstIDX(ctx context.Context) int {
+func (sq *SchoolQuery) FirstIDX(ctx context.Context) uuid.UUID {
 	id, err := sq.FirstID(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
@@ -185,8 +186,8 @@ func (sq *SchoolQuery) OnlyX(ctx context.Context) *School {
 // OnlyID is like Only, but returns the only School ID in the query.
 // Returns a *NotSingularError when exactly one School ID is not found.
 // Returns a *NotFoundError when no entities are found.
-func (sq *SchoolQuery) OnlyID(ctx context.Context) (id int, err error) {
-	var ids []int
+func (sq *SchoolQuery) OnlyID(ctx context.Context) (id uuid.UUID, err error) {
+	var ids []uuid.UUID
 	if ids, err = sq.Limit(2).IDs(ctx); err != nil {
 		return
 	}
@@ -202,7 +203,7 @@ func (sq *SchoolQuery) OnlyID(ctx context.Context) (id int, err error) {
 }
 
 // OnlyIDX is like OnlyID, but panics if an error occurs.
-func (sq *SchoolQuery) OnlyIDX(ctx context.Context) int {
+func (sq *SchoolQuery) OnlyIDX(ctx context.Context) uuid.UUID {
 	id, err := sq.OnlyID(ctx)
 	if err != nil {
 		panic(err)
@@ -228,8 +229,8 @@ func (sq *SchoolQuery) AllX(ctx context.Context) []*School {
 }
 
 // IDs executes the query and returns a list of School IDs.
-func (sq *SchoolQuery) IDs(ctx context.Context) ([]int, error) {
-	var ids []int
+func (sq *SchoolQuery) IDs(ctx context.Context) ([]uuid.UUID, error) {
+	var ids []uuid.UUID
 	if err := sq.Select(school.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
@@ -237,7 +238,7 @@ func (sq *SchoolQuery) IDs(ctx context.Context) ([]int, error) {
 }
 
 // IDsX is like IDs, but panics if an error occurs.
-func (sq *SchoolQuery) IDsX(ctx context.Context) []int {
+func (sq *SchoolQuery) IDsX(ctx context.Context) []uuid.UUID {
 	ids, err := sq.IDs(ctx)
 	if err != nil {
 		panic(err)
@@ -413,7 +414,7 @@ func (sq *SchoolQuery) sqlAll(ctx context.Context) ([]*School, error) {
 
 	if query := sq.withUsers; query != nil {
 		fks := make([]driver.Value, 0, len(nodes))
-		nodeids := make(map[int]*School)
+		nodeids := make(map[uuid.UUID]*School)
 		for i := range nodes {
 			fks = append(fks, nodes[i].ID)
 			nodeids[nodes[i].ID] = nodes[i]
@@ -442,7 +443,7 @@ func (sq *SchoolQuery) sqlAll(ctx context.Context) ([]*School, error) {
 
 	if query := sq.withStages; query != nil {
 		fks := make([]driver.Value, 0, len(nodes))
-		nodeids := make(map[int]*School)
+		nodeids := make(map[uuid.UUID]*School)
 		for i := range nodes {
 			fks = append(fks, nodes[i].ID)
 			nodeids[nodes[i].ID] = nodes[i]
@@ -491,7 +492,7 @@ func (sq *SchoolQuery) querySpec() *sqlgraph.QuerySpec {
 			Table:   school.Table,
 			Columns: school.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeUUID,
 				Column: school.FieldID,
 			},
 		},

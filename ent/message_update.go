@@ -11,6 +11,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/google/uuid"
 	"github.com/msal4/hassah_school_server/ent/group"
 	"github.com/msal4/hassah_school_server/ent/message"
 	"github.com/msal4/hassah_school_server/ent/predicate"
@@ -91,7 +92,7 @@ func (mu *MessageUpdate) ClearDeletedAt() *MessageUpdate {
 }
 
 // SetGroupID sets the "group" edge to the Group entity by ID.
-func (mu *MessageUpdate) SetGroupID(id int) *MessageUpdate {
+func (mu *MessageUpdate) SetGroupID(id uuid.UUID) *MessageUpdate {
 	mu.mutation.SetGroupID(id)
 	return mu
 }
@@ -102,7 +103,7 @@ func (mu *MessageUpdate) SetGroup(g *Group) *MessageUpdate {
 }
 
 // SetOwnerID sets the "owner" edge to the User entity by ID.
-func (mu *MessageUpdate) SetOwnerID(id int) *MessageUpdate {
+func (mu *MessageUpdate) SetOwnerID(id uuid.UUID) *MessageUpdate {
 	mu.mutation.SetOwnerID(id)
 	return mu
 }
@@ -215,7 +216,7 @@ func (mu *MessageUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Table:   message.Table,
 			Columns: message.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeUUID,
 				Column: message.FieldID,
 			},
 		},
@@ -282,7 +283,7 @@ func (mu *MessageUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: group.FieldID,
 				},
 			},
@@ -298,7 +299,7 @@ func (mu *MessageUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: group.FieldID,
 				},
 			},
@@ -317,7 +318,7 @@ func (mu *MessageUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: user.FieldID,
 				},
 			},
@@ -333,7 +334,7 @@ func (mu *MessageUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: user.FieldID,
 				},
 			},
@@ -423,7 +424,7 @@ func (muo *MessageUpdateOne) ClearDeletedAt() *MessageUpdateOne {
 }
 
 // SetGroupID sets the "group" edge to the Group entity by ID.
-func (muo *MessageUpdateOne) SetGroupID(id int) *MessageUpdateOne {
+func (muo *MessageUpdateOne) SetGroupID(id uuid.UUID) *MessageUpdateOne {
 	muo.mutation.SetGroupID(id)
 	return muo
 }
@@ -434,7 +435,7 @@ func (muo *MessageUpdateOne) SetGroup(g *Group) *MessageUpdateOne {
 }
 
 // SetOwnerID sets the "owner" edge to the User entity by ID.
-func (muo *MessageUpdateOne) SetOwnerID(id int) *MessageUpdateOne {
+func (muo *MessageUpdateOne) SetOwnerID(id uuid.UUID) *MessageUpdateOne {
 	muo.mutation.SetOwnerID(id)
 	return muo
 }
@@ -554,7 +555,7 @@ func (muo *MessageUpdateOne) sqlSave(ctx context.Context) (_node *Message, err e
 			Table:   message.Table,
 			Columns: message.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeUUID,
 				Column: message.FieldID,
 			},
 		},
@@ -638,7 +639,7 @@ func (muo *MessageUpdateOne) sqlSave(ctx context.Context) (_node *Message, err e
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: group.FieldID,
 				},
 			},
@@ -654,7 +655,7 @@ func (muo *MessageUpdateOne) sqlSave(ctx context.Context) (_node *Message, err e
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: group.FieldID,
 				},
 			},
@@ -673,7 +674,7 @@ func (muo *MessageUpdateOne) sqlSave(ctx context.Context) (_node *Message, err e
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: user.FieldID,
 				},
 			},
@@ -689,7 +690,7 @@ func (muo *MessageUpdateOne) sqlSave(ctx context.Context) (_node *Message, err e
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: user.FieldID,
 				},
 			},

@@ -10,6 +10,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/google/uuid"
 	"github.com/msal4/hassah_school_server/ent/assignment"
 	"github.com/msal4/hassah_school_server/ent/grade"
 	"github.com/msal4/hassah_school_server/ent/predicate"
@@ -30,20 +31,20 @@ func (gu *GradeUpdate) Where(ps ...predicate.Grade) *GradeUpdate {
 }
 
 // SetExamGrade sets the "exam_grade" field.
-func (gu *GradeUpdate) SetExamGrade(f float64) *GradeUpdate {
+func (gu *GradeUpdate) SetExamGrade(i int) *GradeUpdate {
 	gu.mutation.ResetExamGrade()
-	gu.mutation.SetExamGrade(f)
+	gu.mutation.SetExamGrade(i)
 	return gu
 }
 
-// AddExamGrade adds f to the "exam_grade" field.
-func (gu *GradeUpdate) AddExamGrade(f float64) *GradeUpdate {
-	gu.mutation.AddExamGrade(f)
+// AddExamGrade adds i to the "exam_grade" field.
+func (gu *GradeUpdate) AddExamGrade(i int) *GradeUpdate {
+	gu.mutation.AddExamGrade(i)
 	return gu
 }
 
 // SetStudentID sets the "student" edge to the User entity by ID.
-func (gu *GradeUpdate) SetStudentID(id int) *GradeUpdate {
+func (gu *GradeUpdate) SetStudentID(id uuid.UUID) *GradeUpdate {
 	gu.mutation.SetStudentID(id)
 	return gu
 }
@@ -54,7 +55,7 @@ func (gu *GradeUpdate) SetStudent(u *User) *GradeUpdate {
 }
 
 // SetExamID sets the "exam" edge to the Assignment entity by ID.
-func (gu *GradeUpdate) SetExamID(id int) *GradeUpdate {
+func (gu *GradeUpdate) SetExamID(id uuid.UUID) *GradeUpdate {
 	gu.mutation.SetExamID(id)
 	return gu
 }
@@ -172,7 +173,7 @@ func (gu *GradeUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Table:   grade.Table,
 			Columns: grade.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeUUID,
 				Column: grade.FieldID,
 			},
 		},
@@ -193,14 +194,14 @@ func (gu *GradeUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := gu.mutation.ExamGrade(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeFloat64,
+			Type:   field.TypeInt,
 			Value:  value,
 			Column: grade.FieldExamGrade,
 		})
 	}
 	if value, ok := gu.mutation.AddedExamGrade(); ok {
 		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
-			Type:   field.TypeFloat64,
+			Type:   field.TypeInt,
 			Value:  value,
 			Column: grade.FieldExamGrade,
 		})
@@ -214,7 +215,7 @@ func (gu *GradeUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: user.FieldID,
 				},
 			},
@@ -230,7 +231,7 @@ func (gu *GradeUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: user.FieldID,
 				},
 			},
@@ -249,7 +250,7 @@ func (gu *GradeUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: assignment.FieldID,
 				},
 			},
@@ -265,7 +266,7 @@ func (gu *GradeUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: assignment.FieldID,
 				},
 			},
@@ -295,20 +296,20 @@ type GradeUpdateOne struct {
 }
 
 // SetExamGrade sets the "exam_grade" field.
-func (guo *GradeUpdateOne) SetExamGrade(f float64) *GradeUpdateOne {
+func (guo *GradeUpdateOne) SetExamGrade(i int) *GradeUpdateOne {
 	guo.mutation.ResetExamGrade()
-	guo.mutation.SetExamGrade(f)
+	guo.mutation.SetExamGrade(i)
 	return guo
 }
 
-// AddExamGrade adds f to the "exam_grade" field.
-func (guo *GradeUpdateOne) AddExamGrade(f float64) *GradeUpdateOne {
-	guo.mutation.AddExamGrade(f)
+// AddExamGrade adds i to the "exam_grade" field.
+func (guo *GradeUpdateOne) AddExamGrade(i int) *GradeUpdateOne {
+	guo.mutation.AddExamGrade(i)
 	return guo
 }
 
 // SetStudentID sets the "student" edge to the User entity by ID.
-func (guo *GradeUpdateOne) SetStudentID(id int) *GradeUpdateOne {
+func (guo *GradeUpdateOne) SetStudentID(id uuid.UUID) *GradeUpdateOne {
 	guo.mutation.SetStudentID(id)
 	return guo
 }
@@ -319,7 +320,7 @@ func (guo *GradeUpdateOne) SetStudent(u *User) *GradeUpdateOne {
 }
 
 // SetExamID sets the "exam" edge to the Assignment entity by ID.
-func (guo *GradeUpdateOne) SetExamID(id int) *GradeUpdateOne {
+func (guo *GradeUpdateOne) SetExamID(id uuid.UUID) *GradeUpdateOne {
 	guo.mutation.SetExamID(id)
 	return guo
 }
@@ -444,7 +445,7 @@ func (guo *GradeUpdateOne) sqlSave(ctx context.Context) (_node *Grade, err error
 			Table:   grade.Table,
 			Columns: grade.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeUUID,
 				Column: grade.FieldID,
 			},
 		},
@@ -482,14 +483,14 @@ func (guo *GradeUpdateOne) sqlSave(ctx context.Context) (_node *Grade, err error
 	}
 	if value, ok := guo.mutation.ExamGrade(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeFloat64,
+			Type:   field.TypeInt,
 			Value:  value,
 			Column: grade.FieldExamGrade,
 		})
 	}
 	if value, ok := guo.mutation.AddedExamGrade(); ok {
 		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
-			Type:   field.TypeFloat64,
+			Type:   field.TypeInt,
 			Value:  value,
 			Column: grade.FieldExamGrade,
 		})
@@ -503,7 +504,7 @@ func (guo *GradeUpdateOne) sqlSave(ctx context.Context) (_node *Grade, err error
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: user.FieldID,
 				},
 			},
@@ -519,7 +520,7 @@ func (guo *GradeUpdateOne) sqlSave(ctx context.Context) (_node *Grade, err error
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: user.FieldID,
 				},
 			},
@@ -538,7 +539,7 @@ func (guo *GradeUpdateOne) sqlSave(ctx context.Context) (_node *Grade, err error
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: assignment.FieldID,
 				},
 			},
@@ -554,7 +555,7 @@ func (guo *GradeUpdateOne) sqlSave(ctx context.Context) (_node *Grade, err error
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: assignment.FieldID,
 				},
 			},

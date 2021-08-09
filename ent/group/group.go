@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/99designs/gqlgen/graphql"
+	"github.com/google/uuid"
 	"github.com/msal4/hassah_school_server/ent/schema"
 )
 
@@ -23,8 +24,8 @@ const (
 	FieldUpdatedAt = "updated_at"
 	// FieldName holds the string denoting the name field in the database.
 	FieldName = "name"
-	// FieldType holds the string denoting the type field in the database.
-	FieldType = "type"
+	// FieldGroupType holds the string denoting the group_type field in the database.
+	FieldGroupType = "group_type"
 	// FieldStatus holds the string denoting the status field in the database.
 	FieldStatus = "status"
 	// EdgeClass holds the string denoting the class edge name in mutations.
@@ -55,7 +56,7 @@ var Columns = []string{
 	FieldCreatedAt,
 	FieldUpdatedAt,
 	FieldName,
-	FieldType,
+	FieldGroupType,
 	FieldStatus,
 }
 
@@ -87,31 +88,33 @@ var (
 	DefaultUpdatedAt func() time.Time
 	// UpdateDefaultUpdatedAt holds the default value on update for the "updated_at" field.
 	UpdateDefaultUpdatedAt func() time.Time
+	// DefaultID holds the default value on creation for the "id" field.
+	DefaultID func() uuid.UUID
 )
 
-// Type defines the type for the "type" enum field.
-type Type string
+// GroupType defines the type for the "group_type" enum field.
+type GroupType string
 
-// TypeShared is the default value of the Type enum.
-const DefaultType = TypeShared
+// GroupTypeSHARED is the default value of the GroupType enum.
+const DefaultGroupType = GroupTypeSHARED
 
-// Type values.
+// GroupType values.
 const (
-	TypePrivate Type = "private"
-	TypeShared  Type = "shared"
+	GroupTypePRIVATE GroupType = "PRIVATE"
+	GroupTypeSHARED  GroupType = "SHARED"
 )
 
-func (_type Type) String() string {
-	return string(_type)
+func (gt GroupType) String() string {
+	return string(gt)
 }
 
-// TypeValidator is a validator for the "type" field enum values. It is called by the builders before save.
-func TypeValidator(_type Type) error {
-	switch _type {
-	case TypePrivate, TypeShared:
+// GroupTypeValidator is a validator for the "group_type" field enum values. It is called by the builders before save.
+func GroupTypeValidator(gt GroupType) error {
+	switch gt {
+	case GroupTypePRIVATE, GroupTypeSHARED:
 		return nil
 	default:
-		return fmt.Errorf("group: invalid enum value for type field: %q", _type)
+		return fmt.Errorf("group: invalid enum value for group_type field: %q", gt)
 	}
 }
 
@@ -128,19 +131,19 @@ func StatusValidator(s schema.Status) error {
 }
 
 // MarshalGQL implements graphql.Marshaler interface.
-func (_type Type) MarshalGQL(w io.Writer) {
-	io.WriteString(w, strconv.Quote(_type.String()))
+func (gt GroupType) MarshalGQL(w io.Writer) {
+	io.WriteString(w, strconv.Quote(gt.String()))
 }
 
 // UnmarshalGQL implements graphql.Unmarshaler interface.
-func (_type *Type) UnmarshalGQL(val interface{}) error {
+func (gt *GroupType) UnmarshalGQL(val interface{}) error {
 	str, ok := val.(string)
 	if !ok {
 		return fmt.Errorf("enum %T must be a string", val)
 	}
-	*_type = Type(str)
-	if err := TypeValidator(*_type); err != nil {
-		return fmt.Errorf("%s is not a valid Type", str)
+	*gt = GroupType(str)
+	if err := GroupTypeValidator(*gt); err != nil {
+		return fmt.Errorf("%s is not a valid GroupType", str)
 	}
 	return nil
 }

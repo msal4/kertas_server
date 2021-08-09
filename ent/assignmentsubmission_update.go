@@ -11,6 +11,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/google/uuid"
 	"github.com/msal4/hassah_school_server/ent/assignment"
 	"github.com/msal4/hassah_school_server/ent/assignmentsubmission"
 	"github.com/msal4/hassah_school_server/ent/predicate"
@@ -57,7 +58,7 @@ func (asu *AssignmentSubmissionUpdate) ClearSubmittedAt() *AssignmentSubmissionU
 }
 
 // SetStudentID sets the "student" edge to the User entity by ID.
-func (asu *AssignmentSubmissionUpdate) SetStudentID(id int) *AssignmentSubmissionUpdate {
+func (asu *AssignmentSubmissionUpdate) SetStudentID(id uuid.UUID) *AssignmentSubmissionUpdate {
 	asu.mutation.SetStudentID(id)
 	return asu
 }
@@ -68,7 +69,7 @@ func (asu *AssignmentSubmissionUpdate) SetStudent(u *User) *AssignmentSubmission
 }
 
 // SetAssignmentID sets the "assignment" edge to the Assignment entity by ID.
-func (asu *AssignmentSubmissionUpdate) SetAssignmentID(id int) *AssignmentSubmissionUpdate {
+func (asu *AssignmentSubmissionUpdate) SetAssignmentID(id uuid.UUID) *AssignmentSubmissionUpdate {
 	asu.mutation.SetAssignmentID(id)
 	return asu
 }
@@ -181,7 +182,7 @@ func (asu *AssignmentSubmissionUpdate) sqlSave(ctx context.Context) (n int, err 
 			Table:   assignmentsubmission.Table,
 			Columns: assignmentsubmission.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeUUID,
 				Column: assignmentsubmission.FieldID,
 			},
 		},
@@ -229,7 +230,7 @@ func (asu *AssignmentSubmissionUpdate) sqlSave(ctx context.Context) (n int, err 
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: user.FieldID,
 				},
 			},
@@ -245,7 +246,7 @@ func (asu *AssignmentSubmissionUpdate) sqlSave(ctx context.Context) (n int, err 
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: user.FieldID,
 				},
 			},
@@ -264,7 +265,7 @@ func (asu *AssignmentSubmissionUpdate) sqlSave(ctx context.Context) (n int, err 
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: assignment.FieldID,
 				},
 			},
@@ -280,7 +281,7 @@ func (asu *AssignmentSubmissionUpdate) sqlSave(ctx context.Context) (n int, err 
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: assignment.FieldID,
 				},
 			},
@@ -336,7 +337,7 @@ func (asuo *AssignmentSubmissionUpdateOne) ClearSubmittedAt() *AssignmentSubmiss
 }
 
 // SetStudentID sets the "student" edge to the User entity by ID.
-func (asuo *AssignmentSubmissionUpdateOne) SetStudentID(id int) *AssignmentSubmissionUpdateOne {
+func (asuo *AssignmentSubmissionUpdateOne) SetStudentID(id uuid.UUID) *AssignmentSubmissionUpdateOne {
 	asuo.mutation.SetStudentID(id)
 	return asuo
 }
@@ -347,7 +348,7 @@ func (asuo *AssignmentSubmissionUpdateOne) SetStudent(u *User) *AssignmentSubmis
 }
 
 // SetAssignmentID sets the "assignment" edge to the Assignment entity by ID.
-func (asuo *AssignmentSubmissionUpdateOne) SetAssignmentID(id int) *AssignmentSubmissionUpdateOne {
+func (asuo *AssignmentSubmissionUpdateOne) SetAssignmentID(id uuid.UUID) *AssignmentSubmissionUpdateOne {
 	asuo.mutation.SetAssignmentID(id)
 	return asuo
 }
@@ -467,7 +468,7 @@ func (asuo *AssignmentSubmissionUpdateOne) sqlSave(ctx context.Context) (_node *
 			Table:   assignmentsubmission.Table,
 			Columns: assignmentsubmission.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeUUID,
 				Column: assignmentsubmission.FieldID,
 			},
 		},
@@ -532,7 +533,7 @@ func (asuo *AssignmentSubmissionUpdateOne) sqlSave(ctx context.Context) (_node *
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: user.FieldID,
 				},
 			},
@@ -548,7 +549,7 @@ func (asuo *AssignmentSubmissionUpdateOne) sqlSave(ctx context.Context) (_node *
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: user.FieldID,
 				},
 			},
@@ -567,7 +568,7 @@ func (asuo *AssignmentSubmissionUpdateOne) sqlSave(ctx context.Context) (_node *
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: assignment.FieldID,
 				},
 			},
@@ -583,7 +584,7 @@ func (asuo *AssignmentSubmissionUpdateOne) sqlSave(ctx context.Context) (_node *
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: assignment.FieldID,
 				},
 			},

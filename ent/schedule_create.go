@@ -10,6 +10,7 @@ import (
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/google/uuid"
 	"github.com/msal4/hassah_school_server/ent/class"
 	"github.com/msal4/hassah_school_server/ent/schedule"
 )
@@ -22,8 +23,8 @@ type ScheduleCreate struct {
 }
 
 // SetWeekday sets the "weekday" field.
-func (sc *ScheduleCreate) SetWeekday(u uint8) *ScheduleCreate {
-	sc.mutation.SetWeekday(u)
+func (sc *ScheduleCreate) SetWeekday(i int) *ScheduleCreate {
+	sc.mutation.SetWeekday(i)
 	return sc
 }
 
@@ -47,8 +48,14 @@ func (sc *ScheduleCreate) SetNillableDuration(i *int) *ScheduleCreate {
 	return sc
 }
 
+// SetID sets the "id" field.
+func (sc *ScheduleCreate) SetID(u uuid.UUID) *ScheduleCreate {
+	sc.mutation.SetID(u)
+	return sc
+}
+
 // SetClassID sets the "class" edge to the Class entity by ID.
-func (sc *ScheduleCreate) SetClassID(id int) *ScheduleCreate {
+func (sc *ScheduleCreate) SetClassID(id uuid.UUID) *ScheduleCreate {
 	sc.mutation.SetClassID(id)
 	return sc
 }
@@ -133,6 +140,10 @@ func (sc *ScheduleCreate) defaults() {
 		v := schedule.DefaultDuration
 		sc.mutation.SetDuration(v)
 	}
+	if _, ok := sc.mutation.ID(); !ok {
+		v := schedule.DefaultID()
+		sc.mutation.SetID(v)
+	}
 }
 
 // check runs all checks and user-defined validators on the builder.
@@ -165,8 +176,6 @@ func (sc *ScheduleCreate) sqlSave(ctx context.Context) (*Schedule, error) {
 		}
 		return nil, err
 	}
-	id := _spec.ID.Value.(int64)
-	_node.ID = int(id)
 	return _node, nil
 }
 
@@ -176,14 +185,18 @@ func (sc *ScheduleCreate) createSpec() (*Schedule, *sqlgraph.CreateSpec) {
 		_spec = &sqlgraph.CreateSpec{
 			Table: schedule.Table,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeUUID,
 				Column: schedule.FieldID,
 			},
 		}
 	)
+	if id, ok := sc.mutation.ID(); ok {
+		_node.ID = id
+		_spec.ID.Value = id
+	}
 	if value, ok := sc.mutation.Weekday(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeUint8,
+			Type:   field.TypeInt,
 			Value:  value,
 			Column: schedule.FieldWeekday,
 		})
@@ -214,7 +227,7 @@ func (sc *ScheduleCreate) createSpec() (*Schedule, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: class.FieldID,
 				},
 			},
@@ -270,10 +283,6 @@ func (scb *ScheduleCreateBulk) Save(ctx context.Context) ([]*Schedule, error) {
 				}
 				mutation.id = &nodes[i].ID
 				mutation.done = true
-				if specs[i].ID.Value != nil {
-					id := specs[i].ID.Value.(int64)
-					nodes[i].ID = int(id)
-				}
 				return nodes[i], nil
 			})
 			for i := len(builder.hooks) - 1; i >= 0; i-- {

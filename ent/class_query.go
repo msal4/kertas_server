@@ -12,6 +12,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/google/uuid"
 	"github.com/msal4/hassah_school_server/ent/assignment"
 	"github.com/msal4/hassah_school_server/ent/attendance"
 	"github.com/msal4/hassah_school_server/ent/class"
@@ -231,8 +232,8 @@ func (cq *ClassQuery) FirstX(ctx context.Context) *Class {
 
 // FirstID returns the first Class ID from the query.
 // Returns a *NotFoundError when no Class ID was found.
-func (cq *ClassQuery) FirstID(ctx context.Context) (id int, err error) {
-	var ids []int
+func (cq *ClassQuery) FirstID(ctx context.Context) (id uuid.UUID, err error) {
+	var ids []uuid.UUID
 	if ids, err = cq.Limit(1).IDs(ctx); err != nil {
 		return
 	}
@@ -244,7 +245,7 @@ func (cq *ClassQuery) FirstID(ctx context.Context) (id int, err error) {
 }
 
 // FirstIDX is like FirstID, but panics if an error occurs.
-func (cq *ClassQuery) FirstIDX(ctx context.Context) int {
+func (cq *ClassQuery) FirstIDX(ctx context.Context) uuid.UUID {
 	id, err := cq.FirstID(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
@@ -282,8 +283,8 @@ func (cq *ClassQuery) OnlyX(ctx context.Context) *Class {
 // OnlyID is like Only, but returns the only Class ID in the query.
 // Returns a *NotSingularError when exactly one Class ID is not found.
 // Returns a *NotFoundError when no entities are found.
-func (cq *ClassQuery) OnlyID(ctx context.Context) (id int, err error) {
-	var ids []int
+func (cq *ClassQuery) OnlyID(ctx context.Context) (id uuid.UUID, err error) {
+	var ids []uuid.UUID
 	if ids, err = cq.Limit(2).IDs(ctx); err != nil {
 		return
 	}
@@ -299,7 +300,7 @@ func (cq *ClassQuery) OnlyID(ctx context.Context) (id int, err error) {
 }
 
 // OnlyIDX is like OnlyID, but panics if an error occurs.
-func (cq *ClassQuery) OnlyIDX(ctx context.Context) int {
+func (cq *ClassQuery) OnlyIDX(ctx context.Context) uuid.UUID {
 	id, err := cq.OnlyID(ctx)
 	if err != nil {
 		panic(err)
@@ -325,8 +326,8 @@ func (cq *ClassQuery) AllX(ctx context.Context) []*Class {
 }
 
 // IDs executes the query and returns a list of Class IDs.
-func (cq *ClassQuery) IDs(ctx context.Context) ([]int, error) {
-	var ids []int
+func (cq *ClassQuery) IDs(ctx context.Context) ([]uuid.UUID, error) {
+	var ids []uuid.UUID
 	if err := cq.Select(class.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
@@ -334,7 +335,7 @@ func (cq *ClassQuery) IDs(ctx context.Context) ([]int, error) {
 }
 
 // IDsX is like IDs, but panics if an error occurs.
-func (cq *ClassQuery) IDsX(ctx context.Context) []int {
+func (cq *ClassQuery) IDsX(ctx context.Context) []uuid.UUID {
 	ids, err := cq.IDs(ctx)
 	if err != nil {
 		panic(err)
@@ -568,8 +569,8 @@ func (cq *ClassQuery) sqlAll(ctx context.Context) ([]*Class, error) {
 	}
 
 	if query := cq.withStage; query != nil {
-		ids := make([]int, 0, len(nodes))
-		nodeids := make(map[int][]*Class)
+		ids := make([]uuid.UUID, 0, len(nodes))
+		nodeids := make(map[uuid.UUID][]*Class)
 		for i := range nodes {
 			if nodes[i].stage_classes == nil {
 				continue
@@ -597,8 +598,8 @@ func (cq *ClassQuery) sqlAll(ctx context.Context) ([]*Class, error) {
 	}
 
 	if query := cq.withTeacher; query != nil {
-		ids := make([]int, 0, len(nodes))
-		nodeids := make(map[int][]*Class)
+		ids := make([]uuid.UUID, 0, len(nodes))
+		nodeids := make(map[uuid.UUID][]*Class)
 		for i := range nodes {
 			if nodes[i].user_classes == nil {
 				continue
@@ -627,7 +628,7 @@ func (cq *ClassQuery) sqlAll(ctx context.Context) ([]*Class, error) {
 
 	if query := cq.withGroup; query != nil {
 		fks := make([]driver.Value, 0, len(nodes))
-		nodeids := make(map[int]*Class)
+		nodeids := make(map[uuid.UUID]*Class)
 		for i := range nodes {
 			fks = append(fks, nodes[i].ID)
 			nodeids[nodes[i].ID] = nodes[i]
@@ -655,7 +656,7 @@ func (cq *ClassQuery) sqlAll(ctx context.Context) ([]*Class, error) {
 
 	if query := cq.withAssignments; query != nil {
 		fks := make([]driver.Value, 0, len(nodes))
-		nodeids := make(map[int]*Class)
+		nodeids := make(map[uuid.UUID]*Class)
 		for i := range nodes {
 			fks = append(fks, nodes[i].ID)
 			nodeids[nodes[i].ID] = nodes[i]
@@ -684,7 +685,7 @@ func (cq *ClassQuery) sqlAll(ctx context.Context) ([]*Class, error) {
 
 	if query := cq.withAttendances; query != nil {
 		fks := make([]driver.Value, 0, len(nodes))
-		nodeids := make(map[int]*Class)
+		nodeids := make(map[uuid.UUID]*Class)
 		for i := range nodes {
 			fks = append(fks, nodes[i].ID)
 			nodeids[nodes[i].ID] = nodes[i]
@@ -713,7 +714,7 @@ func (cq *ClassQuery) sqlAll(ctx context.Context) ([]*Class, error) {
 
 	if query := cq.withSchedules; query != nil {
 		fks := make([]driver.Value, 0, len(nodes))
-		nodeids := make(map[int]*Class)
+		nodeids := make(map[uuid.UUID]*Class)
 		for i := range nodes {
 			fks = append(fks, nodes[i].ID)
 			nodeids[nodes[i].ID] = nodes[i]
@@ -762,7 +763,7 @@ func (cq *ClassQuery) querySpec() *sqlgraph.QuerySpec {
 			Table:   class.Table,
 			Columns: class.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeUUID,
 				Column: class.FieldID,
 			},
 		},

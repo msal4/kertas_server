@@ -113,6 +113,18 @@ func (s *SchoolQuery) CollectFields(ctx context.Context, satisfies ...string) *S
 }
 
 func (s *SchoolQuery) collectField(ctx *graphql.OperationContext, field graphql.CollectedField, satisfies ...string) *SchoolQuery {
+	for _, field := range graphql.CollectFields(ctx, field.Selections, satisfies) {
+		switch field.Name {
+		case "stages":
+			s = s.WithStages(func(query *StageQuery) {
+				query.collectField(ctx, field)
+			})
+		case "users":
+			s = s.WithUsers(func(query *UserQuery) {
+				query.collectField(ctx, field)
+			})
+		}
+	}
 	return s
 }
 

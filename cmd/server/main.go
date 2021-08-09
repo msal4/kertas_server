@@ -32,8 +32,8 @@ func init() {
 // minio credentials
 const (
 	endpoint        = "localhost:9000"
-	accessKeyID     = "DZA890X2MQHF05I1MP6B"
-	secretAccessKey = "+9+710e2QlZT1POOM8zLG7nVWpx+UlEA85ZkPd6t"
+	accessKeyID     = "minioadmin"
+	secretAccessKey = "minioadmin"
 )
 
 func main() {

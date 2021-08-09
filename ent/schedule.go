@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"entgo.io/ent/dialect/sql"
+	"github.com/google/uuid"
 	"github.com/msal4/hassah_school_server/ent/class"
 	"github.com/msal4/hassah_school_server/ent/schedule"
 )
@@ -16,9 +17,9 @@ import (
 type Schedule struct {
 	config `json:"-"`
 	// ID of the ent.
-	ID int `json:"id,omitempty"`
+	ID uuid.UUID `json:"id,omitempty"`
 	// Weekday holds the value of the "weekday" field.
-	Weekday uint8 `json:"weekday,omitempty"`
+	Weekday int `json:"weekday,omitempty"`
 	// StartsAt holds the value of the "starts_at" field.
 	StartsAt time.Time `json:"starts_at,omitempty"`
 	// Duration holds the value of the "duration" field.
@@ -27,7 +28,7 @@ type Schedule struct {
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the ScheduleQuery when eager-loading is set.
 	Edges           ScheduleEdges `json:"edges"`
-	class_schedules *int
+	class_schedules *uuid.UUID
 }
 
 // ScheduleEdges holds the relations/edges for other nodes in the graph.
@@ -58,12 +59,14 @@ func (*Schedule) scanValues(columns []string) ([]interface{}, error) {
 	values := make([]interface{}, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case schedule.FieldID, schedule.FieldWeekday, schedule.FieldDuration:
+		case schedule.FieldWeekday, schedule.FieldDuration:
 			values[i] = new(sql.NullInt64)
 		case schedule.FieldStartsAt:
 			values[i] = new(sql.NullTime)
+		case schedule.FieldID:
+			values[i] = new(uuid.UUID)
 		case schedule.ForeignKeys[0]: // class_schedules
-			values[i] = new(sql.NullInt64)
+			values[i] = &sql.NullScanner{S: new(uuid.UUID)}
 		default:
 			return nil, fmt.Errorf("unexpected column %q for type Schedule", columns[i])
 		}
@@ -80,16 +83,16 @@ func (s *Schedule) assignValues(columns []string, values []interface{}) error {
 	for i := range columns {
 		switch columns[i] {
 		case schedule.FieldID:
-			value, ok := values[i].(*sql.NullInt64)
-			if !ok {
-				return fmt.Errorf("unexpected type %T for field id", value)
+			if value, ok := values[i].(*uuid.UUID); !ok {
+				return fmt.Errorf("unexpected type %T for field id", values[i])
+			} else if value != nil {
+				s.ID = *value
 			}
-			s.ID = int(value.Int64)
 		case schedule.FieldWeekday:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field weekday", values[i])
 			} else if value.Valid {
-				s.Weekday = uint8(value.Int64)
+				s.Weekday = int(value.Int64)
 			}
 		case schedule.FieldStartsAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
@@ -104,11 +107,11 @@ func (s *Schedule) assignValues(columns []string, values []interface{}) error {
 				s.Duration = int(value.Int64)
 			}
 		case schedule.ForeignKeys[0]:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for edge-field class_schedules", value)
+			if value, ok := values[i].(*sql.NullScanner); !ok {
+				return fmt.Errorf("unexpected type %T for field class_schedules", values[i])
 			} else if value.Valid {
-				s.class_schedules = new(int)
-				*s.class_schedules = int(value.Int64)
+				s.class_schedules = new(uuid.UUID)
+				*s.class_schedules = *value.S.(*uuid.UUID)
 			}
 		}
 	}

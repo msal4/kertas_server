@@ -10,6 +10,7 @@ import (
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/google/uuid"
 	"github.com/msal4/hassah_school_server/ent/schema"
 	"github.com/msal4/hassah_school_server/ent/school"
 	"github.com/msal4/hassah_school_server/ent/stage"
@@ -77,15 +78,21 @@ func (sc *SchoolCreate) SetNillableStatus(s *schema.Status) *SchoolCreate {
 	return sc
 }
 
+// SetID sets the "id" field.
+func (sc *SchoolCreate) SetID(u uuid.UUID) *SchoolCreate {
+	sc.mutation.SetID(u)
+	return sc
+}
+
 // AddUserIDs adds the "users" edge to the User entity by IDs.
-func (sc *SchoolCreate) AddUserIDs(ids ...int) *SchoolCreate {
+func (sc *SchoolCreate) AddUserIDs(ids ...uuid.UUID) *SchoolCreate {
 	sc.mutation.AddUserIDs(ids...)
 	return sc
 }
 
 // AddUsers adds the "users" edges to the User entity.
 func (sc *SchoolCreate) AddUsers(u ...*User) *SchoolCreate {
-	ids := make([]int, len(u))
+	ids := make([]uuid.UUID, len(u))
 	for i := range u {
 		ids[i] = u[i].ID
 	}
@@ -93,14 +100,14 @@ func (sc *SchoolCreate) AddUsers(u ...*User) *SchoolCreate {
 }
 
 // AddStageIDs adds the "stages" edge to the Stage entity by IDs.
-func (sc *SchoolCreate) AddStageIDs(ids ...int) *SchoolCreate {
+func (sc *SchoolCreate) AddStageIDs(ids ...uuid.UUID) *SchoolCreate {
 	sc.mutation.AddStageIDs(ids...)
 	return sc
 }
 
 // AddStages adds the "stages" edges to the Stage entity.
 func (sc *SchoolCreate) AddStages(s ...*Stage) *SchoolCreate {
-	ids := make([]int, len(s))
+	ids := make([]uuid.UUID, len(s))
 	for i := range s {
 		ids[i] = s[i].ID
 	}
@@ -190,6 +197,10 @@ func (sc *SchoolCreate) defaults() {
 		v := school.DefaultStatus
 		sc.mutation.SetStatus(v)
 	}
+	if _, ok := sc.mutation.ID(); !ok {
+		v := school.DefaultID()
+		sc.mutation.SetID(v)
+	}
 }
 
 // check runs all checks and user-defined validators on the builder.
@@ -235,8 +246,6 @@ func (sc *SchoolCreate) sqlSave(ctx context.Context) (*School, error) {
 		}
 		return nil, err
 	}
-	id := _spec.ID.Value.(int64)
-	_node.ID = int(id)
 	return _node, nil
 }
 
@@ -246,11 +255,15 @@ func (sc *SchoolCreate) createSpec() (*School, *sqlgraph.CreateSpec) {
 		_spec = &sqlgraph.CreateSpec{
 			Table: school.Table,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeUUID,
 				Column: school.FieldID,
 			},
 		}
 	)
+	if id, ok := sc.mutation.ID(); ok {
+		_node.ID = id
+		_spec.ID.Value = id
+	}
 	if value, ok := sc.mutation.CreatedAt(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
 			Type:   field.TypeTime,
@@ -300,7 +313,7 @@ func (sc *SchoolCreate) createSpec() (*School, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: user.FieldID,
 				},
 			},
@@ -319,7 +332,7 @@ func (sc *SchoolCreate) createSpec() (*School, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: stage.FieldID,
 				},
 			},
@@ -374,10 +387,6 @@ func (scb *SchoolCreateBulk) Save(ctx context.Context) ([]*School, error) {
 				}
 				mutation.id = &nodes[i].ID
 				mutation.done = true
-				if specs[i].ID.Value != nil {
-					id := specs[i].ID.Value.(int64)
-					nodes[i].ID = int(id)
-				}
 				return nodes[i], nil
 			})
 			for i := len(builder.hooks) - 1; i >= 0; i-- {

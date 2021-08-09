@@ -9,6 +9,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/google/uuid"
 	"github.com/msal4/hassah_school_server/ent/predicate"
 	"github.com/msal4/hassah_school_server/ent/schema"
 	"github.com/msal4/hassah_school_server/ent/school"
@@ -56,14 +57,14 @@ func (su *SchoolUpdate) SetNillableStatus(s *schema.Status) *SchoolUpdate {
 }
 
 // AddUserIDs adds the "users" edge to the User entity by IDs.
-func (su *SchoolUpdate) AddUserIDs(ids ...int) *SchoolUpdate {
+func (su *SchoolUpdate) AddUserIDs(ids ...uuid.UUID) *SchoolUpdate {
 	su.mutation.AddUserIDs(ids...)
 	return su
 }
 
 // AddUsers adds the "users" edges to the User entity.
 func (su *SchoolUpdate) AddUsers(u ...*User) *SchoolUpdate {
-	ids := make([]int, len(u))
+	ids := make([]uuid.UUID, len(u))
 	for i := range u {
 		ids[i] = u[i].ID
 	}
@@ -71,14 +72,14 @@ func (su *SchoolUpdate) AddUsers(u ...*User) *SchoolUpdate {
 }
 
 // AddStageIDs adds the "stages" edge to the Stage entity by IDs.
-func (su *SchoolUpdate) AddStageIDs(ids ...int) *SchoolUpdate {
+func (su *SchoolUpdate) AddStageIDs(ids ...uuid.UUID) *SchoolUpdate {
 	su.mutation.AddStageIDs(ids...)
 	return su
 }
 
 // AddStages adds the "stages" edges to the Stage entity.
 func (su *SchoolUpdate) AddStages(s ...*Stage) *SchoolUpdate {
-	ids := make([]int, len(s))
+	ids := make([]uuid.UUID, len(s))
 	for i := range s {
 		ids[i] = s[i].ID
 	}
@@ -97,14 +98,14 @@ func (su *SchoolUpdate) ClearUsers() *SchoolUpdate {
 }
 
 // RemoveUserIDs removes the "users" edge to User entities by IDs.
-func (su *SchoolUpdate) RemoveUserIDs(ids ...int) *SchoolUpdate {
+func (su *SchoolUpdate) RemoveUserIDs(ids ...uuid.UUID) *SchoolUpdate {
 	su.mutation.RemoveUserIDs(ids...)
 	return su
 }
 
 // RemoveUsers removes "users" edges to User entities.
 func (su *SchoolUpdate) RemoveUsers(u ...*User) *SchoolUpdate {
-	ids := make([]int, len(u))
+	ids := make([]uuid.UUID, len(u))
 	for i := range u {
 		ids[i] = u[i].ID
 	}
@@ -118,14 +119,14 @@ func (su *SchoolUpdate) ClearStages() *SchoolUpdate {
 }
 
 // RemoveStageIDs removes the "stages" edge to Stage entities by IDs.
-func (su *SchoolUpdate) RemoveStageIDs(ids ...int) *SchoolUpdate {
+func (su *SchoolUpdate) RemoveStageIDs(ids ...uuid.UUID) *SchoolUpdate {
 	su.mutation.RemoveStageIDs(ids...)
 	return su
 }
 
 // RemoveStages removes "stages" edges to Stage entities.
 func (su *SchoolUpdate) RemoveStages(s ...*Stage) *SchoolUpdate {
-	ids := make([]int, len(s))
+	ids := make([]uuid.UUID, len(s))
 	for i := range s {
 		ids[i] = s[i].ID
 	}
@@ -227,7 +228,7 @@ func (su *SchoolUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Table:   school.Table,
 			Columns: school.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeUUID,
 				Column: school.FieldID,
 			},
 		},
@@ -276,7 +277,7 @@ func (su *SchoolUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: user.FieldID,
 				},
 			},
@@ -292,7 +293,7 @@ func (su *SchoolUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: user.FieldID,
 				},
 			},
@@ -311,7 +312,7 @@ func (su *SchoolUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: user.FieldID,
 				},
 			},
@@ -330,7 +331,7 @@ func (su *SchoolUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: stage.FieldID,
 				},
 			},
@@ -346,7 +347,7 @@ func (su *SchoolUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: stage.FieldID,
 				},
 			},
@@ -365,7 +366,7 @@ func (su *SchoolUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: stage.FieldID,
 				},
 			},
@@ -421,14 +422,14 @@ func (suo *SchoolUpdateOne) SetNillableStatus(s *schema.Status) *SchoolUpdateOne
 }
 
 // AddUserIDs adds the "users" edge to the User entity by IDs.
-func (suo *SchoolUpdateOne) AddUserIDs(ids ...int) *SchoolUpdateOne {
+func (suo *SchoolUpdateOne) AddUserIDs(ids ...uuid.UUID) *SchoolUpdateOne {
 	suo.mutation.AddUserIDs(ids...)
 	return suo
 }
 
 // AddUsers adds the "users" edges to the User entity.
 func (suo *SchoolUpdateOne) AddUsers(u ...*User) *SchoolUpdateOne {
-	ids := make([]int, len(u))
+	ids := make([]uuid.UUID, len(u))
 	for i := range u {
 		ids[i] = u[i].ID
 	}
@@ -436,14 +437,14 @@ func (suo *SchoolUpdateOne) AddUsers(u ...*User) *SchoolUpdateOne {
 }
 
 // AddStageIDs adds the "stages" edge to the Stage entity by IDs.
-func (suo *SchoolUpdateOne) AddStageIDs(ids ...int) *SchoolUpdateOne {
+func (suo *SchoolUpdateOne) AddStageIDs(ids ...uuid.UUID) *SchoolUpdateOne {
 	suo.mutation.AddStageIDs(ids...)
 	return suo
 }
 
 // AddStages adds the "stages" edges to the Stage entity.
 func (suo *SchoolUpdateOne) AddStages(s ...*Stage) *SchoolUpdateOne {
-	ids := make([]int, len(s))
+	ids := make([]uuid.UUID, len(s))
 	for i := range s {
 		ids[i] = s[i].ID
 	}
@@ -462,14 +463,14 @@ func (suo *SchoolUpdateOne) ClearUsers() *SchoolUpdateOne {
 }
 
 // RemoveUserIDs removes the "users" edge to User entities by IDs.
-func (suo *SchoolUpdateOne) RemoveUserIDs(ids ...int) *SchoolUpdateOne {
+func (suo *SchoolUpdateOne) RemoveUserIDs(ids ...uuid.UUID) *SchoolUpdateOne {
 	suo.mutation.RemoveUserIDs(ids...)
 	return suo
 }
 
 // RemoveUsers removes "users" edges to User entities.
 func (suo *SchoolUpdateOne) RemoveUsers(u ...*User) *SchoolUpdateOne {
-	ids := make([]int, len(u))
+	ids := make([]uuid.UUID, len(u))
 	for i := range u {
 		ids[i] = u[i].ID
 	}
@@ -483,14 +484,14 @@ func (suo *SchoolUpdateOne) ClearStages() *SchoolUpdateOne {
 }
 
 // RemoveStageIDs removes the "stages" edge to Stage entities by IDs.
-func (suo *SchoolUpdateOne) RemoveStageIDs(ids ...int) *SchoolUpdateOne {
+func (suo *SchoolUpdateOne) RemoveStageIDs(ids ...uuid.UUID) *SchoolUpdateOne {
 	suo.mutation.RemoveStageIDs(ids...)
 	return suo
 }
 
 // RemoveStages removes "stages" edges to Stage entities.
 func (suo *SchoolUpdateOne) RemoveStages(s ...*Stage) *SchoolUpdateOne {
-	ids := make([]int, len(s))
+	ids := make([]uuid.UUID, len(s))
 	for i := range s {
 		ids[i] = s[i].ID
 	}
@@ -599,7 +600,7 @@ func (suo *SchoolUpdateOne) sqlSave(ctx context.Context) (_node *School, err err
 			Table:   school.Table,
 			Columns: school.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeUUID,
 				Column: school.FieldID,
 			},
 		},
@@ -665,7 +666,7 @@ func (suo *SchoolUpdateOne) sqlSave(ctx context.Context) (_node *School, err err
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: user.FieldID,
 				},
 			},
@@ -681,7 +682,7 @@ func (suo *SchoolUpdateOne) sqlSave(ctx context.Context) (_node *School, err err
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: user.FieldID,
 				},
 			},
@@ -700,7 +701,7 @@ func (suo *SchoolUpdateOne) sqlSave(ctx context.Context) (_node *School, err err
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: user.FieldID,
 				},
 			},
@@ -719,7 +720,7 @@ func (suo *SchoolUpdateOne) sqlSave(ctx context.Context) (_node *School, err err
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: stage.FieldID,
 				},
 			},
@@ -735,7 +736,7 @@ func (suo *SchoolUpdateOne) sqlSave(ctx context.Context) (_node *School, err err
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: stage.FieldID,
 				},
 			},
@@ -754,7 +755,7 @@ func (suo *SchoolUpdateOne) sqlSave(ctx context.Context) (_node *School, err err
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: stage.FieldID,
 				},
 			},

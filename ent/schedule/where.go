@@ -7,32 +7,33 @@ import (
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
+	"github.com/google/uuid"
 	"github.com/msal4/hassah_school_server/ent/predicate"
 )
 
 // ID filters vertices based on their ID field.
-func ID(id int) predicate.Schedule {
+func ID(id uuid.UUID) predicate.Schedule {
 	return predicate.Schedule(func(s *sql.Selector) {
 		s.Where(sql.EQ(s.C(FieldID), id))
 	})
 }
 
 // IDEQ applies the EQ predicate on the ID field.
-func IDEQ(id int) predicate.Schedule {
+func IDEQ(id uuid.UUID) predicate.Schedule {
 	return predicate.Schedule(func(s *sql.Selector) {
 		s.Where(sql.EQ(s.C(FieldID), id))
 	})
 }
 
 // IDNEQ applies the NEQ predicate on the ID field.
-func IDNEQ(id int) predicate.Schedule {
+func IDNEQ(id uuid.UUID) predicate.Schedule {
 	return predicate.Schedule(func(s *sql.Selector) {
 		s.Where(sql.NEQ(s.C(FieldID), id))
 	})
 }
 
 // IDIn applies the In predicate on the ID field.
-func IDIn(ids ...int) predicate.Schedule {
+func IDIn(ids ...uuid.UUID) predicate.Schedule {
 	return predicate.Schedule(func(s *sql.Selector) {
 		// if not arguments were provided, append the FALSE constants,
 		// since we can't apply "IN ()". This will make this predicate falsy.
@@ -49,7 +50,7 @@ func IDIn(ids ...int) predicate.Schedule {
 }
 
 // IDNotIn applies the NotIn predicate on the ID field.
-func IDNotIn(ids ...int) predicate.Schedule {
+func IDNotIn(ids ...uuid.UUID) predicate.Schedule {
 	return predicate.Schedule(func(s *sql.Selector) {
 		// if not arguments were provided, append the FALSE constants,
 		// since we can't apply "IN ()". This will make this predicate falsy.
@@ -66,35 +67,35 @@ func IDNotIn(ids ...int) predicate.Schedule {
 }
 
 // IDGT applies the GT predicate on the ID field.
-func IDGT(id int) predicate.Schedule {
+func IDGT(id uuid.UUID) predicate.Schedule {
 	return predicate.Schedule(func(s *sql.Selector) {
 		s.Where(sql.GT(s.C(FieldID), id))
 	})
 }
 
 // IDGTE applies the GTE predicate on the ID field.
-func IDGTE(id int) predicate.Schedule {
+func IDGTE(id uuid.UUID) predicate.Schedule {
 	return predicate.Schedule(func(s *sql.Selector) {
 		s.Where(sql.GTE(s.C(FieldID), id))
 	})
 }
 
 // IDLT applies the LT predicate on the ID field.
-func IDLT(id int) predicate.Schedule {
+func IDLT(id uuid.UUID) predicate.Schedule {
 	return predicate.Schedule(func(s *sql.Selector) {
 		s.Where(sql.LT(s.C(FieldID), id))
 	})
 }
 
 // IDLTE applies the LTE predicate on the ID field.
-func IDLTE(id int) predicate.Schedule {
+func IDLTE(id uuid.UUID) predicate.Schedule {
 	return predicate.Schedule(func(s *sql.Selector) {
 		s.Where(sql.LTE(s.C(FieldID), id))
 	})
 }
 
 // Weekday applies equality check predicate on the "weekday" field. It's identical to WeekdayEQ.
-func Weekday(v uint8) predicate.Schedule {
+func Weekday(v int) predicate.Schedule {
 	return predicate.Schedule(func(s *sql.Selector) {
 		s.Where(sql.EQ(s.C(FieldWeekday), v))
 	})
@@ -115,21 +116,21 @@ func Duration(v int) predicate.Schedule {
 }
 
 // WeekdayEQ applies the EQ predicate on the "weekday" field.
-func WeekdayEQ(v uint8) predicate.Schedule {
+func WeekdayEQ(v int) predicate.Schedule {
 	return predicate.Schedule(func(s *sql.Selector) {
 		s.Where(sql.EQ(s.C(FieldWeekday), v))
 	})
 }
 
 // WeekdayNEQ applies the NEQ predicate on the "weekday" field.
-func WeekdayNEQ(v uint8) predicate.Schedule {
+func WeekdayNEQ(v int) predicate.Schedule {
 	return predicate.Schedule(func(s *sql.Selector) {
 		s.Where(sql.NEQ(s.C(FieldWeekday), v))
 	})
 }
 
 // WeekdayIn applies the In predicate on the "weekday" field.
-func WeekdayIn(vs ...uint8) predicate.Schedule {
+func WeekdayIn(vs ...int) predicate.Schedule {
 	v := make([]interface{}, len(vs))
 	for i := range v {
 		v[i] = vs[i]
@@ -146,7 +147,7 @@ func WeekdayIn(vs ...uint8) predicate.Schedule {
 }
 
 // WeekdayNotIn applies the NotIn predicate on the "weekday" field.
-func WeekdayNotIn(vs ...uint8) predicate.Schedule {
+func WeekdayNotIn(vs ...int) predicate.Schedule {
 	v := make([]interface{}, len(vs))
 	for i := range v {
 		v[i] = vs[i]
@@ -163,28 +164,28 @@ func WeekdayNotIn(vs ...uint8) predicate.Schedule {
 }
 
 // WeekdayGT applies the GT predicate on the "weekday" field.
-func WeekdayGT(v uint8) predicate.Schedule {
+func WeekdayGT(v int) predicate.Schedule {
 	return predicate.Schedule(func(s *sql.Selector) {
 		s.Where(sql.GT(s.C(FieldWeekday), v))
 	})
 }
 
 // WeekdayGTE applies the GTE predicate on the "weekday" field.
-func WeekdayGTE(v uint8) predicate.Schedule {
+func WeekdayGTE(v int) predicate.Schedule {
 	return predicate.Schedule(func(s *sql.Selector) {
 		s.Where(sql.GTE(s.C(FieldWeekday), v))
 	})
 }
 
 // WeekdayLT applies the LT predicate on the "weekday" field.
-func WeekdayLT(v uint8) predicate.Schedule {
+func WeekdayLT(v int) predicate.Schedule {
 	return predicate.Schedule(func(s *sql.Selector) {
 		s.Where(sql.LT(s.C(FieldWeekday), v))
 	})
 }
 
 // WeekdayLTE applies the LTE predicate on the "weekday" field.
-func WeekdayLTE(v uint8) predicate.Schedule {
+func WeekdayLTE(v int) predicate.Schedule {
 	return predicate.Schedule(func(s *sql.Selector) {
 		s.Where(sql.LTE(s.C(FieldWeekday), v))
 	})

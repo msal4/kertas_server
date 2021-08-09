@@ -1,5 +1,6 @@
 schema:
   - schema.graphql 
+  - ent.graphql 
 
 exec:
   filename: graph/generated/generated.go
@@ -21,10 +22,20 @@ autobind:
 models:
   ID:
     model:
-      - github.com/99designs/gqlgen/graphql.IntID
+      - github.com/msal4/hassah_school_server/ent/schema/uuidgql.UUID 
+
   Node:
     model:
       - github.com/msal4/hassah_school_server/ent.Noder
   Status:
     model:
       - github.com/msal4/hassah_school_server/ent/schema.Status
+  State:
+    model:
+      - github.com/msal4/hassah_school_server/ent/attendance.State
+  Role:
+    model:
+      - github.com/msal4/hassah_school_server/ent/user.Role
+  GroupType:
+    model:
+      - github.com/msal4/hassah_school_server/ent/group.GroupType

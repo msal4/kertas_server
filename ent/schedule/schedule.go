@@ -2,6 +2,10 @@
 
 package schedule
 
+import (
+	"github.com/google/uuid"
+)
+
 const (
 	// Label holds the string label denoting the schedule type in the database.
 	Label = "schedule"
@@ -57,7 +61,9 @@ func ValidColumn(column string) bool {
 
 var (
 	// WeekdayValidator is a validator for the "weekday" field. It is called by the builders before save.
-	WeekdayValidator func(uint8) error
+	WeekdayValidator func(int) error
 	// DefaultDuration holds the default value on creation for the "duration" field.
 	DefaultDuration int
+	// DefaultID holds the default value on creation for the "id" field.
+	DefaultID func() uuid.UUID
 )

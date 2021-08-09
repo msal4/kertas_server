@@ -4,6 +4,8 @@ package assignment
 
 import (
 	"time"
+
+	"github.com/google/uuid"
 )
 
 const (
@@ -103,4 +105,6 @@ var (
 	NameValidator func(string) error
 	// DefaultIsExam holds the default value on creation for the "is_exam" field.
 	DefaultIsExam bool
+	// DefaultID holds the default value on creation for the "id" field.
+	DefaultID func() uuid.UUID
 )

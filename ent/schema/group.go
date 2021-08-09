@@ -1,11 +1,13 @@
 package schema
 
 import (
+	"entgo.io/contrib/entgql"
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/entsql"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
 	"entgo.io/ent/schema/index"
+	"github.com/google/uuid"
 )
 
 // Group holds the schema definition for the Group entity.
@@ -16,9 +18,10 @@ type Group struct {
 // Fields of the Group.
 func (Group) Fields() []ent.Field {
 	return []ent.Field{
-		field.String("name").Optional(),
-		field.Enum("type").Values("private", "shared").Default("shared"),
-		field.Enum("status").GoType(Status("")).Default(StatusActive.String()),
+		field.UUID("id", uuid.UUID{}).Default(uuid.New),
+		field.String("name").Optional().Annotations(entgql.OrderField("NAME")),
+		field.Enum("group_type").Values("PRIVATE", "SHARED").Default("SHARED").Annotations(entgql.OrderField("GROUP_TYPE")),
+		field.Enum("status").GoType(Status("")).Default(StatusActive.String()).Annotations(entgql.OrderField("STATUS")),
 	}
 }
 
@@ -40,6 +43,6 @@ func (Group) Indexes() []ent.Index {
 	return []ent.Index{
 		index.Edges("class"),
 		index.Fields("status"),
-		index.Fields("type"),
+		index.Fields("group_type"),
 	}
 }

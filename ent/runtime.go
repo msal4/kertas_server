@@ -5,6 +5,7 @@ package ent
 import (
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/msal4/hassah_school_server/ent/assignment"
 	"github.com/msal4/hassah_school_server/ent/assignmentsubmission"
 	"github.com/msal4/hassah_school_server/ent/attendance"
@@ -40,13 +41,17 @@ func init() {
 	// assignment.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
 	assignment.UpdateDefaultUpdatedAt = assignmentDescUpdatedAt.UpdateDefault.(func() time.Time)
 	// assignmentDescName is the schema descriptor for name field.
-	assignmentDescName := assignmentFields[0].Descriptor()
+	assignmentDescName := assignmentFields[1].Descriptor()
 	// assignment.NameValidator is a validator for the "name" field. It is called by the builders before save.
 	assignment.NameValidator = assignmentDescName.Validators[0].(func(string) error)
 	// assignmentDescIsExam is the schema descriptor for is_exam field.
-	assignmentDescIsExam := assignmentFields[2].Descriptor()
+	assignmentDescIsExam := assignmentFields[3].Descriptor()
 	// assignment.DefaultIsExam holds the default value on creation for the is_exam field.
 	assignment.DefaultIsExam = assignmentDescIsExam.Default.(bool)
+	// assignmentDescID is the schema descriptor for id field.
+	assignmentDescID := assignmentFields[0].Descriptor()
+	// assignment.DefaultID holds the default value on creation for the id field.
+	assignment.DefaultID = assignmentDescID.Default.(func() uuid.UUID)
 	assignmentsubmissionMixin := schema.AssignmentSubmission{}.Mixin()
 	assignmentsubmissionMixinFields0 := assignmentsubmissionMixin[0].Fields()
 	_ = assignmentsubmissionMixinFields0
@@ -62,6 +67,10 @@ func init() {
 	assignmentsubmission.DefaultUpdatedAt = assignmentsubmissionDescUpdatedAt.Default.(func() time.Time)
 	// assignmentsubmission.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
 	assignmentsubmission.UpdateDefaultUpdatedAt = assignmentsubmissionDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// assignmentsubmissionDescID is the schema descriptor for id field.
+	assignmentsubmissionDescID := assignmentsubmissionFields[0].Descriptor()
+	// assignmentsubmission.DefaultID holds the default value on creation for the id field.
+	assignmentsubmission.DefaultID = assignmentsubmissionDescID.Default.(func() uuid.UUID)
 	attendanceMixin := schema.Attendance{}.Mixin()
 	attendanceMixinFields0 := attendanceMixin[0].Fields()
 	_ = attendanceMixinFields0
@@ -77,6 +86,10 @@ func init() {
 	attendance.DefaultUpdatedAt = attendanceDescUpdatedAt.Default.(func() time.Time)
 	// attendance.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
 	attendance.UpdateDefaultUpdatedAt = attendanceDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// attendanceDescID is the schema descriptor for id field.
+	attendanceDescID := attendanceFields[0].Descriptor()
+	// attendance.DefaultID holds the default value on creation for the id field.
+	attendance.DefaultID = attendanceDescID.Default.(func() uuid.UUID)
 	classMixin := schema.Class{}.Mixin()
 	classMixinFields0 := classMixin[0].Fields()
 	_ = classMixinFields0
@@ -93,9 +106,13 @@ func init() {
 	// class.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
 	class.UpdateDefaultUpdatedAt = classDescUpdatedAt.UpdateDefault.(func() time.Time)
 	// classDescName is the schema descriptor for name field.
-	classDescName := classFields[0].Descriptor()
+	classDescName := classFields[1].Descriptor()
 	// class.NameValidator is a validator for the "name" field. It is called by the builders before save.
 	class.NameValidator = classDescName.Validators[0].(func(string) error)
+	// classDescID is the schema descriptor for id field.
+	classDescID := classFields[0].Descriptor()
+	// class.DefaultID holds the default value on creation for the id field.
+	class.DefaultID = classDescID.Default.(func() uuid.UUID)
 	gradeMixin := schema.Grade{}.Mixin()
 	gradeMixinFields0 := gradeMixin[0].Fields()
 	_ = gradeMixinFields0
@@ -112,9 +129,13 @@ func init() {
 	// grade.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
 	grade.UpdateDefaultUpdatedAt = gradeDescUpdatedAt.UpdateDefault.(func() time.Time)
 	// gradeDescExamGrade is the schema descriptor for exam_grade field.
-	gradeDescExamGrade := gradeFields[0].Descriptor()
+	gradeDescExamGrade := gradeFields[1].Descriptor()
 	// grade.ExamGradeValidator is a validator for the "exam_grade" field. It is called by the builders before save.
-	grade.ExamGradeValidator = gradeDescExamGrade.Validators[0].(func(float64) error)
+	grade.ExamGradeValidator = gradeDescExamGrade.Validators[0].(func(int) error)
+	// gradeDescID is the schema descriptor for id field.
+	gradeDescID := gradeFields[0].Descriptor()
+	// grade.DefaultID holds the default value on creation for the id field.
+	grade.DefaultID = gradeDescID.Default.(func() uuid.UUID)
 	groupMixin := schema.Group{}.Mixin()
 	groupMixinFields0 := groupMixin[0].Fields()
 	_ = groupMixinFields0
@@ -130,6 +151,10 @@ func init() {
 	group.DefaultUpdatedAt = groupDescUpdatedAt.Default.(func() time.Time)
 	// group.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
 	group.UpdateDefaultUpdatedAt = groupDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// groupDescID is the schema descriptor for id field.
+	groupDescID := groupFields[0].Descriptor()
+	// group.DefaultID holds the default value on creation for the id field.
+	group.DefaultID = groupDescID.Default.(func() uuid.UUID)
 	messageMixin := schema.Message{}.Mixin()
 	messageMixinFields0 := messageMixin[0].Fields()
 	_ = messageMixinFields0
@@ -145,16 +170,38 @@ func init() {
 	message.DefaultUpdatedAt = messageDescUpdatedAt.Default.(func() time.Time)
 	// message.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
 	message.UpdateDefaultUpdatedAt = messageDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// messageDescID is the schema descriptor for id field.
+	messageDescID := messageFields[0].Descriptor()
+	// message.DefaultID holds the default value on creation for the id field.
+	message.DefaultID = messageDescID.Default.(func() uuid.UUID)
 	scheduleFields := schema.Schedule{}.Fields()
 	_ = scheduleFields
 	// scheduleDescWeekday is the schema descriptor for weekday field.
-	scheduleDescWeekday := scheduleFields[0].Descriptor()
+	scheduleDescWeekday := scheduleFields[1].Descriptor()
 	// schedule.WeekdayValidator is a validator for the "weekday" field. It is called by the builders before save.
-	schedule.WeekdayValidator = scheduleDescWeekday.Validators[0].(func(uint8) error)
+	schedule.WeekdayValidator = func() func(int) error {
+		validators := scheduleDescWeekday.Validators
+		fns := [...]func(int) error{
+			validators[0].(func(int) error),
+			validators[1].(func(int) error),
+		}
+		return func(weekday int) error {
+			for _, fn := range fns {
+				if err := fn(weekday); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
 	// scheduleDescDuration is the schema descriptor for duration field.
-	scheduleDescDuration := scheduleFields[2].Descriptor()
+	scheduleDescDuration := scheduleFields[3].Descriptor()
 	// schedule.DefaultDuration holds the default value on creation for the duration field.
 	schedule.DefaultDuration = scheduleDescDuration.Default.(int)
+	// scheduleDescID is the schema descriptor for id field.
+	scheduleDescID := scheduleFields[0].Descriptor()
+	// schedule.DefaultID holds the default value on creation for the id field.
+	schedule.DefaultID = scheduleDescID.Default.(func() uuid.UUID)
 	schoolMixin := schema.School{}.Mixin()
 	schoolMixinFields0 := schoolMixin[0].Fields()
 	_ = schoolMixinFields0
@@ -171,13 +218,17 @@ func init() {
 	// school.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
 	school.UpdateDefaultUpdatedAt = schoolDescUpdatedAt.UpdateDefault.(func() time.Time)
 	// schoolDescName is the schema descriptor for name field.
-	schoolDescName := schoolFields[0].Descriptor()
+	schoolDescName := schoolFields[1].Descriptor()
 	// school.NameValidator is a validator for the "name" field. It is called by the builders before save.
 	school.NameValidator = schoolDescName.Validators[0].(func(string) error)
 	// schoolDescImage is the schema descriptor for image field.
-	schoolDescImage := schoolFields[1].Descriptor()
+	schoolDescImage := schoolFields[2].Descriptor()
 	// school.ImageValidator is a validator for the "image" field. It is called by the builders before save.
 	school.ImageValidator = schoolDescImage.Validators[0].(func(string) error)
+	// schoolDescID is the schema descriptor for id field.
+	schoolDescID := schoolFields[0].Descriptor()
+	// school.DefaultID holds the default value on creation for the id field.
+	school.DefaultID = schoolDescID.Default.(func() uuid.UUID)
 	stageMixin := schema.Stage{}.Mixin()
 	stageMixinFields0 := stageMixin[0].Fields()
 	_ = stageMixinFields0
@@ -194,9 +245,13 @@ func init() {
 	// stage.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
 	stage.UpdateDefaultUpdatedAt = stageDescUpdatedAt.UpdateDefault.(func() time.Time)
 	// stageDescName is the schema descriptor for name field.
-	stageDescName := stageFields[0].Descriptor()
+	stageDescName := stageFields[1].Descriptor()
 	// stage.NameValidator is a validator for the "name" field. It is called by the builders before save.
 	stage.NameValidator = stageDescName.Validators[0].(func(string) error)
+	// stageDescID is the schema descriptor for id field.
+	stageDescID := stageFields[0].Descriptor()
+	// stage.DefaultID holds the default value on creation for the id field.
+	stage.DefaultID = stageDescID.Default.(func() uuid.UUID)
 	tuitionpaymentMixin := schema.TuitionPayment{}.Mixin()
 	tuitionpaymentMixinFields0 := tuitionpaymentMixin[0].Fields()
 	_ = tuitionpaymentMixinFields0
@@ -212,6 +267,10 @@ func init() {
 	tuitionpayment.DefaultUpdatedAt = tuitionpaymentDescUpdatedAt.Default.(func() time.Time)
 	// tuitionpayment.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
 	tuitionpayment.UpdateDefaultUpdatedAt = tuitionpaymentDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// tuitionpaymentDescID is the schema descriptor for id field.
+	tuitionpaymentDescID := tuitionpaymentFields[0].Descriptor()
+	// tuitionpayment.DefaultID holds the default value on creation for the id field.
+	tuitionpayment.DefaultID = tuitionpaymentDescID.Default.(func() uuid.UUID)
 	userMixin := schema.User{}.Mixin()
 	userMixinFields0 := userMixin[0].Fields()
 	_ = userMixinFields0
@@ -228,23 +287,27 @@ func init() {
 	// user.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
 	user.UpdateDefaultUpdatedAt = userDescUpdatedAt.UpdateDefault.(func() time.Time)
 	// userDescName is the schema descriptor for name field.
-	userDescName := userFields[0].Descriptor()
+	userDescName := userFields[1].Descriptor()
 	// user.NameValidator is a validator for the "name" field. It is called by the builders before save.
 	user.NameValidator = userDescName.Validators[0].(func(string) error)
 	// userDescUsername is the schema descriptor for username field.
-	userDescUsername := userFields[1].Descriptor()
+	userDescUsername := userFields[2].Descriptor()
 	// user.UsernameValidator is a validator for the "username" field. It is called by the builders before save.
 	user.UsernameValidator = userDescUsername.Validators[0].(func(string) error)
 	// userDescPassword is the schema descriptor for password field.
-	userDescPassword := userFields[2].Descriptor()
+	userDescPassword := userFields[3].Descriptor()
 	// user.PasswordValidator is a validator for the "password" field. It is called by the builders before save.
 	user.PasswordValidator = userDescPassword.Validators[0].(func(string) error)
 	// userDescPhone is the schema descriptor for phone field.
-	userDescPhone := userFields[3].Descriptor()
+	userDescPhone := userFields[4].Descriptor()
 	// user.PhoneValidator is a validator for the "phone" field. It is called by the builders before save.
 	user.PhoneValidator = userDescPhone.Validators[0].(func(string) error)
 	// userDescTokenVersion is the schema descriptor for token_version field.
-	userDescTokenVersion := userFields[5].Descriptor()
+	userDescTokenVersion := userFields[6].Descriptor()
 	// user.DefaultTokenVersion holds the default value on creation for the token_version field.
 	user.DefaultTokenVersion = userDescTokenVersion.Default.(int)
+	// userDescID is the schema descriptor for id field.
+	userDescID := userFields[0].Descriptor()
+	// user.DefaultID holds the default value on creation for the id field.
+	user.DefaultID = userDescID.Default.(func() uuid.UUID)
 }

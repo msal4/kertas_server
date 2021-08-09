@@ -7,6 +7,8 @@ import (
 	"io"
 	"strconv"
 	"time"
+
+	"github.com/google/uuid"
 )
 
 const (
@@ -82,17 +84,22 @@ var (
 	DefaultUpdatedAt func() time.Time
 	// UpdateDefaultUpdatedAt holds the default value on update for the "updated_at" field.
 	UpdateDefaultUpdatedAt func() time.Time
+	// DefaultID holds the default value on creation for the "id" field.
+	DefaultID func() uuid.UUID
 )
 
 // State defines the type for the "state" enum field.
 type State string
 
+// StatePRESENT is the default value of the State enum.
+const DefaultState = StatePRESENT
+
 // State values.
 const (
-	StatePresent        State = "present"
-	StateAbsent         State = "absent"
-	StateExcusedAbsence State = "excused_absence"
-	StateSick           State = "sick"
+	StatePRESENT         State = "PRESENT"
+	StateABSENT          State = "ABSENT"
+	StateEXCUSED_ABSENCE State = "EXCUSED_ABSENCE"
+	StateSICK            State = "SICK"
 )
 
 func (s State) String() string {
@@ -102,7 +109,7 @@ func (s State) String() string {
 // StateValidator is a validator for the "state" field enum values. It is called by the builders before save.
 func StateValidator(s State) error {
 	switch s {
-	case StatePresent, StateAbsent, StateExcusedAbsence, StateSick:
+	case StatePRESENT, StateABSENT, StateEXCUSED_ABSENCE, StateSICK:
 		return nil
 	default:
 		return fmt.Errorf("attendance: invalid enum value for state field: %q", s)

@@ -10,6 +10,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/google/uuid"
 	"github.com/msal4/hassah_school_server/ent/predicate"
 	"github.com/msal4/hassah_school_server/ent/stage"
 	"github.com/msal4/hassah_school_server/ent/tuitionpayment"
@@ -43,7 +44,7 @@ func (tpu *TuitionPaymentUpdate) AddPaidAmount(i int) *TuitionPaymentUpdate {
 }
 
 // SetStudentID sets the "student" edge to the User entity by ID.
-func (tpu *TuitionPaymentUpdate) SetStudentID(id int) *TuitionPaymentUpdate {
+func (tpu *TuitionPaymentUpdate) SetStudentID(id uuid.UUID) *TuitionPaymentUpdate {
 	tpu.mutation.SetStudentID(id)
 	return tpu
 }
@@ -54,7 +55,7 @@ func (tpu *TuitionPaymentUpdate) SetStudent(u *User) *TuitionPaymentUpdate {
 }
 
 // SetStageID sets the "stage" edge to the Stage entity by ID.
-func (tpu *TuitionPaymentUpdate) SetStageID(id int) *TuitionPaymentUpdate {
+func (tpu *TuitionPaymentUpdate) SetStageID(id uuid.UUID) *TuitionPaymentUpdate {
 	tpu.mutation.SetStageID(id)
 	return tpu
 }
@@ -167,7 +168,7 @@ func (tpu *TuitionPaymentUpdate) sqlSave(ctx context.Context) (n int, err error)
 			Table:   tuitionpayment.Table,
 			Columns: tuitionpayment.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeUUID,
 				Column: tuitionpayment.FieldID,
 			},
 		},
@@ -209,7 +210,7 @@ func (tpu *TuitionPaymentUpdate) sqlSave(ctx context.Context) (n int, err error)
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: user.FieldID,
 				},
 			},
@@ -225,7 +226,7 @@ func (tpu *TuitionPaymentUpdate) sqlSave(ctx context.Context) (n int, err error)
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: user.FieldID,
 				},
 			},
@@ -244,7 +245,7 @@ func (tpu *TuitionPaymentUpdate) sqlSave(ctx context.Context) (n int, err error)
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: stage.FieldID,
 				},
 			},
@@ -260,7 +261,7 @@ func (tpu *TuitionPaymentUpdate) sqlSave(ctx context.Context) (n int, err error)
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: stage.FieldID,
 				},
 			},
@@ -303,7 +304,7 @@ func (tpuo *TuitionPaymentUpdateOne) AddPaidAmount(i int) *TuitionPaymentUpdateO
 }
 
 // SetStudentID sets the "student" edge to the User entity by ID.
-func (tpuo *TuitionPaymentUpdateOne) SetStudentID(id int) *TuitionPaymentUpdateOne {
+func (tpuo *TuitionPaymentUpdateOne) SetStudentID(id uuid.UUID) *TuitionPaymentUpdateOne {
 	tpuo.mutation.SetStudentID(id)
 	return tpuo
 }
@@ -314,7 +315,7 @@ func (tpuo *TuitionPaymentUpdateOne) SetStudent(u *User) *TuitionPaymentUpdateOn
 }
 
 // SetStageID sets the "stage" edge to the Stage entity by ID.
-func (tpuo *TuitionPaymentUpdateOne) SetStageID(id int) *TuitionPaymentUpdateOne {
+func (tpuo *TuitionPaymentUpdateOne) SetStageID(id uuid.UUID) *TuitionPaymentUpdateOne {
 	tpuo.mutation.SetStageID(id)
 	return tpuo
 }
@@ -434,7 +435,7 @@ func (tpuo *TuitionPaymentUpdateOne) sqlSave(ctx context.Context) (_node *Tuitio
 			Table:   tuitionpayment.Table,
 			Columns: tuitionpayment.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeUUID,
 				Column: tuitionpayment.FieldID,
 			},
 		},
@@ -493,7 +494,7 @@ func (tpuo *TuitionPaymentUpdateOne) sqlSave(ctx context.Context) (_node *Tuitio
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: user.FieldID,
 				},
 			},
@@ -509,7 +510,7 @@ func (tpuo *TuitionPaymentUpdateOne) sqlSave(ctx context.Context) (_node *Tuitio
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: user.FieldID,
 				},
 			},
@@ -528,7 +529,7 @@ func (tpuo *TuitionPaymentUpdateOne) sqlSave(ctx context.Context) (_node *Tuitio
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: stage.FieldID,
 				},
 			},
@@ -544,7 +545,7 @@ func (tpuo *TuitionPaymentUpdateOne) sqlSave(ctx context.Context) (_node *Tuitio
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: stage.FieldID,
 				},
 			},

@@ -1,11 +1,13 @@
 package schema
 
 import (
+	"entgo.io/contrib/entgql"
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/entsql"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
 	"entgo.io/ent/schema/index"
+	"github.com/google/uuid"
 )
 
 const (
@@ -20,14 +22,15 @@ type User struct {
 // Fields of the User.
 func (User) Fields() []ent.Field {
 	return []ent.Field{
-		field.String("name").NotEmpty(),
-		field.String("username").Unique().NotEmpty(),
+		field.UUID("id", uuid.UUID{}).Default(uuid.New),
+		field.String("name").NotEmpty().Annotations(entgql.OrderField("NAME")),
+		field.String("username").Unique().NotEmpty().Annotations(entgql.OrderField("USERNAME")),
 		field.String("password").MinLen(passwordMinLength),
-		field.String("phone").NotEmpty(),
+		field.String("phone").NotEmpty().Annotations(entgql.OrderField("PHONE")),
 		field.String("image").Optional(),
 		field.Int("token_version").Default(0),
-		field.Enum("role").Values("super_admin", "school_admin", "teacher", "student").Default("student"),
-		field.Enum("status").GoType(Status("")).Default(StatusActive.String()),
+		field.Enum("role").Values("SUPER_ADMIN", "SCHOOL_ADMIN", "TEACHER", "STUDENT").Default("STUDENT").Annotations(entgql.OrderField("ROLE")),
+		field.Enum("status").GoType(Status("")).Default(StatusActive.String()).Annotations(entgql.OrderField("STATUS")),
 	}
 }
 

@@ -11,6 +11,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/google/uuid"
 	"github.com/msal4/hassah_school_server/ent/class"
 	"github.com/msal4/hassah_school_server/ent/predicate"
 	"github.com/msal4/hassah_school_server/ent/schedule"
@@ -30,15 +31,15 @@ func (su *ScheduleUpdate) Where(ps ...predicate.Schedule) *ScheduleUpdate {
 }
 
 // SetWeekday sets the "weekday" field.
-func (su *ScheduleUpdate) SetWeekday(u uint8) *ScheduleUpdate {
+func (su *ScheduleUpdate) SetWeekday(i int) *ScheduleUpdate {
 	su.mutation.ResetWeekday()
-	su.mutation.SetWeekday(u)
+	su.mutation.SetWeekday(i)
 	return su
 }
 
-// AddWeekday adds u to the "weekday" field.
-func (su *ScheduleUpdate) AddWeekday(u uint8) *ScheduleUpdate {
-	su.mutation.AddWeekday(u)
+// AddWeekday adds i to the "weekday" field.
+func (su *ScheduleUpdate) AddWeekday(i int) *ScheduleUpdate {
+	su.mutation.AddWeekday(i)
 	return su
 }
 
@@ -70,7 +71,7 @@ func (su *ScheduleUpdate) AddDuration(i int) *ScheduleUpdate {
 }
 
 // SetClassID sets the "class" edge to the Class entity by ID.
-func (su *ScheduleUpdate) SetClassID(id int) *ScheduleUpdate {
+func (su *ScheduleUpdate) SetClassID(id uuid.UUID) *ScheduleUpdate {
 	su.mutation.SetClassID(id)
 	return su
 }
@@ -170,7 +171,7 @@ func (su *ScheduleUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Table:   schedule.Table,
 			Columns: schedule.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeUUID,
 				Column: schedule.FieldID,
 			},
 		},
@@ -184,14 +185,14 @@ func (su *ScheduleUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := su.mutation.Weekday(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeUint8,
+			Type:   field.TypeInt,
 			Value:  value,
 			Column: schedule.FieldWeekday,
 		})
 	}
 	if value, ok := su.mutation.AddedWeekday(); ok {
 		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
-			Type:   field.TypeUint8,
+			Type:   field.TypeInt,
 			Value:  value,
 			Column: schedule.FieldWeekday,
 		})
@@ -226,7 +227,7 @@ func (su *ScheduleUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: class.FieldID,
 				},
 			},
@@ -242,7 +243,7 @@ func (su *ScheduleUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: class.FieldID,
 				},
 			},
@@ -272,15 +273,15 @@ type ScheduleUpdateOne struct {
 }
 
 // SetWeekday sets the "weekday" field.
-func (suo *ScheduleUpdateOne) SetWeekday(u uint8) *ScheduleUpdateOne {
+func (suo *ScheduleUpdateOne) SetWeekday(i int) *ScheduleUpdateOne {
 	suo.mutation.ResetWeekday()
-	suo.mutation.SetWeekday(u)
+	suo.mutation.SetWeekday(i)
 	return suo
 }
 
-// AddWeekday adds u to the "weekday" field.
-func (suo *ScheduleUpdateOne) AddWeekday(u uint8) *ScheduleUpdateOne {
-	suo.mutation.AddWeekday(u)
+// AddWeekday adds i to the "weekday" field.
+func (suo *ScheduleUpdateOne) AddWeekday(i int) *ScheduleUpdateOne {
+	suo.mutation.AddWeekday(i)
 	return suo
 }
 
@@ -312,7 +313,7 @@ func (suo *ScheduleUpdateOne) AddDuration(i int) *ScheduleUpdateOne {
 }
 
 // SetClassID sets the "class" edge to the Class entity by ID.
-func (suo *ScheduleUpdateOne) SetClassID(id int) *ScheduleUpdateOne {
+func (suo *ScheduleUpdateOne) SetClassID(id uuid.UUID) *ScheduleUpdateOne {
 	suo.mutation.SetClassID(id)
 	return suo
 }
@@ -419,7 +420,7 @@ func (suo *ScheduleUpdateOne) sqlSave(ctx context.Context) (_node *Schedule, err
 			Table:   schedule.Table,
 			Columns: schedule.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeUUID,
 				Column: schedule.FieldID,
 			},
 		},
@@ -450,14 +451,14 @@ func (suo *ScheduleUpdateOne) sqlSave(ctx context.Context) (_node *Schedule, err
 	}
 	if value, ok := suo.mutation.Weekday(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeUint8,
+			Type:   field.TypeInt,
 			Value:  value,
 			Column: schedule.FieldWeekday,
 		})
 	}
 	if value, ok := suo.mutation.AddedWeekday(); ok {
 		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
-			Type:   field.TypeUint8,
+			Type:   field.TypeInt,
 			Value:  value,
 			Column: schedule.FieldWeekday,
 		})
@@ -492,7 +493,7 @@ func (suo *ScheduleUpdateOne) sqlSave(ctx context.Context) (_node *Schedule, err
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: class.FieldID,
 				},
 			},
@@ -508,7 +509,7 @@ func (suo *ScheduleUpdateOne) sqlSave(ctx context.Context) (_node *Schedule, err
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: class.FieldID,
 				},
 			},

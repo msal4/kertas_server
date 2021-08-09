@@ -10,6 +10,7 @@ import (
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/google/uuid"
 	"github.com/msal4/hassah_school_server/ent/class"
 	"github.com/msal4/hassah_school_server/ent/schema"
 	"github.com/msal4/hassah_school_server/ent/school"
@@ -79,14 +80,20 @@ func (sc *StageCreate) SetNillableStatus(s *schema.Status) *StageCreate {
 	return sc
 }
 
+// SetID sets the "id" field.
+func (sc *StageCreate) SetID(u uuid.UUID) *StageCreate {
+	sc.mutation.SetID(u)
+	return sc
+}
+
 // SetSchoolID sets the "school" edge to the School entity by ID.
-func (sc *StageCreate) SetSchoolID(id int) *StageCreate {
+func (sc *StageCreate) SetSchoolID(id uuid.UUID) *StageCreate {
 	sc.mutation.SetSchoolID(id)
 	return sc
 }
 
 // SetNillableSchoolID sets the "school" edge to the School entity by ID if the given value is not nil.
-func (sc *StageCreate) SetNillableSchoolID(id *int) *StageCreate {
+func (sc *StageCreate) SetNillableSchoolID(id *uuid.UUID) *StageCreate {
 	if id != nil {
 		sc = sc.SetSchoolID(*id)
 	}
@@ -99,14 +106,14 @@ func (sc *StageCreate) SetSchool(s *School) *StageCreate {
 }
 
 // AddClassIDs adds the "classes" edge to the Class entity by IDs.
-func (sc *StageCreate) AddClassIDs(ids ...int) *StageCreate {
+func (sc *StageCreate) AddClassIDs(ids ...uuid.UUID) *StageCreate {
 	sc.mutation.AddClassIDs(ids...)
 	return sc
 }
 
 // AddClasses adds the "classes" edges to the Class entity.
 func (sc *StageCreate) AddClasses(c ...*Class) *StageCreate {
-	ids := make([]int, len(c))
+	ids := make([]uuid.UUID, len(c))
 	for i := range c {
 		ids[i] = c[i].ID
 	}
@@ -114,14 +121,14 @@ func (sc *StageCreate) AddClasses(c ...*Class) *StageCreate {
 }
 
 // AddPaymentIDs adds the "payments" edge to the TuitionPayment entity by IDs.
-func (sc *StageCreate) AddPaymentIDs(ids ...int) *StageCreate {
+func (sc *StageCreate) AddPaymentIDs(ids ...uuid.UUID) *StageCreate {
 	sc.mutation.AddPaymentIDs(ids...)
 	return sc
 }
 
 // AddPayments adds the "payments" edges to the TuitionPayment entity.
 func (sc *StageCreate) AddPayments(t ...*TuitionPayment) *StageCreate {
-	ids := make([]int, len(t))
+	ids := make([]uuid.UUID, len(t))
 	for i := range t {
 		ids[i] = t[i].ID
 	}
@@ -129,14 +136,14 @@ func (sc *StageCreate) AddPayments(t ...*TuitionPayment) *StageCreate {
 }
 
 // AddStudentIDs adds the "students" edge to the User entity by IDs.
-func (sc *StageCreate) AddStudentIDs(ids ...int) *StageCreate {
+func (sc *StageCreate) AddStudentIDs(ids ...uuid.UUID) *StageCreate {
 	sc.mutation.AddStudentIDs(ids...)
 	return sc
 }
 
 // AddStudents adds the "students" edges to the User entity.
 func (sc *StageCreate) AddStudents(u ...*User) *StageCreate {
-	ids := make([]int, len(u))
+	ids := make([]uuid.UUID, len(u))
 	for i := range u {
 		ids[i] = u[i].ID
 	}
@@ -226,6 +233,10 @@ func (sc *StageCreate) defaults() {
 		v := stage.DefaultStatus
 		sc.mutation.SetStatus(v)
 	}
+	if _, ok := sc.mutation.ID(); !ok {
+		v := stage.DefaultID()
+		sc.mutation.SetID(v)
+	}
 }
 
 // check runs all checks and user-defined validators on the builder.
@@ -266,8 +277,6 @@ func (sc *StageCreate) sqlSave(ctx context.Context) (*Stage, error) {
 		}
 		return nil, err
 	}
-	id := _spec.ID.Value.(int64)
-	_node.ID = int(id)
 	return _node, nil
 }
 
@@ -277,11 +286,15 @@ func (sc *StageCreate) createSpec() (*Stage, *sqlgraph.CreateSpec) {
 		_spec = &sqlgraph.CreateSpec{
 			Table: stage.Table,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeUUID,
 				Column: stage.FieldID,
 			},
 		}
 	)
+	if id, ok := sc.mutation.ID(); ok {
+		_node.ID = id
+		_spec.ID.Value = id
+	}
 	if value, ok := sc.mutation.CreatedAt(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
 			Type:   field.TypeTime,
@@ -331,7 +344,7 @@ func (sc *StageCreate) createSpec() (*Stage, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: school.FieldID,
 				},
 			},
@@ -351,7 +364,7 @@ func (sc *StageCreate) createSpec() (*Stage, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: class.FieldID,
 				},
 			},
@@ -370,7 +383,7 @@ func (sc *StageCreate) createSpec() (*Stage, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: tuitionpayment.FieldID,
 				},
 			},
@@ -389,7 +402,7 @@ func (sc *StageCreate) createSpec() (*Stage, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: user.FieldID,
 				},
 			},
@@ -444,10 +457,6 @@ func (scb *StageCreateBulk) Save(ctx context.Context) ([]*Stage, error) {
 				}
 				mutation.id = &nodes[i].ID
 				mutation.done = true
-				if specs[i].ID.Value != nil {
-					id := specs[i].ID.Value.(int64)
-					nodes[i].ID = int(id)
-				}
 				return nodes[i], nil
 			})
 			for i := len(builder.hooks) - 1; i >= 0; i-- {

@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"entgo.io/ent/dialect/sql"
+	"github.com/google/uuid"
 	"github.com/msal4/hassah_school_server/ent/group"
 	"github.com/msal4/hassah_school_server/ent/message"
 	"github.com/msal4/hassah_school_server/ent/user"
@@ -17,7 +18,7 @@ import (
 type Message struct {
 	config `json:"-"`
 	// ID of the ent.
-	ID int `json:"id,omitempty"`
+	ID uuid.UUID `json:"id,omitempty"`
 	// CreatedAt holds the value of the "created_at" field.
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// UpdatedAt holds the value of the "updated_at" field.
@@ -31,8 +32,8 @@ type Message struct {
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the MessageQuery when eager-loading is set.
 	Edges          MessageEdges `json:"edges"`
-	group_messages *int
-	user_messages  *int
+	group_messages *uuid.UUID
+	user_messages  *uuid.UUID
 }
 
 // MessageEdges holds the relations/edges for other nodes in the graph.
@@ -79,16 +80,16 @@ func (*Message) scanValues(columns []string) ([]interface{}, error) {
 	values := make([]interface{}, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case message.FieldID:
-			values[i] = new(sql.NullInt64)
 		case message.FieldContent, message.FieldAttachment:
 			values[i] = new(sql.NullString)
 		case message.FieldCreatedAt, message.FieldUpdatedAt, message.FieldDeletedAt:
 			values[i] = new(sql.NullTime)
+		case message.FieldID:
+			values[i] = new(uuid.UUID)
 		case message.ForeignKeys[0]: // group_messages
-			values[i] = new(sql.NullInt64)
+			values[i] = &sql.NullScanner{S: new(uuid.UUID)}
 		case message.ForeignKeys[1]: // user_messages
-			values[i] = new(sql.NullInt64)
+			values[i] = &sql.NullScanner{S: new(uuid.UUID)}
 		default:
 			return nil, fmt.Errorf("unexpected column %q for type Message", columns[i])
 		}
@@ -105,11 +106,11 @@ func (m *Message) assignValues(columns []string, values []interface{}) error {
 	for i := range columns {
 		switch columns[i] {
 		case message.FieldID:
-			value, ok := values[i].(*sql.NullInt64)
-			if !ok {
-				return fmt.Errorf("unexpected type %T for field id", value)
+			if value, ok := values[i].(*uuid.UUID); !ok {
+				return fmt.Errorf("unexpected type %T for field id", values[i])
+			} else if value != nil {
+				m.ID = *value
 			}
-			m.ID = int(value.Int64)
 		case message.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field created_at", values[i])
@@ -142,18 +143,18 @@ func (m *Message) assignValues(columns []string, values []interface{}) error {
 				*m.DeletedAt = value.Time
 			}
 		case message.ForeignKeys[0]:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for edge-field group_messages", value)
+			if value, ok := values[i].(*sql.NullScanner); !ok {
+				return fmt.Errorf("unexpected type %T for field group_messages", values[i])
 			} else if value.Valid {
-				m.group_messages = new(int)
-				*m.group_messages = int(value.Int64)
+				m.group_messages = new(uuid.UUID)
+				*m.group_messages = *value.S.(*uuid.UUID)
 			}
 		case message.ForeignKeys[1]:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for edge-field user_messages", value)
+			if value, ok := values[i].(*sql.NullScanner); !ok {
+				return fmt.Errorf("unexpected type %T for field user_messages", values[i])
 			} else if value.Valid {
-				m.user_messages = new(int)
-				*m.user_messages = int(value.Int64)
+				m.user_messages = new(uuid.UUID)
+				*m.user_messages = *value.S.(*uuid.UUID)
 			}
 		}
 	}

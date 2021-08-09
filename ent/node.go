@@ -6,14 +6,10 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"sync"
-	"sync/atomic"
 
 	"entgo.io/contrib/entgql"
-	"entgo.io/ent/dialect"
-	"entgo.io/ent/dialect/sql"
-	"entgo.io/ent/dialect/sql/schema"
 	"github.com/99designs/gqlgen/graphql"
+	"github.com/google/uuid"
 	"github.com/hashicorp/go-multierror"
 	"github.com/msal4/hassah_school_server/ent/assignment"
 	"github.com/msal4/hassah_school_server/ent/assignmentsubmission"
@@ -27,7 +23,6 @@ import (
 	"github.com/msal4/hassah_school_server/ent/stage"
 	"github.com/msal4/hassah_school_server/ent/tuitionpayment"
 	"github.com/msal4/hassah_school_server/ent/user"
-	"golang.org/x/sync/semaphore"
 )
 
 // Noder wraps the basic Node method.
@@ -37,10 +32,10 @@ type Noder interface {
 
 // Node in the graph.
 type Node struct {
-	ID     int      `json:"id,omitempty"`     // node id.
-	Type   string   `json:"type,omitempty"`   // node type.
-	Fields []*Field `json:"fields,omitempty"` // node fields.
-	Edges  []*Edge  `json:"edges,omitempty"`  // node edges.
+	ID     uuid.UUID `json:"id,omitempty"`     // node id.
+	Type   string    `json:"type,omitempty"`   // node type.
+	Fields []*Field  `json:"fields,omitempty"` // node fields.
+	Edges  []*Edge   `json:"edges,omitempty"`  // node edges.
 }
 
 // Field of a node.
@@ -52,9 +47,9 @@ type Field struct {
 
 // Edges between two nodes.
 type Edge struct {
-	Type string `json:"type,omitempty"` // edge type.
-	Name string `json:"name,omitempty"` // edge name.
-	IDs  []int  `json:"ids,omitempty"`  // node ids (where this edge point to).
+	Type string      `json:"type,omitempty"` // edge type.
+	Name string      `json:"name,omitempty"` // edge name.
+	IDs  []uuid.UUID `json:"ids,omitempty"`  // node ids (where this edge point to).
 }
 
 func (a *Assignment) Node(ctx context.Context) (node *Node, err error) {
@@ -133,9 +128,9 @@ func (a *Assignment) Node(ctx context.Context) (node *Node, err error) {
 		Type: "Class",
 		Name: "class",
 	}
-	node.Edges[0].IDs, err = a.QueryClass().
+	err = a.QueryClass().
 		Select(class.FieldID).
-		Ints(ctx)
+		Scan(ctx, &node.Edges[0].IDs)
 	if err != nil {
 		return nil, err
 	}
@@ -143,9 +138,9 @@ func (a *Assignment) Node(ctx context.Context) (node *Node, err error) {
 		Type: "AssignmentSubmission",
 		Name: "submissions",
 	}
-	node.Edges[1].IDs, err = a.QuerySubmissions().
+	err = a.QuerySubmissions().
 		Select(assignmentsubmission.FieldID).
-		Ints(ctx)
+		Scan(ctx, &node.Edges[1].IDs)
 	if err != nil {
 		return nil, err
 	}
@@ -153,9 +148,9 @@ func (a *Assignment) Node(ctx context.Context) (node *Node, err error) {
 		Type: "Grade",
 		Name: "grades",
 	}
-	node.Edges[2].IDs, err = a.QueryGrades().
+	err = a.QueryGrades().
 		Select(grade.FieldID).
-		Ints(ctx)
+		Scan(ctx, &node.Edges[2].IDs)
 	if err != nil {
 		return nil, err
 	}
@@ -206,9 +201,9 @@ func (as *AssignmentSubmission) Node(ctx context.Context) (node *Node, err error
 		Type: "User",
 		Name: "student",
 	}
-	node.Edges[0].IDs, err = as.QueryStudent().
+	err = as.QueryStudent().
 		Select(user.FieldID).
-		Ints(ctx)
+		Scan(ctx, &node.Edges[0].IDs)
 	if err != nil {
 		return nil, err
 	}
@@ -216,9 +211,9 @@ func (as *AssignmentSubmission) Node(ctx context.Context) (node *Node, err error
 		Type: "Assignment",
 		Name: "assignment",
 	}
-	node.Edges[1].IDs, err = as.QueryAssignment().
+	err = as.QueryAssignment().
 		Select(assignment.FieldID).
-		Ints(ctx)
+		Scan(ctx, &node.Edges[1].IDs)
 	if err != nil {
 		return nil, err
 	}
@@ -269,9 +264,9 @@ func (a *Attendance) Node(ctx context.Context) (node *Node, err error) {
 		Type: "Class",
 		Name: "class",
 	}
-	node.Edges[0].IDs, err = a.QueryClass().
+	err = a.QueryClass().
 		Select(class.FieldID).
-		Ints(ctx)
+		Scan(ctx, &node.Edges[0].IDs)
 	if err != nil {
 		return nil, err
 	}
@@ -279,9 +274,9 @@ func (a *Attendance) Node(ctx context.Context) (node *Node, err error) {
 		Type: "User",
 		Name: "student",
 	}
-	node.Edges[1].IDs, err = a.QueryStudent().
+	err = a.QueryStudent().
 		Select(user.FieldID).
-		Ints(ctx)
+		Scan(ctx, &node.Edges[1].IDs)
 	if err != nil {
 		return nil, err
 	}
@@ -332,9 +327,9 @@ func (c *Class) Node(ctx context.Context) (node *Node, err error) {
 		Type: "Stage",
 		Name: "stage",
 	}
-	node.Edges[0].IDs, err = c.QueryStage().
+	err = c.QueryStage().
 		Select(stage.FieldID).
-		Ints(ctx)
+		Scan(ctx, &node.Edges[0].IDs)
 	if err != nil {
 		return nil, err
 	}
@@ -342,9 +337,9 @@ func (c *Class) Node(ctx context.Context) (node *Node, err error) {
 		Type: "User",
 		Name: "teacher",
 	}
-	node.Edges[1].IDs, err = c.QueryTeacher().
+	err = c.QueryTeacher().
 		Select(user.FieldID).
-		Ints(ctx)
+		Scan(ctx, &node.Edges[1].IDs)
 	if err != nil {
 		return nil, err
 	}
@@ -352,9 +347,9 @@ func (c *Class) Node(ctx context.Context) (node *Node, err error) {
 		Type: "Group",
 		Name: "group",
 	}
-	node.Edges[2].IDs, err = c.QueryGroup().
+	err = c.QueryGroup().
 		Select(group.FieldID).
-		Ints(ctx)
+		Scan(ctx, &node.Edges[2].IDs)
 	if err != nil {
 		return nil, err
 	}
@@ -362,9 +357,9 @@ func (c *Class) Node(ctx context.Context) (node *Node, err error) {
 		Type: "Assignment",
 		Name: "assignments",
 	}
-	node.Edges[3].IDs, err = c.QueryAssignments().
+	err = c.QueryAssignments().
 		Select(assignment.FieldID).
-		Ints(ctx)
+		Scan(ctx, &node.Edges[3].IDs)
 	if err != nil {
 		return nil, err
 	}
@@ -372,9 +367,9 @@ func (c *Class) Node(ctx context.Context) (node *Node, err error) {
 		Type: "Attendance",
 		Name: "attendances",
 	}
-	node.Edges[4].IDs, err = c.QueryAttendances().
+	err = c.QueryAttendances().
 		Select(attendance.FieldID).
-		Ints(ctx)
+		Scan(ctx, &node.Edges[4].IDs)
 	if err != nil {
 		return nil, err
 	}
@@ -382,9 +377,9 @@ func (c *Class) Node(ctx context.Context) (node *Node, err error) {
 		Type: "Schedule",
 		Name: "schedules",
 	}
-	node.Edges[5].IDs, err = c.QuerySchedules().
+	err = c.QuerySchedules().
 		Select(schedule.FieldID).
-		Ints(ctx)
+		Scan(ctx, &node.Edges[5].IDs)
 	if err != nil {
 		return nil, err
 	}
@@ -419,7 +414,7 @@ func (gr *Grade) Node(ctx context.Context) (node *Node, err error) {
 		return nil, err
 	}
 	node.Fields[2] = &Field{
-		Type:  "float64",
+		Type:  "int",
 		Name:  "exam_grade",
 		Value: string(buf),
 	}
@@ -427,9 +422,9 @@ func (gr *Grade) Node(ctx context.Context) (node *Node, err error) {
 		Type: "User",
 		Name: "student",
 	}
-	node.Edges[0].IDs, err = gr.QueryStudent().
+	err = gr.QueryStudent().
 		Select(user.FieldID).
-		Ints(ctx)
+		Scan(ctx, &node.Edges[0].IDs)
 	if err != nil {
 		return nil, err
 	}
@@ -437,9 +432,9 @@ func (gr *Grade) Node(ctx context.Context) (node *Node, err error) {
 		Type: "Assignment",
 		Name: "exam",
 	}
-	node.Edges[1].IDs, err = gr.QueryExam().
+	err = gr.QueryExam().
 		Select(assignment.FieldID).
-		Ints(ctx)
+		Scan(ctx, &node.Edges[1].IDs)
 	if err != nil {
 		return nil, err
 	}
@@ -478,12 +473,12 @@ func (gr *Group) Node(ctx context.Context) (node *Node, err error) {
 		Name:  "name",
 		Value: string(buf),
 	}
-	if buf, err = json.Marshal(gr.Type); err != nil {
+	if buf, err = json.Marshal(gr.GroupType); err != nil {
 		return nil, err
 	}
 	node.Fields[3] = &Field{
-		Type:  "group.Type",
-		Name:  "type",
+		Type:  "group.GroupType",
+		Name:  "group_type",
 		Value: string(buf),
 	}
 	if buf, err = json.Marshal(gr.Status); err != nil {
@@ -498,9 +493,9 @@ func (gr *Group) Node(ctx context.Context) (node *Node, err error) {
 		Type: "Class",
 		Name: "class",
 	}
-	node.Edges[0].IDs, err = gr.QueryClass().
+	err = gr.QueryClass().
 		Select(class.FieldID).
-		Ints(ctx)
+		Scan(ctx, &node.Edges[0].IDs)
 	if err != nil {
 		return nil, err
 	}
@@ -508,9 +503,9 @@ func (gr *Group) Node(ctx context.Context) (node *Node, err error) {
 		Type: "Message",
 		Name: "messages",
 	}
-	node.Edges[1].IDs, err = gr.QueryMessages().
+	err = gr.QueryMessages().
 		Select(message.FieldID).
-		Ints(ctx)
+		Scan(ctx, &node.Edges[1].IDs)
 	if err != nil {
 		return nil, err
 	}
@@ -569,9 +564,9 @@ func (m *Message) Node(ctx context.Context) (node *Node, err error) {
 		Type: "Group",
 		Name: "group",
 	}
-	node.Edges[0].IDs, err = m.QueryGroup().
+	err = m.QueryGroup().
 		Select(group.FieldID).
-		Ints(ctx)
+		Scan(ctx, &node.Edges[0].IDs)
 	if err != nil {
 		return nil, err
 	}
@@ -579,9 +574,9 @@ func (m *Message) Node(ctx context.Context) (node *Node, err error) {
 		Type: "User",
 		Name: "owner",
 	}
-	node.Edges[1].IDs, err = m.QueryOwner().
+	err = m.QueryOwner().
 		Select(user.FieldID).
-		Ints(ctx)
+		Scan(ctx, &node.Edges[1].IDs)
 	if err != nil {
 		return nil, err
 	}
@@ -600,7 +595,7 @@ func (s *Schedule) Node(ctx context.Context) (node *Node, err error) {
 		return nil, err
 	}
 	node.Fields[0] = &Field{
-		Type:  "uint8",
+		Type:  "int",
 		Name:  "weekday",
 		Value: string(buf),
 	}
@@ -624,9 +619,9 @@ func (s *Schedule) Node(ctx context.Context) (node *Node, err error) {
 		Type: "Class",
 		Name: "class",
 	}
-	node.Edges[0].IDs, err = s.QueryClass().
+	err = s.QueryClass().
 		Select(class.FieldID).
-		Ints(ctx)
+		Scan(ctx, &node.Edges[0].IDs)
 	if err != nil {
 		return nil, err
 	}
@@ -685,9 +680,9 @@ func (s *School) Node(ctx context.Context) (node *Node, err error) {
 		Type: "User",
 		Name: "users",
 	}
-	node.Edges[0].IDs, err = s.QueryUsers().
+	err = s.QueryUsers().
 		Select(user.FieldID).
-		Ints(ctx)
+		Scan(ctx, &node.Edges[0].IDs)
 	if err != nil {
 		return nil, err
 	}
@@ -695,9 +690,9 @@ func (s *School) Node(ctx context.Context) (node *Node, err error) {
 		Type: "Stage",
 		Name: "stages",
 	}
-	node.Edges[1].IDs, err = s.QueryStages().
+	err = s.QueryStages().
 		Select(stage.FieldID).
-		Ints(ctx)
+		Scan(ctx, &node.Edges[1].IDs)
 	if err != nil {
 		return nil, err
 	}
@@ -756,9 +751,9 @@ func (s *Stage) Node(ctx context.Context) (node *Node, err error) {
 		Type: "School",
 		Name: "school",
 	}
-	node.Edges[0].IDs, err = s.QuerySchool().
+	err = s.QuerySchool().
 		Select(school.FieldID).
-		Ints(ctx)
+		Scan(ctx, &node.Edges[0].IDs)
 	if err != nil {
 		return nil, err
 	}
@@ -766,9 +761,9 @@ func (s *Stage) Node(ctx context.Context) (node *Node, err error) {
 		Type: "Class",
 		Name: "classes",
 	}
-	node.Edges[1].IDs, err = s.QueryClasses().
+	err = s.QueryClasses().
 		Select(class.FieldID).
-		Ints(ctx)
+		Scan(ctx, &node.Edges[1].IDs)
 	if err != nil {
 		return nil, err
 	}
@@ -776,9 +771,9 @@ func (s *Stage) Node(ctx context.Context) (node *Node, err error) {
 		Type: "TuitionPayment",
 		Name: "payments",
 	}
-	node.Edges[2].IDs, err = s.QueryPayments().
+	err = s.QueryPayments().
 		Select(tuitionpayment.FieldID).
-		Ints(ctx)
+		Scan(ctx, &node.Edges[2].IDs)
 	if err != nil {
 		return nil, err
 	}
@@ -786,9 +781,9 @@ func (s *Stage) Node(ctx context.Context) (node *Node, err error) {
 		Type: "User",
 		Name: "students",
 	}
-	node.Edges[3].IDs, err = s.QueryStudents().
+	err = s.QueryStudents().
 		Select(user.FieldID).
-		Ints(ctx)
+		Scan(ctx, &node.Edges[3].IDs)
 	if err != nil {
 		return nil, err
 	}
@@ -831,9 +826,9 @@ func (tp *TuitionPayment) Node(ctx context.Context) (node *Node, err error) {
 		Type: "User",
 		Name: "student",
 	}
-	node.Edges[0].IDs, err = tp.QueryStudent().
+	err = tp.QueryStudent().
 		Select(user.FieldID).
-		Ints(ctx)
+		Scan(ctx, &node.Edges[0].IDs)
 	if err != nil {
 		return nil, err
 	}
@@ -841,9 +836,9 @@ func (tp *TuitionPayment) Node(ctx context.Context) (node *Node, err error) {
 		Type: "Stage",
 		Name: "stage",
 	}
-	node.Edges[1].IDs, err = tp.QueryStage().
+	err = tp.QueryStage().
 		Select(stage.FieldID).
-		Ints(ctx)
+		Scan(ctx, &node.Edges[1].IDs)
 	if err != nil {
 		return nil, err
 	}
@@ -942,9 +937,9 @@ func (u *User) Node(ctx context.Context) (node *Node, err error) {
 		Type: "Stage",
 		Name: "stage",
 	}
-	node.Edges[0].IDs, err = u.QueryStage().
+	err = u.QueryStage().
 		Select(stage.FieldID).
-		Ints(ctx)
+		Scan(ctx, &node.Edges[0].IDs)
 	if err != nil {
 		return nil, err
 	}
@@ -952,9 +947,9 @@ func (u *User) Node(ctx context.Context) (node *Node, err error) {
 		Type: "School",
 		Name: "school",
 	}
-	node.Edges[1].IDs, err = u.QuerySchool().
+	err = u.QuerySchool().
 		Select(school.FieldID).
-		Ints(ctx)
+		Scan(ctx, &node.Edges[1].IDs)
 	if err != nil {
 		return nil, err
 	}
@@ -962,9 +957,9 @@ func (u *User) Node(ctx context.Context) (node *Node, err error) {
 		Type: "Class",
 		Name: "classes",
 	}
-	node.Edges[2].IDs, err = u.QueryClasses().
+	err = u.QueryClasses().
 		Select(class.FieldID).
-		Ints(ctx)
+		Scan(ctx, &node.Edges[2].IDs)
 	if err != nil {
 		return nil, err
 	}
@@ -972,9 +967,9 @@ func (u *User) Node(ctx context.Context) (node *Node, err error) {
 		Type: "Message",
 		Name: "messages",
 	}
-	node.Edges[3].IDs, err = u.QueryMessages().
+	err = u.QueryMessages().
 		Select(message.FieldID).
-		Ints(ctx)
+		Scan(ctx, &node.Edges[3].IDs)
 	if err != nil {
 		return nil, err
 	}
@@ -982,9 +977,9 @@ func (u *User) Node(ctx context.Context) (node *Node, err error) {
 		Type: "AssignmentSubmission",
 		Name: "submissions",
 	}
-	node.Edges[4].IDs, err = u.QuerySubmissions().
+	err = u.QuerySubmissions().
 		Select(assignmentsubmission.FieldID).
-		Ints(ctx)
+		Scan(ctx, &node.Edges[4].IDs)
 	if err != nil {
 		return nil, err
 	}
@@ -992,9 +987,9 @@ func (u *User) Node(ctx context.Context) (node *Node, err error) {
 		Type: "Attendance",
 		Name: "attendances",
 	}
-	node.Edges[5].IDs, err = u.QueryAttendances().
+	err = u.QueryAttendances().
 		Select(attendance.FieldID).
-		Ints(ctx)
+		Scan(ctx, &node.Edges[5].IDs)
 	if err != nil {
 		return nil, err
 	}
@@ -1002,9 +997,9 @@ func (u *User) Node(ctx context.Context) (node *Node, err error) {
 		Type: "TuitionPayment",
 		Name: "payments",
 	}
-	node.Edges[6].IDs, err = u.QueryPayments().
+	err = u.QueryPayments().
 		Select(tuitionpayment.FieldID).
-		Ints(ctx)
+		Scan(ctx, &node.Edges[6].IDs)
 	if err != nil {
 		return nil, err
 	}
@@ -1012,16 +1007,16 @@ func (u *User) Node(ctx context.Context) (node *Node, err error) {
 		Type: "Grade",
 		Name: "grades",
 	}
-	node.Edges[7].IDs, err = u.QueryGrades().
+	err = u.QueryGrades().
 		Select(grade.FieldID).
-		Ints(ctx)
+		Scan(ctx, &node.Edges[7].IDs)
 	if err != nil {
 		return nil, err
 	}
 	return node, nil
 }
 
-func (c *Client) Node(ctx context.Context, id int) (*Node, error) {
+func (c *Client) Node(ctx context.Context, id uuid.UUID) (*Node, error) {
 	n, err := c.Noder(ctx, id)
 	if err != nil {
 		return nil, err
@@ -1037,7 +1032,7 @@ type NodeOption func(*nodeOptions)
 // WithNodeType sets the node Type resolver function (i.e. the table to query).
 // If was not provided, the table will be derived from the universal-id
 // configuration as described in: https://entgo.io/docs/migrate/#universal-ids.
-func WithNodeType(f func(context.Context, int) (string, error)) NodeOption {
+func WithNodeType(f func(context.Context, uuid.UUID) (string, error)) NodeOption {
 	return func(o *nodeOptions) {
 		o.nodeType = f
 	}
@@ -1045,13 +1040,13 @@ func WithNodeType(f func(context.Context, int) (string, error)) NodeOption {
 
 // WithFixedNodeType sets the Type of the node to a fixed value.
 func WithFixedNodeType(t string) NodeOption {
-	return WithNodeType(func(context.Context, int) (string, error) {
+	return WithNodeType(func(context.Context, uuid.UUID) (string, error) {
 		return t, nil
 	})
 }
 
 type nodeOptions struct {
-	nodeType func(context.Context, int) (string, error)
+	nodeType func(context.Context, uuid.UUID) (string, error)
 }
 
 func (c *Client) newNodeOpts(opts []NodeOption) *nodeOptions {
@@ -1060,8 +1055,8 @@ func (c *Client) newNodeOpts(opts []NodeOption) *nodeOptions {
 		opt(nopts)
 	}
 	if nopts.nodeType == nil {
-		nopts.nodeType = func(ctx context.Context, id int) (string, error) {
-			return c.tables.nodeType(ctx, c.driver, id)
+		nopts.nodeType = func(ctx context.Context, id uuid.UUID) (string, error) {
+			return "", fmt.Errorf("cannot resolve noder (%v) without its type", id)
 		}
 	}
 	return nopts
@@ -1073,7 +1068,7 @@ func (c *Client) newNodeOpts(opts []NodeOption) *nodeOptions {
 //		c.Noder(ctx, id)
 //		c.Noder(ctx, id, ent.WithNodeType(pet.Table))
 //
-func (c *Client) Noder(ctx context.Context, id int, opts ...NodeOption) (_ Noder, err error) {
+func (c *Client) Noder(ctx context.Context, id uuid.UUID, opts ...NodeOption) (_ Noder, err error) {
 	defer func() {
 		if IsNotFound(err) {
 			err = multierror.Append(err, entgql.ErrNodeNotFound(id))
@@ -1086,7 +1081,7 @@ func (c *Client) Noder(ctx context.Context, id int, opts ...NodeOption) (_ Noder
 	return c.noder(ctx, table, id)
 }
 
-func (c *Client) noder(ctx context.Context, table string, id int) (Noder, error) {
+func (c *Client) noder(ctx context.Context, table string, id uuid.UUID) (Noder, error) {
 	switch table {
 	case assignment.Table:
 		n, err := c.Assignment.Query().
@@ -1201,7 +1196,7 @@ func (c *Client) noder(ctx context.Context, table string, id int) (Noder, error)
 	}
 }
 
-func (c *Client) Noders(ctx context.Context, ids []int, opts ...NodeOption) ([]Noder, error) {
+func (c *Client) Noders(ctx context.Context, ids []uuid.UUID, opts ...NodeOption) ([]Noder, error) {
 	switch len(ids) {
 	case 1:
 		noder, err := c.Noder(ctx, ids[0], opts...)
@@ -1215,8 +1210,8 @@ func (c *Client) Noders(ctx context.Context, ids []int, opts ...NodeOption) ([]N
 
 	noders := make([]Noder, len(ids))
 	errors := make([]error, len(ids))
-	tables := make(map[string][]int)
-	id2idx := make(map[int][]int, len(ids))
+	tables := make(map[string][]uuid.UUID)
+	id2idx := make(map[uuid.UUID][]int, len(ids))
 	nopts := c.newNodeOpts(opts)
 	for i, id := range ids {
 		table, err := nopts.nodeType(ctx, id)
@@ -1262,9 +1257,9 @@ func (c *Client) Noders(ctx context.Context, ids []int, opts ...NodeOption) ([]N
 	return noders, nil
 }
 
-func (c *Client) noders(ctx context.Context, table string, ids []int) ([]Noder, error) {
+func (c *Client) noders(ctx context.Context, table string, ids []uuid.UUID) ([]Noder, error) {
 	noders := make([]Noder, len(ids))
-	idmap := make(map[int][]*Noder, len(ids))
+	idmap := make(map[uuid.UUID][]*Noder, len(ids))
 	for i, id := range ids {
 		idmap[id] = append(idmap[id], &noders[i])
 	}
@@ -1429,56 +1424,4 @@ func (c *Client) noders(ctx context.Context, table string, ids []int) ([]Noder, 
 		return nil, fmt.Errorf("cannot resolve noders from table %q: %w", table, errNodeInvalidID)
 	}
 	return noders, nil
-}
-
-type tables struct {
-	once  sync.Once
-	sem   *semaphore.Weighted
-	value atomic.Value
-}
-
-func (t *tables) nodeType(ctx context.Context, drv dialect.Driver, id int) (string, error) {
-	tables, err := t.Load(ctx, drv)
-	if err != nil {
-		return "", err
-	}
-	idx := int(id / (1<<32 - 1))
-	if idx < 0 || idx >= len(tables) {
-		return "", fmt.Errorf("cannot resolve table from id %v: %w", id, errNodeInvalidID)
-	}
-	return tables[idx], nil
-}
-
-func (t *tables) Load(ctx context.Context, drv dialect.Driver) ([]string, error) {
-	if tables := t.value.Load(); tables != nil {
-		return tables.([]string), nil
-	}
-	t.once.Do(func() { t.sem = semaphore.NewWeighted(1) })
-	if err := t.sem.Acquire(ctx, 1); err != nil {
-		return nil, err
-	}
-	defer t.sem.Release(1)
-	if tables := t.value.Load(); tables != nil {
-		return tables.([]string), nil
-	}
-	tables, err := t.load(ctx, drv)
-	if err == nil {
-		t.value.Store(tables)
-	}
-	return tables, err
-}
-
-func (*tables) load(ctx context.Context, drv dialect.Driver) ([]string, error) {
-	rows := &sql.Rows{}
-	query, args := sql.Dialect(drv.Dialect()).
-		Select("type").
-		From(sql.Table(schema.TypeTable)).
-		OrderBy(sql.Asc("id")).
-		Query()
-	if err := drv.Query(ctx, query, args, rows); err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	var tables []string
-	return tables, sql.ScanSlice(rows, &tables)
 }

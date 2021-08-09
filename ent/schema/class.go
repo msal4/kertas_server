@@ -1,11 +1,13 @@
 package schema
 
 import (
+	"entgo.io/contrib/entgql"
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/entsql"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
 	"entgo.io/ent/schema/index"
+	"github.com/google/uuid"
 )
 
 // Class holds the schema definition for the Class entity.
@@ -16,8 +18,9 @@ type Class struct {
 // Fields of the Class.
 func (Class) Fields() []ent.Field {
 	return []ent.Field{
-		field.String("name").NotEmpty(),
-		field.Enum("status").GoType(Status("")).Default(StatusActive.String()),
+		field.UUID("id", uuid.UUID{}).Default(uuid.New),
+		field.String("name").NotEmpty().Annotations(entgql.OrderField("NAME")),
+		field.Enum("status").GoType(Status("")).Default(StatusActive.String()).Annotations(entgql.OrderField("STATUS")),
 	}
 }
 

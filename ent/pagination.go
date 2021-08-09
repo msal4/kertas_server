@@ -14,6 +14,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/99designs/gqlgen/graphql/errcode"
+	"github.com/google/uuid"
 	"github.com/msal4/hassah_school_server/ent/assignment"
 	"github.com/msal4/hassah_school_server/ent/assignmentsubmission"
 	"github.com/msal4/hassah_school_server/ent/attendance"
@@ -155,8 +156,8 @@ type PageInfo struct {
 
 // Cursor of an edge type.
 type Cursor struct {
-	ID    int   `msgpack:"i"`
-	Value Value `msgpack:"v,omitempty"`
+	ID    uuid.UUID `msgpack:"i"`
+	Value Value     `msgpack:"v,omitempty"`
 }
 
 // MarshalGQL implements graphql.Marshaler interface.
@@ -457,6 +458,56 @@ var (
 			}
 		},
 	}
+	// AssignmentOrderFieldName orders Assignment by name.
+	AssignmentOrderFieldName = &AssignmentOrderField{
+		field: assignment.FieldName,
+		toCursor: func(a *Assignment) Cursor {
+			return Cursor{
+				ID:    a.ID,
+				Value: a.Name,
+			}
+		},
+	}
+	// AssignmentOrderFieldDescription orders Assignment by description.
+	AssignmentOrderFieldDescription = &AssignmentOrderField{
+		field: assignment.FieldDescription,
+		toCursor: func(a *Assignment) Cursor {
+			return Cursor{
+				ID:    a.ID,
+				Value: a.Description,
+			}
+		},
+	}
+	// AssignmentOrderFieldIsExam orders Assignment by is_exam.
+	AssignmentOrderFieldIsExam = &AssignmentOrderField{
+		field: assignment.FieldIsExam,
+		toCursor: func(a *Assignment) Cursor {
+			return Cursor{
+				ID:    a.ID,
+				Value: a.IsExam,
+			}
+		},
+	}
+	// AssignmentOrderFieldDueDate orders Assignment by due_date.
+	AssignmentOrderFieldDueDate = &AssignmentOrderField{
+		field: assignment.FieldDueDate,
+		toCursor: func(a *Assignment) Cursor {
+			return Cursor{
+				ID:    a.ID,
+				Value: a.DueDate,
+			}
+		},
+	}
+	// AssignmentOrderFieldDuration orders Assignment by duration.
+	AssignmentOrderFieldDuration = &AssignmentOrderField{
+		field: assignment.FieldDuration,
+		toCursor: func(a *Assignment) Cursor {
+			return Cursor{
+				ID:    a.ID,
+				Value: a.Duration,
+			}
+		},
+	}
 )
 
 // String implement fmt.Stringer interface.
@@ -467,6 +518,16 @@ func (f AssignmentOrderField) String() string {
 		str = "CREATED_AT"
 	case assignment.FieldUpdatedAt:
 		str = "UPDATED_AT"
+	case assignment.FieldName:
+		str = "NAME"
+	case assignment.FieldDescription:
+		str = "DESCRIPTION"
+	case assignment.FieldIsExam:
+		str = "IS_EXAM"
+	case assignment.FieldDueDate:
+		str = "DUE_DATE"
+	case assignment.FieldDuration:
+		str = "DURATION"
 	}
 	return str
 }
@@ -487,6 +548,16 @@ func (f *AssignmentOrderField) UnmarshalGQL(v interface{}) error {
 		*f = *AssignmentOrderFieldCreatedAt
 	case "UPDATED_AT":
 		*f = *AssignmentOrderFieldUpdatedAt
+	case "NAME":
+		*f = *AssignmentOrderFieldName
+	case "DESCRIPTION":
+		*f = *AssignmentOrderFieldDescription
+	case "IS_EXAM":
+		*f = *AssignmentOrderFieldIsExam
+	case "DUE_DATE":
+		*f = *AssignmentOrderFieldDueDate
+	case "DURATION":
+		*f = *AssignmentOrderFieldDuration
 	default:
 		return fmt.Errorf("%s is not a valid AssignmentOrderField", str)
 	}
@@ -741,6 +812,16 @@ var (
 			}
 		},
 	}
+	// AssignmentSubmissionOrderFieldSubmittedAt orders AssignmentSubmission by submitted_at.
+	AssignmentSubmissionOrderFieldSubmittedAt = &AssignmentSubmissionOrderField{
+		field: assignmentsubmission.FieldSubmittedAt,
+		toCursor: func(as *AssignmentSubmission) Cursor {
+			return Cursor{
+				ID:    as.ID,
+				Value: as.SubmittedAt,
+			}
+		},
+	}
 )
 
 // String implement fmt.Stringer interface.
@@ -751,6 +832,8 @@ func (f AssignmentSubmissionOrderField) String() string {
 		str = "CREATED_AT"
 	case assignmentsubmission.FieldUpdatedAt:
 		str = "UPDATED_AT"
+	case assignmentsubmission.FieldSubmittedAt:
+		str = "SUBMITTED_AT"
 	}
 	return str
 }
@@ -771,6 +854,8 @@ func (f *AssignmentSubmissionOrderField) UnmarshalGQL(v interface{}) error {
 		*f = *AssignmentSubmissionOrderFieldCreatedAt
 	case "UPDATED_AT":
 		*f = *AssignmentSubmissionOrderFieldUpdatedAt
+	case "SUBMITTED_AT":
+		*f = *AssignmentSubmissionOrderFieldSubmittedAt
 	default:
 		return fmt.Errorf("%s is not a valid AssignmentSubmissionOrderField", str)
 	}
@@ -1025,6 +1110,26 @@ var (
 			}
 		},
 	}
+	// AttendanceOrderFieldDate orders Attendance by date.
+	AttendanceOrderFieldDate = &AttendanceOrderField{
+		field: attendance.FieldDate,
+		toCursor: func(a *Attendance) Cursor {
+			return Cursor{
+				ID:    a.ID,
+				Value: a.Date,
+			}
+		},
+	}
+	// AttendanceOrderFieldState orders Attendance by state.
+	AttendanceOrderFieldState = &AttendanceOrderField{
+		field: attendance.FieldState,
+		toCursor: func(a *Attendance) Cursor {
+			return Cursor{
+				ID:    a.ID,
+				Value: a.State,
+			}
+		},
+	}
 )
 
 // String implement fmt.Stringer interface.
@@ -1035,6 +1140,10 @@ func (f AttendanceOrderField) String() string {
 		str = "CREATED_AT"
 	case attendance.FieldUpdatedAt:
 		str = "UPDATED_AT"
+	case attendance.FieldDate:
+		str = "DATE"
+	case attendance.FieldState:
+		str = "STATE"
 	}
 	return str
 }
@@ -1055,6 +1164,10 @@ func (f *AttendanceOrderField) UnmarshalGQL(v interface{}) error {
 		*f = *AttendanceOrderFieldCreatedAt
 	case "UPDATED_AT":
 		*f = *AttendanceOrderFieldUpdatedAt
+	case "DATE":
+		*f = *AttendanceOrderFieldDate
+	case "STATE":
+		*f = *AttendanceOrderFieldState
 	default:
 		return fmt.Errorf("%s is not a valid AttendanceOrderField", str)
 	}
@@ -1309,6 +1422,26 @@ var (
 			}
 		},
 	}
+	// ClassOrderFieldName orders Class by name.
+	ClassOrderFieldName = &ClassOrderField{
+		field: class.FieldName,
+		toCursor: func(c *Class) Cursor {
+			return Cursor{
+				ID:    c.ID,
+				Value: c.Name,
+			}
+		},
+	}
+	// ClassOrderFieldStatus orders Class by status.
+	ClassOrderFieldStatus = &ClassOrderField{
+		field: class.FieldStatus,
+		toCursor: func(c *Class) Cursor {
+			return Cursor{
+				ID:    c.ID,
+				Value: c.Status,
+			}
+		},
+	}
 )
 
 // String implement fmt.Stringer interface.
@@ -1319,6 +1452,10 @@ func (f ClassOrderField) String() string {
 		str = "CREATED_AT"
 	case class.FieldUpdatedAt:
 		str = "UPDATED_AT"
+	case class.FieldName:
+		str = "NAME"
+	case class.FieldStatus:
+		str = "STATUS"
 	}
 	return str
 }
@@ -1339,6 +1476,10 @@ func (f *ClassOrderField) UnmarshalGQL(v interface{}) error {
 		*f = *ClassOrderFieldCreatedAt
 	case "UPDATED_AT":
 		*f = *ClassOrderFieldUpdatedAt
+	case "NAME":
+		*f = *ClassOrderFieldName
+	case "STATUS":
+		*f = *ClassOrderFieldStatus
 	default:
 		return fmt.Errorf("%s is not a valid ClassOrderField", str)
 	}
@@ -1593,6 +1734,16 @@ var (
 			}
 		},
 	}
+	// GradeOrderFieldExamGrade orders Grade by exam_grade.
+	GradeOrderFieldExamGrade = &GradeOrderField{
+		field: grade.FieldExamGrade,
+		toCursor: func(gr *Grade) Cursor {
+			return Cursor{
+				ID:    gr.ID,
+				Value: gr.ExamGrade,
+			}
+		},
+	}
 )
 
 // String implement fmt.Stringer interface.
@@ -1603,6 +1754,8 @@ func (f GradeOrderField) String() string {
 		str = "CREATED_AT"
 	case grade.FieldUpdatedAt:
 		str = "UPDATED_AT"
+	case grade.FieldExamGrade:
+		str = "EXAM_GRADE"
 	}
 	return str
 }
@@ -1623,6 +1776,8 @@ func (f *GradeOrderField) UnmarshalGQL(v interface{}) error {
 		*f = *GradeOrderFieldCreatedAt
 	case "UPDATED_AT":
 		*f = *GradeOrderFieldUpdatedAt
+	case "EXAM_GRADE":
+		*f = *GradeOrderFieldExamGrade
 	default:
 		return fmt.Errorf("%s is not a valid GradeOrderField", str)
 	}
@@ -1877,6 +2032,36 @@ var (
 			}
 		},
 	}
+	// GroupOrderFieldName orders Group by name.
+	GroupOrderFieldName = &GroupOrderField{
+		field: group.FieldName,
+		toCursor: func(gr *Group) Cursor {
+			return Cursor{
+				ID:    gr.ID,
+				Value: gr.Name,
+			}
+		},
+	}
+	// GroupOrderFieldGroupType orders Group by group_type.
+	GroupOrderFieldGroupType = &GroupOrderField{
+		field: group.FieldGroupType,
+		toCursor: func(gr *Group) Cursor {
+			return Cursor{
+				ID:    gr.ID,
+				Value: gr.GroupType,
+			}
+		},
+	}
+	// GroupOrderFieldStatus orders Group by status.
+	GroupOrderFieldStatus = &GroupOrderField{
+		field: group.FieldStatus,
+		toCursor: func(gr *Group) Cursor {
+			return Cursor{
+				ID:    gr.ID,
+				Value: gr.Status,
+			}
+		},
+	}
 )
 
 // String implement fmt.Stringer interface.
@@ -1887,6 +2072,12 @@ func (f GroupOrderField) String() string {
 		str = "CREATED_AT"
 	case group.FieldUpdatedAt:
 		str = "UPDATED_AT"
+	case group.FieldName:
+		str = "NAME"
+	case group.FieldGroupType:
+		str = "GROUP_TYPE"
+	case group.FieldStatus:
+		str = "STATUS"
 	}
 	return str
 }
@@ -1907,6 +2098,12 @@ func (f *GroupOrderField) UnmarshalGQL(v interface{}) error {
 		*f = *GroupOrderFieldCreatedAt
 	case "UPDATED_AT":
 		*f = *GroupOrderFieldUpdatedAt
+	case "NAME":
+		*f = *GroupOrderFieldName
+	case "GROUP_TYPE":
+		*f = *GroupOrderFieldGroupType
+	case "STATUS":
+		*f = *GroupOrderFieldStatus
 	default:
 		return fmt.Errorf("%s is not a valid GroupOrderField", str)
 	}
@@ -2161,6 +2358,16 @@ var (
 			}
 		},
 	}
+	// MessageOrderFieldContent orders Message by content.
+	MessageOrderFieldContent = &MessageOrderField{
+		field: message.FieldContent,
+		toCursor: func(m *Message) Cursor {
+			return Cursor{
+				ID:    m.ID,
+				Value: m.Content,
+			}
+		},
+	}
 )
 
 // String implement fmt.Stringer interface.
@@ -2171,6 +2378,8 @@ func (f MessageOrderField) String() string {
 		str = "CREATED_AT"
 	case message.FieldUpdatedAt:
 		str = "UPDATED_AT"
+	case message.FieldContent:
+		str = "CONTENT"
 	}
 	return str
 }
@@ -2191,6 +2400,8 @@ func (f *MessageOrderField) UnmarshalGQL(v interface{}) error {
 		*f = *MessageOrderFieldCreatedAt
 	case "UPDATED_AT":
 		*f = *MessageOrderFieldUpdatedAt
+	case "CONTENT":
+		*f = *MessageOrderFieldContent
 	default:
 		return fmt.Errorf("%s is not a valid MessageOrderField", str)
 	}
@@ -2422,6 +2633,77 @@ func (s *ScheduleQuery) Paginate(
 	}
 
 	return conn, nil
+}
+
+var (
+	// ScheduleOrderFieldWeekday orders Schedule by weekday.
+	ScheduleOrderFieldWeekday = &ScheduleOrderField{
+		field: schedule.FieldWeekday,
+		toCursor: func(s *Schedule) Cursor {
+			return Cursor{
+				ID:    s.ID,
+				Value: s.Weekday,
+			}
+		},
+	}
+	// ScheduleOrderFieldStartsAt orders Schedule by starts_at.
+	ScheduleOrderFieldStartsAt = &ScheduleOrderField{
+		field: schedule.FieldStartsAt,
+		toCursor: func(s *Schedule) Cursor {
+			return Cursor{
+				ID:    s.ID,
+				Value: s.StartsAt,
+			}
+		},
+	}
+	// ScheduleOrderFieldDuration orders Schedule by duration.
+	ScheduleOrderFieldDuration = &ScheduleOrderField{
+		field: schedule.FieldDuration,
+		toCursor: func(s *Schedule) Cursor {
+			return Cursor{
+				ID:    s.ID,
+				Value: s.Duration,
+			}
+		},
+	}
+)
+
+// String implement fmt.Stringer interface.
+func (f ScheduleOrderField) String() string {
+	var str string
+	switch f.field {
+	case schedule.FieldWeekday:
+		str = "WEEKDAY"
+	case schedule.FieldStartsAt:
+		str = "STARTS_AT"
+	case schedule.FieldDuration:
+		str = "DURATION"
+	}
+	return str
+}
+
+// MarshalGQL implements graphql.Marshaler interface.
+func (f ScheduleOrderField) MarshalGQL(w io.Writer) {
+	io.WriteString(w, strconv.Quote(f.String()))
+}
+
+// UnmarshalGQL implements graphql.Unmarshaler interface.
+func (f *ScheduleOrderField) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("ScheduleOrderField %T must be a string", v)
+	}
+	switch str {
+	case "WEEKDAY":
+		*f = *ScheduleOrderFieldWeekday
+	case "STARTS_AT":
+		*f = *ScheduleOrderFieldStartsAt
+	case "DURATION":
+		*f = *ScheduleOrderFieldDuration
+	default:
+		return fmt.Errorf("%s is not a valid ScheduleOrderField", str)
+	}
+	return nil
 }
 
 // ScheduleOrderField defines the ordering field of Schedule.
@@ -2984,6 +3266,36 @@ var (
 			}
 		},
 	}
+	// StageOrderFieldName orders Stage by name.
+	StageOrderFieldName = &StageOrderField{
+		field: stage.FieldName,
+		toCursor: func(s *Stage) Cursor {
+			return Cursor{
+				ID:    s.ID,
+				Value: s.Name,
+			}
+		},
+	}
+	// StageOrderFieldTuitionAmount orders Stage by tuition_amount.
+	StageOrderFieldTuitionAmount = &StageOrderField{
+		field: stage.FieldTuitionAmount,
+		toCursor: func(s *Stage) Cursor {
+			return Cursor{
+				ID:    s.ID,
+				Value: s.TuitionAmount,
+			}
+		},
+	}
+	// StageOrderFieldStatus orders Stage by status.
+	StageOrderFieldStatus = &StageOrderField{
+		field: stage.FieldStatus,
+		toCursor: func(s *Stage) Cursor {
+			return Cursor{
+				ID:    s.ID,
+				Value: s.Status,
+			}
+		},
+	}
 )
 
 // String implement fmt.Stringer interface.
@@ -2994,6 +3306,12 @@ func (f StageOrderField) String() string {
 		str = "CREATED_AT"
 	case stage.FieldUpdatedAt:
 		str = "UPDATED_AT"
+	case stage.FieldName:
+		str = "NAME"
+	case stage.FieldTuitionAmount:
+		str = "TUITION_AMOUNT"
+	case stage.FieldStatus:
+		str = "STATUS"
 	}
 	return str
 }
@@ -3014,6 +3332,12 @@ func (f *StageOrderField) UnmarshalGQL(v interface{}) error {
 		*f = *StageOrderFieldCreatedAt
 	case "UPDATED_AT":
 		*f = *StageOrderFieldUpdatedAt
+	case "NAME":
+		*f = *StageOrderFieldName
+	case "TUITION_AMOUNT":
+		*f = *StageOrderFieldTuitionAmount
+	case "STATUS":
+		*f = *StageOrderFieldStatus
 	default:
 		return fmt.Errorf("%s is not a valid StageOrderField", str)
 	}
@@ -3268,6 +3592,16 @@ var (
 			}
 		},
 	}
+	// TuitionPaymentOrderFieldPaidAmount orders TuitionPayment by paid_amount.
+	TuitionPaymentOrderFieldPaidAmount = &TuitionPaymentOrderField{
+		field: tuitionpayment.FieldPaidAmount,
+		toCursor: func(tp *TuitionPayment) Cursor {
+			return Cursor{
+				ID:    tp.ID,
+				Value: tp.PaidAmount,
+			}
+		},
+	}
 )
 
 // String implement fmt.Stringer interface.
@@ -3278,6 +3612,8 @@ func (f TuitionPaymentOrderField) String() string {
 		str = "CREATED_AT"
 	case tuitionpayment.FieldUpdatedAt:
 		str = "UPDATED_AT"
+	case tuitionpayment.FieldPaidAmount:
+		str = "PAID_AMOUNT"
 	}
 	return str
 }
@@ -3298,6 +3634,8 @@ func (f *TuitionPaymentOrderField) UnmarshalGQL(v interface{}) error {
 		*f = *TuitionPaymentOrderFieldCreatedAt
 	case "UPDATED_AT":
 		*f = *TuitionPaymentOrderFieldUpdatedAt
+	case "PAID_AMOUNT":
+		*f = *TuitionPaymentOrderFieldPaidAmount
 	default:
 		return fmt.Errorf("%s is not a valid TuitionPaymentOrderField", str)
 	}
@@ -3552,6 +3890,56 @@ var (
 			}
 		},
 	}
+	// UserOrderFieldName orders User by name.
+	UserOrderFieldName = &UserOrderField{
+		field: user.FieldName,
+		toCursor: func(u *User) Cursor {
+			return Cursor{
+				ID:    u.ID,
+				Value: u.Name,
+			}
+		},
+	}
+	// UserOrderFieldUsername orders User by username.
+	UserOrderFieldUsername = &UserOrderField{
+		field: user.FieldUsername,
+		toCursor: func(u *User) Cursor {
+			return Cursor{
+				ID:    u.ID,
+				Value: u.Username,
+			}
+		},
+	}
+	// UserOrderFieldPhone orders User by phone.
+	UserOrderFieldPhone = &UserOrderField{
+		field: user.FieldPhone,
+		toCursor: func(u *User) Cursor {
+			return Cursor{
+				ID:    u.ID,
+				Value: u.Phone,
+			}
+		},
+	}
+	// UserOrderFieldRole orders User by role.
+	UserOrderFieldRole = &UserOrderField{
+		field: user.FieldRole,
+		toCursor: func(u *User) Cursor {
+			return Cursor{
+				ID:    u.ID,
+				Value: u.Role,
+			}
+		},
+	}
+	// UserOrderFieldStatus orders User by status.
+	UserOrderFieldStatus = &UserOrderField{
+		field: user.FieldStatus,
+		toCursor: func(u *User) Cursor {
+			return Cursor{
+				ID:    u.ID,
+				Value: u.Status,
+			}
+		},
+	}
 )
 
 // String implement fmt.Stringer interface.
@@ -3562,6 +3950,16 @@ func (f UserOrderField) String() string {
 		str = "CREATED_AT"
 	case user.FieldUpdatedAt:
 		str = "UPDATED_AT"
+	case user.FieldName:
+		str = "NAME"
+	case user.FieldUsername:
+		str = "USERNAME"
+	case user.FieldPhone:
+		str = "PHONE"
+	case user.FieldRole:
+		str = "ROLE"
+	case user.FieldStatus:
+		str = "STATUS"
 	}
 	return str
 }
@@ -3582,6 +3980,16 @@ func (f *UserOrderField) UnmarshalGQL(v interface{}) error {
 		*f = *UserOrderFieldCreatedAt
 	case "UPDATED_AT":
 		*f = *UserOrderFieldUpdatedAt
+	case "NAME":
+		*f = *UserOrderFieldName
+	case "USERNAME":
+		*f = *UserOrderFieldUsername
+	case "PHONE":
+		*f = *UserOrderFieldPhone
+	case "ROLE":
+		*f = *UserOrderFieldRole
+	case "STATUS":
+		*f = *UserOrderFieldStatus
 	default:
 		return fmt.Errorf("%s is not a valid UserOrderField", str)
 	}

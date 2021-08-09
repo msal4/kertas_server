@@ -10,6 +10,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/google/uuid"
 	"github.com/msal4/hassah_school_server/ent/assignment"
 	"github.com/msal4/hassah_school_server/ent/attendance"
 	"github.com/msal4/hassah_school_server/ent/class"
@@ -55,7 +56,7 @@ func (cu *ClassUpdate) SetNillableStatus(s *schema.Status) *ClassUpdate {
 }
 
 // SetStageID sets the "stage" edge to the Stage entity by ID.
-func (cu *ClassUpdate) SetStageID(id int) *ClassUpdate {
+func (cu *ClassUpdate) SetStageID(id uuid.UUID) *ClassUpdate {
 	cu.mutation.SetStageID(id)
 	return cu
 }
@@ -66,7 +67,7 @@ func (cu *ClassUpdate) SetStage(s *Stage) *ClassUpdate {
 }
 
 // SetTeacherID sets the "teacher" edge to the User entity by ID.
-func (cu *ClassUpdate) SetTeacherID(id int) *ClassUpdate {
+func (cu *ClassUpdate) SetTeacherID(id uuid.UUID) *ClassUpdate {
 	cu.mutation.SetTeacherID(id)
 	return cu
 }
@@ -77,7 +78,7 @@ func (cu *ClassUpdate) SetTeacher(u *User) *ClassUpdate {
 }
 
 // SetGroupID sets the "group" edge to the Group entity by ID.
-func (cu *ClassUpdate) SetGroupID(id int) *ClassUpdate {
+func (cu *ClassUpdate) SetGroupID(id uuid.UUID) *ClassUpdate {
 	cu.mutation.SetGroupID(id)
 	return cu
 }
@@ -88,14 +89,14 @@ func (cu *ClassUpdate) SetGroup(g *Group) *ClassUpdate {
 }
 
 // AddAssignmentIDs adds the "assignments" edge to the Assignment entity by IDs.
-func (cu *ClassUpdate) AddAssignmentIDs(ids ...int) *ClassUpdate {
+func (cu *ClassUpdate) AddAssignmentIDs(ids ...uuid.UUID) *ClassUpdate {
 	cu.mutation.AddAssignmentIDs(ids...)
 	return cu
 }
 
 // AddAssignments adds the "assignments" edges to the Assignment entity.
 func (cu *ClassUpdate) AddAssignments(a ...*Assignment) *ClassUpdate {
-	ids := make([]int, len(a))
+	ids := make([]uuid.UUID, len(a))
 	for i := range a {
 		ids[i] = a[i].ID
 	}
@@ -103,14 +104,14 @@ func (cu *ClassUpdate) AddAssignments(a ...*Assignment) *ClassUpdate {
 }
 
 // AddAttendanceIDs adds the "attendances" edge to the Attendance entity by IDs.
-func (cu *ClassUpdate) AddAttendanceIDs(ids ...int) *ClassUpdate {
+func (cu *ClassUpdate) AddAttendanceIDs(ids ...uuid.UUID) *ClassUpdate {
 	cu.mutation.AddAttendanceIDs(ids...)
 	return cu
 }
 
 // AddAttendances adds the "attendances" edges to the Attendance entity.
 func (cu *ClassUpdate) AddAttendances(a ...*Attendance) *ClassUpdate {
-	ids := make([]int, len(a))
+	ids := make([]uuid.UUID, len(a))
 	for i := range a {
 		ids[i] = a[i].ID
 	}
@@ -118,14 +119,14 @@ func (cu *ClassUpdate) AddAttendances(a ...*Attendance) *ClassUpdate {
 }
 
 // AddScheduleIDs adds the "schedules" edge to the Schedule entity by IDs.
-func (cu *ClassUpdate) AddScheduleIDs(ids ...int) *ClassUpdate {
+func (cu *ClassUpdate) AddScheduleIDs(ids ...uuid.UUID) *ClassUpdate {
 	cu.mutation.AddScheduleIDs(ids...)
 	return cu
 }
 
 // AddSchedules adds the "schedules" edges to the Schedule entity.
 func (cu *ClassUpdate) AddSchedules(s ...*Schedule) *ClassUpdate {
-	ids := make([]int, len(s))
+	ids := make([]uuid.UUID, len(s))
 	for i := range s {
 		ids[i] = s[i].ID
 	}
@@ -162,14 +163,14 @@ func (cu *ClassUpdate) ClearAssignments() *ClassUpdate {
 }
 
 // RemoveAssignmentIDs removes the "assignments" edge to Assignment entities by IDs.
-func (cu *ClassUpdate) RemoveAssignmentIDs(ids ...int) *ClassUpdate {
+func (cu *ClassUpdate) RemoveAssignmentIDs(ids ...uuid.UUID) *ClassUpdate {
 	cu.mutation.RemoveAssignmentIDs(ids...)
 	return cu
 }
 
 // RemoveAssignments removes "assignments" edges to Assignment entities.
 func (cu *ClassUpdate) RemoveAssignments(a ...*Assignment) *ClassUpdate {
-	ids := make([]int, len(a))
+	ids := make([]uuid.UUID, len(a))
 	for i := range a {
 		ids[i] = a[i].ID
 	}
@@ -183,14 +184,14 @@ func (cu *ClassUpdate) ClearAttendances() *ClassUpdate {
 }
 
 // RemoveAttendanceIDs removes the "attendances" edge to Attendance entities by IDs.
-func (cu *ClassUpdate) RemoveAttendanceIDs(ids ...int) *ClassUpdate {
+func (cu *ClassUpdate) RemoveAttendanceIDs(ids ...uuid.UUID) *ClassUpdate {
 	cu.mutation.RemoveAttendanceIDs(ids...)
 	return cu
 }
 
 // RemoveAttendances removes "attendances" edges to Attendance entities.
 func (cu *ClassUpdate) RemoveAttendances(a ...*Attendance) *ClassUpdate {
-	ids := make([]int, len(a))
+	ids := make([]uuid.UUID, len(a))
 	for i := range a {
 		ids[i] = a[i].ID
 	}
@@ -204,14 +205,14 @@ func (cu *ClassUpdate) ClearSchedules() *ClassUpdate {
 }
 
 // RemoveScheduleIDs removes the "schedules" edge to Schedule entities by IDs.
-func (cu *ClassUpdate) RemoveScheduleIDs(ids ...int) *ClassUpdate {
+func (cu *ClassUpdate) RemoveScheduleIDs(ids ...uuid.UUID) *ClassUpdate {
 	cu.mutation.RemoveScheduleIDs(ids...)
 	return cu
 }
 
 // RemoveSchedules removes "schedules" edges to Schedule entities.
 func (cu *ClassUpdate) RemoveSchedules(s ...*Schedule) *ClassUpdate {
-	ids := make([]int, len(s))
+	ids := make([]uuid.UUID, len(s))
 	for i := range s {
 		ids[i] = s[i].ID
 	}
@@ -317,7 +318,7 @@ func (cu *ClassUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Table:   class.Table,
 			Columns: class.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeUUID,
 				Column: class.FieldID,
 			},
 		},
@@ -359,7 +360,7 @@ func (cu *ClassUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: stage.FieldID,
 				},
 			},
@@ -375,7 +376,7 @@ func (cu *ClassUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: stage.FieldID,
 				},
 			},
@@ -394,7 +395,7 @@ func (cu *ClassUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: user.FieldID,
 				},
 			},
@@ -410,7 +411,7 @@ func (cu *ClassUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: user.FieldID,
 				},
 			},
@@ -429,7 +430,7 @@ func (cu *ClassUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: group.FieldID,
 				},
 			},
@@ -445,7 +446,7 @@ func (cu *ClassUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: group.FieldID,
 				},
 			},
@@ -464,7 +465,7 @@ func (cu *ClassUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: assignment.FieldID,
 				},
 			},
@@ -480,7 +481,7 @@ func (cu *ClassUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: assignment.FieldID,
 				},
 			},
@@ -499,7 +500,7 @@ func (cu *ClassUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: assignment.FieldID,
 				},
 			},
@@ -518,7 +519,7 @@ func (cu *ClassUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: attendance.FieldID,
 				},
 			},
@@ -534,7 +535,7 @@ func (cu *ClassUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: attendance.FieldID,
 				},
 			},
@@ -553,7 +554,7 @@ func (cu *ClassUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: attendance.FieldID,
 				},
 			},
@@ -572,7 +573,7 @@ func (cu *ClassUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: schedule.FieldID,
 				},
 			},
@@ -588,7 +589,7 @@ func (cu *ClassUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: schedule.FieldID,
 				},
 			},
@@ -607,7 +608,7 @@ func (cu *ClassUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: schedule.FieldID,
 				},
 			},
@@ -657,7 +658,7 @@ func (cuo *ClassUpdateOne) SetNillableStatus(s *schema.Status) *ClassUpdateOne {
 }
 
 // SetStageID sets the "stage" edge to the Stage entity by ID.
-func (cuo *ClassUpdateOne) SetStageID(id int) *ClassUpdateOne {
+func (cuo *ClassUpdateOne) SetStageID(id uuid.UUID) *ClassUpdateOne {
 	cuo.mutation.SetStageID(id)
 	return cuo
 }
@@ -668,7 +669,7 @@ func (cuo *ClassUpdateOne) SetStage(s *Stage) *ClassUpdateOne {
 }
 
 // SetTeacherID sets the "teacher" edge to the User entity by ID.
-func (cuo *ClassUpdateOne) SetTeacherID(id int) *ClassUpdateOne {
+func (cuo *ClassUpdateOne) SetTeacherID(id uuid.UUID) *ClassUpdateOne {
 	cuo.mutation.SetTeacherID(id)
 	return cuo
 }
@@ -679,7 +680,7 @@ func (cuo *ClassUpdateOne) SetTeacher(u *User) *ClassUpdateOne {
 }
 
 // SetGroupID sets the "group" edge to the Group entity by ID.
-func (cuo *ClassUpdateOne) SetGroupID(id int) *ClassUpdateOne {
+func (cuo *ClassUpdateOne) SetGroupID(id uuid.UUID) *ClassUpdateOne {
 	cuo.mutation.SetGroupID(id)
 	return cuo
 }
@@ -690,14 +691,14 @@ func (cuo *ClassUpdateOne) SetGroup(g *Group) *ClassUpdateOne {
 }
 
 // AddAssignmentIDs adds the "assignments" edge to the Assignment entity by IDs.
-func (cuo *ClassUpdateOne) AddAssignmentIDs(ids ...int) *ClassUpdateOne {
+func (cuo *ClassUpdateOne) AddAssignmentIDs(ids ...uuid.UUID) *ClassUpdateOne {
 	cuo.mutation.AddAssignmentIDs(ids...)
 	return cuo
 }
 
 // AddAssignments adds the "assignments" edges to the Assignment entity.
 func (cuo *ClassUpdateOne) AddAssignments(a ...*Assignment) *ClassUpdateOne {
-	ids := make([]int, len(a))
+	ids := make([]uuid.UUID, len(a))
 	for i := range a {
 		ids[i] = a[i].ID
 	}
@@ -705,14 +706,14 @@ func (cuo *ClassUpdateOne) AddAssignments(a ...*Assignment) *ClassUpdateOne {
 }
 
 // AddAttendanceIDs adds the "attendances" edge to the Attendance entity by IDs.
-func (cuo *ClassUpdateOne) AddAttendanceIDs(ids ...int) *ClassUpdateOne {
+func (cuo *ClassUpdateOne) AddAttendanceIDs(ids ...uuid.UUID) *ClassUpdateOne {
 	cuo.mutation.AddAttendanceIDs(ids...)
 	return cuo
 }
 
 // AddAttendances adds the "attendances" edges to the Attendance entity.
 func (cuo *ClassUpdateOne) AddAttendances(a ...*Attendance) *ClassUpdateOne {
-	ids := make([]int, len(a))
+	ids := make([]uuid.UUID, len(a))
 	for i := range a {
 		ids[i] = a[i].ID
 	}
@@ -720,14 +721,14 @@ func (cuo *ClassUpdateOne) AddAttendances(a ...*Attendance) *ClassUpdateOne {
 }
 
 // AddScheduleIDs adds the "schedules" edge to the Schedule entity by IDs.
-func (cuo *ClassUpdateOne) AddScheduleIDs(ids ...int) *ClassUpdateOne {
+func (cuo *ClassUpdateOne) AddScheduleIDs(ids ...uuid.UUID) *ClassUpdateOne {
 	cuo.mutation.AddScheduleIDs(ids...)
 	return cuo
 }
 
 // AddSchedules adds the "schedules" edges to the Schedule entity.
 func (cuo *ClassUpdateOne) AddSchedules(s ...*Schedule) *ClassUpdateOne {
-	ids := make([]int, len(s))
+	ids := make([]uuid.UUID, len(s))
 	for i := range s {
 		ids[i] = s[i].ID
 	}
@@ -764,14 +765,14 @@ func (cuo *ClassUpdateOne) ClearAssignments() *ClassUpdateOne {
 }
 
 // RemoveAssignmentIDs removes the "assignments" edge to Assignment entities by IDs.
-func (cuo *ClassUpdateOne) RemoveAssignmentIDs(ids ...int) *ClassUpdateOne {
+func (cuo *ClassUpdateOne) RemoveAssignmentIDs(ids ...uuid.UUID) *ClassUpdateOne {
 	cuo.mutation.RemoveAssignmentIDs(ids...)
 	return cuo
 }
 
 // RemoveAssignments removes "assignments" edges to Assignment entities.
 func (cuo *ClassUpdateOne) RemoveAssignments(a ...*Assignment) *ClassUpdateOne {
-	ids := make([]int, len(a))
+	ids := make([]uuid.UUID, len(a))
 	for i := range a {
 		ids[i] = a[i].ID
 	}
@@ -785,14 +786,14 @@ func (cuo *ClassUpdateOne) ClearAttendances() *ClassUpdateOne {
 }
 
 // RemoveAttendanceIDs removes the "attendances" edge to Attendance entities by IDs.
-func (cuo *ClassUpdateOne) RemoveAttendanceIDs(ids ...int) *ClassUpdateOne {
+func (cuo *ClassUpdateOne) RemoveAttendanceIDs(ids ...uuid.UUID) *ClassUpdateOne {
 	cuo.mutation.RemoveAttendanceIDs(ids...)
 	return cuo
 }
 
 // RemoveAttendances removes "attendances" edges to Attendance entities.
 func (cuo *ClassUpdateOne) RemoveAttendances(a ...*Attendance) *ClassUpdateOne {
-	ids := make([]int, len(a))
+	ids := make([]uuid.UUID, len(a))
 	for i := range a {
 		ids[i] = a[i].ID
 	}
@@ -806,14 +807,14 @@ func (cuo *ClassUpdateOne) ClearSchedules() *ClassUpdateOne {
 }
 
 // RemoveScheduleIDs removes the "schedules" edge to Schedule entities by IDs.
-func (cuo *ClassUpdateOne) RemoveScheduleIDs(ids ...int) *ClassUpdateOne {
+func (cuo *ClassUpdateOne) RemoveScheduleIDs(ids ...uuid.UUID) *ClassUpdateOne {
 	cuo.mutation.RemoveScheduleIDs(ids...)
 	return cuo
 }
 
 // RemoveSchedules removes "schedules" edges to Schedule entities.
 func (cuo *ClassUpdateOne) RemoveSchedules(s ...*Schedule) *ClassUpdateOne {
-	ids := make([]int, len(s))
+	ids := make([]uuid.UUID, len(s))
 	for i := range s {
 		ids[i] = s[i].ID
 	}
@@ -926,7 +927,7 @@ func (cuo *ClassUpdateOne) sqlSave(ctx context.Context) (_node *Class, err error
 			Table:   class.Table,
 			Columns: class.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeUUID,
 				Column: class.FieldID,
 			},
 		},
@@ -985,7 +986,7 @@ func (cuo *ClassUpdateOne) sqlSave(ctx context.Context) (_node *Class, err error
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: stage.FieldID,
 				},
 			},
@@ -1001,7 +1002,7 @@ func (cuo *ClassUpdateOne) sqlSave(ctx context.Context) (_node *Class, err error
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: stage.FieldID,
 				},
 			},
@@ -1020,7 +1021,7 @@ func (cuo *ClassUpdateOne) sqlSave(ctx context.Context) (_node *Class, err error
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: user.FieldID,
 				},
 			},
@@ -1036,7 +1037,7 @@ func (cuo *ClassUpdateOne) sqlSave(ctx context.Context) (_node *Class, err error
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: user.FieldID,
 				},
 			},
@@ -1055,7 +1056,7 @@ func (cuo *ClassUpdateOne) sqlSave(ctx context.Context) (_node *Class, err error
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: group.FieldID,
 				},
 			},
@@ -1071,7 +1072,7 @@ func (cuo *ClassUpdateOne) sqlSave(ctx context.Context) (_node *Class, err error
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: group.FieldID,
 				},
 			},
@@ -1090,7 +1091,7 @@ func (cuo *ClassUpdateOne) sqlSave(ctx context.Context) (_node *Class, err error
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: assignment.FieldID,
 				},
 			},
@@ -1106,7 +1107,7 @@ func (cuo *ClassUpdateOne) sqlSave(ctx context.Context) (_node *Class, err error
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: assignment.FieldID,
 				},
 			},
@@ -1125,7 +1126,7 @@ func (cuo *ClassUpdateOne) sqlSave(ctx context.Context) (_node *Class, err error
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: assignment.FieldID,
 				},
 			},
@@ -1144,7 +1145,7 @@ func (cuo *ClassUpdateOne) sqlSave(ctx context.Context) (_node *Class, err error
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: attendance.FieldID,
 				},
 			},
@@ -1160,7 +1161,7 @@ func (cuo *ClassUpdateOne) sqlSave(ctx context.Context) (_node *Class, err error
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: attendance.FieldID,
 				},
 			},
@@ -1179,7 +1180,7 @@ func (cuo *ClassUpdateOne) sqlSave(ctx context.Context) (_node *Class, err error
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: attendance.FieldID,
 				},
 			},
@@ -1198,7 +1199,7 @@ func (cuo *ClassUpdateOne) sqlSave(ctx context.Context) (_node *Class, err error
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: schedule.FieldID,
 				},
 			},
@@ -1214,7 +1215,7 @@ func (cuo *ClassUpdateOne) sqlSave(ctx context.Context) (_node *Class, err error
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: schedule.FieldID,
 				},
 			},
@@ -1233,7 +1234,7 @@ func (cuo *ClassUpdateOne) sqlSave(ctx context.Context) (_node *Class, err error
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: schedule.FieldID,
 				},
 			},

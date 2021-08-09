@@ -4,6 +4,8 @@ package grade
 
 import (
 	"time"
+
+	"github.com/google/uuid"
 )
 
 const (
@@ -77,5 +79,7 @@ var (
 	// UpdateDefaultUpdatedAt holds the default value on update for the "updated_at" field.
 	UpdateDefaultUpdatedAt func() time.Time
 	// ExamGradeValidator is a validator for the "exam_grade" field. It is called by the builders before save.
-	ExamGradeValidator func(float64) error
+	ExamGradeValidator func(int) error
+	// DefaultID holds the default value on creation for the "id" field.
+	DefaultID func() uuid.UUID
 )

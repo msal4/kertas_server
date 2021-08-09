@@ -72,7 +72,7 @@ func (asd *AssignmentSubmissionDelete) sqlExec(ctx context.Context) (int, error)
 		Node: &sqlgraph.NodeSpec{
 			Table: assignmentsubmission.Table,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeUUID,
 				Column: assignmentsubmission.FieldID,
 			},
 		},

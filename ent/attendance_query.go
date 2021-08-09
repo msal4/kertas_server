@@ -11,6 +11,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/google/uuid"
 	"github.com/msal4/hassah_school_server/ent/attendance"
 	"github.com/msal4/hassah_school_server/ent/class"
 	"github.com/msal4/hassah_school_server/ent/predicate"
@@ -134,8 +135,8 @@ func (aq *AttendanceQuery) FirstX(ctx context.Context) *Attendance {
 
 // FirstID returns the first Attendance ID from the query.
 // Returns a *NotFoundError when no Attendance ID was found.
-func (aq *AttendanceQuery) FirstID(ctx context.Context) (id int, err error) {
-	var ids []int
+func (aq *AttendanceQuery) FirstID(ctx context.Context) (id uuid.UUID, err error) {
+	var ids []uuid.UUID
 	if ids, err = aq.Limit(1).IDs(ctx); err != nil {
 		return
 	}
@@ -147,7 +148,7 @@ func (aq *AttendanceQuery) FirstID(ctx context.Context) (id int, err error) {
 }
 
 // FirstIDX is like FirstID, but panics if an error occurs.
-func (aq *AttendanceQuery) FirstIDX(ctx context.Context) int {
+func (aq *AttendanceQuery) FirstIDX(ctx context.Context) uuid.UUID {
 	id, err := aq.FirstID(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
@@ -185,8 +186,8 @@ func (aq *AttendanceQuery) OnlyX(ctx context.Context) *Attendance {
 // OnlyID is like Only, but returns the only Attendance ID in the query.
 // Returns a *NotSingularError when exactly one Attendance ID is not found.
 // Returns a *NotFoundError when no entities are found.
-func (aq *AttendanceQuery) OnlyID(ctx context.Context) (id int, err error) {
-	var ids []int
+func (aq *AttendanceQuery) OnlyID(ctx context.Context) (id uuid.UUID, err error) {
+	var ids []uuid.UUID
 	if ids, err = aq.Limit(2).IDs(ctx); err != nil {
 		return
 	}
@@ -202,7 +203,7 @@ func (aq *AttendanceQuery) OnlyID(ctx context.Context) (id int, err error) {
 }
 
 // OnlyIDX is like OnlyID, but panics if an error occurs.
-func (aq *AttendanceQuery) OnlyIDX(ctx context.Context) int {
+func (aq *AttendanceQuery) OnlyIDX(ctx context.Context) uuid.UUID {
 	id, err := aq.OnlyID(ctx)
 	if err != nil {
 		panic(err)
@@ -228,8 +229,8 @@ func (aq *AttendanceQuery) AllX(ctx context.Context) []*Attendance {
 }
 
 // IDs executes the query and returns a list of Attendance IDs.
-func (aq *AttendanceQuery) IDs(ctx context.Context) ([]int, error) {
-	var ids []int
+func (aq *AttendanceQuery) IDs(ctx context.Context) ([]uuid.UUID, error) {
+	var ids []uuid.UUID
 	if err := aq.Select(attendance.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
@@ -237,7 +238,7 @@ func (aq *AttendanceQuery) IDs(ctx context.Context) ([]int, error) {
 }
 
 // IDsX is like IDs, but panics if an error occurs.
-func (aq *AttendanceQuery) IDsX(ctx context.Context) []int {
+func (aq *AttendanceQuery) IDsX(ctx context.Context) []uuid.UUID {
 	ids, err := aq.IDs(ctx)
 	if err != nil {
 		panic(err)
@@ -419,8 +420,8 @@ func (aq *AttendanceQuery) sqlAll(ctx context.Context) ([]*Attendance, error) {
 	}
 
 	if query := aq.withClass; query != nil {
-		ids := make([]int, 0, len(nodes))
-		nodeids := make(map[int][]*Attendance)
+		ids := make([]uuid.UUID, 0, len(nodes))
+		nodeids := make(map[uuid.UUID][]*Attendance)
 		for i := range nodes {
 			if nodes[i].class_attendances == nil {
 				continue
@@ -448,8 +449,8 @@ func (aq *AttendanceQuery) sqlAll(ctx context.Context) ([]*Attendance, error) {
 	}
 
 	if query := aq.withStudent; query != nil {
-		ids := make([]int, 0, len(nodes))
-		nodeids := make(map[int][]*Attendance)
+		ids := make([]uuid.UUID, 0, len(nodes))
+		nodeids := make(map[uuid.UUID][]*Attendance)
 		for i := range nodes {
 			if nodes[i].user_attendances == nil {
 				continue
@@ -498,7 +499,7 @@ func (aq *AttendanceQuery) querySpec() *sqlgraph.QuerySpec {
 			Table:   attendance.Table,
 			Columns: attendance.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeUUID,
 				Column: attendance.FieldID,
 			},
 		},

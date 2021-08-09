@@ -10,6 +10,7 @@ import (
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/google/uuid"
 	"github.com/msal4/hassah_school_server/ent/assignment"
 	"github.com/msal4/hassah_school_server/ent/assignmentsubmission"
 	"github.com/msal4/hassah_school_server/ent/class"
@@ -119,8 +120,14 @@ func (ac *AssignmentCreate) SetNillableDeletedAt(t *time.Time) *AssignmentCreate
 	return ac
 }
 
+// SetID sets the "id" field.
+func (ac *AssignmentCreate) SetID(u uuid.UUID) *AssignmentCreate {
+	ac.mutation.SetID(u)
+	return ac
+}
+
 // SetClassID sets the "class" edge to the Class entity by ID.
-func (ac *AssignmentCreate) SetClassID(id int) *AssignmentCreate {
+func (ac *AssignmentCreate) SetClassID(id uuid.UUID) *AssignmentCreate {
 	ac.mutation.SetClassID(id)
 	return ac
 }
@@ -131,14 +138,14 @@ func (ac *AssignmentCreate) SetClass(c *Class) *AssignmentCreate {
 }
 
 // AddSubmissionIDs adds the "submissions" edge to the AssignmentSubmission entity by IDs.
-func (ac *AssignmentCreate) AddSubmissionIDs(ids ...int) *AssignmentCreate {
+func (ac *AssignmentCreate) AddSubmissionIDs(ids ...uuid.UUID) *AssignmentCreate {
 	ac.mutation.AddSubmissionIDs(ids...)
 	return ac
 }
 
 // AddSubmissions adds the "submissions" edges to the AssignmentSubmission entity.
 func (ac *AssignmentCreate) AddSubmissions(a ...*AssignmentSubmission) *AssignmentCreate {
-	ids := make([]int, len(a))
+	ids := make([]uuid.UUID, len(a))
 	for i := range a {
 		ids[i] = a[i].ID
 	}
@@ -146,14 +153,14 @@ func (ac *AssignmentCreate) AddSubmissions(a ...*AssignmentSubmission) *Assignme
 }
 
 // AddGradeIDs adds the "grades" edge to the Grade entity by IDs.
-func (ac *AssignmentCreate) AddGradeIDs(ids ...int) *AssignmentCreate {
+func (ac *AssignmentCreate) AddGradeIDs(ids ...uuid.UUID) *AssignmentCreate {
 	ac.mutation.AddGradeIDs(ids...)
 	return ac
 }
 
 // AddGrades adds the "grades" edges to the Grade entity.
 func (ac *AssignmentCreate) AddGrades(g ...*Grade) *AssignmentCreate {
-	ids := make([]int, len(g))
+	ids := make([]uuid.UUID, len(g))
 	for i := range g {
 		ids[i] = g[i].ID
 	}
@@ -243,6 +250,10 @@ func (ac *AssignmentCreate) defaults() {
 		v := assignment.DefaultIsExam
 		ac.mutation.SetIsExam(v)
 	}
+	if _, ok := ac.mutation.ID(); !ok {
+		v := assignment.DefaultID()
+		ac.mutation.SetID(v)
+	}
 }
 
 // check runs all checks and user-defined validators on the builder.
@@ -281,8 +292,6 @@ func (ac *AssignmentCreate) sqlSave(ctx context.Context) (*Assignment, error) {
 		}
 		return nil, err
 	}
-	id := _spec.ID.Value.(int64)
-	_node.ID = int(id)
 	return _node, nil
 }
 
@@ -292,11 +301,15 @@ func (ac *AssignmentCreate) createSpec() (*Assignment, *sqlgraph.CreateSpec) {
 		_spec = &sqlgraph.CreateSpec{
 			Table: assignment.Table,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeUUID,
 				Column: assignment.FieldID,
 			},
 		}
 	)
+	if id, ok := ac.mutation.ID(); ok {
+		_node.ID = id
+		_spec.ID.Value = id
+	}
 	if value, ok := ac.mutation.CreatedAt(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
 			Type:   field.TypeTime,
@@ -370,7 +383,7 @@ func (ac *AssignmentCreate) createSpec() (*Assignment, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: class.FieldID,
 				},
 			},
@@ -390,7 +403,7 @@ func (ac *AssignmentCreate) createSpec() (*Assignment, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: assignmentsubmission.FieldID,
 				},
 			},
@@ -409,7 +422,7 @@ func (ac *AssignmentCreate) createSpec() (*Assignment, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: grade.FieldID,
 				},
 			},
@@ -464,10 +477,6 @@ func (acb *AssignmentCreateBulk) Save(ctx context.Context) ([]*Assignment, error
 				}
 				mutation.id = &nodes[i].ID
 				mutation.done = true
-				if specs[i].ID.Value != nil {
-					id := specs[i].ID.Value.(int64)
-					nodes[i].ID = int(id)
-				}
 				return nodes[i], nil
 			})
 			for i := len(builder.hooks) - 1; i >= 0; i-- {

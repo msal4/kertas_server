@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"entgo.io/ent/dialect/sql"
+	"github.com/google/uuid"
 	"github.com/msal4/hassah_school_server/ent/assignment"
 	"github.com/msal4/hassah_school_server/ent/assignmentsubmission"
 	"github.com/msal4/hassah_school_server/ent/user"
@@ -18,7 +19,7 @@ import (
 type AssignmentSubmission struct {
 	config `json:"-"`
 	// ID of the ent.
-	ID int `json:"id,omitempty"`
+	ID uuid.UUID `json:"id,omitempty"`
 	// CreatedAt holds the value of the "created_at" field.
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// UpdatedAt holds the value of the "updated_at" field.
@@ -30,8 +31,8 @@ type AssignmentSubmission struct {
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the AssignmentSubmissionQuery when eager-loading is set.
 	Edges                  AssignmentSubmissionEdges `json:"edges"`
-	assignment_submissions *int
-	user_submissions       *int
+	assignment_submissions *uuid.UUID
+	user_submissions       *uuid.UUID
 }
 
 // AssignmentSubmissionEdges holds the relations/edges for other nodes in the graph.
@@ -80,14 +81,14 @@ func (*AssignmentSubmission) scanValues(columns []string) ([]interface{}, error)
 		switch columns[i] {
 		case assignmentsubmission.FieldFiles:
 			values[i] = new([]byte)
-		case assignmentsubmission.FieldID:
-			values[i] = new(sql.NullInt64)
 		case assignmentsubmission.FieldCreatedAt, assignmentsubmission.FieldUpdatedAt, assignmentsubmission.FieldSubmittedAt:
 			values[i] = new(sql.NullTime)
+		case assignmentsubmission.FieldID:
+			values[i] = new(uuid.UUID)
 		case assignmentsubmission.ForeignKeys[0]: // assignment_submissions
-			values[i] = new(sql.NullInt64)
+			values[i] = &sql.NullScanner{S: new(uuid.UUID)}
 		case assignmentsubmission.ForeignKeys[1]: // user_submissions
-			values[i] = new(sql.NullInt64)
+			values[i] = &sql.NullScanner{S: new(uuid.UUID)}
 		default:
 			return nil, fmt.Errorf("unexpected column %q for type AssignmentSubmission", columns[i])
 		}
@@ -104,11 +105,11 @@ func (as *AssignmentSubmission) assignValues(columns []string, values []interfac
 	for i := range columns {
 		switch columns[i] {
 		case assignmentsubmission.FieldID:
-			value, ok := values[i].(*sql.NullInt64)
-			if !ok {
-				return fmt.Errorf("unexpected type %T for field id", value)
+			if value, ok := values[i].(*uuid.UUID); !ok {
+				return fmt.Errorf("unexpected type %T for field id", values[i])
+			} else if value != nil {
+				as.ID = *value
 			}
-			as.ID = int(value.Int64)
 		case assignmentsubmission.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field created_at", values[i])
@@ -137,18 +138,18 @@ func (as *AssignmentSubmission) assignValues(columns []string, values []interfac
 				*as.SubmittedAt = value.Time
 			}
 		case assignmentsubmission.ForeignKeys[0]:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for edge-field assignment_submissions", value)
+			if value, ok := values[i].(*sql.NullScanner); !ok {
+				return fmt.Errorf("unexpected type %T for field assignment_submissions", values[i])
 			} else if value.Valid {
-				as.assignment_submissions = new(int)
-				*as.assignment_submissions = int(value.Int64)
+				as.assignment_submissions = new(uuid.UUID)
+				*as.assignment_submissions = *value.S.(*uuid.UUID)
 			}
 		case assignmentsubmission.ForeignKeys[1]:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for edge-field user_submissions", value)
+			if value, ok := values[i].(*sql.NullScanner); !ok {
+				return fmt.Errorf("unexpected type %T for field user_submissions", values[i])
 			} else if value.Valid {
-				as.user_submissions = new(int)
-				*as.user_submissions = int(value.Int64)
+				as.user_submissions = new(uuid.UUID)
+				*as.user_submissions = *value.S.(*uuid.UUID)
 			}
 		}
 	}

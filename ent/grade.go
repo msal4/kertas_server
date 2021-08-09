@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"entgo.io/ent/dialect/sql"
+	"github.com/google/uuid"
 	"github.com/msal4/hassah_school_server/ent/assignment"
 	"github.com/msal4/hassah_school_server/ent/grade"
 	"github.com/msal4/hassah_school_server/ent/user"
@@ -17,18 +18,18 @@ import (
 type Grade struct {
 	config `json:"-"`
 	// ID of the ent.
-	ID int `json:"id,omitempty"`
+	ID uuid.UUID `json:"id,omitempty"`
 	// CreatedAt holds the value of the "created_at" field.
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// UpdatedAt holds the value of the "updated_at" field.
 	UpdatedAt time.Time `json:"updated_at,omitempty"`
 	// ExamGrade holds the value of the "exam_grade" field.
-	ExamGrade float64 `json:"exam_grade,omitempty"`
+	ExamGrade int `json:"exam_grade,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the GradeQuery when eager-loading is set.
 	Edges             GradeEdges `json:"edges"`
-	assignment_grades *int
-	user_grades       *int
+	assignment_grades *uuid.UUID
+	user_grades       *uuid.UUID
 }
 
 // GradeEdges holds the relations/edges for other nodes in the graph.
@@ -76,15 +77,15 @@ func (*Grade) scanValues(columns []string) ([]interface{}, error) {
 	for i := range columns {
 		switch columns[i] {
 		case grade.FieldExamGrade:
-			values[i] = new(sql.NullFloat64)
-		case grade.FieldID:
 			values[i] = new(sql.NullInt64)
 		case grade.FieldCreatedAt, grade.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
+		case grade.FieldID:
+			values[i] = new(uuid.UUID)
 		case grade.ForeignKeys[0]: // assignment_grades
-			values[i] = new(sql.NullInt64)
+			values[i] = &sql.NullScanner{S: new(uuid.UUID)}
 		case grade.ForeignKeys[1]: // user_grades
-			values[i] = new(sql.NullInt64)
+			values[i] = &sql.NullScanner{S: new(uuid.UUID)}
 		default:
 			return nil, fmt.Errorf("unexpected column %q for type Grade", columns[i])
 		}
@@ -101,11 +102,11 @@ func (gr *Grade) assignValues(columns []string, values []interface{}) error {
 	for i := range columns {
 		switch columns[i] {
 		case grade.FieldID:
-			value, ok := values[i].(*sql.NullInt64)
-			if !ok {
-				return fmt.Errorf("unexpected type %T for field id", value)
+			if value, ok := values[i].(*uuid.UUID); !ok {
+				return fmt.Errorf("unexpected type %T for field id", values[i])
+			} else if value != nil {
+				gr.ID = *value
 			}
-			gr.ID = int(value.Int64)
 		case grade.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field created_at", values[i])
@@ -119,24 +120,24 @@ func (gr *Grade) assignValues(columns []string, values []interface{}) error {
 				gr.UpdatedAt = value.Time
 			}
 		case grade.FieldExamGrade:
-			if value, ok := values[i].(*sql.NullFloat64); !ok {
+			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field exam_grade", values[i])
 			} else if value.Valid {
-				gr.ExamGrade = value.Float64
+				gr.ExamGrade = int(value.Int64)
 			}
 		case grade.ForeignKeys[0]:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for edge-field assignment_grades", value)
+			if value, ok := values[i].(*sql.NullScanner); !ok {
+				return fmt.Errorf("unexpected type %T for field assignment_grades", values[i])
 			} else if value.Valid {
-				gr.assignment_grades = new(int)
-				*gr.assignment_grades = int(value.Int64)
+				gr.assignment_grades = new(uuid.UUID)
+				*gr.assignment_grades = *value.S.(*uuid.UUID)
 			}
 		case grade.ForeignKeys[1]:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for edge-field user_grades", value)
+			if value, ok := values[i].(*sql.NullScanner); !ok {
+				return fmt.Errorf("unexpected type %T for field user_grades", values[i])
 			} else if value.Valid {
-				gr.user_grades = new(int)
-				*gr.user_grades = int(value.Int64)
+				gr.user_grades = new(uuid.UUID)
+				*gr.user_grades = *value.S.(*uuid.UUID)
 			}
 		}
 	}

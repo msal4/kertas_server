@@ -10,6 +10,7 @@ import (
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/google/uuid"
 	"github.com/msal4/hassah_school_server/ent/group"
 	"github.com/msal4/hassah_school_server/ent/message"
 	"github.com/msal4/hassah_school_server/ent/user"
@@ -92,8 +93,14 @@ func (mc *MessageCreate) SetNillableDeletedAt(t *time.Time) *MessageCreate {
 	return mc
 }
 
+// SetID sets the "id" field.
+func (mc *MessageCreate) SetID(u uuid.UUID) *MessageCreate {
+	mc.mutation.SetID(u)
+	return mc
+}
+
 // SetGroupID sets the "group" edge to the Group entity by ID.
-func (mc *MessageCreate) SetGroupID(id int) *MessageCreate {
+func (mc *MessageCreate) SetGroupID(id uuid.UUID) *MessageCreate {
 	mc.mutation.SetGroupID(id)
 	return mc
 }
@@ -104,7 +111,7 @@ func (mc *MessageCreate) SetGroup(g *Group) *MessageCreate {
 }
 
 // SetOwnerID sets the "owner" edge to the User entity by ID.
-func (mc *MessageCreate) SetOwnerID(id int) *MessageCreate {
+func (mc *MessageCreate) SetOwnerID(id uuid.UUID) *MessageCreate {
 	mc.mutation.SetOwnerID(id)
 	return mc
 }
@@ -193,6 +200,10 @@ func (mc *MessageCreate) defaults() {
 		v := message.DefaultUpdatedAt()
 		mc.mutation.SetUpdatedAt(v)
 	}
+	if _, ok := mc.mutation.ID(); !ok {
+		v := message.DefaultID()
+		mc.mutation.SetID(v)
+	}
 }
 
 // check runs all checks and user-defined validators on the builder.
@@ -220,8 +231,6 @@ func (mc *MessageCreate) sqlSave(ctx context.Context) (*Message, error) {
 		}
 		return nil, err
 	}
-	id := _spec.ID.Value.(int64)
-	_node.ID = int(id)
 	return _node, nil
 }
 
@@ -231,11 +240,15 @@ func (mc *MessageCreate) createSpec() (*Message, *sqlgraph.CreateSpec) {
 		_spec = &sqlgraph.CreateSpec{
 			Table: message.Table,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeUUID,
 				Column: message.FieldID,
 			},
 		}
 	)
+	if id, ok := mc.mutation.ID(); ok {
+		_node.ID = id
+		_spec.ID.Value = id
+	}
 	if value, ok := mc.mutation.CreatedAt(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
 			Type:   field.TypeTime,
@@ -285,7 +298,7 @@ func (mc *MessageCreate) createSpec() (*Message, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: group.FieldID,
 				},
 			},
@@ -305,7 +318,7 @@ func (mc *MessageCreate) createSpec() (*Message, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: user.FieldID,
 				},
 			},
@@ -361,10 +374,6 @@ func (mcb *MessageCreateBulk) Save(ctx context.Context) ([]*Message, error) {
 				}
 				mutation.id = &nodes[i].ID
 				mutation.done = true
-				if specs[i].ID.Value != nil {
-					id := specs[i].ID.Value.(int64)
-					nodes[i].ID = int(id)
-				}
 				return nodes[i], nil
 			})
 			for i := len(builder.hooks) - 1; i >= 0; i-- {

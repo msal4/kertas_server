@@ -1,10 +1,12 @@
 package schema
 
 import (
+	"entgo.io/contrib/entgql"
 	"entgo.io/ent"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
 	"entgo.io/ent/schema/index"
+	"github.com/google/uuid"
 )
 
 // Grade holds the schema definition for the Grade entity.
@@ -15,7 +17,8 @@ type Grade struct {
 // Fields of the Grade.
 func (Grade) Fields() []ent.Field {
 	return []ent.Field{
-		field.Float("exam_grade").Range(0, 100),
+		field.UUID("id", uuid.UUID{}).Default(uuid.New),
+		field.Int("exam_grade").Range(0, 100).Annotations(entgql.OrderField("EXAM_GRADE")),
 	}
 }
 

@@ -8,6 +8,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/msal4/hassah_school_server/ent/assignment"
 	"github.com/msal4/hassah_school_server/ent/assignmentsubmission"
 	"github.com/msal4/hassah_school_server/ent/attendance"
@@ -54,7 +55,7 @@ type AssignmentMutation struct {
 	config
 	op                 Op
 	typ                string
-	id                 *int
+	id                 *uuid.UUID
 	created_at         *time.Time
 	updated_at         *time.Time
 	name               *string
@@ -65,13 +66,13 @@ type AssignmentMutation struct {
 	addduration        *int
 	deleted_at         *time.Time
 	clearedFields      map[string]struct{}
-	class              *int
+	class              *uuid.UUID
 	clearedclass       bool
-	submissions        map[int]struct{}
-	removedsubmissions map[int]struct{}
+	submissions        map[uuid.UUID]struct{}
+	removedsubmissions map[uuid.UUID]struct{}
 	clearedsubmissions bool
-	grades             map[int]struct{}
-	removedgrades      map[int]struct{}
+	grades             map[uuid.UUID]struct{}
+	removedgrades      map[uuid.UUID]struct{}
 	clearedgrades      bool
 	done               bool
 	oldValue           func(context.Context) (*Assignment, error)
@@ -98,7 +99,7 @@ func newAssignmentMutation(c config, op Op, opts ...assignmentOption) *Assignmen
 }
 
 // withAssignmentID sets the ID field of the mutation.
-func withAssignmentID(id int) assignmentOption {
+func withAssignmentID(id uuid.UUID) assignmentOption {
 	return func(m *AssignmentMutation) {
 		var (
 			err   error
@@ -148,9 +149,15 @@ func (m AssignmentMutation) Tx() (*Tx, error) {
 	return tx, nil
 }
 
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of Assignment entities.
+func (m *AssignmentMutation) SetID(id uuid.UUID) {
+	m.id = &id
+}
+
 // ID returns the ID value in the mutation. Note that the ID is only available
 // if it was provided to the builder or after it was returned from the database.
-func (m *AssignmentMutation) ID() (id int, exists bool) {
+func (m *AssignmentMutation) ID() (id uuid.UUID, exists bool) {
 	if m.id == nil {
 		return
 	}
@@ -506,7 +513,7 @@ func (m *AssignmentMutation) ResetDeletedAt() {
 }
 
 // SetClassID sets the "class" edge to the Class entity by id.
-func (m *AssignmentMutation) SetClassID(id int) {
+func (m *AssignmentMutation) SetClassID(id uuid.UUID) {
 	m.class = &id
 }
 
@@ -521,7 +528,7 @@ func (m *AssignmentMutation) ClassCleared() bool {
 }
 
 // ClassID returns the "class" edge ID in the mutation.
-func (m *AssignmentMutation) ClassID() (id int, exists bool) {
+func (m *AssignmentMutation) ClassID() (id uuid.UUID, exists bool) {
 	if m.class != nil {
 		return *m.class, true
 	}
@@ -531,7 +538,7 @@ func (m *AssignmentMutation) ClassID() (id int, exists bool) {
 // ClassIDs returns the "class" edge IDs in the mutation.
 // Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
 // ClassID instead. It exists only for internal usage by the builders.
-func (m *AssignmentMutation) ClassIDs() (ids []int) {
+func (m *AssignmentMutation) ClassIDs() (ids []uuid.UUID) {
 	if id := m.class; id != nil {
 		ids = append(ids, *id)
 	}
@@ -545,9 +552,9 @@ func (m *AssignmentMutation) ResetClass() {
 }
 
 // AddSubmissionIDs adds the "submissions" edge to the AssignmentSubmission entity by ids.
-func (m *AssignmentMutation) AddSubmissionIDs(ids ...int) {
+func (m *AssignmentMutation) AddSubmissionIDs(ids ...uuid.UUID) {
 	if m.submissions == nil {
-		m.submissions = make(map[int]struct{})
+		m.submissions = make(map[uuid.UUID]struct{})
 	}
 	for i := range ids {
 		m.submissions[ids[i]] = struct{}{}
@@ -565,9 +572,9 @@ func (m *AssignmentMutation) SubmissionsCleared() bool {
 }
 
 // RemoveSubmissionIDs removes the "submissions" edge to the AssignmentSubmission entity by IDs.
-func (m *AssignmentMutation) RemoveSubmissionIDs(ids ...int) {
+func (m *AssignmentMutation) RemoveSubmissionIDs(ids ...uuid.UUID) {
 	if m.removedsubmissions == nil {
-		m.removedsubmissions = make(map[int]struct{})
+		m.removedsubmissions = make(map[uuid.UUID]struct{})
 	}
 	for i := range ids {
 		delete(m.submissions, ids[i])
@@ -576,7 +583,7 @@ func (m *AssignmentMutation) RemoveSubmissionIDs(ids ...int) {
 }
 
 // RemovedSubmissions returns the removed IDs of the "submissions" edge to the AssignmentSubmission entity.
-func (m *AssignmentMutation) RemovedSubmissionsIDs() (ids []int) {
+func (m *AssignmentMutation) RemovedSubmissionsIDs() (ids []uuid.UUID) {
 	for id := range m.removedsubmissions {
 		ids = append(ids, id)
 	}
@@ -584,7 +591,7 @@ func (m *AssignmentMutation) RemovedSubmissionsIDs() (ids []int) {
 }
 
 // SubmissionsIDs returns the "submissions" edge IDs in the mutation.
-func (m *AssignmentMutation) SubmissionsIDs() (ids []int) {
+func (m *AssignmentMutation) SubmissionsIDs() (ids []uuid.UUID) {
 	for id := range m.submissions {
 		ids = append(ids, id)
 	}
@@ -599,9 +606,9 @@ func (m *AssignmentMutation) ResetSubmissions() {
 }
 
 // AddGradeIDs adds the "grades" edge to the Grade entity by ids.
-func (m *AssignmentMutation) AddGradeIDs(ids ...int) {
+func (m *AssignmentMutation) AddGradeIDs(ids ...uuid.UUID) {
 	if m.grades == nil {
-		m.grades = make(map[int]struct{})
+		m.grades = make(map[uuid.UUID]struct{})
 	}
 	for i := range ids {
 		m.grades[ids[i]] = struct{}{}
@@ -619,9 +626,9 @@ func (m *AssignmentMutation) GradesCleared() bool {
 }
 
 // RemoveGradeIDs removes the "grades" edge to the Grade entity by IDs.
-func (m *AssignmentMutation) RemoveGradeIDs(ids ...int) {
+func (m *AssignmentMutation) RemoveGradeIDs(ids ...uuid.UUID) {
 	if m.removedgrades == nil {
-		m.removedgrades = make(map[int]struct{})
+		m.removedgrades = make(map[uuid.UUID]struct{})
 	}
 	for i := range ids {
 		delete(m.grades, ids[i])
@@ -630,7 +637,7 @@ func (m *AssignmentMutation) RemoveGradeIDs(ids ...int) {
 }
 
 // RemovedGrades returns the removed IDs of the "grades" edge to the Grade entity.
-func (m *AssignmentMutation) RemovedGradesIDs() (ids []int) {
+func (m *AssignmentMutation) RemovedGradesIDs() (ids []uuid.UUID) {
 	for id := range m.removedgrades {
 		ids = append(ids, id)
 	}
@@ -638,7 +645,7 @@ func (m *AssignmentMutation) RemovedGradesIDs() (ids []int) {
 }
 
 // GradesIDs returns the "grades" edge IDs in the mutation.
-func (m *AssignmentMutation) GradesIDs() (ids []int) {
+func (m *AssignmentMutation) GradesIDs() (ids []uuid.UUID) {
 	for id := range m.grades {
 		ids = append(ids, id)
 	}
@@ -1056,15 +1063,15 @@ type AssignmentSubmissionMutation struct {
 	config
 	op                Op
 	typ               string
-	id                *int
+	id                *uuid.UUID
 	created_at        *time.Time
 	updated_at        *time.Time
 	files             *[]string
 	submitted_at      *time.Time
 	clearedFields     map[string]struct{}
-	student           *int
+	student           *uuid.UUID
 	clearedstudent    bool
-	assignment        *int
+	assignment        *uuid.UUID
 	clearedassignment bool
 	done              bool
 	oldValue          func(context.Context) (*AssignmentSubmission, error)
@@ -1091,7 +1098,7 @@ func newAssignmentSubmissionMutation(c config, op Op, opts ...assignmentsubmissi
 }
 
 // withAssignmentSubmissionID sets the ID field of the mutation.
-func withAssignmentSubmissionID(id int) assignmentsubmissionOption {
+func withAssignmentSubmissionID(id uuid.UUID) assignmentsubmissionOption {
 	return func(m *AssignmentSubmissionMutation) {
 		var (
 			err   error
@@ -1141,9 +1148,15 @@ func (m AssignmentSubmissionMutation) Tx() (*Tx, error) {
 	return tx, nil
 }
 
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of AssignmentSubmission entities.
+func (m *AssignmentSubmissionMutation) SetID(id uuid.UUID) {
+	m.id = &id
+}
+
 // ID returns the ID value in the mutation. Note that the ID is only available
 // if it was provided to the builder or after it was returned from the database.
-func (m *AssignmentSubmissionMutation) ID() (id int, exists bool) {
+func (m *AssignmentSubmissionMutation) ID() (id uuid.UUID, exists bool) {
 	if m.id == nil {
 		return
 	}
@@ -1308,7 +1321,7 @@ func (m *AssignmentSubmissionMutation) ResetSubmittedAt() {
 }
 
 // SetStudentID sets the "student" edge to the User entity by id.
-func (m *AssignmentSubmissionMutation) SetStudentID(id int) {
+func (m *AssignmentSubmissionMutation) SetStudentID(id uuid.UUID) {
 	m.student = &id
 }
 
@@ -1323,7 +1336,7 @@ func (m *AssignmentSubmissionMutation) StudentCleared() bool {
 }
 
 // StudentID returns the "student" edge ID in the mutation.
-func (m *AssignmentSubmissionMutation) StudentID() (id int, exists bool) {
+func (m *AssignmentSubmissionMutation) StudentID() (id uuid.UUID, exists bool) {
 	if m.student != nil {
 		return *m.student, true
 	}
@@ -1333,7 +1346,7 @@ func (m *AssignmentSubmissionMutation) StudentID() (id int, exists bool) {
 // StudentIDs returns the "student" edge IDs in the mutation.
 // Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
 // StudentID instead. It exists only for internal usage by the builders.
-func (m *AssignmentSubmissionMutation) StudentIDs() (ids []int) {
+func (m *AssignmentSubmissionMutation) StudentIDs() (ids []uuid.UUID) {
 	if id := m.student; id != nil {
 		ids = append(ids, *id)
 	}
@@ -1347,7 +1360,7 @@ func (m *AssignmentSubmissionMutation) ResetStudent() {
 }
 
 // SetAssignmentID sets the "assignment" edge to the Assignment entity by id.
-func (m *AssignmentSubmissionMutation) SetAssignmentID(id int) {
+func (m *AssignmentSubmissionMutation) SetAssignmentID(id uuid.UUID) {
 	m.assignment = &id
 }
 
@@ -1362,7 +1375,7 @@ func (m *AssignmentSubmissionMutation) AssignmentCleared() bool {
 }
 
 // AssignmentID returns the "assignment" edge ID in the mutation.
-func (m *AssignmentSubmissionMutation) AssignmentID() (id int, exists bool) {
+func (m *AssignmentSubmissionMutation) AssignmentID() (id uuid.UUID, exists bool) {
 	if m.assignment != nil {
 		return *m.assignment, true
 	}
@@ -1372,7 +1385,7 @@ func (m *AssignmentSubmissionMutation) AssignmentID() (id int, exists bool) {
 // AssignmentIDs returns the "assignment" edge IDs in the mutation.
 // Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
 // AssignmentID instead. It exists only for internal usage by the builders.
-func (m *AssignmentSubmissionMutation) AssignmentIDs() (ids []int) {
+func (m *AssignmentSubmissionMutation) AssignmentIDs() (ids []uuid.UUID) {
 	if id := m.assignment; id != nil {
 		ids = append(ids, *id)
 	}
@@ -1660,15 +1673,15 @@ type AttendanceMutation struct {
 	config
 	op             Op
 	typ            string
-	id             *int
+	id             *uuid.UUID
 	created_at     *time.Time
 	updated_at     *time.Time
 	date           *time.Time
 	state          *attendance.State
 	clearedFields  map[string]struct{}
-	class          *int
+	class          *uuid.UUID
 	clearedclass   bool
-	student        *int
+	student        *uuid.UUID
 	clearedstudent bool
 	done           bool
 	oldValue       func(context.Context) (*Attendance, error)
@@ -1695,7 +1708,7 @@ func newAttendanceMutation(c config, op Op, opts ...attendanceOption) *Attendanc
 }
 
 // withAttendanceID sets the ID field of the mutation.
-func withAttendanceID(id int) attendanceOption {
+func withAttendanceID(id uuid.UUID) attendanceOption {
 	return func(m *AttendanceMutation) {
 		var (
 			err   error
@@ -1745,9 +1758,15 @@ func (m AttendanceMutation) Tx() (*Tx, error) {
 	return tx, nil
 }
 
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of Attendance entities.
+func (m *AttendanceMutation) SetID(id uuid.UUID) {
+	m.id = &id
+}
+
 // ID returns the ID value in the mutation. Note that the ID is only available
 // if it was provided to the builder or after it was returned from the database.
-func (m *AttendanceMutation) ID() (id int, exists bool) {
+func (m *AttendanceMutation) ID() (id uuid.UUID, exists bool) {
 	if m.id == nil {
 		return
 	}
@@ -1899,7 +1918,7 @@ func (m *AttendanceMutation) ResetState() {
 }
 
 // SetClassID sets the "class" edge to the Class entity by id.
-func (m *AttendanceMutation) SetClassID(id int) {
+func (m *AttendanceMutation) SetClassID(id uuid.UUID) {
 	m.class = &id
 }
 
@@ -1914,7 +1933,7 @@ func (m *AttendanceMutation) ClassCleared() bool {
 }
 
 // ClassID returns the "class" edge ID in the mutation.
-func (m *AttendanceMutation) ClassID() (id int, exists bool) {
+func (m *AttendanceMutation) ClassID() (id uuid.UUID, exists bool) {
 	if m.class != nil {
 		return *m.class, true
 	}
@@ -1924,7 +1943,7 @@ func (m *AttendanceMutation) ClassID() (id int, exists bool) {
 // ClassIDs returns the "class" edge IDs in the mutation.
 // Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
 // ClassID instead. It exists only for internal usage by the builders.
-func (m *AttendanceMutation) ClassIDs() (ids []int) {
+func (m *AttendanceMutation) ClassIDs() (ids []uuid.UUID) {
 	if id := m.class; id != nil {
 		ids = append(ids, *id)
 	}
@@ -1938,7 +1957,7 @@ func (m *AttendanceMutation) ResetClass() {
 }
 
 // SetStudentID sets the "student" edge to the User entity by id.
-func (m *AttendanceMutation) SetStudentID(id int) {
+func (m *AttendanceMutation) SetStudentID(id uuid.UUID) {
 	m.student = &id
 }
 
@@ -1953,7 +1972,7 @@ func (m *AttendanceMutation) StudentCleared() bool {
 }
 
 // StudentID returns the "student" edge ID in the mutation.
-func (m *AttendanceMutation) StudentID() (id int, exists bool) {
+func (m *AttendanceMutation) StudentID() (id uuid.UUID, exists bool) {
 	if m.student != nil {
 		return *m.student, true
 	}
@@ -1963,7 +1982,7 @@ func (m *AttendanceMutation) StudentID() (id int, exists bool) {
 // StudentIDs returns the "student" edge IDs in the mutation.
 // Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
 // StudentID instead. It exists only for internal usage by the builders.
-func (m *AttendanceMutation) StudentIDs() (ids []int) {
+func (m *AttendanceMutation) StudentIDs() (ids []uuid.UUID) {
 	if id := m.student; id != nil {
 		ids = append(ids, *id)
 	}
@@ -2242,26 +2261,26 @@ type ClassMutation struct {
 	config
 	op                 Op
 	typ                string
-	id                 *int
+	id                 *uuid.UUID
 	created_at         *time.Time
 	updated_at         *time.Time
 	name               *string
 	status             *schema.Status
 	clearedFields      map[string]struct{}
-	stage              *int
+	stage              *uuid.UUID
 	clearedstage       bool
-	teacher            *int
+	teacher            *uuid.UUID
 	clearedteacher     bool
-	group              *int
+	group              *uuid.UUID
 	clearedgroup       bool
-	assignments        map[int]struct{}
-	removedassignments map[int]struct{}
+	assignments        map[uuid.UUID]struct{}
+	removedassignments map[uuid.UUID]struct{}
 	clearedassignments bool
-	attendances        map[int]struct{}
-	removedattendances map[int]struct{}
+	attendances        map[uuid.UUID]struct{}
+	removedattendances map[uuid.UUID]struct{}
 	clearedattendances bool
-	schedules          map[int]struct{}
-	removedschedules   map[int]struct{}
+	schedules          map[uuid.UUID]struct{}
+	removedschedules   map[uuid.UUID]struct{}
 	clearedschedules   bool
 	done               bool
 	oldValue           func(context.Context) (*Class, error)
@@ -2288,7 +2307,7 @@ func newClassMutation(c config, op Op, opts ...classOption) *ClassMutation {
 }
 
 // withClassID sets the ID field of the mutation.
-func withClassID(id int) classOption {
+func withClassID(id uuid.UUID) classOption {
 	return func(m *ClassMutation) {
 		var (
 			err   error
@@ -2338,9 +2357,15 @@ func (m ClassMutation) Tx() (*Tx, error) {
 	return tx, nil
 }
 
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of Class entities.
+func (m *ClassMutation) SetID(id uuid.UUID) {
+	m.id = &id
+}
+
 // ID returns the ID value in the mutation. Note that the ID is only available
 // if it was provided to the builder or after it was returned from the database.
-func (m *ClassMutation) ID() (id int, exists bool) {
+func (m *ClassMutation) ID() (id uuid.UUID, exists bool) {
 	if m.id == nil {
 		return
 	}
@@ -2492,7 +2517,7 @@ func (m *ClassMutation) ResetStatus() {
 }
 
 // SetStageID sets the "stage" edge to the Stage entity by id.
-func (m *ClassMutation) SetStageID(id int) {
+func (m *ClassMutation) SetStageID(id uuid.UUID) {
 	m.stage = &id
 }
 
@@ -2507,7 +2532,7 @@ func (m *ClassMutation) StageCleared() bool {
 }
 
 // StageID returns the "stage" edge ID in the mutation.
-func (m *ClassMutation) StageID() (id int, exists bool) {
+func (m *ClassMutation) StageID() (id uuid.UUID, exists bool) {
 	if m.stage != nil {
 		return *m.stage, true
 	}
@@ -2517,7 +2542,7 @@ func (m *ClassMutation) StageID() (id int, exists bool) {
 // StageIDs returns the "stage" edge IDs in the mutation.
 // Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
 // StageID instead. It exists only for internal usage by the builders.
-func (m *ClassMutation) StageIDs() (ids []int) {
+func (m *ClassMutation) StageIDs() (ids []uuid.UUID) {
 	if id := m.stage; id != nil {
 		ids = append(ids, *id)
 	}
@@ -2531,7 +2556,7 @@ func (m *ClassMutation) ResetStage() {
 }
 
 // SetTeacherID sets the "teacher" edge to the User entity by id.
-func (m *ClassMutation) SetTeacherID(id int) {
+func (m *ClassMutation) SetTeacherID(id uuid.UUID) {
 	m.teacher = &id
 }
 
@@ -2546,7 +2571,7 @@ func (m *ClassMutation) TeacherCleared() bool {
 }
 
 // TeacherID returns the "teacher" edge ID in the mutation.
-func (m *ClassMutation) TeacherID() (id int, exists bool) {
+func (m *ClassMutation) TeacherID() (id uuid.UUID, exists bool) {
 	if m.teacher != nil {
 		return *m.teacher, true
 	}
@@ -2556,7 +2581,7 @@ func (m *ClassMutation) TeacherID() (id int, exists bool) {
 // TeacherIDs returns the "teacher" edge IDs in the mutation.
 // Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
 // TeacherID instead. It exists only for internal usage by the builders.
-func (m *ClassMutation) TeacherIDs() (ids []int) {
+func (m *ClassMutation) TeacherIDs() (ids []uuid.UUID) {
 	if id := m.teacher; id != nil {
 		ids = append(ids, *id)
 	}
@@ -2570,7 +2595,7 @@ func (m *ClassMutation) ResetTeacher() {
 }
 
 // SetGroupID sets the "group" edge to the Group entity by id.
-func (m *ClassMutation) SetGroupID(id int) {
+func (m *ClassMutation) SetGroupID(id uuid.UUID) {
 	m.group = &id
 }
 
@@ -2585,7 +2610,7 @@ func (m *ClassMutation) GroupCleared() bool {
 }
 
 // GroupID returns the "group" edge ID in the mutation.
-func (m *ClassMutation) GroupID() (id int, exists bool) {
+func (m *ClassMutation) GroupID() (id uuid.UUID, exists bool) {
 	if m.group != nil {
 		return *m.group, true
 	}
@@ -2595,7 +2620,7 @@ func (m *ClassMutation) GroupID() (id int, exists bool) {
 // GroupIDs returns the "group" edge IDs in the mutation.
 // Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
 // GroupID instead. It exists only for internal usage by the builders.
-func (m *ClassMutation) GroupIDs() (ids []int) {
+func (m *ClassMutation) GroupIDs() (ids []uuid.UUID) {
 	if id := m.group; id != nil {
 		ids = append(ids, *id)
 	}
@@ -2609,9 +2634,9 @@ func (m *ClassMutation) ResetGroup() {
 }
 
 // AddAssignmentIDs adds the "assignments" edge to the Assignment entity by ids.
-func (m *ClassMutation) AddAssignmentIDs(ids ...int) {
+func (m *ClassMutation) AddAssignmentIDs(ids ...uuid.UUID) {
 	if m.assignments == nil {
-		m.assignments = make(map[int]struct{})
+		m.assignments = make(map[uuid.UUID]struct{})
 	}
 	for i := range ids {
 		m.assignments[ids[i]] = struct{}{}
@@ -2629,9 +2654,9 @@ func (m *ClassMutation) AssignmentsCleared() bool {
 }
 
 // RemoveAssignmentIDs removes the "assignments" edge to the Assignment entity by IDs.
-func (m *ClassMutation) RemoveAssignmentIDs(ids ...int) {
+func (m *ClassMutation) RemoveAssignmentIDs(ids ...uuid.UUID) {
 	if m.removedassignments == nil {
-		m.removedassignments = make(map[int]struct{})
+		m.removedassignments = make(map[uuid.UUID]struct{})
 	}
 	for i := range ids {
 		delete(m.assignments, ids[i])
@@ -2640,7 +2665,7 @@ func (m *ClassMutation) RemoveAssignmentIDs(ids ...int) {
 }
 
 // RemovedAssignments returns the removed IDs of the "assignments" edge to the Assignment entity.
-func (m *ClassMutation) RemovedAssignmentsIDs() (ids []int) {
+func (m *ClassMutation) RemovedAssignmentsIDs() (ids []uuid.UUID) {
 	for id := range m.removedassignments {
 		ids = append(ids, id)
 	}
@@ -2648,7 +2673,7 @@ func (m *ClassMutation) RemovedAssignmentsIDs() (ids []int) {
 }
 
 // AssignmentsIDs returns the "assignments" edge IDs in the mutation.
-func (m *ClassMutation) AssignmentsIDs() (ids []int) {
+func (m *ClassMutation) AssignmentsIDs() (ids []uuid.UUID) {
 	for id := range m.assignments {
 		ids = append(ids, id)
 	}
@@ -2663,9 +2688,9 @@ func (m *ClassMutation) ResetAssignments() {
 }
 
 // AddAttendanceIDs adds the "attendances" edge to the Attendance entity by ids.
-func (m *ClassMutation) AddAttendanceIDs(ids ...int) {
+func (m *ClassMutation) AddAttendanceIDs(ids ...uuid.UUID) {
 	if m.attendances == nil {
-		m.attendances = make(map[int]struct{})
+		m.attendances = make(map[uuid.UUID]struct{})
 	}
 	for i := range ids {
 		m.attendances[ids[i]] = struct{}{}
@@ -2683,9 +2708,9 @@ func (m *ClassMutation) AttendancesCleared() bool {
 }
 
 // RemoveAttendanceIDs removes the "attendances" edge to the Attendance entity by IDs.
-func (m *ClassMutation) RemoveAttendanceIDs(ids ...int) {
+func (m *ClassMutation) RemoveAttendanceIDs(ids ...uuid.UUID) {
 	if m.removedattendances == nil {
-		m.removedattendances = make(map[int]struct{})
+		m.removedattendances = make(map[uuid.UUID]struct{})
 	}
 	for i := range ids {
 		delete(m.attendances, ids[i])
@@ -2694,7 +2719,7 @@ func (m *ClassMutation) RemoveAttendanceIDs(ids ...int) {
 }
 
 // RemovedAttendances returns the removed IDs of the "attendances" edge to the Attendance entity.
-func (m *ClassMutation) RemovedAttendancesIDs() (ids []int) {
+func (m *ClassMutation) RemovedAttendancesIDs() (ids []uuid.UUID) {
 	for id := range m.removedattendances {
 		ids = append(ids, id)
 	}
@@ -2702,7 +2727,7 @@ func (m *ClassMutation) RemovedAttendancesIDs() (ids []int) {
 }
 
 // AttendancesIDs returns the "attendances" edge IDs in the mutation.
-func (m *ClassMutation) AttendancesIDs() (ids []int) {
+func (m *ClassMutation) AttendancesIDs() (ids []uuid.UUID) {
 	for id := range m.attendances {
 		ids = append(ids, id)
 	}
@@ -2717,9 +2742,9 @@ func (m *ClassMutation) ResetAttendances() {
 }
 
 // AddScheduleIDs adds the "schedules" edge to the Schedule entity by ids.
-func (m *ClassMutation) AddScheduleIDs(ids ...int) {
+func (m *ClassMutation) AddScheduleIDs(ids ...uuid.UUID) {
 	if m.schedules == nil {
-		m.schedules = make(map[int]struct{})
+		m.schedules = make(map[uuid.UUID]struct{})
 	}
 	for i := range ids {
 		m.schedules[ids[i]] = struct{}{}
@@ -2737,9 +2762,9 @@ func (m *ClassMutation) SchedulesCleared() bool {
 }
 
 // RemoveScheduleIDs removes the "schedules" edge to the Schedule entity by IDs.
-func (m *ClassMutation) RemoveScheduleIDs(ids ...int) {
+func (m *ClassMutation) RemoveScheduleIDs(ids ...uuid.UUID) {
 	if m.removedschedules == nil {
-		m.removedschedules = make(map[int]struct{})
+		m.removedschedules = make(map[uuid.UUID]struct{})
 	}
 	for i := range ids {
 		delete(m.schedules, ids[i])
@@ -2748,7 +2773,7 @@ func (m *ClassMutation) RemoveScheduleIDs(ids ...int) {
 }
 
 // RemovedSchedules returns the removed IDs of the "schedules" edge to the Schedule entity.
-func (m *ClassMutation) RemovedSchedulesIDs() (ids []int) {
+func (m *ClassMutation) RemovedSchedulesIDs() (ids []uuid.UUID) {
 	for id := range m.removedschedules {
 		ids = append(ids, id)
 	}
@@ -2756,7 +2781,7 @@ func (m *ClassMutation) RemovedSchedulesIDs() (ids []int) {
 }
 
 // SchedulesIDs returns the "schedules" edge IDs in the mutation.
-func (m *ClassMutation) SchedulesIDs() (ids []int) {
+func (m *ClassMutation) SchedulesIDs() (ids []uuid.UUID) {
 	for id := range m.schedules {
 		ids = append(ids, id)
 	}
@@ -3132,15 +3157,15 @@ type GradeMutation struct {
 	config
 	op             Op
 	typ            string
-	id             *int
+	id             *uuid.UUID
 	created_at     *time.Time
 	updated_at     *time.Time
-	exam_grade     *float64
-	addexam_grade  *float64
+	exam_grade     *int
+	addexam_grade  *int
 	clearedFields  map[string]struct{}
-	student        *int
+	student        *uuid.UUID
 	clearedstudent bool
-	exam           *int
+	exam           *uuid.UUID
 	clearedexam    bool
 	done           bool
 	oldValue       func(context.Context) (*Grade, error)
@@ -3167,7 +3192,7 @@ func newGradeMutation(c config, op Op, opts ...gradeOption) *GradeMutation {
 }
 
 // withGradeID sets the ID field of the mutation.
-func withGradeID(id int) gradeOption {
+func withGradeID(id uuid.UUID) gradeOption {
 	return func(m *GradeMutation) {
 		var (
 			err   error
@@ -3217,9 +3242,15 @@ func (m GradeMutation) Tx() (*Tx, error) {
 	return tx, nil
 }
 
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of Grade entities.
+func (m *GradeMutation) SetID(id uuid.UUID) {
+	m.id = &id
+}
+
 // ID returns the ID value in the mutation. Note that the ID is only available
 // if it was provided to the builder or after it was returned from the database.
-func (m *GradeMutation) ID() (id int, exists bool) {
+func (m *GradeMutation) ID() (id uuid.UUID, exists bool) {
 	if m.id == nil {
 		return
 	}
@@ -3299,13 +3330,13 @@ func (m *GradeMutation) ResetUpdatedAt() {
 }
 
 // SetExamGrade sets the "exam_grade" field.
-func (m *GradeMutation) SetExamGrade(f float64) {
-	m.exam_grade = &f
+func (m *GradeMutation) SetExamGrade(i int) {
+	m.exam_grade = &i
 	m.addexam_grade = nil
 }
 
 // ExamGrade returns the value of the "exam_grade" field in the mutation.
-func (m *GradeMutation) ExamGrade() (r float64, exists bool) {
+func (m *GradeMutation) ExamGrade() (r int, exists bool) {
 	v := m.exam_grade
 	if v == nil {
 		return
@@ -3316,7 +3347,7 @@ func (m *GradeMutation) ExamGrade() (r float64, exists bool) {
 // OldExamGrade returns the old "exam_grade" field's value of the Grade entity.
 // If the Grade object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *GradeMutation) OldExamGrade(ctx context.Context) (v float64, err error) {
+func (m *GradeMutation) OldExamGrade(ctx context.Context) (v int, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, fmt.Errorf("OldExamGrade is only allowed on UpdateOne operations")
 	}
@@ -3330,17 +3361,17 @@ func (m *GradeMutation) OldExamGrade(ctx context.Context) (v float64, err error)
 	return oldValue.ExamGrade, nil
 }
 
-// AddExamGrade adds f to the "exam_grade" field.
-func (m *GradeMutation) AddExamGrade(f float64) {
+// AddExamGrade adds i to the "exam_grade" field.
+func (m *GradeMutation) AddExamGrade(i int) {
 	if m.addexam_grade != nil {
-		*m.addexam_grade += f
+		*m.addexam_grade += i
 	} else {
-		m.addexam_grade = &f
+		m.addexam_grade = &i
 	}
 }
 
 // AddedExamGrade returns the value that was added to the "exam_grade" field in this mutation.
-func (m *GradeMutation) AddedExamGrade() (r float64, exists bool) {
+func (m *GradeMutation) AddedExamGrade() (r int, exists bool) {
 	v := m.addexam_grade
 	if v == nil {
 		return
@@ -3355,7 +3386,7 @@ func (m *GradeMutation) ResetExamGrade() {
 }
 
 // SetStudentID sets the "student" edge to the User entity by id.
-func (m *GradeMutation) SetStudentID(id int) {
+func (m *GradeMutation) SetStudentID(id uuid.UUID) {
 	m.student = &id
 }
 
@@ -3370,7 +3401,7 @@ func (m *GradeMutation) StudentCleared() bool {
 }
 
 // StudentID returns the "student" edge ID in the mutation.
-func (m *GradeMutation) StudentID() (id int, exists bool) {
+func (m *GradeMutation) StudentID() (id uuid.UUID, exists bool) {
 	if m.student != nil {
 		return *m.student, true
 	}
@@ -3380,7 +3411,7 @@ func (m *GradeMutation) StudentID() (id int, exists bool) {
 // StudentIDs returns the "student" edge IDs in the mutation.
 // Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
 // StudentID instead. It exists only for internal usage by the builders.
-func (m *GradeMutation) StudentIDs() (ids []int) {
+func (m *GradeMutation) StudentIDs() (ids []uuid.UUID) {
 	if id := m.student; id != nil {
 		ids = append(ids, *id)
 	}
@@ -3394,7 +3425,7 @@ func (m *GradeMutation) ResetStudent() {
 }
 
 // SetExamID sets the "exam" edge to the Assignment entity by id.
-func (m *GradeMutation) SetExamID(id int) {
+func (m *GradeMutation) SetExamID(id uuid.UUID) {
 	m.exam = &id
 }
 
@@ -3409,7 +3440,7 @@ func (m *GradeMutation) ExamCleared() bool {
 }
 
 // ExamID returns the "exam" edge ID in the mutation.
-func (m *GradeMutation) ExamID() (id int, exists bool) {
+func (m *GradeMutation) ExamID() (id uuid.UUID, exists bool) {
 	if m.exam != nil {
 		return *m.exam, true
 	}
@@ -3419,7 +3450,7 @@ func (m *GradeMutation) ExamID() (id int, exists bool) {
 // ExamIDs returns the "exam" edge IDs in the mutation.
 // Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
 // ExamID instead. It exists only for internal usage by the builders.
-func (m *GradeMutation) ExamIDs() (ids []int) {
+func (m *GradeMutation) ExamIDs() (ids []uuid.UUID) {
 	if id := m.exam; id != nil {
 		ids = append(ids, *id)
 	}
@@ -3514,7 +3545,7 @@ func (m *GradeMutation) SetField(name string, value ent.Value) error {
 		m.SetUpdatedAt(v)
 		return nil
 	case grade.FieldExamGrade:
-		v, ok := value.(float64)
+		v, ok := value.(int)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -3551,7 +3582,7 @@ func (m *GradeMutation) AddedField(name string) (ent.Value, bool) {
 func (m *GradeMutation) AddField(name string, value ent.Value) error {
 	switch name {
 	case grade.FieldExamGrade:
-		v, ok := value.(float64)
+		v, ok := value.(int)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -3696,17 +3727,17 @@ type GroupMutation struct {
 	config
 	op              Op
 	typ             string
-	id              *int
+	id              *uuid.UUID
 	created_at      *time.Time
 	updated_at      *time.Time
 	name            *string
-	_type           *group.Type
+	group_type      *group.GroupType
 	status          *schema.Status
 	clearedFields   map[string]struct{}
-	class           *int
+	class           *uuid.UUID
 	clearedclass    bool
-	messages        map[int]struct{}
-	removedmessages map[int]struct{}
+	messages        map[uuid.UUID]struct{}
+	removedmessages map[uuid.UUID]struct{}
 	clearedmessages bool
 	done            bool
 	oldValue        func(context.Context) (*Group, error)
@@ -3733,7 +3764,7 @@ func newGroupMutation(c config, op Op, opts ...groupOption) *GroupMutation {
 }
 
 // withGroupID sets the ID field of the mutation.
-func withGroupID(id int) groupOption {
+func withGroupID(id uuid.UUID) groupOption {
 	return func(m *GroupMutation) {
 		var (
 			err   error
@@ -3783,9 +3814,15 @@ func (m GroupMutation) Tx() (*Tx, error) {
 	return tx, nil
 }
 
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of Group entities.
+func (m *GroupMutation) SetID(id uuid.UUID) {
+	m.id = &id
+}
+
 // ID returns the ID value in the mutation. Note that the ID is only available
 // if it was provided to the builder or after it was returned from the database.
-func (m *GroupMutation) ID() (id int, exists bool) {
+func (m *GroupMutation) ID() (id uuid.UUID, exists bool) {
 	if m.id == nil {
 		return
 	}
@@ -3913,40 +3950,40 @@ func (m *GroupMutation) ResetName() {
 	delete(m.clearedFields, group.FieldName)
 }
 
-// SetType sets the "type" field.
-func (m *GroupMutation) SetType(gr group.Type) {
-	m._type = &gr
+// SetGroupType sets the "group_type" field.
+func (m *GroupMutation) SetGroupType(gt group.GroupType) {
+	m.group_type = &gt
 }
 
-// GetType returns the value of the "type" field in the mutation.
-func (m *GroupMutation) GetType() (r group.Type, exists bool) {
-	v := m._type
+// GroupType returns the value of the "group_type" field in the mutation.
+func (m *GroupMutation) GroupType() (r group.GroupType, exists bool) {
+	v := m.group_type
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldType returns the old "type" field's value of the Group entity.
+// OldGroupType returns the old "group_type" field's value of the Group entity.
 // If the Group object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *GroupMutation) OldType(ctx context.Context) (v group.Type, err error) {
+func (m *GroupMutation) OldGroupType(ctx context.Context) (v group.GroupType, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, fmt.Errorf("OldType is only allowed on UpdateOne operations")
+		return v, fmt.Errorf("OldGroupType is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, fmt.Errorf("OldType requires an ID field in the mutation")
+		return v, fmt.Errorf("OldGroupType requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldType: %w", err)
+		return v, fmt.Errorf("querying old value for OldGroupType: %w", err)
 	}
-	return oldValue.Type, nil
+	return oldValue.GroupType, nil
 }
 
-// ResetType resets all changes to the "type" field.
-func (m *GroupMutation) ResetType() {
-	m._type = nil
+// ResetGroupType resets all changes to the "group_type" field.
+func (m *GroupMutation) ResetGroupType() {
+	m.group_type = nil
 }
 
 // SetStatus sets the "status" field.
@@ -3986,7 +4023,7 @@ func (m *GroupMutation) ResetStatus() {
 }
 
 // SetClassID sets the "class" edge to the Class entity by id.
-func (m *GroupMutation) SetClassID(id int) {
+func (m *GroupMutation) SetClassID(id uuid.UUID) {
 	m.class = &id
 }
 
@@ -4001,7 +4038,7 @@ func (m *GroupMutation) ClassCleared() bool {
 }
 
 // ClassID returns the "class" edge ID in the mutation.
-func (m *GroupMutation) ClassID() (id int, exists bool) {
+func (m *GroupMutation) ClassID() (id uuid.UUID, exists bool) {
 	if m.class != nil {
 		return *m.class, true
 	}
@@ -4011,7 +4048,7 @@ func (m *GroupMutation) ClassID() (id int, exists bool) {
 // ClassIDs returns the "class" edge IDs in the mutation.
 // Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
 // ClassID instead. It exists only for internal usage by the builders.
-func (m *GroupMutation) ClassIDs() (ids []int) {
+func (m *GroupMutation) ClassIDs() (ids []uuid.UUID) {
 	if id := m.class; id != nil {
 		ids = append(ids, *id)
 	}
@@ -4025,9 +4062,9 @@ func (m *GroupMutation) ResetClass() {
 }
 
 // AddMessageIDs adds the "messages" edge to the Message entity by ids.
-func (m *GroupMutation) AddMessageIDs(ids ...int) {
+func (m *GroupMutation) AddMessageIDs(ids ...uuid.UUID) {
 	if m.messages == nil {
-		m.messages = make(map[int]struct{})
+		m.messages = make(map[uuid.UUID]struct{})
 	}
 	for i := range ids {
 		m.messages[ids[i]] = struct{}{}
@@ -4045,9 +4082,9 @@ func (m *GroupMutation) MessagesCleared() bool {
 }
 
 // RemoveMessageIDs removes the "messages" edge to the Message entity by IDs.
-func (m *GroupMutation) RemoveMessageIDs(ids ...int) {
+func (m *GroupMutation) RemoveMessageIDs(ids ...uuid.UUID) {
 	if m.removedmessages == nil {
-		m.removedmessages = make(map[int]struct{})
+		m.removedmessages = make(map[uuid.UUID]struct{})
 	}
 	for i := range ids {
 		delete(m.messages, ids[i])
@@ -4056,7 +4093,7 @@ func (m *GroupMutation) RemoveMessageIDs(ids ...int) {
 }
 
 // RemovedMessages returns the removed IDs of the "messages" edge to the Message entity.
-func (m *GroupMutation) RemovedMessagesIDs() (ids []int) {
+func (m *GroupMutation) RemovedMessagesIDs() (ids []uuid.UUID) {
 	for id := range m.removedmessages {
 		ids = append(ids, id)
 	}
@@ -4064,7 +4101,7 @@ func (m *GroupMutation) RemovedMessagesIDs() (ids []int) {
 }
 
 // MessagesIDs returns the "messages" edge IDs in the mutation.
-func (m *GroupMutation) MessagesIDs() (ids []int) {
+func (m *GroupMutation) MessagesIDs() (ids []uuid.UUID) {
 	for id := range m.messages {
 		ids = append(ids, id)
 	}
@@ -4107,8 +4144,8 @@ func (m *GroupMutation) Fields() []string {
 	if m.name != nil {
 		fields = append(fields, group.FieldName)
 	}
-	if m._type != nil {
-		fields = append(fields, group.FieldType)
+	if m.group_type != nil {
+		fields = append(fields, group.FieldGroupType)
 	}
 	if m.status != nil {
 		fields = append(fields, group.FieldStatus)
@@ -4127,8 +4164,8 @@ func (m *GroupMutation) Field(name string) (ent.Value, bool) {
 		return m.UpdatedAt()
 	case group.FieldName:
 		return m.Name()
-	case group.FieldType:
-		return m.GetType()
+	case group.FieldGroupType:
+		return m.GroupType()
 	case group.FieldStatus:
 		return m.Status()
 	}
@@ -4146,8 +4183,8 @@ func (m *GroupMutation) OldField(ctx context.Context, name string) (ent.Value, e
 		return m.OldUpdatedAt(ctx)
 	case group.FieldName:
 		return m.OldName(ctx)
-	case group.FieldType:
-		return m.OldType(ctx)
+	case group.FieldGroupType:
+		return m.OldGroupType(ctx)
 	case group.FieldStatus:
 		return m.OldStatus(ctx)
 	}
@@ -4180,12 +4217,12 @@ func (m *GroupMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetName(v)
 		return nil
-	case group.FieldType:
-		v, ok := value.(group.Type)
+	case group.FieldGroupType:
+		v, ok := value.(group.GroupType)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetType(v)
+		m.SetGroupType(v)
 		return nil
 	case group.FieldStatus:
 		v, ok := value.(schema.Status)
@@ -4261,8 +4298,8 @@ func (m *GroupMutation) ResetField(name string) error {
 	case group.FieldName:
 		m.ResetName()
 		return nil
-	case group.FieldType:
-		m.ResetType()
+	case group.FieldGroupType:
+		m.ResetGroupType()
 		return nil
 	case group.FieldStatus:
 		m.ResetStatus()
@@ -4378,16 +4415,16 @@ type MessageMutation struct {
 	config
 	op            Op
 	typ           string
-	id            *int
+	id            *uuid.UUID
 	created_at    *time.Time
 	updated_at    *time.Time
 	content       *string
 	attachment    *string
 	deleted_at    *time.Time
 	clearedFields map[string]struct{}
-	group         *int
+	group         *uuid.UUID
 	clearedgroup  bool
-	owner         *int
+	owner         *uuid.UUID
 	clearedowner  bool
 	done          bool
 	oldValue      func(context.Context) (*Message, error)
@@ -4414,7 +4451,7 @@ func newMessageMutation(c config, op Op, opts ...messageOption) *MessageMutation
 }
 
 // withMessageID sets the ID field of the mutation.
-func withMessageID(id int) messageOption {
+func withMessageID(id uuid.UUID) messageOption {
 	return func(m *MessageMutation) {
 		var (
 			err   error
@@ -4464,9 +4501,15 @@ func (m MessageMutation) Tx() (*Tx, error) {
 	return tx, nil
 }
 
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of Message entities.
+func (m *MessageMutation) SetID(id uuid.UUID) {
+	m.id = &id
+}
+
 // ID returns the ID value in the mutation. Note that the ID is only available
 // if it was provided to the builder or after it was returned from the database.
-func (m *MessageMutation) ID() (id int, exists bool) {
+func (m *MessageMutation) ID() (id uuid.UUID, exists bool) {
 	if m.id == nil {
 		return
 	}
@@ -4693,7 +4736,7 @@ func (m *MessageMutation) ResetDeletedAt() {
 }
 
 // SetGroupID sets the "group" edge to the Group entity by id.
-func (m *MessageMutation) SetGroupID(id int) {
+func (m *MessageMutation) SetGroupID(id uuid.UUID) {
 	m.group = &id
 }
 
@@ -4708,7 +4751,7 @@ func (m *MessageMutation) GroupCleared() bool {
 }
 
 // GroupID returns the "group" edge ID in the mutation.
-func (m *MessageMutation) GroupID() (id int, exists bool) {
+func (m *MessageMutation) GroupID() (id uuid.UUID, exists bool) {
 	if m.group != nil {
 		return *m.group, true
 	}
@@ -4718,7 +4761,7 @@ func (m *MessageMutation) GroupID() (id int, exists bool) {
 // GroupIDs returns the "group" edge IDs in the mutation.
 // Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
 // GroupID instead. It exists only for internal usage by the builders.
-func (m *MessageMutation) GroupIDs() (ids []int) {
+func (m *MessageMutation) GroupIDs() (ids []uuid.UUID) {
 	if id := m.group; id != nil {
 		ids = append(ids, *id)
 	}
@@ -4732,7 +4775,7 @@ func (m *MessageMutation) ResetGroup() {
 }
 
 // SetOwnerID sets the "owner" edge to the User entity by id.
-func (m *MessageMutation) SetOwnerID(id int) {
+func (m *MessageMutation) SetOwnerID(id uuid.UUID) {
 	m.owner = &id
 }
 
@@ -4747,7 +4790,7 @@ func (m *MessageMutation) OwnerCleared() bool {
 }
 
 // OwnerID returns the "owner" edge ID in the mutation.
-func (m *MessageMutation) OwnerID() (id int, exists bool) {
+func (m *MessageMutation) OwnerID() (id uuid.UUID, exists bool) {
 	if m.owner != nil {
 		return *m.owner, true
 	}
@@ -4757,7 +4800,7 @@ func (m *MessageMutation) OwnerID() (id int, exists bool) {
 // OwnerIDs returns the "owner" edge IDs in the mutation.
 // Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
 // OwnerID instead. It exists only for internal usage by the builders.
-func (m *MessageMutation) OwnerIDs() (ids []int) {
+func (m *MessageMutation) OwnerIDs() (ids []uuid.UUID) {
 	if id := m.owner; id != nil {
 		ids = append(ids, *id)
 	}
@@ -5074,14 +5117,14 @@ type ScheduleMutation struct {
 	config
 	op            Op
 	typ           string
-	id            *int
-	weekday       *uint8
-	addweekday    *uint8
+	id            *uuid.UUID
+	weekday       *int
+	addweekday    *int
 	starts_at     *time.Time
 	duration      *int
 	addduration   *int
 	clearedFields map[string]struct{}
-	class         *int
+	class         *uuid.UUID
 	clearedclass  bool
 	done          bool
 	oldValue      func(context.Context) (*Schedule, error)
@@ -5108,7 +5151,7 @@ func newScheduleMutation(c config, op Op, opts ...scheduleOption) *ScheduleMutat
 }
 
 // withScheduleID sets the ID field of the mutation.
-func withScheduleID(id int) scheduleOption {
+func withScheduleID(id uuid.UUID) scheduleOption {
 	return func(m *ScheduleMutation) {
 		var (
 			err   error
@@ -5158,9 +5201,15 @@ func (m ScheduleMutation) Tx() (*Tx, error) {
 	return tx, nil
 }
 
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of Schedule entities.
+func (m *ScheduleMutation) SetID(id uuid.UUID) {
+	m.id = &id
+}
+
 // ID returns the ID value in the mutation. Note that the ID is only available
 // if it was provided to the builder or after it was returned from the database.
-func (m *ScheduleMutation) ID() (id int, exists bool) {
+func (m *ScheduleMutation) ID() (id uuid.UUID, exists bool) {
 	if m.id == nil {
 		return
 	}
@@ -5168,13 +5217,13 @@ func (m *ScheduleMutation) ID() (id int, exists bool) {
 }
 
 // SetWeekday sets the "weekday" field.
-func (m *ScheduleMutation) SetWeekday(u uint8) {
-	m.weekday = &u
+func (m *ScheduleMutation) SetWeekday(i int) {
+	m.weekday = &i
 	m.addweekday = nil
 }
 
 // Weekday returns the value of the "weekday" field in the mutation.
-func (m *ScheduleMutation) Weekday() (r uint8, exists bool) {
+func (m *ScheduleMutation) Weekday() (r int, exists bool) {
 	v := m.weekday
 	if v == nil {
 		return
@@ -5185,7 +5234,7 @@ func (m *ScheduleMutation) Weekday() (r uint8, exists bool) {
 // OldWeekday returns the old "weekday" field's value of the Schedule entity.
 // If the Schedule object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ScheduleMutation) OldWeekday(ctx context.Context) (v uint8, err error) {
+func (m *ScheduleMutation) OldWeekday(ctx context.Context) (v int, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, fmt.Errorf("OldWeekday is only allowed on UpdateOne operations")
 	}
@@ -5199,17 +5248,17 @@ func (m *ScheduleMutation) OldWeekday(ctx context.Context) (v uint8, err error) 
 	return oldValue.Weekday, nil
 }
 
-// AddWeekday adds u to the "weekday" field.
-func (m *ScheduleMutation) AddWeekday(u uint8) {
+// AddWeekday adds i to the "weekday" field.
+func (m *ScheduleMutation) AddWeekday(i int) {
 	if m.addweekday != nil {
-		*m.addweekday += u
+		*m.addweekday += i
 	} else {
-		m.addweekday = &u
+		m.addweekday = &i
 	}
 }
 
 // AddedWeekday returns the value that was added to the "weekday" field in this mutation.
-func (m *ScheduleMutation) AddedWeekday() (r uint8, exists bool) {
+func (m *ScheduleMutation) AddedWeekday() (r int, exists bool) {
 	v := m.addweekday
 	if v == nil {
 		return
@@ -5316,7 +5365,7 @@ func (m *ScheduleMutation) ResetDuration() {
 }
 
 // SetClassID sets the "class" edge to the Class entity by id.
-func (m *ScheduleMutation) SetClassID(id int) {
+func (m *ScheduleMutation) SetClassID(id uuid.UUID) {
 	m.class = &id
 }
 
@@ -5331,7 +5380,7 @@ func (m *ScheduleMutation) ClassCleared() bool {
 }
 
 // ClassID returns the "class" edge ID in the mutation.
-func (m *ScheduleMutation) ClassID() (id int, exists bool) {
+func (m *ScheduleMutation) ClassID() (id uuid.UUID, exists bool) {
 	if m.class != nil {
 		return *m.class, true
 	}
@@ -5341,7 +5390,7 @@ func (m *ScheduleMutation) ClassID() (id int, exists bool) {
 // ClassIDs returns the "class" edge IDs in the mutation.
 // Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
 // ClassID instead. It exists only for internal usage by the builders.
-func (m *ScheduleMutation) ClassIDs() (ids []int) {
+func (m *ScheduleMutation) ClassIDs() (ids []uuid.UUID) {
 	if id := m.class; id != nil {
 		ids = append(ids, *id)
 	}
@@ -5422,7 +5471,7 @@ func (m *ScheduleMutation) OldField(ctx context.Context, name string) (ent.Value
 func (m *ScheduleMutation) SetField(name string, value ent.Value) error {
 	switch name {
 	case schedule.FieldWeekday:
-		v, ok := value.(uint8)
+		v, ok := value.(int)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -5478,7 +5527,7 @@ func (m *ScheduleMutation) AddedField(name string) (ent.Value, bool) {
 func (m *ScheduleMutation) AddField(name string, value ent.Value) error {
 	switch name {
 	case schedule.FieldWeekday:
-		v, ok := value.(uint8)
+		v, ok := value.(int)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -5612,18 +5661,18 @@ type SchoolMutation struct {
 	config
 	op            Op
 	typ           string
-	id            *int
+	id            *uuid.UUID
 	created_at    *time.Time
 	updated_at    *time.Time
 	name          *string
 	image         *string
 	status        *schema.Status
 	clearedFields map[string]struct{}
-	users         map[int]struct{}
-	removedusers  map[int]struct{}
+	users         map[uuid.UUID]struct{}
+	removedusers  map[uuid.UUID]struct{}
 	clearedusers  bool
-	stages        map[int]struct{}
-	removedstages map[int]struct{}
+	stages        map[uuid.UUID]struct{}
+	removedstages map[uuid.UUID]struct{}
 	clearedstages bool
 	done          bool
 	oldValue      func(context.Context) (*School, error)
@@ -5650,7 +5699,7 @@ func newSchoolMutation(c config, op Op, opts ...schoolOption) *SchoolMutation {
 }
 
 // withSchoolID sets the ID field of the mutation.
-func withSchoolID(id int) schoolOption {
+func withSchoolID(id uuid.UUID) schoolOption {
 	return func(m *SchoolMutation) {
 		var (
 			err   error
@@ -5700,9 +5749,15 @@ func (m SchoolMutation) Tx() (*Tx, error) {
 	return tx, nil
 }
 
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of School entities.
+func (m *SchoolMutation) SetID(id uuid.UUID) {
+	m.id = &id
+}
+
 // ID returns the ID value in the mutation. Note that the ID is only available
 // if it was provided to the builder or after it was returned from the database.
-func (m *SchoolMutation) ID() (id int, exists bool) {
+func (m *SchoolMutation) ID() (id uuid.UUID, exists bool) {
 	if m.id == nil {
 		return
 	}
@@ -5890,9 +5945,9 @@ func (m *SchoolMutation) ResetStatus() {
 }
 
 // AddUserIDs adds the "users" edge to the User entity by ids.
-func (m *SchoolMutation) AddUserIDs(ids ...int) {
+func (m *SchoolMutation) AddUserIDs(ids ...uuid.UUID) {
 	if m.users == nil {
-		m.users = make(map[int]struct{})
+		m.users = make(map[uuid.UUID]struct{})
 	}
 	for i := range ids {
 		m.users[ids[i]] = struct{}{}
@@ -5910,9 +5965,9 @@ func (m *SchoolMutation) UsersCleared() bool {
 }
 
 // RemoveUserIDs removes the "users" edge to the User entity by IDs.
-func (m *SchoolMutation) RemoveUserIDs(ids ...int) {
+func (m *SchoolMutation) RemoveUserIDs(ids ...uuid.UUID) {
 	if m.removedusers == nil {
-		m.removedusers = make(map[int]struct{})
+		m.removedusers = make(map[uuid.UUID]struct{})
 	}
 	for i := range ids {
 		delete(m.users, ids[i])
@@ -5921,7 +5976,7 @@ func (m *SchoolMutation) RemoveUserIDs(ids ...int) {
 }
 
 // RemovedUsers returns the removed IDs of the "users" edge to the User entity.
-func (m *SchoolMutation) RemovedUsersIDs() (ids []int) {
+func (m *SchoolMutation) RemovedUsersIDs() (ids []uuid.UUID) {
 	for id := range m.removedusers {
 		ids = append(ids, id)
 	}
@@ -5929,7 +5984,7 @@ func (m *SchoolMutation) RemovedUsersIDs() (ids []int) {
 }
 
 // UsersIDs returns the "users" edge IDs in the mutation.
-func (m *SchoolMutation) UsersIDs() (ids []int) {
+func (m *SchoolMutation) UsersIDs() (ids []uuid.UUID) {
 	for id := range m.users {
 		ids = append(ids, id)
 	}
@@ -5944,9 +5999,9 @@ func (m *SchoolMutation) ResetUsers() {
 }
 
 // AddStageIDs adds the "stages" edge to the Stage entity by ids.
-func (m *SchoolMutation) AddStageIDs(ids ...int) {
+func (m *SchoolMutation) AddStageIDs(ids ...uuid.UUID) {
 	if m.stages == nil {
-		m.stages = make(map[int]struct{})
+		m.stages = make(map[uuid.UUID]struct{})
 	}
 	for i := range ids {
 		m.stages[ids[i]] = struct{}{}
@@ -5964,9 +6019,9 @@ func (m *SchoolMutation) StagesCleared() bool {
 }
 
 // RemoveStageIDs removes the "stages" edge to the Stage entity by IDs.
-func (m *SchoolMutation) RemoveStageIDs(ids ...int) {
+func (m *SchoolMutation) RemoveStageIDs(ids ...uuid.UUID) {
 	if m.removedstages == nil {
-		m.removedstages = make(map[int]struct{})
+		m.removedstages = make(map[uuid.UUID]struct{})
 	}
 	for i := range ids {
 		delete(m.stages, ids[i])
@@ -5975,7 +6030,7 @@ func (m *SchoolMutation) RemoveStageIDs(ids ...int) {
 }
 
 // RemovedStages returns the removed IDs of the "stages" edge to the Stage entity.
-func (m *SchoolMutation) RemovedStagesIDs() (ids []int) {
+func (m *SchoolMutation) RemovedStagesIDs() (ids []uuid.UUID) {
 	for id := range m.removedstages {
 		ids = append(ids, id)
 	}
@@ -5983,7 +6038,7 @@ func (m *SchoolMutation) RemovedStagesIDs() (ids []int) {
 }
 
 // StagesIDs returns the "stages" edge IDs in the mutation.
-func (m *SchoolMutation) StagesIDs() (ids []int) {
+func (m *SchoolMutation) StagesIDs() (ids []uuid.UUID) {
 	for id := range m.stages {
 		ids = append(ids, id)
 	}
@@ -6296,7 +6351,7 @@ type StageMutation struct {
 	config
 	op                Op
 	typ               string
-	id                *int
+	id                *uuid.UUID
 	created_at        *time.Time
 	updated_at        *time.Time
 	name              *string
@@ -6304,16 +6359,16 @@ type StageMutation struct {
 	addtuition_amount *int
 	status            *schema.Status
 	clearedFields     map[string]struct{}
-	school            *int
+	school            *uuid.UUID
 	clearedschool     bool
-	classes           map[int]struct{}
-	removedclasses    map[int]struct{}
+	classes           map[uuid.UUID]struct{}
+	removedclasses    map[uuid.UUID]struct{}
 	clearedclasses    bool
-	payments          map[int]struct{}
-	removedpayments   map[int]struct{}
+	payments          map[uuid.UUID]struct{}
+	removedpayments   map[uuid.UUID]struct{}
 	clearedpayments   bool
-	students          map[int]struct{}
-	removedstudents   map[int]struct{}
+	students          map[uuid.UUID]struct{}
+	removedstudents   map[uuid.UUID]struct{}
 	clearedstudents   bool
 	done              bool
 	oldValue          func(context.Context) (*Stage, error)
@@ -6340,7 +6395,7 @@ func newStageMutation(c config, op Op, opts ...stageOption) *StageMutation {
 }
 
 // withStageID sets the ID field of the mutation.
-func withStageID(id int) stageOption {
+func withStageID(id uuid.UUID) stageOption {
 	return func(m *StageMutation) {
 		var (
 			err   error
@@ -6390,9 +6445,15 @@ func (m StageMutation) Tx() (*Tx, error) {
 	return tx, nil
 }
 
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of Stage entities.
+func (m *StageMutation) SetID(id uuid.UUID) {
+	m.id = &id
+}
+
 // ID returns the ID value in the mutation. Note that the ID is only available
 // if it was provided to the builder or after it was returned from the database.
-func (m *StageMutation) ID() (id int, exists bool) {
+func (m *StageMutation) ID() (id uuid.UUID, exists bool) {
 	if m.id == nil {
 		return
 	}
@@ -6600,7 +6661,7 @@ func (m *StageMutation) ResetStatus() {
 }
 
 // SetSchoolID sets the "school" edge to the School entity by id.
-func (m *StageMutation) SetSchoolID(id int) {
+func (m *StageMutation) SetSchoolID(id uuid.UUID) {
 	m.school = &id
 }
 
@@ -6615,7 +6676,7 @@ func (m *StageMutation) SchoolCleared() bool {
 }
 
 // SchoolID returns the "school" edge ID in the mutation.
-func (m *StageMutation) SchoolID() (id int, exists bool) {
+func (m *StageMutation) SchoolID() (id uuid.UUID, exists bool) {
 	if m.school != nil {
 		return *m.school, true
 	}
@@ -6625,7 +6686,7 @@ func (m *StageMutation) SchoolID() (id int, exists bool) {
 // SchoolIDs returns the "school" edge IDs in the mutation.
 // Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
 // SchoolID instead. It exists only for internal usage by the builders.
-func (m *StageMutation) SchoolIDs() (ids []int) {
+func (m *StageMutation) SchoolIDs() (ids []uuid.UUID) {
 	if id := m.school; id != nil {
 		ids = append(ids, *id)
 	}
@@ -6639,9 +6700,9 @@ func (m *StageMutation) ResetSchool() {
 }
 
 // AddClassIDs adds the "classes" edge to the Class entity by ids.
-func (m *StageMutation) AddClassIDs(ids ...int) {
+func (m *StageMutation) AddClassIDs(ids ...uuid.UUID) {
 	if m.classes == nil {
-		m.classes = make(map[int]struct{})
+		m.classes = make(map[uuid.UUID]struct{})
 	}
 	for i := range ids {
 		m.classes[ids[i]] = struct{}{}
@@ -6659,9 +6720,9 @@ func (m *StageMutation) ClassesCleared() bool {
 }
 
 // RemoveClassIDs removes the "classes" edge to the Class entity by IDs.
-func (m *StageMutation) RemoveClassIDs(ids ...int) {
+func (m *StageMutation) RemoveClassIDs(ids ...uuid.UUID) {
 	if m.removedclasses == nil {
-		m.removedclasses = make(map[int]struct{})
+		m.removedclasses = make(map[uuid.UUID]struct{})
 	}
 	for i := range ids {
 		delete(m.classes, ids[i])
@@ -6670,7 +6731,7 @@ func (m *StageMutation) RemoveClassIDs(ids ...int) {
 }
 
 // RemovedClasses returns the removed IDs of the "classes" edge to the Class entity.
-func (m *StageMutation) RemovedClassesIDs() (ids []int) {
+func (m *StageMutation) RemovedClassesIDs() (ids []uuid.UUID) {
 	for id := range m.removedclasses {
 		ids = append(ids, id)
 	}
@@ -6678,7 +6739,7 @@ func (m *StageMutation) RemovedClassesIDs() (ids []int) {
 }
 
 // ClassesIDs returns the "classes" edge IDs in the mutation.
-func (m *StageMutation) ClassesIDs() (ids []int) {
+func (m *StageMutation) ClassesIDs() (ids []uuid.UUID) {
 	for id := range m.classes {
 		ids = append(ids, id)
 	}
@@ -6693,9 +6754,9 @@ func (m *StageMutation) ResetClasses() {
 }
 
 // AddPaymentIDs adds the "payments" edge to the TuitionPayment entity by ids.
-func (m *StageMutation) AddPaymentIDs(ids ...int) {
+func (m *StageMutation) AddPaymentIDs(ids ...uuid.UUID) {
 	if m.payments == nil {
-		m.payments = make(map[int]struct{})
+		m.payments = make(map[uuid.UUID]struct{})
 	}
 	for i := range ids {
 		m.payments[ids[i]] = struct{}{}
@@ -6713,9 +6774,9 @@ func (m *StageMutation) PaymentsCleared() bool {
 }
 
 // RemovePaymentIDs removes the "payments" edge to the TuitionPayment entity by IDs.
-func (m *StageMutation) RemovePaymentIDs(ids ...int) {
+func (m *StageMutation) RemovePaymentIDs(ids ...uuid.UUID) {
 	if m.removedpayments == nil {
-		m.removedpayments = make(map[int]struct{})
+		m.removedpayments = make(map[uuid.UUID]struct{})
 	}
 	for i := range ids {
 		delete(m.payments, ids[i])
@@ -6724,7 +6785,7 @@ func (m *StageMutation) RemovePaymentIDs(ids ...int) {
 }
 
 // RemovedPayments returns the removed IDs of the "payments" edge to the TuitionPayment entity.
-func (m *StageMutation) RemovedPaymentsIDs() (ids []int) {
+func (m *StageMutation) RemovedPaymentsIDs() (ids []uuid.UUID) {
 	for id := range m.removedpayments {
 		ids = append(ids, id)
 	}
@@ -6732,7 +6793,7 @@ func (m *StageMutation) RemovedPaymentsIDs() (ids []int) {
 }
 
 // PaymentsIDs returns the "payments" edge IDs in the mutation.
-func (m *StageMutation) PaymentsIDs() (ids []int) {
+func (m *StageMutation) PaymentsIDs() (ids []uuid.UUID) {
 	for id := range m.payments {
 		ids = append(ids, id)
 	}
@@ -6747,9 +6808,9 @@ func (m *StageMutation) ResetPayments() {
 }
 
 // AddStudentIDs adds the "students" edge to the User entity by ids.
-func (m *StageMutation) AddStudentIDs(ids ...int) {
+func (m *StageMutation) AddStudentIDs(ids ...uuid.UUID) {
 	if m.students == nil {
-		m.students = make(map[int]struct{})
+		m.students = make(map[uuid.UUID]struct{})
 	}
 	for i := range ids {
 		m.students[ids[i]] = struct{}{}
@@ -6767,9 +6828,9 @@ func (m *StageMutation) StudentsCleared() bool {
 }
 
 // RemoveStudentIDs removes the "students" edge to the User entity by IDs.
-func (m *StageMutation) RemoveStudentIDs(ids ...int) {
+func (m *StageMutation) RemoveStudentIDs(ids ...uuid.UUID) {
 	if m.removedstudents == nil {
-		m.removedstudents = make(map[int]struct{})
+		m.removedstudents = make(map[uuid.UUID]struct{})
 	}
 	for i := range ids {
 		delete(m.students, ids[i])
@@ -6778,7 +6839,7 @@ func (m *StageMutation) RemoveStudentIDs(ids ...int) {
 }
 
 // RemovedStudents returns the removed IDs of the "students" edge to the User entity.
-func (m *StageMutation) RemovedStudentsIDs() (ids []int) {
+func (m *StageMutation) RemovedStudentsIDs() (ids []uuid.UUID) {
 	for id := range m.removedstudents {
 		ids = append(ids, id)
 	}
@@ -6786,7 +6847,7 @@ func (m *StageMutation) RemovedStudentsIDs() (ids []int) {
 }
 
 // StudentsIDs returns the "students" edge IDs in the mutation.
-func (m *StageMutation) StudentsIDs() (ids []int) {
+func (m *StageMutation) StudentsIDs() (ids []uuid.UUID) {
 	for id := range m.students {
 		ids = append(ids, id)
 	}
@@ -7158,15 +7219,15 @@ type TuitionPaymentMutation struct {
 	config
 	op             Op
 	typ            string
-	id             *int
+	id             *uuid.UUID
 	created_at     *time.Time
 	updated_at     *time.Time
 	paid_amount    *int
 	addpaid_amount *int
 	clearedFields  map[string]struct{}
-	student        *int
+	student        *uuid.UUID
 	clearedstudent bool
-	stage          *int
+	stage          *uuid.UUID
 	clearedstage   bool
 	done           bool
 	oldValue       func(context.Context) (*TuitionPayment, error)
@@ -7193,7 +7254,7 @@ func newTuitionPaymentMutation(c config, op Op, opts ...tuitionpaymentOption) *T
 }
 
 // withTuitionPaymentID sets the ID field of the mutation.
-func withTuitionPaymentID(id int) tuitionpaymentOption {
+func withTuitionPaymentID(id uuid.UUID) tuitionpaymentOption {
 	return func(m *TuitionPaymentMutation) {
 		var (
 			err   error
@@ -7243,9 +7304,15 @@ func (m TuitionPaymentMutation) Tx() (*Tx, error) {
 	return tx, nil
 }
 
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of TuitionPayment entities.
+func (m *TuitionPaymentMutation) SetID(id uuid.UUID) {
+	m.id = &id
+}
+
 // ID returns the ID value in the mutation. Note that the ID is only available
 // if it was provided to the builder or after it was returned from the database.
-func (m *TuitionPaymentMutation) ID() (id int, exists bool) {
+func (m *TuitionPaymentMutation) ID() (id uuid.UUID, exists bool) {
 	if m.id == nil {
 		return
 	}
@@ -7381,7 +7448,7 @@ func (m *TuitionPaymentMutation) ResetPaidAmount() {
 }
 
 // SetStudentID sets the "student" edge to the User entity by id.
-func (m *TuitionPaymentMutation) SetStudentID(id int) {
+func (m *TuitionPaymentMutation) SetStudentID(id uuid.UUID) {
 	m.student = &id
 }
 
@@ -7396,7 +7463,7 @@ func (m *TuitionPaymentMutation) StudentCleared() bool {
 }
 
 // StudentID returns the "student" edge ID in the mutation.
-func (m *TuitionPaymentMutation) StudentID() (id int, exists bool) {
+func (m *TuitionPaymentMutation) StudentID() (id uuid.UUID, exists bool) {
 	if m.student != nil {
 		return *m.student, true
 	}
@@ -7406,7 +7473,7 @@ func (m *TuitionPaymentMutation) StudentID() (id int, exists bool) {
 // StudentIDs returns the "student" edge IDs in the mutation.
 // Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
 // StudentID instead. It exists only for internal usage by the builders.
-func (m *TuitionPaymentMutation) StudentIDs() (ids []int) {
+func (m *TuitionPaymentMutation) StudentIDs() (ids []uuid.UUID) {
 	if id := m.student; id != nil {
 		ids = append(ids, *id)
 	}
@@ -7420,7 +7487,7 @@ func (m *TuitionPaymentMutation) ResetStudent() {
 }
 
 // SetStageID sets the "stage" edge to the Stage entity by id.
-func (m *TuitionPaymentMutation) SetStageID(id int) {
+func (m *TuitionPaymentMutation) SetStageID(id uuid.UUID) {
 	m.stage = &id
 }
 
@@ -7435,7 +7502,7 @@ func (m *TuitionPaymentMutation) StageCleared() bool {
 }
 
 // StageID returns the "stage" edge ID in the mutation.
-func (m *TuitionPaymentMutation) StageID() (id int, exists bool) {
+func (m *TuitionPaymentMutation) StageID() (id uuid.UUID, exists bool) {
 	if m.stage != nil {
 		return *m.stage, true
 	}
@@ -7445,7 +7512,7 @@ func (m *TuitionPaymentMutation) StageID() (id int, exists bool) {
 // StageIDs returns the "stage" edge IDs in the mutation.
 // Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
 // StageID instead. It exists only for internal usage by the builders.
-func (m *TuitionPaymentMutation) StageIDs() (ids []int) {
+func (m *TuitionPaymentMutation) StageIDs() (ids []uuid.UUID) {
 	if id := m.stage; id != nil {
 		ids = append(ids, *id)
 	}
@@ -7722,7 +7789,7 @@ type UserMutation struct {
 	config
 	op                 Op
 	typ                string
-	id                 *int
+	id                 *uuid.UUID
 	created_at         *time.Time
 	updated_at         *time.Time
 	name               *string
@@ -7735,27 +7802,27 @@ type UserMutation struct {
 	role               *user.Role
 	status             *schema.Status
 	clearedFields      map[string]struct{}
-	stage              *int
+	stage              *uuid.UUID
 	clearedstage       bool
-	school             *int
+	school             *uuid.UUID
 	clearedschool      bool
-	classes            map[int]struct{}
-	removedclasses     map[int]struct{}
+	classes            map[uuid.UUID]struct{}
+	removedclasses     map[uuid.UUID]struct{}
 	clearedclasses     bool
-	messages           map[int]struct{}
-	removedmessages    map[int]struct{}
+	messages           map[uuid.UUID]struct{}
+	removedmessages    map[uuid.UUID]struct{}
 	clearedmessages    bool
-	submissions        map[int]struct{}
-	removedsubmissions map[int]struct{}
+	submissions        map[uuid.UUID]struct{}
+	removedsubmissions map[uuid.UUID]struct{}
 	clearedsubmissions bool
-	attendances        map[int]struct{}
-	removedattendances map[int]struct{}
+	attendances        map[uuid.UUID]struct{}
+	removedattendances map[uuid.UUID]struct{}
 	clearedattendances bool
-	payments           map[int]struct{}
-	removedpayments    map[int]struct{}
+	payments           map[uuid.UUID]struct{}
+	removedpayments    map[uuid.UUID]struct{}
 	clearedpayments    bool
-	grades             map[int]struct{}
-	removedgrades      map[int]struct{}
+	grades             map[uuid.UUID]struct{}
+	removedgrades      map[uuid.UUID]struct{}
 	clearedgrades      bool
 	done               bool
 	oldValue           func(context.Context) (*User, error)
@@ -7782,7 +7849,7 @@ func newUserMutation(c config, op Op, opts ...userOption) *UserMutation {
 }
 
 // withUserID sets the ID field of the mutation.
-func withUserID(id int) userOption {
+func withUserID(id uuid.UUID) userOption {
 	return func(m *UserMutation) {
 		var (
 			err   error
@@ -7832,9 +7899,15 @@ func (m UserMutation) Tx() (*Tx, error) {
 	return tx, nil
 }
 
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of User entities.
+func (m *UserMutation) SetID(id uuid.UUID) {
+	m.id = &id
+}
+
 // ID returns the ID value in the mutation. Note that the ID is only available
 // if it was provided to the builder or after it was returned from the database.
-func (m *UserMutation) ID() (id int, exists bool) {
+func (m *UserMutation) ID() (id uuid.UUID, exists bool) {
 	if m.id == nil {
 		return
 	}
@@ -8235,7 +8308,7 @@ func (m *UserMutation) ResetStatus() {
 }
 
 // SetStageID sets the "stage" edge to the Stage entity by id.
-func (m *UserMutation) SetStageID(id int) {
+func (m *UserMutation) SetStageID(id uuid.UUID) {
 	m.stage = &id
 }
 
@@ -8250,7 +8323,7 @@ func (m *UserMutation) StageCleared() bool {
 }
 
 // StageID returns the "stage" edge ID in the mutation.
-func (m *UserMutation) StageID() (id int, exists bool) {
+func (m *UserMutation) StageID() (id uuid.UUID, exists bool) {
 	if m.stage != nil {
 		return *m.stage, true
 	}
@@ -8260,7 +8333,7 @@ func (m *UserMutation) StageID() (id int, exists bool) {
 // StageIDs returns the "stage" edge IDs in the mutation.
 // Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
 // StageID instead. It exists only for internal usage by the builders.
-func (m *UserMutation) StageIDs() (ids []int) {
+func (m *UserMutation) StageIDs() (ids []uuid.UUID) {
 	if id := m.stage; id != nil {
 		ids = append(ids, *id)
 	}
@@ -8274,7 +8347,7 @@ func (m *UserMutation) ResetStage() {
 }
 
 // SetSchoolID sets the "school" edge to the School entity by id.
-func (m *UserMutation) SetSchoolID(id int) {
+func (m *UserMutation) SetSchoolID(id uuid.UUID) {
 	m.school = &id
 }
 
@@ -8289,7 +8362,7 @@ func (m *UserMutation) SchoolCleared() bool {
 }
 
 // SchoolID returns the "school" edge ID in the mutation.
-func (m *UserMutation) SchoolID() (id int, exists bool) {
+func (m *UserMutation) SchoolID() (id uuid.UUID, exists bool) {
 	if m.school != nil {
 		return *m.school, true
 	}
@@ -8299,7 +8372,7 @@ func (m *UserMutation) SchoolID() (id int, exists bool) {
 // SchoolIDs returns the "school" edge IDs in the mutation.
 // Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
 // SchoolID instead. It exists only for internal usage by the builders.
-func (m *UserMutation) SchoolIDs() (ids []int) {
+func (m *UserMutation) SchoolIDs() (ids []uuid.UUID) {
 	if id := m.school; id != nil {
 		ids = append(ids, *id)
 	}
@@ -8313,9 +8386,9 @@ func (m *UserMutation) ResetSchool() {
 }
 
 // AddClassIDs adds the "classes" edge to the Class entity by ids.
-func (m *UserMutation) AddClassIDs(ids ...int) {
+func (m *UserMutation) AddClassIDs(ids ...uuid.UUID) {
 	if m.classes == nil {
-		m.classes = make(map[int]struct{})
+		m.classes = make(map[uuid.UUID]struct{})
 	}
 	for i := range ids {
 		m.classes[ids[i]] = struct{}{}
@@ -8333,9 +8406,9 @@ func (m *UserMutation) ClassesCleared() bool {
 }
 
 // RemoveClassIDs removes the "classes" edge to the Class entity by IDs.
-func (m *UserMutation) RemoveClassIDs(ids ...int) {
+func (m *UserMutation) RemoveClassIDs(ids ...uuid.UUID) {
 	if m.removedclasses == nil {
-		m.removedclasses = make(map[int]struct{})
+		m.removedclasses = make(map[uuid.UUID]struct{})
 	}
 	for i := range ids {
 		delete(m.classes, ids[i])
@@ -8344,7 +8417,7 @@ func (m *UserMutation) RemoveClassIDs(ids ...int) {
 }
 
 // RemovedClasses returns the removed IDs of the "classes" edge to the Class entity.
-func (m *UserMutation) RemovedClassesIDs() (ids []int) {
+func (m *UserMutation) RemovedClassesIDs() (ids []uuid.UUID) {
 	for id := range m.removedclasses {
 		ids = append(ids, id)
 	}
@@ -8352,7 +8425,7 @@ func (m *UserMutation) RemovedClassesIDs() (ids []int) {
 }
 
 // ClassesIDs returns the "classes" edge IDs in the mutation.
-func (m *UserMutation) ClassesIDs() (ids []int) {
+func (m *UserMutation) ClassesIDs() (ids []uuid.UUID) {
 	for id := range m.classes {
 		ids = append(ids, id)
 	}
@@ -8367,9 +8440,9 @@ func (m *UserMutation) ResetClasses() {
 }
 
 // AddMessageIDs adds the "messages" edge to the Message entity by ids.
-func (m *UserMutation) AddMessageIDs(ids ...int) {
+func (m *UserMutation) AddMessageIDs(ids ...uuid.UUID) {
 	if m.messages == nil {
-		m.messages = make(map[int]struct{})
+		m.messages = make(map[uuid.UUID]struct{})
 	}
 	for i := range ids {
 		m.messages[ids[i]] = struct{}{}
@@ -8387,9 +8460,9 @@ func (m *UserMutation) MessagesCleared() bool {
 }
 
 // RemoveMessageIDs removes the "messages" edge to the Message entity by IDs.
-func (m *UserMutation) RemoveMessageIDs(ids ...int) {
+func (m *UserMutation) RemoveMessageIDs(ids ...uuid.UUID) {
 	if m.removedmessages == nil {
-		m.removedmessages = make(map[int]struct{})
+		m.removedmessages = make(map[uuid.UUID]struct{})
 	}
 	for i := range ids {
 		delete(m.messages, ids[i])
@@ -8398,7 +8471,7 @@ func (m *UserMutation) RemoveMessageIDs(ids ...int) {
 }
 
 // RemovedMessages returns the removed IDs of the "messages" edge to the Message entity.
-func (m *UserMutation) RemovedMessagesIDs() (ids []int) {
+func (m *UserMutation) RemovedMessagesIDs() (ids []uuid.UUID) {
 	for id := range m.removedmessages {
 		ids = append(ids, id)
 	}
@@ -8406,7 +8479,7 @@ func (m *UserMutation) RemovedMessagesIDs() (ids []int) {
 }
 
 // MessagesIDs returns the "messages" edge IDs in the mutation.
-func (m *UserMutation) MessagesIDs() (ids []int) {
+func (m *UserMutation) MessagesIDs() (ids []uuid.UUID) {
 	for id := range m.messages {
 		ids = append(ids, id)
 	}
@@ -8421,9 +8494,9 @@ func (m *UserMutation) ResetMessages() {
 }
 
 // AddSubmissionIDs adds the "submissions" edge to the AssignmentSubmission entity by ids.
-func (m *UserMutation) AddSubmissionIDs(ids ...int) {
+func (m *UserMutation) AddSubmissionIDs(ids ...uuid.UUID) {
 	if m.submissions == nil {
-		m.submissions = make(map[int]struct{})
+		m.submissions = make(map[uuid.UUID]struct{})
 	}
 	for i := range ids {
 		m.submissions[ids[i]] = struct{}{}
@@ -8441,9 +8514,9 @@ func (m *UserMutation) SubmissionsCleared() bool {
 }
 
 // RemoveSubmissionIDs removes the "submissions" edge to the AssignmentSubmission entity by IDs.
-func (m *UserMutation) RemoveSubmissionIDs(ids ...int) {
+func (m *UserMutation) RemoveSubmissionIDs(ids ...uuid.UUID) {
 	if m.removedsubmissions == nil {
-		m.removedsubmissions = make(map[int]struct{})
+		m.removedsubmissions = make(map[uuid.UUID]struct{})
 	}
 	for i := range ids {
 		delete(m.submissions, ids[i])
@@ -8452,7 +8525,7 @@ func (m *UserMutation) RemoveSubmissionIDs(ids ...int) {
 }
 
 // RemovedSubmissions returns the removed IDs of the "submissions" edge to the AssignmentSubmission entity.
-func (m *UserMutation) RemovedSubmissionsIDs() (ids []int) {
+func (m *UserMutation) RemovedSubmissionsIDs() (ids []uuid.UUID) {
 	for id := range m.removedsubmissions {
 		ids = append(ids, id)
 	}
@@ -8460,7 +8533,7 @@ func (m *UserMutation) RemovedSubmissionsIDs() (ids []int) {
 }
 
 // SubmissionsIDs returns the "submissions" edge IDs in the mutation.
-func (m *UserMutation) SubmissionsIDs() (ids []int) {
+func (m *UserMutation) SubmissionsIDs() (ids []uuid.UUID) {
 	for id := range m.submissions {
 		ids = append(ids, id)
 	}
@@ -8475,9 +8548,9 @@ func (m *UserMutation) ResetSubmissions() {
 }
 
 // AddAttendanceIDs adds the "attendances" edge to the Attendance entity by ids.
-func (m *UserMutation) AddAttendanceIDs(ids ...int) {
+func (m *UserMutation) AddAttendanceIDs(ids ...uuid.UUID) {
 	if m.attendances == nil {
-		m.attendances = make(map[int]struct{})
+		m.attendances = make(map[uuid.UUID]struct{})
 	}
 	for i := range ids {
 		m.attendances[ids[i]] = struct{}{}
@@ -8495,9 +8568,9 @@ func (m *UserMutation) AttendancesCleared() bool {
 }
 
 // RemoveAttendanceIDs removes the "attendances" edge to the Attendance entity by IDs.
-func (m *UserMutation) RemoveAttendanceIDs(ids ...int) {
+func (m *UserMutation) RemoveAttendanceIDs(ids ...uuid.UUID) {
 	if m.removedattendances == nil {
-		m.removedattendances = make(map[int]struct{})
+		m.removedattendances = make(map[uuid.UUID]struct{})
 	}
 	for i := range ids {
 		delete(m.attendances, ids[i])
@@ -8506,7 +8579,7 @@ func (m *UserMutation) RemoveAttendanceIDs(ids ...int) {
 }
 
 // RemovedAttendances returns the removed IDs of the "attendances" edge to the Attendance entity.
-func (m *UserMutation) RemovedAttendancesIDs() (ids []int) {
+func (m *UserMutation) RemovedAttendancesIDs() (ids []uuid.UUID) {
 	for id := range m.removedattendances {
 		ids = append(ids, id)
 	}
@@ -8514,7 +8587,7 @@ func (m *UserMutation) RemovedAttendancesIDs() (ids []int) {
 }
 
 // AttendancesIDs returns the "attendances" edge IDs in the mutation.
-func (m *UserMutation) AttendancesIDs() (ids []int) {
+func (m *UserMutation) AttendancesIDs() (ids []uuid.UUID) {
 	for id := range m.attendances {
 		ids = append(ids, id)
 	}
@@ -8529,9 +8602,9 @@ func (m *UserMutation) ResetAttendances() {
 }
 
 // AddPaymentIDs adds the "payments" edge to the TuitionPayment entity by ids.
-func (m *UserMutation) AddPaymentIDs(ids ...int) {
+func (m *UserMutation) AddPaymentIDs(ids ...uuid.UUID) {
 	if m.payments == nil {
-		m.payments = make(map[int]struct{})
+		m.payments = make(map[uuid.UUID]struct{})
 	}
 	for i := range ids {
 		m.payments[ids[i]] = struct{}{}
@@ -8549,9 +8622,9 @@ func (m *UserMutation) PaymentsCleared() bool {
 }
 
 // RemovePaymentIDs removes the "payments" edge to the TuitionPayment entity by IDs.
-func (m *UserMutation) RemovePaymentIDs(ids ...int) {
+func (m *UserMutation) RemovePaymentIDs(ids ...uuid.UUID) {
 	if m.removedpayments == nil {
-		m.removedpayments = make(map[int]struct{})
+		m.removedpayments = make(map[uuid.UUID]struct{})
 	}
 	for i := range ids {
 		delete(m.payments, ids[i])
@@ -8560,7 +8633,7 @@ func (m *UserMutation) RemovePaymentIDs(ids ...int) {
 }
 
 // RemovedPayments returns the removed IDs of the "payments" edge to the TuitionPayment entity.
-func (m *UserMutation) RemovedPaymentsIDs() (ids []int) {
+func (m *UserMutation) RemovedPaymentsIDs() (ids []uuid.UUID) {
 	for id := range m.removedpayments {
 		ids = append(ids, id)
 	}
@@ -8568,7 +8641,7 @@ func (m *UserMutation) RemovedPaymentsIDs() (ids []int) {
 }
 
 // PaymentsIDs returns the "payments" edge IDs in the mutation.
-func (m *UserMutation) PaymentsIDs() (ids []int) {
+func (m *UserMutation) PaymentsIDs() (ids []uuid.UUID) {
 	for id := range m.payments {
 		ids = append(ids, id)
 	}
@@ -8583,9 +8656,9 @@ func (m *UserMutation) ResetPayments() {
 }
 
 // AddGradeIDs adds the "grades" edge to the Grade entity by ids.
-func (m *UserMutation) AddGradeIDs(ids ...int) {
+func (m *UserMutation) AddGradeIDs(ids ...uuid.UUID) {
 	if m.grades == nil {
-		m.grades = make(map[int]struct{})
+		m.grades = make(map[uuid.UUID]struct{})
 	}
 	for i := range ids {
 		m.grades[ids[i]] = struct{}{}
@@ -8603,9 +8676,9 @@ func (m *UserMutation) GradesCleared() bool {
 }
 
 // RemoveGradeIDs removes the "grades" edge to the Grade entity by IDs.
-func (m *UserMutation) RemoveGradeIDs(ids ...int) {
+func (m *UserMutation) RemoveGradeIDs(ids ...uuid.UUID) {
 	if m.removedgrades == nil {
-		m.removedgrades = make(map[int]struct{})
+		m.removedgrades = make(map[uuid.UUID]struct{})
 	}
 	for i := range ids {
 		delete(m.grades, ids[i])
@@ -8614,7 +8687,7 @@ func (m *UserMutation) RemoveGradeIDs(ids ...int) {
 }
 
 // RemovedGrades returns the removed IDs of the "grades" edge to the Grade entity.
-func (m *UserMutation) RemovedGradesIDs() (ids []int) {
+func (m *UserMutation) RemovedGradesIDs() (ids []uuid.UUID) {
 	for id := range m.removedgrades {
 		ids = append(ids, id)
 	}
@@ -8622,7 +8695,7 @@ func (m *UserMutation) RemovedGradesIDs() (ids []int) {
 }
 
 // GradesIDs returns the "grades" edge IDs in the mutation.
-func (m *UserMutation) GradesIDs() (ids []int) {
+func (m *UserMutation) GradesIDs() (ids []uuid.UUID) {
 	for id := range m.grades {
 		ids = append(ids, id)
 	}

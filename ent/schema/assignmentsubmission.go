@@ -1,10 +1,12 @@
 package schema
 
 import (
+	"entgo.io/contrib/entgql"
 	"entgo.io/ent"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
 	"entgo.io/ent/schema/index"
+	"github.com/google/uuid"
 )
 
 // AssignmentSubmission holds the schema definition for the AssignmentSubmission entity.
@@ -15,8 +17,9 @@ type AssignmentSubmission struct {
 // Fields of the AssignmentSubmission.
 func (AssignmentSubmission) Fields() []ent.Field {
 	return []ent.Field{
+		field.UUID("id", uuid.UUID{}).Default(uuid.New),
 		field.Strings("files"),
-		field.Time("submitted_at").Optional().Nillable(),
+		field.Time("submitted_at").Optional().Nillable().Annotations(entgql.OrderField("SUBMITTED_AT")),
 	}
 }
 

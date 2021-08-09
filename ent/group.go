@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"entgo.io/ent/dialect/sql"
+	"github.com/google/uuid"
 	"github.com/msal4/hassah_school_server/ent/class"
 	"github.com/msal4/hassah_school_server/ent/group"
 	"github.com/msal4/hassah_school_server/ent/schema"
@@ -17,21 +18,21 @@ import (
 type Group struct {
 	config `json:"-"`
 	// ID of the ent.
-	ID int `json:"id,omitempty"`
+	ID uuid.UUID `json:"id,omitempty"`
 	// CreatedAt holds the value of the "created_at" field.
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// UpdatedAt holds the value of the "updated_at" field.
 	UpdatedAt time.Time `json:"updated_at,omitempty"`
 	// Name holds the value of the "name" field.
 	Name string `json:"name,omitempty"`
-	// Type holds the value of the "type" field.
-	Type group.Type `json:"type,omitempty"`
+	// GroupType holds the value of the "group_type" field.
+	GroupType group.GroupType `json:"group_type,omitempty"`
 	// Status holds the value of the "status" field.
 	Status schema.Status `json:"status,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the GroupQuery when eager-loading is set.
 	Edges       GroupEdges `json:"edges"`
-	class_group *int
+	class_group *uuid.UUID
 }
 
 // GroupEdges holds the relations/edges for other nodes in the graph.
@@ -73,14 +74,14 @@ func (*Group) scanValues(columns []string) ([]interface{}, error) {
 	values := make([]interface{}, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case group.FieldID:
-			values[i] = new(sql.NullInt64)
-		case group.FieldName, group.FieldType, group.FieldStatus:
+		case group.FieldName, group.FieldGroupType, group.FieldStatus:
 			values[i] = new(sql.NullString)
 		case group.FieldCreatedAt, group.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
+		case group.FieldID:
+			values[i] = new(uuid.UUID)
 		case group.ForeignKeys[0]: // class_group
-			values[i] = new(sql.NullInt64)
+			values[i] = &sql.NullScanner{S: new(uuid.UUID)}
 		default:
 			return nil, fmt.Errorf("unexpected column %q for type Group", columns[i])
 		}
@@ -97,11 +98,11 @@ func (gr *Group) assignValues(columns []string, values []interface{}) error {
 	for i := range columns {
 		switch columns[i] {
 		case group.FieldID:
-			value, ok := values[i].(*sql.NullInt64)
-			if !ok {
-				return fmt.Errorf("unexpected type %T for field id", value)
+			if value, ok := values[i].(*uuid.UUID); !ok {
+				return fmt.Errorf("unexpected type %T for field id", values[i])
+			} else if value != nil {
+				gr.ID = *value
 			}
-			gr.ID = int(value.Int64)
 		case group.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field created_at", values[i])
@@ -120,11 +121,11 @@ func (gr *Group) assignValues(columns []string, values []interface{}) error {
 			} else if value.Valid {
 				gr.Name = value.String
 			}
-		case group.FieldType:
+		case group.FieldGroupType:
 			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field type", values[i])
+				return fmt.Errorf("unexpected type %T for field group_type", values[i])
 			} else if value.Valid {
-				gr.Type = group.Type(value.String)
+				gr.GroupType = group.GroupType(value.String)
 			}
 		case group.FieldStatus:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -133,11 +134,11 @@ func (gr *Group) assignValues(columns []string, values []interface{}) error {
 				gr.Status = schema.Status(value.String)
 			}
 		case group.ForeignKeys[0]:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for edge-field class_group", value)
+			if value, ok := values[i].(*sql.NullScanner); !ok {
+				return fmt.Errorf("unexpected type %T for field class_group", values[i])
 			} else if value.Valid {
-				gr.class_group = new(int)
-				*gr.class_group = int(value.Int64)
+				gr.class_group = new(uuid.UUID)
+				*gr.class_group = *value.S.(*uuid.UUID)
 			}
 		}
 	}
@@ -183,8 +184,8 @@ func (gr *Group) String() string {
 	builder.WriteString(gr.UpdatedAt.Format(time.ANSIC))
 	builder.WriteString(", name=")
 	builder.WriteString(gr.Name)
-	builder.WriteString(", type=")
-	builder.WriteString(fmt.Sprintf("%v", gr.Type))
+	builder.WriteString(", group_type=")
+	builder.WriteString(fmt.Sprintf("%v", gr.GroupType))
 	builder.WriteString(", status=")
 	builder.WriteString(fmt.Sprintf("%v", gr.Status))
 	builder.WriteByte(')')

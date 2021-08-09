@@ -7,32 +7,33 @@ import (
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
+	"github.com/google/uuid"
 	"github.com/msal4/hassah_school_server/ent/predicate"
 )
 
 // ID filters vertices based on their ID field.
-func ID(id int) predicate.Grade {
+func ID(id uuid.UUID) predicate.Grade {
 	return predicate.Grade(func(s *sql.Selector) {
 		s.Where(sql.EQ(s.C(FieldID), id))
 	})
 }
 
 // IDEQ applies the EQ predicate on the ID field.
-func IDEQ(id int) predicate.Grade {
+func IDEQ(id uuid.UUID) predicate.Grade {
 	return predicate.Grade(func(s *sql.Selector) {
 		s.Where(sql.EQ(s.C(FieldID), id))
 	})
 }
 
 // IDNEQ applies the NEQ predicate on the ID field.
-func IDNEQ(id int) predicate.Grade {
+func IDNEQ(id uuid.UUID) predicate.Grade {
 	return predicate.Grade(func(s *sql.Selector) {
 		s.Where(sql.NEQ(s.C(FieldID), id))
 	})
 }
 
 // IDIn applies the In predicate on the ID field.
-func IDIn(ids ...int) predicate.Grade {
+func IDIn(ids ...uuid.UUID) predicate.Grade {
 	return predicate.Grade(func(s *sql.Selector) {
 		// if not arguments were provided, append the FALSE constants,
 		// since we can't apply "IN ()". This will make this predicate falsy.
@@ -49,7 +50,7 @@ func IDIn(ids ...int) predicate.Grade {
 }
 
 // IDNotIn applies the NotIn predicate on the ID field.
-func IDNotIn(ids ...int) predicate.Grade {
+func IDNotIn(ids ...uuid.UUID) predicate.Grade {
 	return predicate.Grade(func(s *sql.Selector) {
 		// if not arguments were provided, append the FALSE constants,
 		// since we can't apply "IN ()". This will make this predicate falsy.
@@ -66,28 +67,28 @@ func IDNotIn(ids ...int) predicate.Grade {
 }
 
 // IDGT applies the GT predicate on the ID field.
-func IDGT(id int) predicate.Grade {
+func IDGT(id uuid.UUID) predicate.Grade {
 	return predicate.Grade(func(s *sql.Selector) {
 		s.Where(sql.GT(s.C(FieldID), id))
 	})
 }
 
 // IDGTE applies the GTE predicate on the ID field.
-func IDGTE(id int) predicate.Grade {
+func IDGTE(id uuid.UUID) predicate.Grade {
 	return predicate.Grade(func(s *sql.Selector) {
 		s.Where(sql.GTE(s.C(FieldID), id))
 	})
 }
 
 // IDLT applies the LT predicate on the ID field.
-func IDLT(id int) predicate.Grade {
+func IDLT(id uuid.UUID) predicate.Grade {
 	return predicate.Grade(func(s *sql.Selector) {
 		s.Where(sql.LT(s.C(FieldID), id))
 	})
 }
 
 // IDLTE applies the LTE predicate on the ID field.
-func IDLTE(id int) predicate.Grade {
+func IDLTE(id uuid.UUID) predicate.Grade {
 	return predicate.Grade(func(s *sql.Selector) {
 		s.Where(sql.LTE(s.C(FieldID), id))
 	})
@@ -108,7 +109,7 @@ func UpdatedAt(v time.Time) predicate.Grade {
 }
 
 // ExamGrade applies equality check predicate on the "exam_grade" field. It's identical to ExamGradeEQ.
-func ExamGrade(v float64) predicate.Grade {
+func ExamGrade(v int) predicate.Grade {
 	return predicate.Grade(func(s *sql.Selector) {
 		s.Where(sql.EQ(s.C(FieldExamGrade), v))
 	})
@@ -267,21 +268,21 @@ func UpdatedAtLTE(v time.Time) predicate.Grade {
 }
 
 // ExamGradeEQ applies the EQ predicate on the "exam_grade" field.
-func ExamGradeEQ(v float64) predicate.Grade {
+func ExamGradeEQ(v int) predicate.Grade {
 	return predicate.Grade(func(s *sql.Selector) {
 		s.Where(sql.EQ(s.C(FieldExamGrade), v))
 	})
 }
 
 // ExamGradeNEQ applies the NEQ predicate on the "exam_grade" field.
-func ExamGradeNEQ(v float64) predicate.Grade {
+func ExamGradeNEQ(v int) predicate.Grade {
 	return predicate.Grade(func(s *sql.Selector) {
 		s.Where(sql.NEQ(s.C(FieldExamGrade), v))
 	})
 }
 
 // ExamGradeIn applies the In predicate on the "exam_grade" field.
-func ExamGradeIn(vs ...float64) predicate.Grade {
+func ExamGradeIn(vs ...int) predicate.Grade {
 	v := make([]interface{}, len(vs))
 	for i := range v {
 		v[i] = vs[i]
@@ -298,7 +299,7 @@ func ExamGradeIn(vs ...float64) predicate.Grade {
 }
 
 // ExamGradeNotIn applies the NotIn predicate on the "exam_grade" field.
-func ExamGradeNotIn(vs ...float64) predicate.Grade {
+func ExamGradeNotIn(vs ...int) predicate.Grade {
 	v := make([]interface{}, len(vs))
 	for i := range v {
 		v[i] = vs[i]
@@ -315,28 +316,28 @@ func ExamGradeNotIn(vs ...float64) predicate.Grade {
 }
 
 // ExamGradeGT applies the GT predicate on the "exam_grade" field.
-func ExamGradeGT(v float64) predicate.Grade {
+func ExamGradeGT(v int) predicate.Grade {
 	return predicate.Grade(func(s *sql.Selector) {
 		s.Where(sql.GT(s.C(FieldExamGrade), v))
 	})
 }
 
 // ExamGradeGTE applies the GTE predicate on the "exam_grade" field.
-func ExamGradeGTE(v float64) predicate.Grade {
+func ExamGradeGTE(v int) predicate.Grade {
 	return predicate.Grade(func(s *sql.Selector) {
 		s.Where(sql.GTE(s.C(FieldExamGrade), v))
 	})
 }
 
 // ExamGradeLT applies the LT predicate on the "exam_grade" field.
-func ExamGradeLT(v float64) predicate.Grade {
+func ExamGradeLT(v int) predicate.Grade {
 	return predicate.Grade(func(s *sql.Selector) {
 		s.Where(sql.LT(s.C(FieldExamGrade), v))
 	})
 }
 
 // ExamGradeLTE applies the LTE predicate on the "exam_grade" field.
-func ExamGradeLTE(v float64) predicate.Grade {
+func ExamGradeLTE(v int) predicate.Grade {
 	return predicate.Grade(func(s *sql.Selector) {
 		s.Where(sql.LTE(s.C(FieldExamGrade), v))
 	})

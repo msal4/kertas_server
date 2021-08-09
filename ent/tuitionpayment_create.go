@@ -10,6 +10,7 @@ import (
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/google/uuid"
 	"github.com/msal4/hassah_school_server/ent/stage"
 	"github.com/msal4/hassah_school_server/ent/tuitionpayment"
 	"github.com/msal4/hassah_school_server/ent/user"
@@ -56,8 +57,14 @@ func (tpc *TuitionPaymentCreate) SetPaidAmount(i int) *TuitionPaymentCreate {
 	return tpc
 }
 
+// SetID sets the "id" field.
+func (tpc *TuitionPaymentCreate) SetID(u uuid.UUID) *TuitionPaymentCreate {
+	tpc.mutation.SetID(u)
+	return tpc
+}
+
 // SetStudentID sets the "student" edge to the User entity by ID.
-func (tpc *TuitionPaymentCreate) SetStudentID(id int) *TuitionPaymentCreate {
+func (tpc *TuitionPaymentCreate) SetStudentID(id uuid.UUID) *TuitionPaymentCreate {
 	tpc.mutation.SetStudentID(id)
 	return tpc
 }
@@ -68,7 +75,7 @@ func (tpc *TuitionPaymentCreate) SetStudent(u *User) *TuitionPaymentCreate {
 }
 
 // SetStageID sets the "stage" edge to the Stage entity by ID.
-func (tpc *TuitionPaymentCreate) SetStageID(id int) *TuitionPaymentCreate {
+func (tpc *TuitionPaymentCreate) SetStageID(id uuid.UUID) *TuitionPaymentCreate {
 	tpc.mutation.SetStageID(id)
 	return tpc
 }
@@ -157,6 +164,10 @@ func (tpc *TuitionPaymentCreate) defaults() {
 		v := tuitionpayment.DefaultUpdatedAt()
 		tpc.mutation.SetUpdatedAt(v)
 	}
+	if _, ok := tpc.mutation.ID(); !ok {
+		v := tuitionpayment.DefaultID()
+		tpc.mutation.SetID(v)
+	}
 }
 
 // check runs all checks and user-defined validators on the builder.
@@ -187,8 +198,6 @@ func (tpc *TuitionPaymentCreate) sqlSave(ctx context.Context) (*TuitionPayment, 
 		}
 		return nil, err
 	}
-	id := _spec.ID.Value.(int64)
-	_node.ID = int(id)
 	return _node, nil
 }
 
@@ -198,11 +207,15 @@ func (tpc *TuitionPaymentCreate) createSpec() (*TuitionPayment, *sqlgraph.Create
 		_spec = &sqlgraph.CreateSpec{
 			Table: tuitionpayment.Table,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeUUID,
 				Column: tuitionpayment.FieldID,
 			},
 		}
 	)
+	if id, ok := tpc.mutation.ID(); ok {
+		_node.ID = id
+		_spec.ID.Value = id
+	}
 	if value, ok := tpc.mutation.CreatedAt(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
 			Type:   field.TypeTime,
@@ -236,7 +249,7 @@ func (tpc *TuitionPaymentCreate) createSpec() (*TuitionPayment, *sqlgraph.Create
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: user.FieldID,
 				},
 			},
@@ -256,7 +269,7 @@ func (tpc *TuitionPaymentCreate) createSpec() (*TuitionPayment, *sqlgraph.Create
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: stage.FieldID,
 				},
 			},
@@ -312,10 +325,6 @@ func (tpcb *TuitionPaymentCreateBulk) Save(ctx context.Context) ([]*TuitionPayme
 				}
 				mutation.id = &nodes[i].ID
 				mutation.done = true
-				if specs[i].ID.Value != nil {
-					id := specs[i].ID.Value.(int64)
-					nodes[i].ID = int(id)
-				}
 				return nodes[i], nil
 			})
 			for i := len(builder.hooks) - 1; i >= 0; i-- {

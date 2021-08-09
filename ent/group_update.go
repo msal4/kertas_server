@@ -9,6 +9,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/google/uuid"
 	"github.com/msal4/hassah_school_server/ent/class"
 	"github.com/msal4/hassah_school_server/ent/group"
 	"github.com/msal4/hassah_school_server/ent/message"
@@ -49,16 +50,16 @@ func (gu *GroupUpdate) ClearName() *GroupUpdate {
 	return gu
 }
 
-// SetType sets the "type" field.
-func (gu *GroupUpdate) SetType(gr group.Type) *GroupUpdate {
-	gu.mutation.SetType(gr)
+// SetGroupType sets the "group_type" field.
+func (gu *GroupUpdate) SetGroupType(gt group.GroupType) *GroupUpdate {
+	gu.mutation.SetGroupType(gt)
 	return gu
 }
 
-// SetNillableType sets the "type" field if the given value is not nil.
-func (gu *GroupUpdate) SetNillableType(gr *group.Type) *GroupUpdate {
-	if gr != nil {
-		gu.SetType(*gr)
+// SetNillableGroupType sets the "group_type" field if the given value is not nil.
+func (gu *GroupUpdate) SetNillableGroupType(gt *group.GroupType) *GroupUpdate {
+	if gt != nil {
+		gu.SetGroupType(*gt)
 	}
 	return gu
 }
@@ -78,13 +79,13 @@ func (gu *GroupUpdate) SetNillableStatus(s *schema.Status) *GroupUpdate {
 }
 
 // SetClassID sets the "class" edge to the Class entity by ID.
-func (gu *GroupUpdate) SetClassID(id int) *GroupUpdate {
+func (gu *GroupUpdate) SetClassID(id uuid.UUID) *GroupUpdate {
 	gu.mutation.SetClassID(id)
 	return gu
 }
 
 // SetNillableClassID sets the "class" edge to the Class entity by ID if the given value is not nil.
-func (gu *GroupUpdate) SetNillableClassID(id *int) *GroupUpdate {
+func (gu *GroupUpdate) SetNillableClassID(id *uuid.UUID) *GroupUpdate {
 	if id != nil {
 		gu = gu.SetClassID(*id)
 	}
@@ -97,14 +98,14 @@ func (gu *GroupUpdate) SetClass(c *Class) *GroupUpdate {
 }
 
 // AddMessageIDs adds the "messages" edge to the Message entity by IDs.
-func (gu *GroupUpdate) AddMessageIDs(ids ...int) *GroupUpdate {
+func (gu *GroupUpdate) AddMessageIDs(ids ...uuid.UUID) *GroupUpdate {
 	gu.mutation.AddMessageIDs(ids...)
 	return gu
 }
 
 // AddMessages adds the "messages" edges to the Message entity.
 func (gu *GroupUpdate) AddMessages(m ...*Message) *GroupUpdate {
-	ids := make([]int, len(m))
+	ids := make([]uuid.UUID, len(m))
 	for i := range m {
 		ids[i] = m[i].ID
 	}
@@ -129,14 +130,14 @@ func (gu *GroupUpdate) ClearMessages() *GroupUpdate {
 }
 
 // RemoveMessageIDs removes the "messages" edge to Message entities by IDs.
-func (gu *GroupUpdate) RemoveMessageIDs(ids ...int) *GroupUpdate {
+func (gu *GroupUpdate) RemoveMessageIDs(ids ...uuid.UUID) *GroupUpdate {
 	gu.mutation.RemoveMessageIDs(ids...)
 	return gu
 }
 
 // RemoveMessages removes "messages" edges to Message entities.
 func (gu *GroupUpdate) RemoveMessages(m ...*Message) *GroupUpdate {
-	ids := make([]int, len(m))
+	ids := make([]uuid.UUID, len(m))
 	for i := range m {
 		ids[i] = m[i].ID
 	}
@@ -214,9 +215,9 @@ func (gu *GroupUpdate) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (gu *GroupUpdate) check() error {
-	if v, ok := gu.mutation.GetType(); ok {
-		if err := group.TypeValidator(v); err != nil {
-			return &ValidationError{Name: "type", err: fmt.Errorf("ent: validator failed for field \"type\": %w", err)}
+	if v, ok := gu.mutation.GroupType(); ok {
+		if err := group.GroupTypeValidator(v); err != nil {
+			return &ValidationError{Name: "group_type", err: fmt.Errorf("ent: validator failed for field \"group_type\": %w", err)}
 		}
 	}
 	if v, ok := gu.mutation.Status(); ok {
@@ -233,7 +234,7 @@ func (gu *GroupUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Table:   group.Table,
 			Columns: group.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeUUID,
 				Column: group.FieldID,
 			},
 		},
@@ -265,11 +266,11 @@ func (gu *GroupUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Column: group.FieldName,
 		})
 	}
-	if value, ok := gu.mutation.GetType(); ok {
+	if value, ok := gu.mutation.GroupType(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeEnum,
 			Value:  value,
-			Column: group.FieldType,
+			Column: group.FieldGroupType,
 		})
 	}
 	if value, ok := gu.mutation.Status(); ok {
@@ -288,7 +289,7 @@ func (gu *GroupUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: class.FieldID,
 				},
 			},
@@ -304,7 +305,7 @@ func (gu *GroupUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: class.FieldID,
 				},
 			},
@@ -323,7 +324,7 @@ func (gu *GroupUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: message.FieldID,
 				},
 			},
@@ -339,7 +340,7 @@ func (gu *GroupUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: message.FieldID,
 				},
 			},
@@ -358,7 +359,7 @@ func (gu *GroupUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: message.FieldID,
 				},
 			},
@@ -407,16 +408,16 @@ func (guo *GroupUpdateOne) ClearName() *GroupUpdateOne {
 	return guo
 }
 
-// SetType sets the "type" field.
-func (guo *GroupUpdateOne) SetType(gr group.Type) *GroupUpdateOne {
-	guo.mutation.SetType(gr)
+// SetGroupType sets the "group_type" field.
+func (guo *GroupUpdateOne) SetGroupType(gt group.GroupType) *GroupUpdateOne {
+	guo.mutation.SetGroupType(gt)
 	return guo
 }
 
-// SetNillableType sets the "type" field if the given value is not nil.
-func (guo *GroupUpdateOne) SetNillableType(gr *group.Type) *GroupUpdateOne {
-	if gr != nil {
-		guo.SetType(*gr)
+// SetNillableGroupType sets the "group_type" field if the given value is not nil.
+func (guo *GroupUpdateOne) SetNillableGroupType(gt *group.GroupType) *GroupUpdateOne {
+	if gt != nil {
+		guo.SetGroupType(*gt)
 	}
 	return guo
 }
@@ -436,13 +437,13 @@ func (guo *GroupUpdateOne) SetNillableStatus(s *schema.Status) *GroupUpdateOne {
 }
 
 // SetClassID sets the "class" edge to the Class entity by ID.
-func (guo *GroupUpdateOne) SetClassID(id int) *GroupUpdateOne {
+func (guo *GroupUpdateOne) SetClassID(id uuid.UUID) *GroupUpdateOne {
 	guo.mutation.SetClassID(id)
 	return guo
 }
 
 // SetNillableClassID sets the "class" edge to the Class entity by ID if the given value is not nil.
-func (guo *GroupUpdateOne) SetNillableClassID(id *int) *GroupUpdateOne {
+func (guo *GroupUpdateOne) SetNillableClassID(id *uuid.UUID) *GroupUpdateOne {
 	if id != nil {
 		guo = guo.SetClassID(*id)
 	}
@@ -455,14 +456,14 @@ func (guo *GroupUpdateOne) SetClass(c *Class) *GroupUpdateOne {
 }
 
 // AddMessageIDs adds the "messages" edge to the Message entity by IDs.
-func (guo *GroupUpdateOne) AddMessageIDs(ids ...int) *GroupUpdateOne {
+func (guo *GroupUpdateOne) AddMessageIDs(ids ...uuid.UUID) *GroupUpdateOne {
 	guo.mutation.AddMessageIDs(ids...)
 	return guo
 }
 
 // AddMessages adds the "messages" edges to the Message entity.
 func (guo *GroupUpdateOne) AddMessages(m ...*Message) *GroupUpdateOne {
-	ids := make([]int, len(m))
+	ids := make([]uuid.UUID, len(m))
 	for i := range m {
 		ids[i] = m[i].ID
 	}
@@ -487,14 +488,14 @@ func (guo *GroupUpdateOne) ClearMessages() *GroupUpdateOne {
 }
 
 // RemoveMessageIDs removes the "messages" edge to Message entities by IDs.
-func (guo *GroupUpdateOne) RemoveMessageIDs(ids ...int) *GroupUpdateOne {
+func (guo *GroupUpdateOne) RemoveMessageIDs(ids ...uuid.UUID) *GroupUpdateOne {
 	guo.mutation.RemoveMessageIDs(ids...)
 	return guo
 }
 
 // RemoveMessages removes "messages" edges to Message entities.
 func (guo *GroupUpdateOne) RemoveMessages(m ...*Message) *GroupUpdateOne {
-	ids := make([]int, len(m))
+	ids := make([]uuid.UUID, len(m))
 	for i := range m {
 		ids[i] = m[i].ID
 	}
@@ -579,9 +580,9 @@ func (guo *GroupUpdateOne) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (guo *GroupUpdateOne) check() error {
-	if v, ok := guo.mutation.GetType(); ok {
-		if err := group.TypeValidator(v); err != nil {
-			return &ValidationError{Name: "type", err: fmt.Errorf("ent: validator failed for field \"type\": %w", err)}
+	if v, ok := guo.mutation.GroupType(); ok {
+		if err := group.GroupTypeValidator(v); err != nil {
+			return &ValidationError{Name: "group_type", err: fmt.Errorf("ent: validator failed for field \"group_type\": %w", err)}
 		}
 	}
 	if v, ok := guo.mutation.Status(); ok {
@@ -598,7 +599,7 @@ func (guo *GroupUpdateOne) sqlSave(ctx context.Context) (_node *Group, err error
 			Table:   group.Table,
 			Columns: group.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeUUID,
 				Column: group.FieldID,
 			},
 		},
@@ -647,11 +648,11 @@ func (guo *GroupUpdateOne) sqlSave(ctx context.Context) (_node *Group, err error
 			Column: group.FieldName,
 		})
 	}
-	if value, ok := guo.mutation.GetType(); ok {
+	if value, ok := guo.mutation.GroupType(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeEnum,
 			Value:  value,
-			Column: group.FieldType,
+			Column: group.FieldGroupType,
 		})
 	}
 	if value, ok := guo.mutation.Status(); ok {
@@ -670,7 +671,7 @@ func (guo *GroupUpdateOne) sqlSave(ctx context.Context) (_node *Group, err error
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: class.FieldID,
 				},
 			},
@@ -686,7 +687,7 @@ func (guo *GroupUpdateOne) sqlSave(ctx context.Context) (_node *Group, err error
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: class.FieldID,
 				},
 			},
@@ -705,7 +706,7 @@ func (guo *GroupUpdateOne) sqlSave(ctx context.Context) (_node *Group, err error
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: message.FieldID,
 				},
 			},
@@ -721,7 +722,7 @@ func (guo *GroupUpdateOne) sqlSave(ctx context.Context) (_node *Group, err error
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: message.FieldID,
 				},
 			},
@@ -740,7 +741,7 @@ func (guo *GroupUpdateOne) sqlSave(ctx context.Context) (_node *Group, err error
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: message.FieldID,
 				},
 			},

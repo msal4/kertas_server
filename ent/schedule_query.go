@@ -11,6 +11,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/google/uuid"
 	"github.com/msal4/hassah_school_server/ent/class"
 	"github.com/msal4/hassah_school_server/ent/predicate"
 	"github.com/msal4/hassah_school_server/ent/schedule"
@@ -110,8 +111,8 @@ func (sq *ScheduleQuery) FirstX(ctx context.Context) *Schedule {
 
 // FirstID returns the first Schedule ID from the query.
 // Returns a *NotFoundError when no Schedule ID was found.
-func (sq *ScheduleQuery) FirstID(ctx context.Context) (id int, err error) {
-	var ids []int
+func (sq *ScheduleQuery) FirstID(ctx context.Context) (id uuid.UUID, err error) {
+	var ids []uuid.UUID
 	if ids, err = sq.Limit(1).IDs(ctx); err != nil {
 		return
 	}
@@ -123,7 +124,7 @@ func (sq *ScheduleQuery) FirstID(ctx context.Context) (id int, err error) {
 }
 
 // FirstIDX is like FirstID, but panics if an error occurs.
-func (sq *ScheduleQuery) FirstIDX(ctx context.Context) int {
+func (sq *ScheduleQuery) FirstIDX(ctx context.Context) uuid.UUID {
 	id, err := sq.FirstID(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
@@ -161,8 +162,8 @@ func (sq *ScheduleQuery) OnlyX(ctx context.Context) *Schedule {
 // OnlyID is like Only, but returns the only Schedule ID in the query.
 // Returns a *NotSingularError when exactly one Schedule ID is not found.
 // Returns a *NotFoundError when no entities are found.
-func (sq *ScheduleQuery) OnlyID(ctx context.Context) (id int, err error) {
-	var ids []int
+func (sq *ScheduleQuery) OnlyID(ctx context.Context) (id uuid.UUID, err error) {
+	var ids []uuid.UUID
 	if ids, err = sq.Limit(2).IDs(ctx); err != nil {
 		return
 	}
@@ -178,7 +179,7 @@ func (sq *ScheduleQuery) OnlyID(ctx context.Context) (id int, err error) {
 }
 
 // OnlyIDX is like OnlyID, but panics if an error occurs.
-func (sq *ScheduleQuery) OnlyIDX(ctx context.Context) int {
+func (sq *ScheduleQuery) OnlyIDX(ctx context.Context) uuid.UUID {
 	id, err := sq.OnlyID(ctx)
 	if err != nil {
 		panic(err)
@@ -204,8 +205,8 @@ func (sq *ScheduleQuery) AllX(ctx context.Context) []*Schedule {
 }
 
 // IDs executes the query and returns a list of Schedule IDs.
-func (sq *ScheduleQuery) IDs(ctx context.Context) ([]int, error) {
-	var ids []int
+func (sq *ScheduleQuery) IDs(ctx context.Context) ([]uuid.UUID, error) {
+	var ids []uuid.UUID
 	if err := sq.Select(schedule.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
@@ -213,7 +214,7 @@ func (sq *ScheduleQuery) IDs(ctx context.Context) ([]int, error) {
 }
 
 // IDsX is like IDs, but panics if an error occurs.
-func (sq *ScheduleQuery) IDsX(ctx context.Context) []int {
+func (sq *ScheduleQuery) IDsX(ctx context.Context) []uuid.UUID {
 	ids, err := sq.IDs(ctx)
 	if err != nil {
 		panic(err)
@@ -291,7 +292,7 @@ func (sq *ScheduleQuery) WithClass(opts ...func(*ClassQuery)) *ScheduleQuery {
 // Example:
 //
 //	var v []struct {
-//		Weekday uint8 `json:"weekday,omitempty"`
+//		Weekday int `json:"weekday,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
@@ -318,7 +319,7 @@ func (sq *ScheduleQuery) GroupBy(field string, fields ...string) *ScheduleGroupB
 // Example:
 //
 //	var v []struct {
-//		Weekday uint8 `json:"weekday,omitempty"`
+//		Weekday int `json:"weekday,omitempty"`
 //	}
 //
 //	client.Schedule.Query().
@@ -382,8 +383,8 @@ func (sq *ScheduleQuery) sqlAll(ctx context.Context) ([]*Schedule, error) {
 	}
 
 	if query := sq.withClass; query != nil {
-		ids := make([]int, 0, len(nodes))
-		nodeids := make(map[int][]*Schedule)
+		ids := make([]uuid.UUID, 0, len(nodes))
+		nodeids := make(map[uuid.UUID][]*Schedule)
 		for i := range nodes {
 			if nodes[i].class_schedules == nil {
 				continue
@@ -432,7 +433,7 @@ func (sq *ScheduleQuery) querySpec() *sqlgraph.QuerySpec {
 			Table:   schedule.Table,
 			Columns: schedule.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeUUID,
 				Column: schedule.FieldID,
 			},
 		},

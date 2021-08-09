@@ -11,6 +11,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/google/uuid"
 	"github.com/msal4/hassah_school_server/ent/assignment"
 	"github.com/msal4/hassah_school_server/ent/assignmentsubmission"
 	"github.com/msal4/hassah_school_server/ent/class"
@@ -125,7 +126,7 @@ func (au *AssignmentUpdate) ClearDeletedAt() *AssignmentUpdate {
 }
 
 // SetClassID sets the "class" edge to the Class entity by ID.
-func (au *AssignmentUpdate) SetClassID(id int) *AssignmentUpdate {
+func (au *AssignmentUpdate) SetClassID(id uuid.UUID) *AssignmentUpdate {
 	au.mutation.SetClassID(id)
 	return au
 }
@@ -136,14 +137,14 @@ func (au *AssignmentUpdate) SetClass(c *Class) *AssignmentUpdate {
 }
 
 // AddSubmissionIDs adds the "submissions" edge to the AssignmentSubmission entity by IDs.
-func (au *AssignmentUpdate) AddSubmissionIDs(ids ...int) *AssignmentUpdate {
+func (au *AssignmentUpdate) AddSubmissionIDs(ids ...uuid.UUID) *AssignmentUpdate {
 	au.mutation.AddSubmissionIDs(ids...)
 	return au
 }
 
 // AddSubmissions adds the "submissions" edges to the AssignmentSubmission entity.
 func (au *AssignmentUpdate) AddSubmissions(a ...*AssignmentSubmission) *AssignmentUpdate {
-	ids := make([]int, len(a))
+	ids := make([]uuid.UUID, len(a))
 	for i := range a {
 		ids[i] = a[i].ID
 	}
@@ -151,14 +152,14 @@ func (au *AssignmentUpdate) AddSubmissions(a ...*AssignmentSubmission) *Assignme
 }
 
 // AddGradeIDs adds the "grades" edge to the Grade entity by IDs.
-func (au *AssignmentUpdate) AddGradeIDs(ids ...int) *AssignmentUpdate {
+func (au *AssignmentUpdate) AddGradeIDs(ids ...uuid.UUID) *AssignmentUpdate {
 	au.mutation.AddGradeIDs(ids...)
 	return au
 }
 
 // AddGrades adds the "grades" edges to the Grade entity.
 func (au *AssignmentUpdate) AddGrades(g ...*Grade) *AssignmentUpdate {
-	ids := make([]int, len(g))
+	ids := make([]uuid.UUID, len(g))
 	for i := range g {
 		ids[i] = g[i].ID
 	}
@@ -183,14 +184,14 @@ func (au *AssignmentUpdate) ClearSubmissions() *AssignmentUpdate {
 }
 
 // RemoveSubmissionIDs removes the "submissions" edge to AssignmentSubmission entities by IDs.
-func (au *AssignmentUpdate) RemoveSubmissionIDs(ids ...int) *AssignmentUpdate {
+func (au *AssignmentUpdate) RemoveSubmissionIDs(ids ...uuid.UUID) *AssignmentUpdate {
 	au.mutation.RemoveSubmissionIDs(ids...)
 	return au
 }
 
 // RemoveSubmissions removes "submissions" edges to AssignmentSubmission entities.
 func (au *AssignmentUpdate) RemoveSubmissions(a ...*AssignmentSubmission) *AssignmentUpdate {
-	ids := make([]int, len(a))
+	ids := make([]uuid.UUID, len(a))
 	for i := range a {
 		ids[i] = a[i].ID
 	}
@@ -204,14 +205,14 @@ func (au *AssignmentUpdate) ClearGrades() *AssignmentUpdate {
 }
 
 // RemoveGradeIDs removes the "grades" edge to Grade entities by IDs.
-func (au *AssignmentUpdate) RemoveGradeIDs(ids ...int) *AssignmentUpdate {
+func (au *AssignmentUpdate) RemoveGradeIDs(ids ...uuid.UUID) *AssignmentUpdate {
 	au.mutation.RemoveGradeIDs(ids...)
 	return au
 }
 
 // RemoveGrades removes "grades" edges to Grade entities.
 func (au *AssignmentUpdate) RemoveGrades(g ...*Grade) *AssignmentUpdate {
-	ids := make([]int, len(g))
+	ids := make([]uuid.UUID, len(g))
 	for i := range g {
 		ids[i] = g[i].ID
 	}
@@ -306,7 +307,7 @@ func (au *AssignmentUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Table:   assignment.Table,
 			Columns: assignment.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeUUID,
 				Column: assignment.FieldID,
 			},
 		},
@@ -401,7 +402,7 @@ func (au *AssignmentUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: class.FieldID,
 				},
 			},
@@ -417,7 +418,7 @@ func (au *AssignmentUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: class.FieldID,
 				},
 			},
@@ -436,7 +437,7 @@ func (au *AssignmentUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: assignmentsubmission.FieldID,
 				},
 			},
@@ -452,7 +453,7 @@ func (au *AssignmentUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: assignmentsubmission.FieldID,
 				},
 			},
@@ -471,7 +472,7 @@ func (au *AssignmentUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: assignmentsubmission.FieldID,
 				},
 			},
@@ -490,7 +491,7 @@ func (au *AssignmentUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: grade.FieldID,
 				},
 			},
@@ -506,7 +507,7 @@ func (au *AssignmentUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: grade.FieldID,
 				},
 			},
@@ -525,7 +526,7 @@ func (au *AssignmentUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: grade.FieldID,
 				},
 			},
@@ -648,7 +649,7 @@ func (auo *AssignmentUpdateOne) ClearDeletedAt() *AssignmentUpdateOne {
 }
 
 // SetClassID sets the "class" edge to the Class entity by ID.
-func (auo *AssignmentUpdateOne) SetClassID(id int) *AssignmentUpdateOne {
+func (auo *AssignmentUpdateOne) SetClassID(id uuid.UUID) *AssignmentUpdateOne {
 	auo.mutation.SetClassID(id)
 	return auo
 }
@@ -659,14 +660,14 @@ func (auo *AssignmentUpdateOne) SetClass(c *Class) *AssignmentUpdateOne {
 }
 
 // AddSubmissionIDs adds the "submissions" edge to the AssignmentSubmission entity by IDs.
-func (auo *AssignmentUpdateOne) AddSubmissionIDs(ids ...int) *AssignmentUpdateOne {
+func (auo *AssignmentUpdateOne) AddSubmissionIDs(ids ...uuid.UUID) *AssignmentUpdateOne {
 	auo.mutation.AddSubmissionIDs(ids...)
 	return auo
 }
 
 // AddSubmissions adds the "submissions" edges to the AssignmentSubmission entity.
 func (auo *AssignmentUpdateOne) AddSubmissions(a ...*AssignmentSubmission) *AssignmentUpdateOne {
-	ids := make([]int, len(a))
+	ids := make([]uuid.UUID, len(a))
 	for i := range a {
 		ids[i] = a[i].ID
 	}
@@ -674,14 +675,14 @@ func (auo *AssignmentUpdateOne) AddSubmissions(a ...*AssignmentSubmission) *Assi
 }
 
 // AddGradeIDs adds the "grades" edge to the Grade entity by IDs.
-func (auo *AssignmentUpdateOne) AddGradeIDs(ids ...int) *AssignmentUpdateOne {
+func (auo *AssignmentUpdateOne) AddGradeIDs(ids ...uuid.UUID) *AssignmentUpdateOne {
 	auo.mutation.AddGradeIDs(ids...)
 	return auo
 }
 
 // AddGrades adds the "grades" edges to the Grade entity.
 func (auo *AssignmentUpdateOne) AddGrades(g ...*Grade) *AssignmentUpdateOne {
-	ids := make([]int, len(g))
+	ids := make([]uuid.UUID, len(g))
 	for i := range g {
 		ids[i] = g[i].ID
 	}
@@ -706,14 +707,14 @@ func (auo *AssignmentUpdateOne) ClearSubmissions() *AssignmentUpdateOne {
 }
 
 // RemoveSubmissionIDs removes the "submissions" edge to AssignmentSubmission entities by IDs.
-func (auo *AssignmentUpdateOne) RemoveSubmissionIDs(ids ...int) *AssignmentUpdateOne {
+func (auo *AssignmentUpdateOne) RemoveSubmissionIDs(ids ...uuid.UUID) *AssignmentUpdateOne {
 	auo.mutation.RemoveSubmissionIDs(ids...)
 	return auo
 }
 
 // RemoveSubmissions removes "submissions" edges to AssignmentSubmission entities.
 func (auo *AssignmentUpdateOne) RemoveSubmissions(a ...*AssignmentSubmission) *AssignmentUpdateOne {
-	ids := make([]int, len(a))
+	ids := make([]uuid.UUID, len(a))
 	for i := range a {
 		ids[i] = a[i].ID
 	}
@@ -727,14 +728,14 @@ func (auo *AssignmentUpdateOne) ClearGrades() *AssignmentUpdateOne {
 }
 
 // RemoveGradeIDs removes the "grades" edge to Grade entities by IDs.
-func (auo *AssignmentUpdateOne) RemoveGradeIDs(ids ...int) *AssignmentUpdateOne {
+func (auo *AssignmentUpdateOne) RemoveGradeIDs(ids ...uuid.UUID) *AssignmentUpdateOne {
 	auo.mutation.RemoveGradeIDs(ids...)
 	return auo
 }
 
 // RemoveGrades removes "grades" edges to Grade entities.
 func (auo *AssignmentUpdateOne) RemoveGrades(g ...*Grade) *AssignmentUpdateOne {
-	ids := make([]int, len(g))
+	ids := make([]uuid.UUID, len(g))
 	for i := range g {
 		ids[i] = g[i].ID
 	}
@@ -836,7 +837,7 @@ func (auo *AssignmentUpdateOne) sqlSave(ctx context.Context) (_node *Assignment,
 			Table:   assignment.Table,
 			Columns: assignment.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeUUID,
 				Column: assignment.FieldID,
 			},
 		},
@@ -948,7 +949,7 @@ func (auo *AssignmentUpdateOne) sqlSave(ctx context.Context) (_node *Assignment,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: class.FieldID,
 				},
 			},
@@ -964,7 +965,7 @@ func (auo *AssignmentUpdateOne) sqlSave(ctx context.Context) (_node *Assignment,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: class.FieldID,
 				},
 			},
@@ -983,7 +984,7 @@ func (auo *AssignmentUpdateOne) sqlSave(ctx context.Context) (_node *Assignment,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: assignmentsubmission.FieldID,
 				},
 			},
@@ -999,7 +1000,7 @@ func (auo *AssignmentUpdateOne) sqlSave(ctx context.Context) (_node *Assignment,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: assignmentsubmission.FieldID,
 				},
 			},
@@ -1018,7 +1019,7 @@ func (auo *AssignmentUpdateOne) sqlSave(ctx context.Context) (_node *Assignment,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: assignmentsubmission.FieldID,
 				},
 			},
@@ -1037,7 +1038,7 @@ func (auo *AssignmentUpdateOne) sqlSave(ctx context.Context) (_node *Assignment,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: grade.FieldID,
 				},
 			},
@@ -1053,7 +1054,7 @@ func (auo *AssignmentUpdateOne) sqlSave(ctx context.Context) (_node *Assignment,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: grade.FieldID,
 				},
 			},
@@ -1072,7 +1073,7 @@ func (auo *AssignmentUpdateOne) sqlSave(ctx context.Context) (_node *Assignment,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: grade.FieldID,
 				},
 			},

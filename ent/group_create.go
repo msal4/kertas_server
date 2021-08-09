@@ -10,6 +10,7 @@ import (
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/google/uuid"
 	"github.com/msal4/hassah_school_server/ent/class"
 	"github.com/msal4/hassah_school_server/ent/group"
 	"github.com/msal4/hassah_school_server/ent/message"
@@ -65,16 +66,16 @@ func (gc *GroupCreate) SetNillableName(s *string) *GroupCreate {
 	return gc
 }
 
-// SetType sets the "type" field.
-func (gc *GroupCreate) SetType(gr group.Type) *GroupCreate {
-	gc.mutation.SetType(gr)
+// SetGroupType sets the "group_type" field.
+func (gc *GroupCreate) SetGroupType(gt group.GroupType) *GroupCreate {
+	gc.mutation.SetGroupType(gt)
 	return gc
 }
 
-// SetNillableType sets the "type" field if the given value is not nil.
-func (gc *GroupCreate) SetNillableType(gr *group.Type) *GroupCreate {
-	if gr != nil {
-		gc.SetType(*gr)
+// SetNillableGroupType sets the "group_type" field if the given value is not nil.
+func (gc *GroupCreate) SetNillableGroupType(gt *group.GroupType) *GroupCreate {
+	if gt != nil {
+		gc.SetGroupType(*gt)
 	}
 	return gc
 }
@@ -93,14 +94,20 @@ func (gc *GroupCreate) SetNillableStatus(s *schema.Status) *GroupCreate {
 	return gc
 }
 
+// SetID sets the "id" field.
+func (gc *GroupCreate) SetID(u uuid.UUID) *GroupCreate {
+	gc.mutation.SetID(u)
+	return gc
+}
+
 // SetClassID sets the "class" edge to the Class entity by ID.
-func (gc *GroupCreate) SetClassID(id int) *GroupCreate {
+func (gc *GroupCreate) SetClassID(id uuid.UUID) *GroupCreate {
 	gc.mutation.SetClassID(id)
 	return gc
 }
 
 // SetNillableClassID sets the "class" edge to the Class entity by ID if the given value is not nil.
-func (gc *GroupCreate) SetNillableClassID(id *int) *GroupCreate {
+func (gc *GroupCreate) SetNillableClassID(id *uuid.UUID) *GroupCreate {
 	if id != nil {
 		gc = gc.SetClassID(*id)
 	}
@@ -113,14 +120,14 @@ func (gc *GroupCreate) SetClass(c *Class) *GroupCreate {
 }
 
 // AddMessageIDs adds the "messages" edge to the Message entity by IDs.
-func (gc *GroupCreate) AddMessageIDs(ids ...int) *GroupCreate {
+func (gc *GroupCreate) AddMessageIDs(ids ...uuid.UUID) *GroupCreate {
 	gc.mutation.AddMessageIDs(ids...)
 	return gc
 }
 
 // AddMessages adds the "messages" edges to the Message entity.
 func (gc *GroupCreate) AddMessages(m ...*Message) *GroupCreate {
-	ids := make([]int, len(m))
+	ids := make([]uuid.UUID, len(m))
 	for i := range m {
 		ids[i] = m[i].ID
 	}
@@ -206,13 +213,17 @@ func (gc *GroupCreate) defaults() {
 		v := group.DefaultUpdatedAt()
 		gc.mutation.SetUpdatedAt(v)
 	}
-	if _, ok := gc.mutation.GetType(); !ok {
-		v := group.DefaultType
-		gc.mutation.SetType(v)
+	if _, ok := gc.mutation.GroupType(); !ok {
+		v := group.DefaultGroupType
+		gc.mutation.SetGroupType(v)
 	}
 	if _, ok := gc.mutation.Status(); !ok {
 		v := group.DefaultStatus
 		gc.mutation.SetStatus(v)
+	}
+	if _, ok := gc.mutation.ID(); !ok {
+		v := group.DefaultID()
+		gc.mutation.SetID(v)
 	}
 }
 
@@ -224,12 +235,12 @@ func (gc *GroupCreate) check() error {
 	if _, ok := gc.mutation.UpdatedAt(); !ok {
 		return &ValidationError{Name: "updated_at", err: errors.New(`ent: missing required field "updated_at"`)}
 	}
-	if _, ok := gc.mutation.GetType(); !ok {
-		return &ValidationError{Name: "type", err: errors.New(`ent: missing required field "type"`)}
+	if _, ok := gc.mutation.GroupType(); !ok {
+		return &ValidationError{Name: "group_type", err: errors.New(`ent: missing required field "group_type"`)}
 	}
-	if v, ok := gc.mutation.GetType(); ok {
-		if err := group.TypeValidator(v); err != nil {
-			return &ValidationError{Name: "type", err: fmt.Errorf(`ent: validator failed for field "type": %w`, err)}
+	if v, ok := gc.mutation.GroupType(); ok {
+		if err := group.GroupTypeValidator(v); err != nil {
+			return &ValidationError{Name: "group_type", err: fmt.Errorf(`ent: validator failed for field "group_type": %w`, err)}
 		}
 	}
 	if _, ok := gc.mutation.Status(); !ok {
@@ -251,8 +262,6 @@ func (gc *GroupCreate) sqlSave(ctx context.Context) (*Group, error) {
 		}
 		return nil, err
 	}
-	id := _spec.ID.Value.(int64)
-	_node.ID = int(id)
 	return _node, nil
 }
 
@@ -262,11 +271,15 @@ func (gc *GroupCreate) createSpec() (*Group, *sqlgraph.CreateSpec) {
 		_spec = &sqlgraph.CreateSpec{
 			Table: group.Table,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeUUID,
 				Column: group.FieldID,
 			},
 		}
 	)
+	if id, ok := gc.mutation.ID(); ok {
+		_node.ID = id
+		_spec.ID.Value = id
+	}
 	if value, ok := gc.mutation.CreatedAt(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
 			Type:   field.TypeTime,
@@ -291,13 +304,13 @@ func (gc *GroupCreate) createSpec() (*Group, *sqlgraph.CreateSpec) {
 		})
 		_node.Name = value
 	}
-	if value, ok := gc.mutation.GetType(); ok {
+	if value, ok := gc.mutation.GroupType(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
 			Type:   field.TypeEnum,
 			Value:  value,
-			Column: group.FieldType,
+			Column: group.FieldGroupType,
 		})
-		_node.Type = value
+		_node.GroupType = value
 	}
 	if value, ok := gc.mutation.Status(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
@@ -316,7 +329,7 @@ func (gc *GroupCreate) createSpec() (*Group, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: class.FieldID,
 				},
 			},
@@ -336,7 +349,7 @@ func (gc *GroupCreate) createSpec() (*Group, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: message.FieldID,
 				},
 			},
@@ -391,10 +404,6 @@ func (gcb *GroupCreateBulk) Save(ctx context.Context) ([]*Group, error) {
 				}
 				mutation.id = &nodes[i].ID
 				mutation.done = true
-				if specs[i].ID.Value != nil {
-					id := specs[i].ID.Value.(int64)
-					nodes[i].ID = int(id)
-				}
 				return nodes[i], nil
 			})
 			for i := len(builder.hooks) - 1; i >= 0; i-- {

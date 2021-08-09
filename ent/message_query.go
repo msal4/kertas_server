@@ -11,6 +11,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/google/uuid"
 	"github.com/msal4/hassah_school_server/ent/group"
 	"github.com/msal4/hassah_school_server/ent/message"
 	"github.com/msal4/hassah_school_server/ent/predicate"
@@ -134,8 +135,8 @@ func (mq *MessageQuery) FirstX(ctx context.Context) *Message {
 
 // FirstID returns the first Message ID from the query.
 // Returns a *NotFoundError when no Message ID was found.
-func (mq *MessageQuery) FirstID(ctx context.Context) (id int, err error) {
-	var ids []int
+func (mq *MessageQuery) FirstID(ctx context.Context) (id uuid.UUID, err error) {
+	var ids []uuid.UUID
 	if ids, err = mq.Limit(1).IDs(ctx); err != nil {
 		return
 	}
@@ -147,7 +148,7 @@ func (mq *MessageQuery) FirstID(ctx context.Context) (id int, err error) {
 }
 
 // FirstIDX is like FirstID, but panics if an error occurs.
-func (mq *MessageQuery) FirstIDX(ctx context.Context) int {
+func (mq *MessageQuery) FirstIDX(ctx context.Context) uuid.UUID {
 	id, err := mq.FirstID(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
@@ -185,8 +186,8 @@ func (mq *MessageQuery) OnlyX(ctx context.Context) *Message {
 // OnlyID is like Only, but returns the only Message ID in the query.
 // Returns a *NotSingularError when exactly one Message ID is not found.
 // Returns a *NotFoundError when no entities are found.
-func (mq *MessageQuery) OnlyID(ctx context.Context) (id int, err error) {
-	var ids []int
+func (mq *MessageQuery) OnlyID(ctx context.Context) (id uuid.UUID, err error) {
+	var ids []uuid.UUID
 	if ids, err = mq.Limit(2).IDs(ctx); err != nil {
 		return
 	}
@@ -202,7 +203,7 @@ func (mq *MessageQuery) OnlyID(ctx context.Context) (id int, err error) {
 }
 
 // OnlyIDX is like OnlyID, but panics if an error occurs.
-func (mq *MessageQuery) OnlyIDX(ctx context.Context) int {
+func (mq *MessageQuery) OnlyIDX(ctx context.Context) uuid.UUID {
 	id, err := mq.OnlyID(ctx)
 	if err != nil {
 		panic(err)
@@ -228,8 +229,8 @@ func (mq *MessageQuery) AllX(ctx context.Context) []*Message {
 }
 
 // IDs executes the query and returns a list of Message IDs.
-func (mq *MessageQuery) IDs(ctx context.Context) ([]int, error) {
-	var ids []int
+func (mq *MessageQuery) IDs(ctx context.Context) ([]uuid.UUID, error) {
+	var ids []uuid.UUID
 	if err := mq.Select(message.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
@@ -237,7 +238,7 @@ func (mq *MessageQuery) IDs(ctx context.Context) ([]int, error) {
 }
 
 // IDsX is like IDs, but panics if an error occurs.
-func (mq *MessageQuery) IDsX(ctx context.Context) []int {
+func (mq *MessageQuery) IDsX(ctx context.Context) []uuid.UUID {
 	ids, err := mq.IDs(ctx)
 	if err != nil {
 		panic(err)
@@ -419,8 +420,8 @@ func (mq *MessageQuery) sqlAll(ctx context.Context) ([]*Message, error) {
 	}
 
 	if query := mq.withGroup; query != nil {
-		ids := make([]int, 0, len(nodes))
-		nodeids := make(map[int][]*Message)
+		ids := make([]uuid.UUID, 0, len(nodes))
+		nodeids := make(map[uuid.UUID][]*Message)
 		for i := range nodes {
 			if nodes[i].group_messages == nil {
 				continue
@@ -448,8 +449,8 @@ func (mq *MessageQuery) sqlAll(ctx context.Context) ([]*Message, error) {
 	}
 
 	if query := mq.withOwner; query != nil {
-		ids := make([]int, 0, len(nodes))
-		nodeids := make(map[int][]*Message)
+		ids := make([]uuid.UUID, 0, len(nodes))
+		nodeids := make(map[uuid.UUID][]*Message)
 		for i := range nodes {
 			if nodes[i].user_messages == nil {
 				continue
@@ -498,7 +499,7 @@ func (mq *MessageQuery) querySpec() *sqlgraph.QuerySpec {
 			Table:   message.Table,
 			Columns: message.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeUUID,
 				Column: message.FieldID,
 			},
 		},

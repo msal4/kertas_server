@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/99designs/gqlgen/graphql"
+	"github.com/google/uuid"
 	"github.com/msal4/hassah_school_server/ent/schema"
 )
 
@@ -167,20 +168,22 @@ var (
 	PhoneValidator func(string) error
 	// DefaultTokenVersion holds the default value on creation for the "token_version" field.
 	DefaultTokenVersion int
+	// DefaultID holds the default value on creation for the "id" field.
+	DefaultID func() uuid.UUID
 )
 
 // Role defines the type for the "role" enum field.
 type Role string
 
-// RoleStudent is the default value of the Role enum.
-const DefaultRole = RoleStudent
+// RoleSTUDENT is the default value of the Role enum.
+const DefaultRole = RoleSTUDENT
 
 // Role values.
 const (
-	RoleSuperAdmin  Role = "super_admin"
-	RoleSchoolAdmin Role = "school_admin"
-	RoleTeacher     Role = "teacher"
-	RoleStudent     Role = "student"
+	RoleSUPER_ADMIN  Role = "SUPER_ADMIN"
+	RoleSCHOOL_ADMIN Role = "SCHOOL_ADMIN"
+	RoleTEACHER      Role = "TEACHER"
+	RoleSTUDENT      Role = "STUDENT"
 )
 
 func (r Role) String() string {
@@ -190,7 +193,7 @@ func (r Role) String() string {
 // RoleValidator is a validator for the "role" field enum values. It is called by the builders before save.
 func RoleValidator(r Role) error {
 	switch r {
-	case RoleSuperAdmin, RoleSchoolAdmin, RoleTeacher, RoleStudent:
+	case RoleSUPER_ADMIN, RoleSCHOOL_ADMIN, RoleTEACHER, RoleSTUDENT:
 		return nil
 	default:
 		return fmt.Errorf("user: invalid enum value for role field: %q", r)

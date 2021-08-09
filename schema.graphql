@@ -19,6 +19,25 @@ enum Status {
   ACTIVE
 }
 
+enum State {
+  PRESENT
+  ABSENT
+  EXCUSED_ABSENT
+  SICK
+}
+
+enum Role {
+  SUPER_ADMIN
+  SCHOOL_ADMIN
+  TEACHER
+  STUDENT
+}
+
+enum GroupType {
+  PRIVATE
+  SHARED
+}
+
 enum OrderDirection {
     ASC
     DESC
@@ -58,7 +77,6 @@ type SchoolConnection {
 type Query {
     schools(after: Cursor, first: Int, before: Cursor, last: Int, orderBy: SchoolOrder): SchoolConnection
 }
-
 
 input CreateSchoolInput {
   name: String!

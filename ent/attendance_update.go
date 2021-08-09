@@ -11,6 +11,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/google/uuid"
 	"github.com/msal4/hassah_school_server/ent/attendance"
 	"github.com/msal4/hassah_school_server/ent/class"
 	"github.com/msal4/hassah_school_server/ent/predicate"
@@ -42,8 +43,16 @@ func (au *AttendanceUpdate) SetState(a attendance.State) *AttendanceUpdate {
 	return au
 }
 
+// SetNillableState sets the "state" field if the given value is not nil.
+func (au *AttendanceUpdate) SetNillableState(a *attendance.State) *AttendanceUpdate {
+	if a != nil {
+		au.SetState(*a)
+	}
+	return au
+}
+
 // SetClassID sets the "class" edge to the Class entity by ID.
-func (au *AttendanceUpdate) SetClassID(id int) *AttendanceUpdate {
+func (au *AttendanceUpdate) SetClassID(id uuid.UUID) *AttendanceUpdate {
 	au.mutation.SetClassID(id)
 	return au
 }
@@ -54,7 +63,7 @@ func (au *AttendanceUpdate) SetClass(c *Class) *AttendanceUpdate {
 }
 
 // SetStudentID sets the "student" edge to the User entity by ID.
-func (au *AttendanceUpdate) SetStudentID(id int) *AttendanceUpdate {
+func (au *AttendanceUpdate) SetStudentID(id uuid.UUID) *AttendanceUpdate {
 	au.mutation.SetStudentID(id)
 	return au
 }
@@ -172,7 +181,7 @@ func (au *AttendanceUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Table:   attendance.Table,
 			Columns: attendance.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeUUID,
 				Column: attendance.FieldID,
 			},
 		},
@@ -214,7 +223,7 @@ func (au *AttendanceUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: class.FieldID,
 				},
 			},
@@ -230,7 +239,7 @@ func (au *AttendanceUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: class.FieldID,
 				},
 			},
@@ -249,7 +258,7 @@ func (au *AttendanceUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: user.FieldID,
 				},
 			},
@@ -265,7 +274,7 @@ func (au *AttendanceUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: user.FieldID,
 				},
 			},
@@ -306,8 +315,16 @@ func (auo *AttendanceUpdateOne) SetState(a attendance.State) *AttendanceUpdateOn
 	return auo
 }
 
+// SetNillableState sets the "state" field if the given value is not nil.
+func (auo *AttendanceUpdateOne) SetNillableState(a *attendance.State) *AttendanceUpdateOne {
+	if a != nil {
+		auo.SetState(*a)
+	}
+	return auo
+}
+
 // SetClassID sets the "class" edge to the Class entity by ID.
-func (auo *AttendanceUpdateOne) SetClassID(id int) *AttendanceUpdateOne {
+func (auo *AttendanceUpdateOne) SetClassID(id uuid.UUID) *AttendanceUpdateOne {
 	auo.mutation.SetClassID(id)
 	return auo
 }
@@ -318,7 +335,7 @@ func (auo *AttendanceUpdateOne) SetClass(c *Class) *AttendanceUpdateOne {
 }
 
 // SetStudentID sets the "student" edge to the User entity by ID.
-func (auo *AttendanceUpdateOne) SetStudentID(id int) *AttendanceUpdateOne {
+func (auo *AttendanceUpdateOne) SetStudentID(id uuid.UUID) *AttendanceUpdateOne {
 	auo.mutation.SetStudentID(id)
 	return auo
 }
@@ -443,7 +460,7 @@ func (auo *AttendanceUpdateOne) sqlSave(ctx context.Context) (_node *Attendance,
 			Table:   attendance.Table,
 			Columns: attendance.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeUUID,
 				Column: attendance.FieldID,
 			},
 		},
@@ -502,7 +519,7 @@ func (auo *AttendanceUpdateOne) sqlSave(ctx context.Context) (_node *Attendance,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: class.FieldID,
 				},
 			},
@@ -518,7 +535,7 @@ func (auo *AttendanceUpdateOne) sqlSave(ctx context.Context) (_node *Attendance,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: class.FieldID,
 				},
 			},
@@ -537,7 +554,7 @@ func (auo *AttendanceUpdateOne) sqlSave(ctx context.Context) (_node *Attendance,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: user.FieldID,
 				},
 			},
@@ -553,7 +570,7 @@ func (auo *AttendanceUpdateOne) sqlSave(ctx context.Context) (_node *Attendance,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: user.FieldID,
 				},
 			},

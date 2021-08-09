@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"entgo.io/ent/dialect/sql"
+	"github.com/google/uuid"
 	"github.com/msal4/hassah_school_server/ent/class"
 	"github.com/msal4/hassah_school_server/ent/group"
 	"github.com/msal4/hassah_school_server/ent/schema"
@@ -19,7 +20,7 @@ import (
 type Class struct {
 	config `json:"-"`
 	// ID of the ent.
-	ID int `json:"id,omitempty"`
+	ID uuid.UUID `json:"id,omitempty"`
 	// CreatedAt holds the value of the "created_at" field.
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// UpdatedAt holds the value of the "updated_at" field.
@@ -31,8 +32,8 @@ type Class struct {
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the ClassQuery when eager-loading is set.
 	Edges         ClassEdges `json:"edges"`
-	stage_classes *int
-	user_classes  *int
+	stage_classes *uuid.UUID
+	user_classes  *uuid.UUID
 }
 
 // ClassEdges holds the relations/edges for other nodes in the graph.
@@ -128,16 +129,16 @@ func (*Class) scanValues(columns []string) ([]interface{}, error) {
 	values := make([]interface{}, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case class.FieldID:
-			values[i] = new(sql.NullInt64)
 		case class.FieldName, class.FieldStatus:
 			values[i] = new(sql.NullString)
 		case class.FieldCreatedAt, class.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
+		case class.FieldID:
+			values[i] = new(uuid.UUID)
 		case class.ForeignKeys[0]: // stage_classes
-			values[i] = new(sql.NullInt64)
+			values[i] = &sql.NullScanner{S: new(uuid.UUID)}
 		case class.ForeignKeys[1]: // user_classes
-			values[i] = new(sql.NullInt64)
+			values[i] = &sql.NullScanner{S: new(uuid.UUID)}
 		default:
 			return nil, fmt.Errorf("unexpected column %q for type Class", columns[i])
 		}
@@ -154,11 +155,11 @@ func (c *Class) assignValues(columns []string, values []interface{}) error {
 	for i := range columns {
 		switch columns[i] {
 		case class.FieldID:
-			value, ok := values[i].(*sql.NullInt64)
-			if !ok {
-				return fmt.Errorf("unexpected type %T for field id", value)
+			if value, ok := values[i].(*uuid.UUID); !ok {
+				return fmt.Errorf("unexpected type %T for field id", values[i])
+			} else if value != nil {
+				c.ID = *value
 			}
-			c.ID = int(value.Int64)
 		case class.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field created_at", values[i])
@@ -184,18 +185,18 @@ func (c *Class) assignValues(columns []string, values []interface{}) error {
 				c.Status = schema.Status(value.String)
 			}
 		case class.ForeignKeys[0]:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for edge-field stage_classes", value)
+			if value, ok := values[i].(*sql.NullScanner); !ok {
+				return fmt.Errorf("unexpected type %T for field stage_classes", values[i])
 			} else if value.Valid {
-				c.stage_classes = new(int)
-				*c.stage_classes = int(value.Int64)
+				c.stage_classes = new(uuid.UUID)
+				*c.stage_classes = *value.S.(*uuid.UUID)
 			}
 		case class.ForeignKeys[1]:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for edge-field user_classes", value)
+			if value, ok := values[i].(*sql.NullScanner); !ok {
+				return fmt.Errorf("unexpected type %T for field user_classes", values[i])
 			} else if value.Valid {
-				c.user_classes = new(int)
-				*c.user_classes = int(value.Int64)
+				c.user_classes = new(uuid.UUID)
+				*c.user_classes = *value.S.(*uuid.UUID)
 			}
 		}
 	}
