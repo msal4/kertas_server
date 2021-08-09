@@ -19,7 +19,6 @@ import (
 	"github.com/msal4/hassah_school_server/ent/schedule"
 	"github.com/msal4/hassah_school_server/ent/school"
 	"github.com/msal4/hassah_school_server/ent/stage"
-	"github.com/msal4/hassah_school_server/ent/timemixin"
 	"github.com/msal4/hassah_school_server/ent/tuitionpayment"
 	"github.com/msal4/hassah_school_server/ent/user"
 
@@ -53,8 +52,6 @@ type Client struct {
 	School *SchoolClient
 	// Stage is the client for interacting with the Stage builders.
 	Stage *StageClient
-	// TimeMixin is the client for interacting with the TimeMixin builders.
-	TimeMixin *TimeMixinClient
 	// TuitionPayment is the client for interacting with the TuitionPayment builders.
 	TuitionPayment *TuitionPaymentClient
 	// User is the client for interacting with the User builders.
@@ -84,7 +81,6 @@ func (c *Client) init() {
 	c.Schedule = NewScheduleClient(c.config)
 	c.School = NewSchoolClient(c.config)
 	c.Stage = NewStageClient(c.config)
-	c.TimeMixin = NewTimeMixinClient(c.config)
 	c.TuitionPayment = NewTuitionPaymentClient(c.config)
 	c.User = NewUserClient(c.config)
 }
@@ -130,7 +126,6 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		Schedule:             NewScheduleClient(cfg),
 		School:               NewSchoolClient(cfg),
 		Stage:                NewStageClient(cfg),
-		TimeMixin:            NewTimeMixinClient(cfg),
 		TuitionPayment:       NewTuitionPaymentClient(cfg),
 		User:                 NewUserClient(cfg),
 	}, nil
@@ -161,7 +156,6 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		Schedule:             NewScheduleClient(cfg),
 		School:               NewSchoolClient(cfg),
 		Stage:                NewStageClient(cfg),
-		TimeMixin:            NewTimeMixinClient(cfg),
 		TuitionPayment:       NewTuitionPaymentClient(cfg),
 		User:                 NewUserClient(cfg),
 	}, nil
@@ -203,7 +197,6 @@ func (c *Client) Use(hooks ...Hook) {
 	c.Schedule.Use(hooks...)
 	c.School.Use(hooks...)
 	c.Stage.Use(hooks...)
-	c.TimeMixin.Use(hooks...)
 	c.TuitionPayment.Use(hooks...)
 	c.User.Use(hooks...)
 }
@@ -1522,96 +1515,6 @@ func (c *StageClient) QueryStudents(s *Stage) *UserQuery {
 // Hooks returns the client hooks.
 func (c *StageClient) Hooks() []Hook {
 	return c.hooks.Stage
-}
-
-// TimeMixinClient is a client for the TimeMixin schema.
-type TimeMixinClient struct {
-	config
-}
-
-// NewTimeMixinClient returns a client for the TimeMixin from the given config.
-func NewTimeMixinClient(c config) *TimeMixinClient {
-	return &TimeMixinClient{config: c}
-}
-
-// Use adds a list of mutation hooks to the hooks stack.
-// A call to `Use(f, g, h)` equals to `timemixin.Hooks(f(g(h())))`.
-func (c *TimeMixinClient) Use(hooks ...Hook) {
-	c.hooks.TimeMixin = append(c.hooks.TimeMixin, hooks...)
-}
-
-// Create returns a create builder for TimeMixin.
-func (c *TimeMixinClient) Create() *TimeMixinCreate {
-	mutation := newTimeMixinMutation(c.config, OpCreate)
-	return &TimeMixinCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// CreateBulk returns a builder for creating a bulk of TimeMixin entities.
-func (c *TimeMixinClient) CreateBulk(builders ...*TimeMixinCreate) *TimeMixinCreateBulk {
-	return &TimeMixinCreateBulk{config: c.config, builders: builders}
-}
-
-// Update returns an update builder for TimeMixin.
-func (c *TimeMixinClient) Update() *TimeMixinUpdate {
-	mutation := newTimeMixinMutation(c.config, OpUpdate)
-	return &TimeMixinUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// UpdateOne returns an update builder for the given entity.
-func (c *TimeMixinClient) UpdateOne(tm *TimeMixin) *TimeMixinUpdateOne {
-	mutation := newTimeMixinMutation(c.config, OpUpdateOne, withTimeMixin(tm))
-	return &TimeMixinUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// UpdateOneID returns an update builder for the given id.
-func (c *TimeMixinClient) UpdateOneID(id int) *TimeMixinUpdateOne {
-	mutation := newTimeMixinMutation(c.config, OpUpdateOne, withTimeMixinID(id))
-	return &TimeMixinUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// Delete returns a delete builder for TimeMixin.
-func (c *TimeMixinClient) Delete() *TimeMixinDelete {
-	mutation := newTimeMixinMutation(c.config, OpDelete)
-	return &TimeMixinDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// DeleteOne returns a delete builder for the given entity.
-func (c *TimeMixinClient) DeleteOne(tm *TimeMixin) *TimeMixinDeleteOne {
-	return c.DeleteOneID(tm.ID)
-}
-
-// DeleteOneID returns a delete builder for the given id.
-func (c *TimeMixinClient) DeleteOneID(id int) *TimeMixinDeleteOne {
-	builder := c.Delete().Where(timemixin.ID(id))
-	builder.mutation.id = &id
-	builder.mutation.op = OpDeleteOne
-	return &TimeMixinDeleteOne{builder}
-}
-
-// Query returns a query builder for TimeMixin.
-func (c *TimeMixinClient) Query() *TimeMixinQuery {
-	return &TimeMixinQuery{
-		config: c.config,
-	}
-}
-
-// Get returns a TimeMixin entity by its id.
-func (c *TimeMixinClient) Get(ctx context.Context, id int) (*TimeMixin, error) {
-	return c.Query().Where(timemixin.ID(id)).Only(ctx)
-}
-
-// GetX is like Get, but panics if an error occurs.
-func (c *TimeMixinClient) GetX(ctx context.Context, id int) *TimeMixin {
-	obj, err := c.Get(ctx, id)
-	if err != nil {
-		panic(err)
-	}
-	return obj
-}
-
-// Hooks returns the client hooks.
-func (c *TimeMixinClient) Hooks() []Hook {
-	return c.hooks.TimeMixin
 }
 
 // TuitionPaymentClient is a client for the TuitionPayment schema.

@@ -5,17 +5,33 @@ package graph
 
 import (
 	"context"
-	"fmt"
 
-	"github.com/msal4/hassah_school_server"
 	"github.com/msal4/hassah_school_server/ent"
+	"github.com/msal4/hassah_school_server/graph/generated"
+	"github.com/msal4/hassah_school_server/graph/model"
 )
 
-func (r *queryResolver) Schools(ctx context.Context, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.SchoolOrder) (*ent.SchoolConnection, error) {
-	panic(fmt.Errorf("not implemented"))
+func (r *mutationResolver) AddSchool(ctx context.Context, input model.CreateSchoolInput) (*ent.School, error) {
+	client := ent.FromContext(ctx)
+
+	// TODO: create a dir for each school.
+	info, err := r.SaveImage(ctx, "images", "", input.Image.Filename, input.Image)
+	if err != nil {
+		return nil, err
+	}
+
+	return client.School.Create().SetName(input.Name).SetStatus(input.Status).SetImage(info.Key).Save(ctx)
 }
 
-// Query returns server.QueryResolver implementation.
-func (r *Resolver) Query() server.QueryResolver { return &queryResolver{r} }
+func (r *queryResolver) Schools(ctx context.Context, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.SchoolOrder) (*ent.SchoolConnection, error) {
+	return r.Client.School.Query().Paginate(ctx, after, first, before, last, ent.WithSchoolOrder(orderBy))
+}
 
+// Mutation returns generated.MutationResolver implementation.
+func (r *Resolver) Mutation() generated.MutationResolver { return &mutationResolver{r} }
+
+// Query returns generated.QueryResolver implementation.
+func (r *Resolver) Query() generated.QueryResolver { return &queryResolver{r} }
+
+type mutationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }

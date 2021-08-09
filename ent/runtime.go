@@ -16,7 +16,6 @@ import (
 	"github.com/msal4/hassah_school_server/ent/schema"
 	"github.com/msal4/hassah_school_server/ent/school"
 	"github.com/msal4/hassah_school_server/ent/stage"
-	"github.com/msal4/hassah_school_server/ent/timemixin"
 	"github.com/msal4/hassah_school_server/ent/tuitionpayment"
 	"github.com/msal4/hassah_school_server/ent/user"
 )
@@ -198,18 +197,6 @@ func init() {
 	stageDescName := stageFields[0].Descriptor()
 	// stage.NameValidator is a validator for the "name" field. It is called by the builders before save.
 	stage.NameValidator = stageDescName.Validators[0].(func(string) error)
-	timemixinFields := schema.TimeMixin{}.Fields()
-	_ = timemixinFields
-	// timemixinDescCreatedAt is the schema descriptor for created_at field.
-	timemixinDescCreatedAt := timemixinFields[0].Descriptor()
-	// timemixin.DefaultCreatedAt holds the default value on creation for the created_at field.
-	timemixin.DefaultCreatedAt = timemixinDescCreatedAt.Default.(func() time.Time)
-	// timemixinDescUpdatedAt is the schema descriptor for updated_at field.
-	timemixinDescUpdatedAt := timemixinFields[1].Descriptor()
-	// timemixin.DefaultUpdatedAt holds the default value on creation for the updated_at field.
-	timemixin.DefaultUpdatedAt = timemixinDescUpdatedAt.Default.(func() time.Time)
-	// timemixin.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
-	timemixin.UpdateDefaultUpdatedAt = timemixinDescUpdatedAt.UpdateDefault.(func() time.Time)
 	tuitionpaymentMixin := schema.TuitionPayment{}.Mixin()
 	tuitionpaymentMixinFields0 := tuitionpaymentMixin[0].Fields()
 	_ = tuitionpaymentMixinFields0

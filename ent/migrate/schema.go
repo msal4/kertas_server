@@ -388,18 +388,6 @@ var (
 			},
 		},
 	}
-	// TimeMixinsColumns holds the columns for the "time_mixins" table.
-	TimeMixinsColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "created_at", Type: field.TypeTime},
-		{Name: "updated_at", Type: field.TypeTime},
-	}
-	// TimeMixinsTable holds the schema information for the "time_mixins" table.
-	TimeMixinsTable = &schema.Table{
-		Name:       "time_mixins",
-		Columns:    TimeMixinsColumns,
-		PrimaryKey: []*schema.Column{TimeMixinsColumns[0]},
-	}
 	// TuitionPaymentsColumns holds the columns for the "tuition_payments" table.
 	TuitionPaymentsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
@@ -511,7 +499,6 @@ var (
 		SchedulesTable,
 		SchoolsTable,
 		StagesTable,
-		TimeMixinsTable,
 		TuitionPaymentsTable,
 		UsersTable,
 	}

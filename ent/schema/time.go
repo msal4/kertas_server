@@ -6,9 +6,10 @@ import (
 	"entgo.io/contrib/entgql"
 	"entgo.io/ent"
 	"entgo.io/ent/schema/field"
+	"entgo.io/ent/schema/mixin"
 )
 
-type TimeMixin struct{ ent.Schema }
+type TimeMixin struct{ mixin.Schema }
 
 // Fields of the time mixin.
 func (TimeMixin) Fields() []ent.Field {

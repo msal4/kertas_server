@@ -32,8 +32,8 @@ func (School) Mixin() []ent.Mixin {
 // Edges of the School.
 func (School) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.To("users", User.Type).Annotations(entsql.Annotation{OnDelete: entsql.Cascade}),
-		edge.To("stages", Stage.Type).Annotations(entsql.Annotation{OnDelete: entsql.Cascade}),
+		edge.To("users", User.Type).Annotations(entsql.Annotation{OnDelete: entsql.Cascade}, entgql.Bind()),
+		edge.To("stages", Stage.Type).Annotations(entsql.Annotation{OnDelete: entsql.Cascade}, entgql.Bind()),
 	}
 }
 

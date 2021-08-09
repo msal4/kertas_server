@@ -129,18 +129,6 @@ func (s *StageQuery) collectField(ctx *graphql.OperationContext, field graphql.C
 }
 
 // CollectFields tells the query-builder to eagerly load connected nodes by resolver context.
-func (tm *TimeMixinQuery) CollectFields(ctx context.Context, satisfies ...string) *TimeMixinQuery {
-	if fc := graphql.GetFieldContext(ctx); fc != nil {
-		tm = tm.collectField(graphql.GetOperationContext(ctx), fc.Field, satisfies...)
-	}
-	return tm
-}
-
-func (tm *TimeMixinQuery) collectField(ctx *graphql.OperationContext, field graphql.CollectedField, satisfies ...string) *TimeMixinQuery {
-	return tm
-}
-
-// CollectFields tells the query-builder to eagerly load connected nodes by resolver context.
 func (tp *TuitionPaymentQuery) CollectFields(ctx context.Context, satisfies ...string) *TuitionPaymentQuery {
 	if fc := graphql.GetFieldContext(ctx); fc != nil {
 		tp = tp.collectField(graphql.GetOperationContext(ctx), fc.Field, satisfies...)

@@ -25,7 +25,6 @@ import (
 	"github.com/msal4/hassah_school_server/ent/schedule"
 	"github.com/msal4/hassah_school_server/ent/school"
 	"github.com/msal4/hassah_school_server/ent/stage"
-	"github.com/msal4/hassah_school_server/ent/timemixin"
 	"github.com/msal4/hassah_school_server/ent/tuitionpayment"
 	"github.com/msal4/hassah_school_server/ent/user"
 	"golang.org/x/sync/semaphore"
@@ -796,33 +795,6 @@ func (s *Stage) Node(ctx context.Context) (node *Node, err error) {
 	return node, nil
 }
 
-func (tm *TimeMixin) Node(ctx context.Context) (node *Node, err error) {
-	node = &Node{
-		ID:     tm.ID,
-		Type:   "TimeMixin",
-		Fields: make([]*Field, 2),
-		Edges:  make([]*Edge, 0),
-	}
-	var buf []byte
-	if buf, err = json.Marshal(tm.CreatedAt); err != nil {
-		return nil, err
-	}
-	node.Fields[0] = &Field{
-		Type:  "time.Time",
-		Name:  "created_at",
-		Value: string(buf),
-	}
-	if buf, err = json.Marshal(tm.UpdatedAt); err != nil {
-		return nil, err
-	}
-	node.Fields[1] = &Field{
-		Type:  "time.Time",
-		Name:  "updated_at",
-		Value: string(buf),
-	}
-	return node, nil
-}
-
 func (tp *TuitionPayment) Node(ctx context.Context) (node *Node, err error) {
 	node = &Node{
 		ID:     tp.ID,
@@ -1206,15 +1178,6 @@ func (c *Client) noder(ctx context.Context, table string, id int) (Noder, error)
 			return nil, err
 		}
 		return n, nil
-	case timemixin.Table:
-		n, err := c.TimeMixin.Query().
-			Where(timemixin.ID(id)).
-			CollectFields(ctx, "TimeMixin").
-			Only(ctx)
-		if err != nil {
-			return nil, err
-		}
-		return n, nil
 	case tuitionpayment.Table:
 		n, err := c.TuitionPayment.Query().
 			Where(tuitionpayment.ID(id)).
@@ -1427,19 +1390,6 @@ func (c *Client) noders(ctx context.Context, table string, ids []int) ([]Noder, 
 		nodes, err := c.Stage.Query().
 			Where(stage.IDIn(ids...)).
 			CollectFields(ctx, "Stage").
-			All(ctx)
-		if err != nil {
-			return nil, err
-		}
-		for _, node := range nodes {
-			for _, noder := range idmap[node.ID] {
-				*noder = node
-			}
-		}
-	case timemixin.Table:
-		nodes, err := c.TimeMixin.Query().
-			Where(timemixin.IDIn(ids...)).
-			CollectFields(ctx, "TimeMixin").
 			All(ctx)
 		if err != nil {
 			return nil, err

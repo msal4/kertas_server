@@ -1,8 +1,22 @@
 scalar Cursor
 scalar Time
+scalar Upload
 
 interface Node {
   id: ID!
+}
+
+type PageInfo {
+  hasNextPage: Boolean!
+  hasPreviousPage: Boolean!
+  startCursor: Cursor
+  endCursor: Cursor
+}
+
+enum Status {
+  DELETED
+  DISABLED
+  ACTIVE
 }
 
 enum OrderDirection {
@@ -19,19 +33,6 @@ enum SchoolOrderField {
 input SchoolOrder {
     field: SchoolOrderField
     direction: OrderDirection!
-}
-
-type PageInfo {
-  hasNextPage: Boolean!
-  hasPreviousPage: Boolean!
-  startCursor: Cursor
-  endCursor: Cursor
-}
-
-enum Status {
-  DELETED
-  DISABLED
-  ACTIVE
 }
 
 type School implements Node {
@@ -57,3 +58,16 @@ type SchoolConnection {
 type Query {
     schools(after: Cursor, first: Int, before: Cursor, last: Int, orderBy: SchoolOrder): SchoolConnection
 }
+
+
+input CreateSchoolInput {
+  name: String!
+  image: Upload!
+  status: Status! = ACTIVE
+}
+
+
+type Mutation {
+  addSchool(input: CreateSchoolInput!): School
+}
+

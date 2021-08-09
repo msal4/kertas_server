@@ -53,5 +53,5 @@ func (s *Status) UnmarshalGQL(v interface{}) error {
 
 // MarshalGQL implements the graphql.Marshaler interface
 func (s Status) MarshalGQL(w io.Writer) {
-	w.Write([]byte(s))
+	fmt.Fprintf(w, "%q", s)
 }

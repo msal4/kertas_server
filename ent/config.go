@@ -34,7 +34,6 @@ type hooks struct {
 	Schedule             []ent.Hook
 	School               []ent.Hook
 	Stage                []ent.Hook
-	TimeMixin            []ent.Hook
 	TuitionPayment       []ent.Hook
 	User                 []ent.Hook
 }
