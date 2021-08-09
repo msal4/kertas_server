@@ -37,11 +37,10 @@ const (
 )
 
 func main() {
-	client, err := ent.Open(dialect.Postgres, "postgres://postgres@localhost:5432/school?sslmode=disable")
+	ec, err := ent.Open(dialect.Postgres, "postgres://postgres@localhost:5432/school?sslmode=disable")
 	if err != nil {
 		log.Fatalf("establishing db connection: %v", err)
 	}
-
 	mc, err := minio.New(endpoint, &minio.Options{
 		Creds: credentials.NewStaticV4(accessKeyID, secretAccessKey, ""),
 	})
@@ -52,8 +51,8 @@ func main() {
 		log.Fatalf("connecting to minio: %v", err)
 	}
 
-	srv := handler.NewDefaultServer(graph.NewSchema(client, mc, rand.NewSource(time.Now().Unix())))
-	srv.Use(entgql.Transactioner{TxOpener: client})
+	srv := handler.NewDefaultServer(graph.NewSchema(ec, mc, rand.NewSource(time.Now().Unix())))
+	srv.Use(entgql.Transactioner{TxOpener: ec})
 	if debg {
 		srv.Use(&debug.Tracer{})
 	}

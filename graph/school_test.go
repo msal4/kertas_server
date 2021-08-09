@@ -1,12 +1,15 @@
 package graph_test
 
 import (
+	"bytes"
 	"context"
-	"log"
+	"encoding/json"
+	"fmt"
 	"math/rand"
+	"net/http"
+	"net/http/httptest"
 	"testing"
 
-	"github.com/99designs/gqlgen/client"
 	"github.com/99designs/gqlgen/graphql/handler"
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/minio/minio-go/v7"
@@ -34,30 +37,46 @@ func TestSchools_List(t *testing.T) {
 		t.Fatalf("connecting to minio: %v", err)
 	}
 
-	gc := client.New(handler.NewDefaultServer(graph.NewSchema(ec, mc, rand.NewSource(0))))
+	srv := handler.NewDefaultServer(graph.NewSchema(ec, mc, rand.NewSource(0)))
 
-	t.Run("list", func(t *testing.T) {
-		var resp struct {
-			Schools ent.SchoolConnection
-		}
-		gc.MustPost(`{
+	w := httptest.NewRecorder()
+
+	reqbody := struct {
+		OperationName *string  `json:"operationName"`
+		Query         string   `json:"query"`
+		Variables     struct{} `json:"variables"`
+	}{
+		Query: `query {
   schools {
     totalCount
+    pageInfo {
+      hasNextPage
+      hasPreviousPage
+      startCursor
+      endCursor
+    }
     edges {
       node {
         id
-        status
         name
         image
+        status
+        createdAt
+        updatedAt
       }
+      cursor
     }
   }
-}`, &resp)
+}`,
+	}
 
-		log.Println(resp)
-	})
-	t.Run("order", func(t *testing.T) {})
-	t.Run("filter", func(t *testing.T) {})
-	t.Run("search", func(t *testing.T) {})
-	t.Run("not authorized", func(t *testing.T) {})
+	b := new(bytes.Buffer)
+	json.NewEncoder(b).Encode(reqbody)
+
+	r := httptest.NewRequest(http.MethodPost, "/graphql", b)
+	r.Header.Set("content-type", "application/json")
+
+	srv.ServeHTTP(w, r)
+
+	fmt.Println(w.Body.String())
 }
