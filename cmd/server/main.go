@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"flag"
 	"log"
 	"math/rand"
@@ -45,7 +46,10 @@ func main() {
 		Creds: credentials.NewStaticV4(accessKeyID, secretAccessKey, ""),
 	})
 	if err != nil {
-		log.Fatalf("establishing minio connection: %v", err)
+		log.Fatalf("instantiating minio client: %v", err)
+	}
+	if _, err := mc.ListBuckets(context.Background()); err != nil {
+		log.Fatalf("connecting to minio: %v", err)
 	}
 
 	srv := handler.NewDefaultServer(graph.NewSchema(client, mc, rand.NewSource(time.Now().Unix())))
