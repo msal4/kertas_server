@@ -52,7 +52,8 @@ type DirectiveRoot struct {
 
 type ComplexityRoot struct {
 	Mutation struct {
-		AddSchool func(childComplexity int, input model.CreateSchoolInput) int
+		AddSchool    func(childComplexity int, input model.CreateSchoolInput) int
+		DeleteSchool func(childComplexity int, id uuid.UUID) int
 	}
 
 	PageInfo struct {
@@ -89,6 +90,7 @@ type ComplexityRoot struct {
 
 type MutationResolver interface {
 	AddSchool(ctx context.Context, input model.CreateSchoolInput) (*ent.School, error)
+	DeleteSchool(ctx context.Context, id uuid.UUID) (bool, error)
 }
 type QueryResolver interface {
 	Schools(ctx context.Context, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.SchoolOrder, where *ent.SchoolWhereInput) (*ent.SchoolConnection, error)
@@ -120,6 +122,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.AddSchool(childComplexity, args["input"].(model.CreateSchoolInput)), true
+
+	case "Mutation.deleteSchool":
+		if e.complexity.Mutation.DeleteSchool == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_deleteSchool_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.DeleteSchool(childComplexity, args["id"].(uuid.UUID)), true
 
 	case "PageInfo.endCursor":
 		if e.complexity.PageInfo.EndCursor == nil {
@@ -390,6 +404,7 @@ type Query {
 
 type Mutation {
   addSchool(input: CreateSchoolInput!): School
+  deleteSchool(id: ID!): Boolean!
 }
 
 `, BuiltIn: false},
@@ -1429,6 +1444,21 @@ func (ec *executionContext) field_Mutation_addSchool_args(ctx context.Context, r
 	return args, nil
 }
 
+func (ec *executionContext) field_Mutation_deleteSchool_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 uuid.UUID
+	if tmp, ok := rawArgs["id"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+		arg0, err = ec.unmarshalNID2githubᚗcomᚋgoogleᚋuuidᚐUUID(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["id"] = arg0
+	return args, nil
+}
+
 func (ec *executionContext) field_Query___type_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -1579,6 +1609,48 @@ func (ec *executionContext) _Mutation_addSchool(ctx context.Context, field graph
 	res := resTmp.(*ent.School)
 	fc.Result = res
 	return ec.marshalOSchool2ᚖgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚐSchool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_deleteSchool(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_deleteSchool_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().DeleteSchool(rctx, args["id"].(uuid.UUID))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _PageInfo_hasNextPage(ctx context.Context, field graphql.CollectedField, obj *ent.PageInfo) (ret graphql.Marshaler) {
@@ -9283,6 +9355,11 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			out.Values[i] = graphql.MarshalString("Mutation")
 		case "addSchool":
 			out.Values[i] = ec._Mutation_addSchool(ctx, field)
+		case "deleteSchool":
+			out.Values[i] = ec._Mutation_deleteSchool(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}

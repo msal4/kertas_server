@@ -6,6 +6,7 @@ package graph
 import (
 	"context"
 
+	"github.com/google/uuid"
 	"github.com/msal4/hassah_school_server/ent"
 	"github.com/msal4/hassah_school_server/graph/generated"
 	"github.com/msal4/hassah_school_server/graph/model"
@@ -19,6 +20,15 @@ func (r *mutationResolver) AddSchool(ctx context.Context, input model.CreateScho
 	}
 
 	return r.Client.School.Create().SetName(input.Name).SetStatus(input.Status).SetImage(info.Key).Save(ctx)
+}
+
+func (r *mutationResolver) DeleteSchool(ctx context.Context, id uuid.UUID) (bool, error) {
+	err := r.Client.School.DeleteOneID(id).Exec(ctx)
+	if err != nil {
+		return false, err
+	}
+
+	return true, nil
 }
 
 func (r *queryResolver) Schools(ctx context.Context, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.SchoolOrder, where *ent.SchoolWhereInput) (*ent.SchoolConnection, error) {

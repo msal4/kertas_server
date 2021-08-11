@@ -86,5 +86,6 @@ type Query {
 
 type Mutation {
   addSchool(input: CreateSchoolInput!): School
+  deleteSchool(id: ID!): Boolean!
 }
 

@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"fmt"
 	"io"
 	"math/rand"
 	"mime/multipart"
@@ -279,6 +280,7 @@ func (s *schoolTestSuite) TestAddSchool() {
 	ec := enttest.Open(s.T(), dialect.SQLite, "file:ent?mode=memory&cache=shared&_fk=1", enttest.WithOptions(ent.Log(s.T().Log)))
 	srv := handler.NewDefaultServer(graph.NewSchema(ec, s.mc, rand.NewSource(0)))
 	gc := client.New(srv)
+	ctx := context.Background()
 
 	type response struct {
 		Data *struct {
@@ -304,6 +306,8 @@ func (s *schoolTestSuite) TestAddSchool() {
 	})
 
 	s.T().Run("with image", func(t *testing.T) {
+		defer ec.School.Delete().ExecX(ctx)
+
 		w := httptest.NewRecorder()
 
 		imgFile, err := os.Open("../testfiles/stanford.png")
@@ -355,4 +359,41 @@ func createMultipartRequest(t *testing.T, operations, mapData string, f file) *h
 	r.Header.Set("content-type", w.FormDataContentType())
 
 	return r
+}
+
+func (s *schoolTestSuite) TestDeleteSchool() {
+	ec := enttest.Open(s.T(), dialect.SQLite, "file:ent?mode=memory&cache=shared&_fk=1", enttest.WithOptions(ent.Log(s.T().Log)))
+	srv := handler.NewDefaultServer(graph.NewSchema(ec, s.mc, rand.NewSource(0)))
+	gc := client.New(srv)
+	ctx := context.Background()
+
+	type response struct {
+		DeleteSchool bool
+	}
+
+	s.T().Run("exists", func(t *testing.T) {
+		defer ec.School.Delete().ExecX(ctx)
+
+		sch := ec.School.Create().SetName("test school").SetImage("test/image").SaveX(ctx)
+
+		var resp response
+		gc.MustPost(fmt.Sprintf(`mutation { deleteSchool(id:"%s") } `, sch.ID.String()), &resp)
+		require.True(t, resp.DeleteSchool)
+
+		schools := ec.School.Query().AllX(ctx)
+		require.Empty(t, schools)
+	})
+
+	s.T().Run("does not exist", func(t *testing.T) {
+		defer ec.School.Delete().ExecX(ctx)
+
+		ec.School.Create().SetName("test school").SetImage("test/image").SaveX(ctx)
+
+		var resp response
+		err := gc.Post(`mutation { deleteSchool(id:"2710c203-7842-4356-8d9f-12f9da4722a2") } `, &resp)
+		require.Error(t, err)
+
+		schools := ec.School.Query().AllX(ctx)
+		require.Len(t, schools, 1)
+	})
 }
