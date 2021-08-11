@@ -7,3 +7,4 @@
 - [x] Setup tests
 - [ ] Setup authorization
 - [ ] Implement chat
+- [ ] Fulltext search
