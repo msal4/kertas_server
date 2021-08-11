@@ -16,6 +16,8 @@ resolver:
   package: graph
   filename_template: "{name}.resolvers.go"
 
+omit_slice_element_pointers: false
+
 autobind:
   - github.com/msal4/hassah_school_server/ent
 

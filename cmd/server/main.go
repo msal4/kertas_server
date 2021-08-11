@@ -47,8 +47,22 @@ func main() {
 	if err != nil {
 		log.Fatalf("instantiating minio client: %v", err)
 	}
-	if _, err := mc.ListBuckets(context.Background()); err != nil {
+
+	ctx := context.Background()
+	if _, err := mc.ListBuckets(ctx); err != nil {
 		log.Fatalf("connecting to minio: %v", err)
+	}
+	exists, err := mc.BucketExists(ctx, "images")
+	if err != nil {
+		log.Fatalf("checking if images bucket exists: %v", err)
+	}
+	if !exists {
+		log.Println(`bucket "images" does not exist, creating one...`)
+		err := mc.MakeBucket(ctx, "images", minio.MakeBucketOptions{})
+		if err != nil {
+			log.Fatalf(`making "images" bucket: %v`, err)
+		}
+		log.Println(`created bucket "images".`)
 	}
 
 	srv := handler.NewDefaultServer(graph.NewSchema(ec, mc, rand.NewSource(time.Now().Unix())))

@@ -12,19 +12,17 @@ import (
 )
 
 func (r *mutationResolver) AddSchool(ctx context.Context, input model.CreateSchoolInput) (*ent.School, error) {
-	client := ent.FromContext(ctx)
-
 	// TODO: create a dir for each school.
 	info, err := r.SaveImage(ctx, "images", "", input.Image.Filename, input.Image)
 	if err != nil {
 		return nil, err
 	}
 
-	return client.School.Create().SetName(input.Name).SetStatus(input.Status).SetImage(info.Key).Save(ctx)
+	return r.Client.School.Create().SetName(input.Name).SetStatus(input.Status).SetImage(info.Key).Save(ctx)
 }
 
-func (r *queryResolver) Schools(ctx context.Context, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.SchoolOrder) (*ent.SchoolConnection, error) {
-	return r.Client.School.Query().Paginate(ctx, after, first, before, last, ent.WithSchoolOrder(orderBy))
+func (r *queryResolver) Schools(ctx context.Context, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.SchoolOrder, where *ent.SchoolWhereInput) (*ent.SchoolConnection, error) {
+	return r.Client.School.Query().Paginate(ctx, after, first, before, last, ent.WithSchoolOrder(orderBy), ent.WithSchoolFilter(where.Filter))
 }
 
 // Mutation returns generated.MutationResolver implementation.

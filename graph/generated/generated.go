@@ -63,7 +63,7 @@ type ComplexityRoot struct {
 	}
 
 	Query struct {
-		Schools func(childComplexity int, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.SchoolOrder) int
+		Schools func(childComplexity int, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.SchoolOrder, where *ent.SchoolWhereInput) int
 	}
 
 	School struct {
@@ -91,7 +91,7 @@ type MutationResolver interface {
 	AddSchool(ctx context.Context, input model.CreateSchoolInput) (*ent.School, error)
 }
 type QueryResolver interface {
-	Schools(ctx context.Context, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.SchoolOrder) (*ent.SchoolConnection, error)
+	Schools(ctx context.Context, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.SchoolOrder, where *ent.SchoolWhereInput) (*ent.SchoolConnection, error)
 }
 
 type executableSchema struct {
@@ -159,7 +159,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.Schools(childComplexity, args["after"].(*ent.Cursor), args["first"].(*int), args["before"].(*ent.Cursor), args["last"].(*int), args["orderBy"].(*ent.SchoolOrder)), true
+		return e.complexity.Query.Schools(childComplexity, args["after"].(*ent.Cursor), args["first"].(*int), args["before"].(*ent.Cursor), args["last"].(*int), args["orderBy"].(*ent.SchoolOrder), args["where"].(*ent.SchoolWhereInput)), true
 
 	case "School.createdAt":
 		if e.complexity.School.CreatedAt == nil {
@@ -378,16 +378,15 @@ type SchoolConnection {
   edges: [SchoolEdge]
 }
 
-type Query {
-    schools(after: Cursor, first: Int, before: Cursor, last: Int, orderBy: SchoolOrder): SchoolConnection
-}
-
 input CreateSchoolInput {
   name: String!
   image: Upload!
   status: Status! = ACTIVE
 }
 
+type Query {
+    schools(after: Cursor, first: Int, before: Cursor, last: Int, orderBy: SchoolOrder, where: SchoolWhereInput): SchoolConnection
+}
 
 type Mutation {
   addSchool(input: CreateSchoolInput!): School
@@ -1493,6 +1492,15 @@ func (ec *executionContext) field_Query_schools_args(ctx context.Context, rawArg
 		}
 	}
 	args["orderBy"] = arg4
+	var arg5 *ent.SchoolWhereInput
+	if tmp, ok := rawArgs["where"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("where"))
+		arg5, err = ec.unmarshalOSchoolWhereInput2ᚖgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚐSchoolWhereInput(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["where"] = arg5
 	return args, nil
 }
 
@@ -1732,7 +1740,7 @@ func (ec *executionContext) _Query_schools(ctx context.Context, field graphql.Co
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Schools(rctx, args["after"].(*ent.Cursor), args["first"].(*int), args["before"].(*ent.Cursor), args["last"].(*int), args["orderBy"].(*ent.SchoolOrder))
+		return ec.resolvers.Query().Schools(rctx, args["after"].(*ent.Cursor), args["first"].(*int), args["before"].(*ent.Cursor), args["last"].(*int), args["orderBy"].(*ent.SchoolOrder), args["where"].(*ent.SchoolWhereInput))
 	})
 	if err != nil {
 		ec.Error(ctx, err)

@@ -74,16 +74,15 @@ type SchoolConnection {
   edges: [SchoolEdge]
 }
 
-type Query {
-    schools(after: Cursor, first: Int, before: Cursor, last: Int, orderBy: SchoolOrder): SchoolConnection
-}
-
 input CreateSchoolInput {
   name: String!
   image: Upload!
   status: Status! = ACTIVE
 }
 
+type Query {
+    schools(after: Cursor, first: Int, before: Cursor, last: Int, orderBy: SchoolOrder, where: SchoolWhereInput): SchoolConnection
+}
 
 type Mutation {
   addSchool(input: CreateSchoolInput!): School
