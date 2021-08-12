@@ -18,8 +18,7 @@ func (r *mutationResolver) AddSchool(ctx context.Context, input model.CreateScho
 }
 
 func (r *mutationResolver) DeleteSchool(ctx context.Context, id uuid.UUID) (bool, error) {
-	// TODO: delete image object.
-	return true, r.s.EC.School.DeleteOneID(id).Exec(ctx)
+	return true, r.s.SchoolDelete(ctx, id)
 }
 
 func (r *queryResolver) Schools(ctx context.Context, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.SchoolOrder, where *ent.SchoolWhereInput) (*ent.SchoolConnection, error) {
