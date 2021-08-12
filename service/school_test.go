@@ -9,6 +9,7 @@ import (
 	"testing"
 
 	"github.com/99designs/gqlgen/graphql"
+	"github.com/google/uuid"
 	"github.com/minio/minio-go/v7"
 	"github.com/msal4/hassah_school_server/ent"
 	"github.com/msal4/hassah_school_server/ent/schema"
@@ -21,6 +22,7 @@ import (
 
 func TestSchoolList(t *testing.T) {
 	s := newService(t, "1")
+	defer s.EC.Close()
 	ctx := context.Background()
 
 	t.Run("empty", func(t *testing.T) {
@@ -109,6 +111,7 @@ func TestSchoolList(t *testing.T) {
 
 func TestSchoolAdd(t *testing.T) {
 	s := newService(t, "2")
+	defer s.EC.Close()
 	ctx := context.Background()
 
 	t.Run("without image", func(t *testing.T) {
@@ -173,4 +176,38 @@ func getFileContentType(f *os.File) (string, error) {
 }
 
 func TestSchoolDelete(t *testing.T) {
+	s := newService(t, "3sd23")
+	defer s.EC.Close()
+
+	ctx := context.Background()
+
+	f := openFile(t, "../testfiles/stanford.png")
+	defer f.Close()
+
+	sch, err := s.SchoolAdd(ctx, model.CreateSchoolInput{
+		Name:   "test school",
+		Image:  graphql.Upload{File: f, Filename: f.File.Name(), ContentType: f.contentType, Size: f.Size()},
+		Status: schema.StatusActive,
+	})
+	require.NoError(t, err)
+	require.NotNil(t, sch)
+
+	t.Run("non-existing school", func(t *testing.T) {
+		err := s.SchoolDelete(ctx, uuid.MustParse("2710c203-7842-4356-8d9f-12f9da4722a2"))
+		require.Error(t, err)
+		_, err = s.EC.School.Query().Where(school.ID(sch.ID)).Only(ctx)
+		require.NoError(t, err)
+		_, err = s.MC.StatObject(ctx, s.Config.RootBucket, sch.Image, minio.StatObjectOptions{})
+		require.NoError(t, err)
+	})
+
+	t.Run("existing school", func(t *testing.T) {
+		err := s.SchoolDelete(ctx, sch.ID)
+		require.NoError(t, err)
+		_, err = s.EC.School.Query().Where(school.ID(sch.ID)).Only(ctx)
+		require.Error(t, err)
+
+		_, err = s.MC.StatObject(ctx, s.Config.RootBucket, sch.Image, minio.StatObjectOptions{})
+		require.Error(t, err)
+	})
 }

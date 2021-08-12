@@ -4,6 +4,8 @@ import (
 	"context"
 	"path"
 
+	"github.com/google/uuid"
+	"github.com/minio/minio-go/v7"
 	"github.com/msal4/hassah_school_server/ent"
 	"github.com/msal4/hassah_school_server/graph/model"
 )
@@ -31,4 +33,18 @@ func (s *Service) SchoolAdd(ctx context.Context, input model.CreateSchoolInput) 
 	}
 
 	return s.EC.School.Create().SetName(input.Name).SetStatus(input.Status).SetImage(info.Key).SetDirectory(dir).Save(ctx)
+}
+
+func (s *Service) SchoolDelete(ctx context.Context, id uuid.UUID) error {
+	sch, err := s.EC.School.Get(ctx, id)
+	if err != nil {
+		return err
+	}
+
+	err = s.MC.RemoveObject(ctx, s.Config.RootBucket, sch.Image, minio.RemoveObjectOptions{})
+	if err != nil {
+		return err
+	}
+
+	return s.EC.School.DeleteOneID(id).Exec(ctx)
 }
