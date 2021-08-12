@@ -10,29 +10,21 @@ import (
 	"github.com/msal4/hassah_school_server/ent"
 	"github.com/msal4/hassah_school_server/graph/generated"
 	"github.com/msal4/hassah_school_server/graph/model"
+	"github.com/msal4/hassah_school_server/service"
 )
 
 func (r *mutationResolver) AddSchool(ctx context.Context, input model.CreateSchoolInput) (*ent.School, error) {
-	// TODO: create a dir for each school.
-	info, err := r.SaveImage(ctx, "images", "", input.Image.Filename, input.Image)
-	if err != nil {
-		return nil, err
-	}
-
-	return r.Client.School.Create().SetName(input.Name).SetStatus(input.Status).SetImage(info.Key).Save(ctx)
+	return r.s.SchoolAdd(ctx, input)
 }
 
 func (r *mutationResolver) DeleteSchool(ctx context.Context, id uuid.UUID) (bool, error) {
-	err := r.Client.School.DeleteOneID(id).Exec(ctx)
-	if err != nil {
-		return false, err
-	}
-
-	return true, nil
+	// TODO: delete image object.
+	return true, r.s.EC.School.DeleteOneID(id).Exec(ctx)
 }
 
 func (r *queryResolver) Schools(ctx context.Context, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.SchoolOrder, where *ent.SchoolWhereInput) (*ent.SchoolConnection, error) {
-	return r.Client.School.Query().Paginate(ctx, after, first, before, last, ent.WithSchoolOrder(orderBy), ent.WithSchoolFilter(where.Filter))
+	return r.s.SchoolList(ctx, service.SchoolListOptions{
+		After: after, First: first, Before: before, Last: last, OrderBy: orderBy, Where: where})
 }
 
 // Mutation returns generated.MutationResolver implementation.

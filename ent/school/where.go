@@ -123,6 +123,13 @@ func Image(v string) predicate.School {
 	})
 }
 
+// Directory applies equality check predicate on the "directory" field. It's identical to DirectoryEQ.
+func Directory(v string) predicate.School {
+	return predicate.School(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldDirectory), v))
+	})
+}
+
 // CreatedAtEQ applies the EQ predicate on the "created_at" field.
 func CreatedAtEQ(v time.Time) predicate.School {
 	return predicate.School(func(s *sql.Selector) {
@@ -494,6 +501,117 @@ func ImageEqualFold(v string) predicate.School {
 func ImageContainsFold(v string) predicate.School {
 	return predicate.School(func(s *sql.Selector) {
 		s.Where(sql.ContainsFold(s.C(FieldImage), v))
+	})
+}
+
+// DirectoryEQ applies the EQ predicate on the "directory" field.
+func DirectoryEQ(v string) predicate.School {
+	return predicate.School(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldDirectory), v))
+	})
+}
+
+// DirectoryNEQ applies the NEQ predicate on the "directory" field.
+func DirectoryNEQ(v string) predicate.School {
+	return predicate.School(func(s *sql.Selector) {
+		s.Where(sql.NEQ(s.C(FieldDirectory), v))
+	})
+}
+
+// DirectoryIn applies the In predicate on the "directory" field.
+func DirectoryIn(vs ...string) predicate.School {
+	v := make([]interface{}, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.School(func(s *sql.Selector) {
+		// if not arguments were provided, append the FALSE constants,
+		// since we can't apply "IN ()". This will make this predicate falsy.
+		if len(v) == 0 {
+			s.Where(sql.False())
+			return
+		}
+		s.Where(sql.In(s.C(FieldDirectory), v...))
+	})
+}
+
+// DirectoryNotIn applies the NotIn predicate on the "directory" field.
+func DirectoryNotIn(vs ...string) predicate.School {
+	v := make([]interface{}, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.School(func(s *sql.Selector) {
+		// if not arguments were provided, append the FALSE constants,
+		// since we can't apply "IN ()". This will make this predicate falsy.
+		if len(v) == 0 {
+			s.Where(sql.False())
+			return
+		}
+		s.Where(sql.NotIn(s.C(FieldDirectory), v...))
+	})
+}
+
+// DirectoryGT applies the GT predicate on the "directory" field.
+func DirectoryGT(v string) predicate.School {
+	return predicate.School(func(s *sql.Selector) {
+		s.Where(sql.GT(s.C(FieldDirectory), v))
+	})
+}
+
+// DirectoryGTE applies the GTE predicate on the "directory" field.
+func DirectoryGTE(v string) predicate.School {
+	return predicate.School(func(s *sql.Selector) {
+		s.Where(sql.GTE(s.C(FieldDirectory), v))
+	})
+}
+
+// DirectoryLT applies the LT predicate on the "directory" field.
+func DirectoryLT(v string) predicate.School {
+	return predicate.School(func(s *sql.Selector) {
+		s.Where(sql.LT(s.C(FieldDirectory), v))
+	})
+}
+
+// DirectoryLTE applies the LTE predicate on the "directory" field.
+func DirectoryLTE(v string) predicate.School {
+	return predicate.School(func(s *sql.Selector) {
+		s.Where(sql.LTE(s.C(FieldDirectory), v))
+	})
+}
+
+// DirectoryContains applies the Contains predicate on the "directory" field.
+func DirectoryContains(v string) predicate.School {
+	return predicate.School(func(s *sql.Selector) {
+		s.Where(sql.Contains(s.C(FieldDirectory), v))
+	})
+}
+
+// DirectoryHasPrefix applies the HasPrefix predicate on the "directory" field.
+func DirectoryHasPrefix(v string) predicate.School {
+	return predicate.School(func(s *sql.Selector) {
+		s.Where(sql.HasPrefix(s.C(FieldDirectory), v))
+	})
+}
+
+// DirectoryHasSuffix applies the HasSuffix predicate on the "directory" field.
+func DirectoryHasSuffix(v string) predicate.School {
+	return predicate.School(func(s *sql.Selector) {
+		s.Where(sql.HasSuffix(s.C(FieldDirectory), v))
+	})
+}
+
+// DirectoryEqualFold applies the EqualFold predicate on the "directory" field.
+func DirectoryEqualFold(v string) predicate.School {
+	return predicate.School(func(s *sql.Selector) {
+		s.Where(sql.EqualFold(s.C(FieldDirectory), v))
+	})
+}
+
+// DirectoryContainsFold applies the ContainsFold predicate on the "directory" field.
+func DirectoryContainsFold(v string) predicate.School {
+	return predicate.School(func(s *sql.Selector) {
+		s.Where(sql.ContainsFold(s.C(FieldDirectory), v))
 	})
 }
 

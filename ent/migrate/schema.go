@@ -337,6 +337,7 @@ var (
 		{Name: "updated_at", Type: field.TypeTime},
 		{Name: "name", Type: field.TypeString},
 		{Name: "image", Type: field.TypeString},
+		{Name: "directory", Type: field.TypeString},
 		{Name: "status", Type: field.TypeEnum, Enums: []string{"DELETED", "DISABLED", "ACTIVE"}, Default: "ACTIVE"},
 	}
 	// SchoolsTable holds the schema information for the "schools" table.
@@ -348,7 +349,7 @@ var (
 			{
 				Name:    "school_status",
 				Unique:  false,
-				Columns: []*schema.Column{SchoolsColumns[5]},
+				Columns: []*schema.Column{SchoolsColumns[6]},
 			},
 		},
 	}

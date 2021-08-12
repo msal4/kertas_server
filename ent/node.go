@@ -632,7 +632,7 @@ func (s *School) Node(ctx context.Context) (node *Node, err error) {
 	node = &Node{
 		ID:     s.ID,
 		Type:   "School",
-		Fields: make([]*Field, 5),
+		Fields: make([]*Field, 6),
 		Edges:  make([]*Edge, 2),
 	}
 	var buf []byte
@@ -668,10 +668,18 @@ func (s *School) Node(ctx context.Context) (node *Node, err error) {
 		Name:  "image",
 		Value: string(buf),
 	}
-	if buf, err = json.Marshal(s.Status); err != nil {
+	if buf, err = json.Marshal(s.Directory); err != nil {
 		return nil, err
 	}
 	node.Fields[4] = &Field{
+		Type:  "string",
+		Name:  "directory",
+		Value: string(buf),
+	}
+	if buf, err = json.Marshal(s.Status); err != nil {
+		return nil, err
+	}
+	node.Fields[5] = &Field{
 		Type:  "schema.Status",
 		Name:  "status",
 		Value: string(buf),

@@ -2703,6 +2703,21 @@ type SchoolWhereInput struct {
 	ImageEqualFold    *string  `json:"imageEqualFold,omitempty"`
 	ImageContainsFold *string  `json:"imageContainsFold,omitempty"`
 
+	// "directory" field predicates.
+	Directory             *string  `json:"directory,omitempty"`
+	DirectoryNEQ          *string  `json:"directoryNEQ,omitempty"`
+	DirectoryIn           []string `json:"directoryIn,omitempty"`
+	DirectoryNotIn        []string `json:"directoryNotIn,omitempty"`
+	DirectoryGT           *string  `json:"directoryGT,omitempty"`
+	DirectoryGTE          *string  `json:"directoryGTE,omitempty"`
+	DirectoryLT           *string  `json:"directoryLT,omitempty"`
+	DirectoryLTE          *string  `json:"directoryLTE,omitempty"`
+	DirectoryContains     *string  `json:"directoryContains,omitempty"`
+	DirectoryHasPrefix    *string  `json:"directoryHasPrefix,omitempty"`
+	DirectoryHasSuffix    *string  `json:"directoryHasSuffix,omitempty"`
+	DirectoryEqualFold    *string  `json:"directoryEqualFold,omitempty"`
+	DirectoryContainsFold *string  `json:"directoryContainsFold,omitempty"`
+
 	// "status" field predicates.
 	Status      *schema.Status  `json:"status,omitempty"`
 	StatusNEQ   *schema.Status  `json:"statusNEQ,omitempty"`
@@ -2926,6 +2941,45 @@ func (i *SchoolWhereInput) P() (predicate.School, error) {
 	}
 	if i.ImageContainsFold != nil {
 		predicates = append(predicates, school.ImageContainsFold(*i.ImageContainsFold))
+	}
+	if i.Directory != nil {
+		predicates = append(predicates, school.DirectoryEQ(*i.Directory))
+	}
+	if i.DirectoryNEQ != nil {
+		predicates = append(predicates, school.DirectoryNEQ(*i.DirectoryNEQ))
+	}
+	if len(i.DirectoryIn) > 0 {
+		predicates = append(predicates, school.DirectoryIn(i.DirectoryIn...))
+	}
+	if len(i.DirectoryNotIn) > 0 {
+		predicates = append(predicates, school.DirectoryNotIn(i.DirectoryNotIn...))
+	}
+	if i.DirectoryGT != nil {
+		predicates = append(predicates, school.DirectoryGT(*i.DirectoryGT))
+	}
+	if i.DirectoryGTE != nil {
+		predicates = append(predicates, school.DirectoryGTE(*i.DirectoryGTE))
+	}
+	if i.DirectoryLT != nil {
+		predicates = append(predicates, school.DirectoryLT(*i.DirectoryLT))
+	}
+	if i.DirectoryLTE != nil {
+		predicates = append(predicates, school.DirectoryLTE(*i.DirectoryLTE))
+	}
+	if i.DirectoryContains != nil {
+		predicates = append(predicates, school.DirectoryContains(*i.DirectoryContains))
+	}
+	if i.DirectoryHasPrefix != nil {
+		predicates = append(predicates, school.DirectoryHasPrefix(*i.DirectoryHasPrefix))
+	}
+	if i.DirectoryHasSuffix != nil {
+		predicates = append(predicates, school.DirectoryHasSuffix(*i.DirectoryHasSuffix))
+	}
+	if i.DirectoryEqualFold != nil {
+		predicates = append(predicates, school.DirectoryEqualFold(*i.DirectoryEqualFold))
+	}
+	if i.DirectoryContainsFold != nil {
+		predicates = append(predicates, school.DirectoryContainsFold(*i.DirectoryContainsFold))
 	}
 	if i.Status != nil {
 		predicates = append(predicates, school.StatusEQ(*i.Status))

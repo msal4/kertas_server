@@ -26,6 +26,8 @@ type School struct {
 	Name string `json:"name,omitempty"`
 	// Image holds the value of the "image" field.
 	Image string `json:"image,omitempty"`
+	// Directory holds the value of the "directory" field.
+	Directory string `json:"directory,omitempty"`
 	// Status holds the value of the "status" field.
 	Status schema.Status `json:"status,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
@@ -67,7 +69,7 @@ func (*School) scanValues(columns []string) ([]interface{}, error) {
 	values := make([]interface{}, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case school.FieldName, school.FieldImage, school.FieldStatus:
+		case school.FieldName, school.FieldImage, school.FieldDirectory, school.FieldStatus:
 			values[i] = new(sql.NullString)
 		case school.FieldCreatedAt, school.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
@@ -117,6 +119,12 @@ func (s *School) assignValues(columns []string, values []interface{}) error {
 				return fmt.Errorf("unexpected type %T for field image", values[i])
 			} else if value.Valid {
 				s.Image = value.String
+			}
+		case school.FieldDirectory:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field directory", values[i])
+			} else if value.Valid {
+				s.Directory = value.String
 			}
 		case school.FieldStatus:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -170,6 +178,8 @@ func (s *School) String() string {
 	builder.WriteString(s.Name)
 	builder.WriteString(", image=")
 	builder.WriteString(s.Image)
+	builder.WriteString(", directory=")
+	builder.WriteString(s.Directory)
 	builder.WriteString(", status=")
 	builder.WriteString(fmt.Sprintf("%v", s.Status))
 	builder.WriteByte(')')

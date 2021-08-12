@@ -5666,6 +5666,7 @@ type SchoolMutation struct {
 	updated_at    *time.Time
 	name          *string
 	image         *string
+	directory     *string
 	status        *schema.Status
 	clearedFields map[string]struct{}
 	users         map[uuid.UUID]struct{}
@@ -5908,6 +5909,42 @@ func (m *SchoolMutation) ResetImage() {
 	m.image = nil
 }
 
+// SetDirectory sets the "directory" field.
+func (m *SchoolMutation) SetDirectory(s string) {
+	m.directory = &s
+}
+
+// Directory returns the value of the "directory" field in the mutation.
+func (m *SchoolMutation) Directory() (r string, exists bool) {
+	v := m.directory
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDirectory returns the old "directory" field's value of the School entity.
+// If the School object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *SchoolMutation) OldDirectory(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldDirectory is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldDirectory requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDirectory: %w", err)
+	}
+	return oldValue.Directory, nil
+}
+
+// ResetDirectory resets all changes to the "directory" field.
+func (m *SchoolMutation) ResetDirectory() {
+	m.directory = nil
+}
+
 // SetStatus sets the "status" field.
 func (m *SchoolMutation) SetStatus(s schema.Status) {
 	m.status = &s
@@ -6071,7 +6108,7 @@ func (m *SchoolMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *SchoolMutation) Fields() []string {
-	fields := make([]string, 0, 5)
+	fields := make([]string, 0, 6)
 	if m.created_at != nil {
 		fields = append(fields, school.FieldCreatedAt)
 	}
@@ -6083,6 +6120,9 @@ func (m *SchoolMutation) Fields() []string {
 	}
 	if m.image != nil {
 		fields = append(fields, school.FieldImage)
+	}
+	if m.directory != nil {
+		fields = append(fields, school.FieldDirectory)
 	}
 	if m.status != nil {
 		fields = append(fields, school.FieldStatus)
@@ -6103,6 +6143,8 @@ func (m *SchoolMutation) Field(name string) (ent.Value, bool) {
 		return m.Name()
 	case school.FieldImage:
 		return m.Image()
+	case school.FieldDirectory:
+		return m.Directory()
 	case school.FieldStatus:
 		return m.Status()
 	}
@@ -6122,6 +6164,8 @@ func (m *SchoolMutation) OldField(ctx context.Context, name string) (ent.Value, 
 		return m.OldName(ctx)
 	case school.FieldImage:
 		return m.OldImage(ctx)
+	case school.FieldDirectory:
+		return m.OldDirectory(ctx)
 	case school.FieldStatus:
 		return m.OldStatus(ctx)
 	}
@@ -6160,6 +6204,13 @@ func (m *SchoolMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetImage(v)
+		return nil
+	case school.FieldDirectory:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDirectory(v)
 		return nil
 	case school.FieldStatus:
 		v, ok := value.(schema.Status)
@@ -6228,6 +6279,9 @@ func (m *SchoolMutation) ResetField(name string) error {
 		return nil
 	case school.FieldImage:
 		m.ResetImage()
+		return nil
+	case school.FieldDirectory:
+		m.ResetDirectory()
 		return nil
 	case school.FieldStatus:
 		m.ResetStatus()

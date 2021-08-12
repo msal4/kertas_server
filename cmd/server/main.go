@@ -1,12 +1,9 @@
 package main
 
 import (
-	"context"
 	"flag"
 	"log"
-	"math/rand"
 	"net/http"
-	"time"
 
 	"entgo.io/contrib/entgql"
 	"entgo.io/ent/dialect"
@@ -18,6 +15,7 @@ import (
 	"github.com/minio/minio-go/v7/pkg/credentials"
 	"github.com/msal4/hassah_school_server/ent"
 	"github.com/msal4/hassah_school_server/graph"
+	"github.com/msal4/hassah_school_server/service"
 )
 
 var debg bool
@@ -48,24 +46,12 @@ func main() {
 		log.Fatalf("instantiating minio client: %v", err)
 	}
 
-	ctx := context.Background()
-	if _, err := mc.ListBuckets(ctx); err != nil {
-		log.Fatalf("connecting to minio: %v", err)
-	}
-	exists, err := mc.BucketExists(ctx, "images")
+	s, err := service.New(ec, mc, nil)
 	if err != nil {
-		log.Fatalf("checking if images bucket exists: %v", err)
-	}
-	if !exists {
-		log.Println(`bucket "images" does not exist, creating one...`)
-		err := mc.MakeBucket(ctx, "images", minio.MakeBucketOptions{})
-		if err != nil {
-			log.Fatalf(`making "images" bucket: %v`, err)
-		}
-		log.Println(`created bucket "images".`)
+		log.Fatalf("initializing service: %v", err)
 	}
 
-	srv := handler.NewDefaultServer(graph.NewSchema(ec, mc, rand.NewSource(time.Now().Unix())))
+	srv := handler.NewDefaultServer(graph.NewSchema(s))
 	srv.Use(entgql.Transactioner{TxOpener: ec})
 	if debg {
 		srv.Use(&debug.Tracer{})

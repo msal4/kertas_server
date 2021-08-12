@@ -64,6 +64,12 @@ func (sc *SchoolCreate) SetImage(s string) *SchoolCreate {
 	return sc
 }
 
+// SetDirectory sets the "directory" field.
+func (sc *SchoolCreate) SetDirectory(s string) *SchoolCreate {
+	sc.mutation.SetDirectory(s)
+	return sc
+}
+
 // SetStatus sets the "status" field.
 func (sc *SchoolCreate) SetStatus(s schema.Status) *SchoolCreate {
 	sc.mutation.SetStatus(s)
@@ -227,6 +233,14 @@ func (sc *SchoolCreate) check() error {
 			return &ValidationError{Name: "image", err: fmt.Errorf(`ent: validator failed for field "image": %w`, err)}
 		}
 	}
+	if _, ok := sc.mutation.Directory(); !ok {
+		return &ValidationError{Name: "directory", err: errors.New(`ent: missing required field "directory"`)}
+	}
+	if v, ok := sc.mutation.Directory(); ok {
+		if err := school.DirectoryValidator(v); err != nil {
+			return &ValidationError{Name: "directory", err: fmt.Errorf(`ent: validator failed for field "directory": %w`, err)}
+		}
+	}
 	if _, ok := sc.mutation.Status(); !ok {
 		return &ValidationError{Name: "status", err: errors.New(`ent: missing required field "status"`)}
 	}
@@ -295,6 +309,14 @@ func (sc *SchoolCreate) createSpec() (*School, *sqlgraph.CreateSpec) {
 			Column: school.FieldImage,
 		})
 		_node.Image = value
+	}
+	if value, ok := sc.mutation.Directory(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: school.FieldDirectory,
+		})
+		_node.Directory = value
 	}
 	if value, ok := sc.mutation.Status(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{

@@ -24,6 +24,8 @@ const (
 	FieldName = "name"
 	// FieldImage holds the string denoting the image field in the database.
 	FieldImage = "image"
+	// FieldDirectory holds the string denoting the directory field in the database.
+	FieldDirectory = "directory"
 	// FieldStatus holds the string denoting the status field in the database.
 	FieldStatus = "status"
 	// EdgeUsers holds the string denoting the users edge name in mutations.
@@ -55,6 +57,7 @@ var Columns = []string{
 	FieldUpdatedAt,
 	FieldName,
 	FieldImage,
+	FieldDirectory,
 	FieldStatus,
 }
 
@@ -79,6 +82,8 @@ var (
 	NameValidator func(string) error
 	// ImageValidator is a validator for the "image" field. It is called by the builders before save.
 	ImageValidator func(string) error
+	// DirectoryValidator is a validator for the "directory" field. It is called by the builders before save.
+	DirectoryValidator func(string) error
 	// DefaultID holds the default value on creation for the "id" field.
 	DefaultID func() uuid.UUID
 )

@@ -111,6 +111,21 @@ input SchoolWhereInput {
   imageEqualFold: String
   imageContainsFold: String
   
+  """directory field predicates"""
+  directory: String
+  directoryNEQ: String
+  directoryIn: [String!]
+  directoryNotIn: [String!]
+  directoryGT: String
+  directoryGTE: String
+  directoryLT: String
+  directoryLTE: String
+  directoryContains: String
+  directoryHasPrefix: String
+  directoryHasSuffix: String
+  directoryEqualFold: String
+  directoryContainsFold: String
+  
   """status field predicates"""
   status: Status
   statusNEQ: Status

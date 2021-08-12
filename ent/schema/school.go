@@ -21,6 +21,7 @@ func (School) Fields() []ent.Field {
 		field.UUID("id", uuid.UUID{}).Default(uuid.New),
 		field.String("name").NotEmpty().Annotations(entgql.OrderField("NAME")),
 		field.String("image").NotEmpty(),
+		field.String("directory").NotEmpty(),
 		field.Enum("status").GoType(Status("")).Default(StatusActive.String()).Annotations(entgql.OrderField("STATUS")),
 	}
 }

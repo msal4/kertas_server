@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"math/rand"
 	"mime/multipart"
 	"net/http"
 	"net/http/httptest"
@@ -25,6 +24,7 @@ import (
 	"github.com/msal4/hassah_school_server/ent/schema"
 	"github.com/msal4/hassah_school_server/ent/school"
 	"github.com/msal4/hassah_school_server/graph"
+	"github.com/msal4/hassah_school_server/service"
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
 )
@@ -32,6 +32,13 @@ import (
 type schoolTestSuite struct {
 	suite.Suite
 	mc *minio.Client
+}
+
+func (s *schoolTestSuite) newService(db string) *service.Service {
+	ec := enttest.Open(s.T(), dialect.SQLite, fmt.Sprintf("file:%s?mode=memory&cache=shared&_fk=1", db), enttest.WithOptions(ent.Log(s.T().Log)))
+	srv, err := service.New(ec, s.mc, nil)
+	s.Require().NoError(err)
+	return srv
 }
 
 func TestSchool(t *testing.T) {
@@ -49,8 +56,9 @@ func (s *schoolTestSuite) SetupTest() {
 }
 
 func (s *schoolTestSuite) TestSchools() {
-	ec := enttest.Open(s.T(), dialect.SQLite, "file:ent2?mode=memory&cache=shared&_fk=1", enttest.WithOptions(ent.Log(s.T().Log)))
-	gc := client.New(handler.NewDefaultServer(graph.NewSchema(ec, s.mc, rand.NewSource(0))))
+	srv := s.newService("123rand")
+	gc := client.New(handler.NewDefaultServer(graph.NewSchema(srv)))
+	ec := srv.EC
 
 	type response struct {
 		Schools struct {
@@ -113,13 +121,13 @@ func (s *schoolTestSuite) TestSchools() {
 	})
 
 	s.T().Run("unordered", func(t *testing.T) {
-		defer ec.School.Delete().ExecX(ctx)
+		defer srv.EC.School.Delete().ExecX(ctx)
 
 		const expectedLen = 3
 		schools := make([]*ent.School, expectedLen)
-		schools[0] = ec.School.Create().SetName("school 1").SetImage("image/1").SaveX(ctx)
-		schools[1] = ec.School.Create().SetName("school 2").SetImage("image/2").SetStatus(schema.StatusDeleted).SaveX(ctx)
-		schools[2] = ec.School.Create().SetName("school 3").SetImage("image/3").SetStatus(schema.StatusDisabled).SaveX(ctx)
+		schools[0] = ec.School.Create().SetName("school 1").SetImage("image/1").SetDirectory("test_dir").SaveX(ctx)
+		schools[1] = ec.School.Create().SetName("school 2").SetImage("image/2").SetDirectory("test_dir").SetStatus(schema.StatusDeleted).SaveX(ctx)
+		schools[2] = ec.School.Create().SetName("school 3").SetImage("image/3").SetDirectory("test_dir").SetStatus(schema.StatusDisabled).SaveX(ctx)
 
 		var resp response
 
@@ -174,9 +182,9 @@ func (s *schoolTestSuite) TestSchools() {
 	s.T().Run("order", func(t *testing.T) {
 		defer ec.School.Delete().ExecX(ctx)
 
-		ec.School.Create().SetName("school 1").SetImage("image/1").SetCreatedAt(time.Now().Add(time.Minute)).SaveX(ctx)
-		ec.School.Create().SetName("school 2").SetImage("image/2").SetStatus(schema.StatusDeleted).SetCreatedAt(time.Now().Add(time.Hour)).SaveX(ctx)
-		ec.School.Create().SetName("school 3").SetImage("image/3").SetStatus(schema.StatusDisabled).SaveX(ctx)
+		ec.School.Create().SetName("school 1").SetImage("image/1").SetDirectory("test_dir").SetCreatedAt(time.Now().Add(time.Minute)).SaveX(ctx)
+		ec.School.Create().SetName("school 2").SetImage("image/2").SetDirectory("test_dir").SetStatus(schema.StatusDeleted).SetCreatedAt(time.Now().Add(time.Hour)).SaveX(ctx)
+		ec.School.Create().SetName("school 3").SetImage("image/3").SetDirectory("test_dir").SetStatus(schema.StatusDisabled).SaveX(ctx)
 
 		var resp response
 
@@ -226,9 +234,9 @@ schools(orderBy: {field: CREATED_AT, direction: ASC}) {
 	s.T().Run("order & filter", func(t *testing.T) {
 		defer ec.School.Delete().ExecX(ctx)
 
-		ec.School.Create().SetName("school 1").SetImage("image/1").SetCreatedAt(time.Now().Add(time.Minute)).SaveX(ctx)
-		ec.School.Create().SetName("school 2").SetImage("image/2").SetStatus(schema.StatusDeleted).SetCreatedAt(time.Now().Add(time.Hour)).SaveX(ctx)
-		ec.School.Create().SetName("school 3").SetImage("image/3").SetStatus(schema.StatusDisabled).SaveX(ctx)
+		ec.School.Create().SetName("school 1").SetDirectory("test_dir").SetImage("image/1").SetCreatedAt(time.Now().Add(time.Minute)).SaveX(ctx)
+		ec.School.Create().SetName("school 2").SetDirectory("test_dir").SetImage("image/2").SetStatus(schema.StatusDeleted).SetCreatedAt(time.Now().Add(time.Hour)).SaveX(ctx)
+		ec.School.Create().SetName("school 3").SetDirectory("test_dir").SetImage("image/3").SetStatus(schema.StatusDisabled).SaveX(ctx)
 
 		var resp response
 
@@ -277,9 +285,10 @@ schools(orderBy: {field: CREATED_AT, direction: ASC}, where: {status: DISABLED})
 }
 
 func (s *schoolTestSuite) TestAddSchool() {
-	ec := enttest.Open(s.T(), dialect.SQLite, "file:ent?mode=memory&cache=shared&_fk=1", enttest.WithOptions(ent.Log(s.T().Log)))
-	srv := handler.NewDefaultServer(graph.NewSchema(ec, s.mc, rand.NewSource(0)))
-	gc := client.New(srv)
+	srv := s.newService("tesw2")
+	server := handler.NewDefaultServer(graph.NewSchema(srv))
+	gc := client.New(server)
+	ec := srv.EC
 	ctx := context.Background()
 
 	type response struct {
@@ -325,7 +334,7 @@ func (s *schoolTestSuite) TestAddSchool() {
 			File:   imgFile,
 		})
 
-		srv.ServeHTTP(w, r)
+		server.ServeHTTP(w, r)
 
 		var resp response
 		require.NoError(t, json.NewDecoder(w.Body).Decode(&resp))
@@ -362,9 +371,10 @@ func createMultipartRequest(t *testing.T, operations, mapData string, f file) *h
 }
 
 func (s *schoolTestSuite) TestDeleteSchool() {
-	ec := enttest.Open(s.T(), dialect.SQLite, "file:ent?mode=memory&cache=shared&_fk=1", enttest.WithOptions(ent.Log(s.T().Log)))
-	srv := handler.NewDefaultServer(graph.NewSchema(ec, s.mc, rand.NewSource(0)))
-	gc := client.New(srv)
+	srv := s.newService("rsdj2")
+	ec := srv.EC
+	server := handler.NewDefaultServer(graph.NewSchema(srv))
+	gc := client.New(server)
 	ctx := context.Background()
 
 	type response struct {
@@ -374,7 +384,7 @@ func (s *schoolTestSuite) TestDeleteSchool() {
 	s.T().Run("exists", func(t *testing.T) {
 		defer ec.School.Delete().ExecX(ctx)
 
-		sch := ec.School.Create().SetName("test school").SetImage("test/image").SaveX(ctx)
+		sch := ec.School.Create().SetName("test school").SetDirectory("test_dir").SetImage("test/image").SaveX(ctx)
 
 		var resp response
 		gc.MustPost(fmt.Sprintf(`mutation { deleteSchool(id:"%s") } `, sch.ID.String()), &resp)
@@ -387,7 +397,7 @@ func (s *schoolTestSuite) TestDeleteSchool() {
 	s.T().Run("does not exist", func(t *testing.T) {
 		defer ec.School.Delete().ExecX(ctx)
 
-		ec.School.Create().SetName("test school").SetImage("test/image").SaveX(ctx)
+		ec.School.Create().SetName("test school").SetDirectory("test_dir").SetImage("test/image").SaveX(ctx)
 
 		var resp response
 		err := gc.Post(`mutation { deleteSchool(id:"2710c203-7842-4356-8d9f-12f9da4722a2") } `, &resp)

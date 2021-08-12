@@ -42,6 +42,12 @@ func (su *SchoolUpdate) SetImage(s string) *SchoolUpdate {
 	return su
 }
 
+// SetDirectory sets the "directory" field.
+func (su *SchoolUpdate) SetDirectory(s string) *SchoolUpdate {
+	su.mutation.SetDirectory(s)
+	return su
+}
+
 // SetStatus sets the "status" field.
 func (su *SchoolUpdate) SetStatus(s schema.Status) *SchoolUpdate {
 	su.mutation.SetStatus(s)
@@ -214,6 +220,11 @@ func (su *SchoolUpdate) check() error {
 			return &ValidationError{Name: "image", err: fmt.Errorf("ent: validator failed for field \"image\": %w", err)}
 		}
 	}
+	if v, ok := su.mutation.Directory(); ok {
+		if err := school.DirectoryValidator(v); err != nil {
+			return &ValidationError{Name: "directory", err: fmt.Errorf("ent: validator failed for field \"directory\": %w", err)}
+		}
+	}
 	if v, ok := su.mutation.Status(); ok {
 		if err := school.StatusValidator(v); err != nil {
 			return &ValidationError{Name: "status", err: fmt.Errorf("ent: validator failed for field \"status\": %w", err)}
@@ -259,6 +270,13 @@ func (su *SchoolUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Type:   field.TypeString,
 			Value:  value,
 			Column: school.FieldImage,
+		})
+	}
+	if value, ok := su.mutation.Directory(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: school.FieldDirectory,
 		})
 	}
 	if value, ok := su.mutation.Status(); ok {
@@ -404,6 +422,12 @@ func (suo *SchoolUpdateOne) SetName(s string) *SchoolUpdateOne {
 // SetImage sets the "image" field.
 func (suo *SchoolUpdateOne) SetImage(s string) *SchoolUpdateOne {
 	suo.mutation.SetImage(s)
+	return suo
+}
+
+// SetDirectory sets the "directory" field.
+func (suo *SchoolUpdateOne) SetDirectory(s string) *SchoolUpdateOne {
+	suo.mutation.SetDirectory(s)
 	return suo
 }
 
@@ -586,6 +610,11 @@ func (suo *SchoolUpdateOne) check() error {
 			return &ValidationError{Name: "image", err: fmt.Errorf("ent: validator failed for field \"image\": %w", err)}
 		}
 	}
+	if v, ok := suo.mutation.Directory(); ok {
+		if err := school.DirectoryValidator(v); err != nil {
+			return &ValidationError{Name: "directory", err: fmt.Errorf("ent: validator failed for field \"directory\": %w", err)}
+		}
+	}
 	if v, ok := suo.mutation.Status(); ok {
 		if err := school.StatusValidator(v); err != nil {
 			return &ValidationError{Name: "status", err: fmt.Errorf("ent: validator failed for field \"status\": %w", err)}
@@ -648,6 +677,13 @@ func (suo *SchoolUpdateOne) sqlSave(ctx context.Context) (_node *School, err err
 			Type:   field.TypeString,
 			Value:  value,
 			Column: school.FieldImage,
+		})
+	}
+	if value, ok := suo.mutation.Directory(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: school.FieldDirectory,
 		})
 	}
 	if value, ok := suo.mutation.Status(); ok {

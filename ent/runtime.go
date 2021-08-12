@@ -225,6 +225,10 @@ func init() {
 	schoolDescImage := schoolFields[2].Descriptor()
 	// school.ImageValidator is a validator for the "image" field. It is called by the builders before save.
 	school.ImageValidator = schoolDescImage.Validators[0].(func(string) error)
+	// schoolDescDirectory is the schema descriptor for directory field.
+	schoolDescDirectory := schoolFields[3].Descriptor()
+	// school.DirectoryValidator is a validator for the "directory" field. It is called by the builders before save.
+	school.DirectoryValidator = schoolDescDirectory.Validators[0].(func(string) error)
 	// schoolDescID is the schema descriptor for id field.
 	schoolDescID := schoolFields[0].Descriptor()
 	// school.DefaultID holds the default value on creation for the id field.
