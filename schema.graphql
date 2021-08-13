@@ -80,12 +80,20 @@ input CreateSchoolInput {
   status: Status! = ACTIVE
 }
 
+input UpdateSchoolInput {
+  name: String
+  image: Upload
+  status: Status
+}
+
 type Query {
+    school(id: ID!): School
     schools(after: Cursor, first: Int, before: Cursor, last: Int, orderBy: SchoolOrder, where: SchoolWhereInput): SchoolConnection
 }
 
 type Mutation {
   addSchool(input: CreateSchoolInput!): School
+  updateSchool(id: ID!, input: UpdateSchoolInput!): School
   deleteSchool(id: ID!): Boolean!
 }
 

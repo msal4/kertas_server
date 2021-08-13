@@ -2,10 +2,6 @@ package service_test
 
 import (
 	"context"
-	"io/fs"
-	"io/ioutil"
-	"net/http"
-	"os"
 	"testing"
 
 	"github.com/99designs/gqlgen/graphql"
@@ -16,6 +12,7 @@ import (
 	"github.com/msal4/hassah_school_server/ent/school"
 	"github.com/msal4/hassah_school_server/graph/model"
 	"github.com/msal4/hassah_school_server/service"
+	"github.com/msal4/hassah_school_server/testutil"
 	"github.com/msal4/hassah_school_server/util/ptr"
 	"github.com/stretchr/testify/require"
 )
@@ -121,11 +118,11 @@ func TestSchoolAdd(t *testing.T) {
 	})
 
 	t.Run("with image", func(t *testing.T) {
-		f := openFile(t, "../testfiles/stanford.png")
+		f := testutil.OpenFile(t, "../testfiles/stanford.png")
 		defer f.Close()
 		got, err := s.SchoolAdd(ctx, model.CreateSchoolInput{
 			Name:   "test school",
-			Image:  graphql.Upload{File: f, Filename: f.File.Name(), ContentType: f.contentType, Size: f.Size()},
+			Image:  graphql.Upload{File: f, Filename: f.File.Name(), ContentType: f.ContentType, Size: f.Size()},
 			Status: schema.StatusActive,
 		})
 		require.NoError(t, err)
@@ -137,42 +134,16 @@ func TestSchoolAdd(t *testing.T) {
 	})
 
 	t.Run("with invalid image", func(t *testing.T) {
-		f := openFile(t, "../testfiles/file.txt")
+		f := testutil.OpenFile(t, "../testfiles/file.txt")
 		defer f.Close()
 		got, err := s.SchoolAdd(ctx, model.CreateSchoolInput{
 			Name:   "test school",
-			Image:  graphql.Upload{File: f, Filename: f.File.Name(), ContentType: f.contentType, Size: f.Size()},
+			Image:  graphql.Upload{File: f, Filename: f.File.Name(), ContentType: f.ContentType, Size: f.Size()},
 			Status: schema.StatusActive,
 		})
 		require.Error(t, err)
 		require.Nil(t, got)
 	})
-}
-
-type file struct {
-	*os.File
-	fs.FileInfo
-	contentType string
-}
-
-func openFile(t *testing.T, name string) *file {
-	f, err := os.Open(name)
-	require.NoError(t, err)
-	contentType, err := getFileContentType(f)
-	require.NoError(t, err)
-	stat, err := f.Stat()
-	require.NoError(t, err)
-	f.Seek(0, 0)
-
-	return &file{File: f, contentType: contentType, FileInfo: stat}
-}
-
-func getFileContentType(f *os.File) (string, error) {
-	data, err := ioutil.ReadAll(f)
-	if err != nil {
-		return "", err
-	}
-	return http.DetectContentType(data), nil
 }
 
 func TestSchoolDelete(t *testing.T) {
@@ -181,12 +152,12 @@ func TestSchoolDelete(t *testing.T) {
 
 	ctx := context.Background()
 
-	f := openFile(t, "../testfiles/stanford.png")
+	f := testutil.OpenFile(t, "../testfiles/stanford.png")
 	defer f.Close()
 
 	sch, err := s.SchoolAdd(ctx, model.CreateSchoolInput{
 		Name:   "test school",
-		Image:  graphql.Upload{File: f, Filename: f.File.Name(), ContentType: f.contentType, Size: f.Size()},
+		Image:  graphql.Upload{File: f, Filename: f.File.Name(), ContentType: f.ContentType, Size: f.Size()},
 		Status: schema.StatusActive,
 	})
 	require.NoError(t, err)
@@ -209,5 +180,87 @@ func TestSchoolDelete(t *testing.T) {
 
 		_, err = s.MC.StatObject(ctx, s.Config.RootBucket, sch.Image, minio.StatObjectOptions{})
 		require.Error(t, err)
+	})
+}
+
+func TestSchoolUpdate(t *testing.T) {
+	s := newService(t, "3sd23")
+	defer s.EC.Close()
+
+	ctx := context.Background()
+
+	f := testutil.OpenFile(t, "../testfiles/stanford.png")
+	defer f.Close()
+
+	sch, err := s.SchoolAdd(ctx, model.CreateSchoolInput{
+		Name:   "test school",
+		Image:  graphql.Upload{File: f, Filename: f.File.Name(), ContentType: f.ContentType, Size: f.Size()},
+		Status: schema.StatusActive,
+	})
+	require.NoError(t, err)
+	require.NotNil(t, sch)
+
+	t.Run("name", func(t *testing.T) {
+		newSch, err := s.SchoolUpdate(ctx, sch.ID, model.UpdateSchoolInput{Name: ptr.Str("new name")})
+		require.NoError(t, err)
+		require.NotNil(t, newSch)
+		require.Equal(t, newSch.Name, "new name")
+		require.Equal(t, newSch.Status, sch.Status)
+		require.Equal(t, newSch.Image, sch.Image)
+		require.Equal(t, newSch.Directory, sch.Directory)
+	})
+
+	t.Run("image", func(t *testing.T) {
+		f := testutil.OpenFile(t, "../testfiles/harvard.jpg")
+		defer f.Close()
+
+		newSch, err := s.SchoolUpdate(ctx, sch.ID, model.UpdateSchoolInput{Image: &graphql.Upload{
+			File:        f,
+			Filename:    f.File.Name(),
+			ContentType: f.ContentType,
+			Size:        f.Size(),
+		}})
+		require.NoError(t, err)
+		require.NotNil(t, newSch)
+		require.Equal(t, sch.Image, newSch.Image)
+		require.Equal(t, sch.Directory, newSch.Directory)
+		stat, err := s.MC.StatObject(ctx, s.Config.RootBucket, newSch.Image, minio.StatObjectOptions{})
+		require.Equal(t, "image/jpeg", stat.ContentType)
+	})
+
+	t.Run("invalid image file", func(t *testing.T) {
+		f := testutil.OpenFile(t, "../testfiles/file.txt")
+		defer f.Close()
+
+		newSch, err := s.SchoolUpdate(ctx, sch.ID, model.UpdateSchoolInput{Image: &graphql.Upload{
+			File:        f,
+			Filename:    f.File.Name(),
+			ContentType: f.ContentType,
+			Size:        f.Size(),
+		}})
+		require.Error(t, err)
+		require.Nil(t, newSch)
+	})
+
+	t.Run("all", func(t *testing.T) {
+		f := testutil.OpenFile(t, "../testfiles/harvard.jpg")
+		defer f.Close()
+
+		newSch, err := s.SchoolUpdate(ctx, sch.ID, model.UpdateSchoolInput{
+			Name:   ptr.Str("name 2"),
+			Status: ptr.Status(schema.StatusDisabled),
+			Image: &graphql.Upload{
+				File:        f,
+				Filename:    f.File.Name(),
+				ContentType: f.ContentType,
+				Size:        f.Size(),
+			},
+		})
+		require.NoError(t, err)
+		require.NotNil(t, newSch)
+		require.Equal(t, "name 2", newSch.Name)
+		require.Equal(t, schema.StatusDisabled, newSch.Status)
+		require.Equal(t, sch.Image, newSch.Image)
+		require.Equal(t, sch.Directory, newSch.Directory)
 	})
 }

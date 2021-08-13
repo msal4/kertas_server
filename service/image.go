@@ -42,52 +42,58 @@ func (s *Service) FormatFilename(filename, suffix string) string {
 	return b.String()
 }
 
-func (s *Service) SaveImage(ctx context.Context, bucket, dir, filename string, imgSrc graphql.Upload) (minio.UploadInfo, error) {
-	if imgSrc.File == nil {
+type PutImageOptions struct {
+	ParentDir string
+	Filename  string
+	Upload    graphql.Upload
+}
+
+const (
+	thumbnailSuffix = "_w200"
+	hqSuffix        = "_w1000"
+	jpgExt          = ".jpg"
+)
+
+func (s *Service) PutImage(ctx context.Context, opts PutImageOptions) (minio.UploadInfo, error) {
+	if opts.Upload.File == nil {
 		return minio.UploadInfo{}, errors.New("image file is required")
 	}
 
-	filename = s.FormatFilename(filename, "_original")
-
-	info, err := s.MC.PutObject(ctx, s.Config.RootBucket, path.Join(dir, filename), imgSrc.File, imgSrc.Size, minio.PutObjectOptions{
-		ContentType: imgSrc.ContentType,
-	})
-	if err != nil {
-		return info, err
+	if opts.Filename == "" {
+		opts.Filename = s.FormatFilename(opts.Upload.Filename, thumbnailSuffix)
 	}
+	opts.Filename = path.Join(opts.ParentDir, opts.Filename)
 
-	img, _, err := image.Decode(imgSrc.File)
+	img, _, err := image.Decode(opts.Upload.File)
 	if err != nil && err != io.EOF {
-		s.MC.RemoveObject(ctx, s.Config.RootBucket, info.Key, minio.RemoveObjectOptions{})
 		return minio.UploadInfo{}, fmt.Errorf("unsupported image format: %v", err)
 	}
 
 	thumb := resize.Thumbnail(s.Config.ThumbnailSize.Width, s.Config.ThumbnailSize.Height, img, resize.Lanczos2)
 	var thumbBuf bytes.Buffer
 	if err := jpeg.Encode(&thumbBuf, thumb, nil); err != nil {
-		return info, fmt.Errorf("encoding thumbnail: %v", err)
+		return minio.UploadInfo{}, fmt.Errorf("encoding thumbnail: %v", err)
 	}
 
-	info, err = s.MC.PutObject(ctx, s.Config.RootBucket, path.Join(dir, strings.Replace(filename, "_original.", "_w200.", 1)), &thumbBuf, int64(thumbBuf.Len()), minio.PutObjectOptions{
-		ContentType: "image/jpeg",
-	})
+	ext := opts.Filename[strings.LastIndex(opts.Filename, "."):]
+
+	thumbInfo, err := s.MC.PutObject(ctx, s.Config.RootBucket, strings.Replace(opts.Filename, ext, jpgExt, 1),
+		&thumbBuf, int64(thumbBuf.Len()), minio.PutObjectOptions{ContentType: "image/jpeg"})
 	if err != nil {
-		return info, err
+		return thumbInfo, err
 	}
 
 	highQualityImg := resize.Thumbnail(s.Config.HQImageSize.Width, s.Config.HQImageSize.Height, img, resize.Lanczos2)
 	var imgBuf bytes.Buffer
 	if err := jpeg.Encode(&imgBuf, highQualityImg, nil); err != nil {
-		return info, fmt.Errorf("encoding high quality image: %v", err)
+		return thumbInfo, fmt.Errorf("encoding high quality image: %v", err)
 	}
 
-	hqImgPath := path.Join(dir, strings.Replace(filename, "_original.", "_w1000.", 1))
-	info, err = s.MC.PutObject(ctx, s.Config.RootBucket, hqImgPath, &imgBuf, int64(imgBuf.Len()), minio.PutObjectOptions{
-		ContentType: "image/jpeg",
-	})
+	info, err := s.MC.PutObject(ctx, s.Config.RootBucket, strings.Replace(opts.Filename, thumbnailSuffix+ext, hqSuffix+jpgExt, 1),
+		&imgBuf, int64(imgBuf.Len()), minio.PutObjectOptions{ContentType: "image/jpeg"})
 	if err != nil {
 		return info, err
 	}
 
-	return info, nil
+	return thumbInfo, nil
 }

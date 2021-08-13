@@ -27,7 +27,7 @@ func (s *Service) SchoolList(ctx context.Context, opts SchoolListOptions) (*ent.
 func (s *Service) SchoolAdd(ctx context.Context, input model.CreateSchoolInput) (*ent.School, error) {
 	dir := s.FormatFilename(input.Name, "")
 
-	info, err := s.SaveImage(ctx, s.Config.RootBucket, path.Join(dir, "images"), input.Image.Filename, input.Image)
+	info, err := s.PutImage(ctx, PutImageOptions{ParentDir: path.Join(dir, "images"), Upload: input.Image})
 	if err != nil {
 		return nil, err
 	}
@@ -47,4 +47,27 @@ func (s *Service) SchoolDelete(ctx context.Context, id uuid.UUID) error {
 	}
 
 	return s.EC.School.DeleteOneID(id).Exec(ctx)
+}
+
+func (s *Service) SchoolUpdate(ctx context.Context, id uuid.UUID, input model.UpdateSchoolInput) (*ent.School, error) {
+	sch, err := s.EC.School.Get(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+
+	b := s.EC.School.UpdateOneID(id)
+	if input.Name != nil {
+		b.SetName(*input.Name)
+	}
+	if input.Status != nil {
+		b.SetStatus(*input.Status)
+	}
+
+	if input.Image != nil {
+		if _, err := s.PutImage(ctx, PutImageOptions{Filename: sch.Image, Upload: *input.Image}); err != nil {
+			return nil, err
+		}
+	}
+
+	return b.Save(ctx)
 }

@@ -15,6 +15,7 @@ import (
 
 	"entgo.io/ent/dialect"
 	"github.com/99designs/gqlgen/client"
+	"github.com/99designs/gqlgen/graphql"
 	"github.com/99designs/gqlgen/graphql/handler"
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/minio/minio-go/v7"
@@ -24,7 +25,9 @@ import (
 	"github.com/msal4/hassah_school_server/ent/schema"
 	"github.com/msal4/hassah_school_server/ent/school"
 	"github.com/msal4/hassah_school_server/graph"
+	"github.com/msal4/hassah_school_server/graph/model"
 	"github.com/msal4/hassah_school_server/service"
+	"github.com/msal4/hassah_school_server/testutil"
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
 )
@@ -368,6 +371,88 @@ func createMultipartRequest(t *testing.T, operations, mapData string, f file) *h
 	r.Header.Set("content-type", w.FormDataContentType())
 
 	return r
+}
+
+const testID = "2710c203-7842-4356-8d9f-12f9da4722a2"
+
+func (s *schoolTestSuite) TestUpdateSchool() {
+	srv := s.newService("sd3tesw2")
+	defer srv.EC.Close()
+	server := handler.NewDefaultServer(graph.NewSchema(srv))
+	gc := client.New(server)
+	ec := srv.EC
+	ctx := context.Background()
+
+	type response struct {
+		Data *struct {
+			UpdateSchool *struct {
+				ID        string        `json:"id"`
+				Name      string        `json:"name"`
+				Image     string        `json:"image"`
+				Status    schema.Status `json:"status"`
+				CreatedAt string        `json:"created_at"`
+				UpdatedAt string        `json:"updated_at"`
+			} `json:"updateSchool"`
+		} `json:"data"`
+		Errors []struct {
+			Message string   `json:"message"`
+			Path    []string `json:"path"`
+		} `json:"errors,omitempty"`
+	}
+
+	s.T().Run("invalid", func(t *testing.T) {
+		var resp response
+		err := gc.Post(fmt.Sprintf("mutation { updateSchool(id: %q, input: {name: \"a school without an image\"}) { id name image status createdAt updatedAt }}", testID), &resp.Data)
+		fmt.Println(err)
+		require.Error(t, err)
+	})
+
+	f := testutil.OpenFile(s.T(), "../testfiles/harvard.jpg")
+	defer f.Close()
+	sch, err := srv.SchoolAdd(ctx,
+		model.CreateSchoolInput{
+			Name: "test schoo",
+			Image: graphql.Upload{
+				File:     f,
+				Filename: f.File.Name(),
+				Size:     f.Size(),
+			},
+			Status: schema.StatusActive,
+		},
+	)
+	require.NoError(s.T(), err)
+
+	s.T().Run("valid", func(t *testing.T) {
+		defer ec.School.Delete().ExecX(ctx)
+
+		w := httptest.NewRecorder()
+
+		imgFile, err := os.Open("../testfiles/stanford.png")
+		defer imgFile.Close()
+		require.NoError(t, err)
+
+		operations := fmt.Sprintf(`{
+"query": "mutation ($image: Upload!) { updateSchool(id: \"%s\", input: {name: \"a school with an image\", image: $image}) { id name image status createdAt updatedAt }}", 
+			"variables": {"image": null}
+		}`, sch.ID)
+
+		mapData := `{"0": ["variables.image"]}`
+
+		r := createMultipartRequest(t, operations, mapData, file{
+			mapKey: "0",
+			File:   imgFile,
+		})
+
+		server.ServeHTTP(w, r)
+
+		var resp response
+		require.NoError(t, json.NewDecoder(w.Body).Decode(&resp))
+		require.Nil(t, resp.Errors)
+		require.NotNil(t, resp.Data, "data is nil")
+		require.NotNil(t, resp.Data.UpdateSchool, "data.updateSchool is nil")
+		require.NotEmpty(t, resp.Data.UpdateSchool.ID)
+		require.Equal(t, "a school with an image", resp.Data.UpdateSchool.Name)
+	})
 }
 
 func (s *schoolTestSuite) TestDeleteSchool() {

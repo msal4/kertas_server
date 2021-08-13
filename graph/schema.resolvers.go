@@ -17,8 +17,16 @@ func (r *mutationResolver) AddSchool(ctx context.Context, input model.CreateScho
 	return r.s.SchoolAdd(ctx, input)
 }
 
+func (r *mutationResolver) UpdateSchool(ctx context.Context, id uuid.UUID, input model.UpdateSchoolInput) (*ent.School, error) {
+	return r.s.SchoolUpdate(ctx, id, input)
+}
+
 func (r *mutationResolver) DeleteSchool(ctx context.Context, id uuid.UUID) (bool, error) {
 	return true, r.s.SchoolDelete(ctx, id)
+}
+
+func (r *queryResolver) School(ctx context.Context, id uuid.UUID) (*ent.School, error) {
+	return r.s.EC.School.Get(ctx, id)
 }
 
 func (r *queryResolver) Schools(ctx context.Context, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.SchoolOrder, where *ent.SchoolWhereInput) (*ent.SchoolConnection, error) {

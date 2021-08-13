@@ -12,3 +12,9 @@ type CreateSchoolInput struct {
 	Image  graphql.Upload `json:"image"`
 	Status schema.Status  `json:"status"`
 }
+
+type UpdateSchoolInput struct {
+	Name   *string         `json:"name"`
+	Image  *graphql.Upload `json:"image"`
+	Status *schema.Status  `json:"status"`
+}
