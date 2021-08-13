@@ -18,7 +18,7 @@ import (
 )
 
 func TestSchoolList(t *testing.T) {
-	s := newService(t, "1")
+	s := newService(t)
 	defer s.EC.Close()
 	ctx := context.Background()
 
@@ -107,7 +107,7 @@ func TestSchoolList(t *testing.T) {
 }
 
 func TestSchoolAdd(t *testing.T) {
-	s := newService(t, "2")
+	s := newService(t)
 	defer s.EC.Close()
 	ctx := context.Background()
 
@@ -147,7 +147,7 @@ func TestSchoolAdd(t *testing.T) {
 }
 
 func TestSchoolDelete(t *testing.T) {
-	s := newService(t, "3sd23")
+	s := newService(t)
 	defer s.EC.Close()
 
 	ctx := context.Background()
@@ -184,7 +184,7 @@ func TestSchoolDelete(t *testing.T) {
 }
 
 func TestSchoolUpdate(t *testing.T) {
-	s := newService(t, "3sd23")
+	s := newService(t)
 	defer s.EC.Close()
 
 	ctx := context.Background()
