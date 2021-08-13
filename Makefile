@@ -1,8 +1,8 @@
 start:
-	go run cmd/server/main.go
+	@go run cmd/server/main.go --debug
 migrate:
-	go run cmd/migrate-schema/main.go
+	@go run cmd/migrate-schema/main.go
 gen:
-	go generate .
+	@go generate .
 test:
-	go test -v ./...
+	@go test -v ./...
