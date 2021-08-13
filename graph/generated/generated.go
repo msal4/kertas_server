@@ -53,8 +53,8 @@ type DirectiveRoot struct {
 
 type ComplexityRoot struct {
 	Mutation struct {
-		AddSchool    func(childComplexity int, input model.CreateSchoolInput) int
-		AddUser      func(childComplexity int, input model.CreateUserInput) int
+		AddSchool    func(childComplexity int, input model.AddSchoolInput) int
+		AddUser      func(childComplexity int, input model.AddUserInput) int
 		DeleteSchool func(childComplexity int, id uuid.UUID) int
 		UdpateUser   func(childComplexity int, id uuid.UUID, input model.UpdateUserInput) int
 		UpdateSchool func(childComplexity int, id uuid.UUID, input model.UpdateSchoolInput) int
@@ -130,10 +130,10 @@ type ComplexityRoot struct {
 }
 
 type MutationResolver interface {
-	AddSchool(ctx context.Context, input model.CreateSchoolInput) (*ent.School, error)
+	AddSchool(ctx context.Context, input model.AddSchoolInput) (*ent.School, error)
 	UpdateSchool(ctx context.Context, id uuid.UUID, input model.UpdateSchoolInput) (*ent.School, error)
 	DeleteSchool(ctx context.Context, id uuid.UUID) (bool, error)
-	AddUser(ctx context.Context, input model.CreateUserInput) (*ent.User, error)
+	AddUser(ctx context.Context, input model.AddUserInput) (*ent.User, error)
 	UdpateUser(ctx context.Context, id uuid.UUID, input model.UpdateUserInput) (*ent.User, error)
 }
 type QueryResolver interface {
@@ -166,7 +166,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.AddSchool(childComplexity, args["input"].(model.CreateSchoolInput)), true
+		return e.complexity.Mutation.AddSchool(childComplexity, args["input"].(model.AddSchoolInput)), true
 
 	case "Mutation.addUser":
 		if e.complexity.Mutation.AddUser == nil {
@@ -178,7 +178,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.AddUser(childComplexity, args["input"].(model.CreateUserInput)), true
+		return e.complexity.Mutation.AddUser(childComplexity, args["input"].(model.AddUserInput)), true
 
 	case "Mutation.deleteSchool":
 		if e.complexity.Mutation.DeleteSchool == nil {
@@ -653,7 +653,7 @@ type SchoolConnection {
   edges: [SchoolEdge]
 }
 
-input CreateSchoolInput {
+input AddSchoolInput {
   name: String!
   image: Upload!
   status: Status! = ACTIVE
@@ -701,7 +701,7 @@ type UserConnection {
   edges: [UserEdge]
 }
 
-input CreateUserInput {
+input AddUserInput {
   name: String!
   username: String!
   password: String!
@@ -729,11 +729,11 @@ type Query {
 }
 
 type Mutation {
-  addSchool(input: CreateSchoolInput!): School
+  addSchool(input: AddSchoolInput!): School
   updateSchool(id: ID!, input: UpdateSchoolInput!): School
   deleteSchool(id: ID!): Boolean!
 
-  addUser(input: CreateUserInput!): User
+  addUser(input: AddUserInput!): User
   udpateUser(id: ID!, input: UpdateUserInput!): User
 }
 `, BuiltIn: false},
@@ -1791,10 +1791,10 @@ var parsedSchema = gqlparser.MustLoadSchema(sources...)
 func (ec *executionContext) field_Mutation_addSchool_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 model.CreateSchoolInput
+	var arg0 model.AddSchoolInput
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalNCreateSchoolInput2githubᚗcomᚋmsal4ᚋhassah_school_serverᚋgraphᚋmodelᚐCreateSchoolInput(ctx, tmp)
+		arg0, err = ec.unmarshalNAddSchoolInput2githubᚗcomᚋmsal4ᚋhassah_school_serverᚋgraphᚋmodelᚐAddSchoolInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -1806,10 +1806,10 @@ func (ec *executionContext) field_Mutation_addSchool_args(ctx context.Context, r
 func (ec *executionContext) field_Mutation_addUser_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 model.CreateUserInput
+	var arg0 model.AddUserInput
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalNCreateUserInput2githubᚗcomᚋmsal4ᚋhassah_school_serverᚋgraphᚋmodelᚐCreateUserInput(ctx, tmp)
+		arg0, err = ec.unmarshalNAddUserInput2githubᚗcomᚋmsal4ᚋhassah_school_serverᚋgraphᚋmodelᚐAddUserInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -2034,7 +2034,7 @@ func (ec *executionContext) _Mutation_addSchool(ctx context.Context, field graph
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().AddSchool(rctx, args["input"].(model.CreateSchoolInput))
+		return ec.resolvers.Mutation().AddSchool(rctx, args["input"].(model.AddSchoolInput))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2154,7 +2154,7 @@ func (ec *executionContext) _Mutation_addUser(ctx context.Context, field graphql
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().AddUser(rctx, args["input"].(model.CreateUserInput))
+		return ec.resolvers.Mutation().AddUser(rctx, args["input"].(model.AddUserInput))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -4781,6 +4781,137 @@ func (ec *executionContext) ___Type_ofType(ctx context.Context, field graphql.Co
 
 // region    **************************** input.gotpl *****************************
 
+func (ec *executionContext) unmarshalInputAddSchoolInput(ctx context.Context, obj interface{}) (model.AddSchoolInput, error) {
+	var it model.AddSchoolInput
+	var asMap = obj.(map[string]interface{})
+
+	if _, present := asMap["status"]; !present {
+		asMap["status"] = "ACTIVE"
+	}
+
+	for k, v := range asMap {
+		switch k {
+		case "name":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
+			it.Name, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "image":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("image"))
+			it.Image, err = ec.unmarshalNUpload2githubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚐUpload(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "status":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("status"))
+			it.Status, err = ec.unmarshalNStatus2githubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚋschemaᚐStatus(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputAddUserInput(ctx context.Context, obj interface{}) (model.AddUserInput, error) {
+	var it model.AddUserInput
+	var asMap = obj.(map[string]interface{})
+
+	if _, present := asMap["role"]; !present {
+		asMap["role"] = "STUDENT"
+	}
+	if _, present := asMap["status"]; !present {
+		asMap["status"] = "ACTIVE"
+	}
+
+	for k, v := range asMap {
+		switch k {
+		case "name":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
+			it.Name, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "username":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("username"))
+			it.Username, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "password":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("password"))
+			it.Password, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "phone":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("phone"))
+			it.Phone, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "image":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("image"))
+			it.Image, err = ec.unmarshalOUpload2ᚖgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚐUpload(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "role":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("role"))
+			it.Role, err = ec.unmarshalNRole2githubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚋuserᚐRole(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "status":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("status"))
+			it.Status, err = ec.unmarshalNStatus2githubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚋschemaᚐStatus(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "school_id":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("school_id"))
+			it.SchoolID, err = ec.unmarshalOID2ᚖgithubᚗcomᚋgoogleᚋuuidᚐUUID(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "stage_id":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("stage_id"))
+			it.StageID, err = ec.unmarshalOID2ᚖgithubᚗcomᚋgoogleᚋuuidᚐUUID(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputAssignmentSubmissionWhereInput(ctx context.Context, obj interface{}) (ent.AssignmentSubmissionWhereInput, error) {
 	var it ent.AssignmentSubmissionWhereInput
 	var asMap = obj.(map[string]interface{})
@@ -6668,137 +6799,6 @@ func (ec *executionContext) unmarshalInputClassWhereInput(ctx context.Context, o
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasSchedulesWith"))
 			it.HasSchedulesWith, err = ec.unmarshalOScheduleWhereInput2ᚕᚖgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚐScheduleWhereInputᚄ(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		}
-	}
-
-	return it, nil
-}
-
-func (ec *executionContext) unmarshalInputCreateSchoolInput(ctx context.Context, obj interface{}) (model.CreateSchoolInput, error) {
-	var it model.CreateSchoolInput
-	var asMap = obj.(map[string]interface{})
-
-	if _, present := asMap["status"]; !present {
-		asMap["status"] = "ACTIVE"
-	}
-
-	for k, v := range asMap {
-		switch k {
-		case "name":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
-			it.Name, err = ec.unmarshalNString2string(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "image":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("image"))
-			it.Image, err = ec.unmarshalNUpload2githubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚐUpload(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "status":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("status"))
-			it.Status, err = ec.unmarshalNStatus2githubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚋschemaᚐStatus(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		}
-	}
-
-	return it, nil
-}
-
-func (ec *executionContext) unmarshalInputCreateUserInput(ctx context.Context, obj interface{}) (model.CreateUserInput, error) {
-	var it model.CreateUserInput
-	var asMap = obj.(map[string]interface{})
-
-	if _, present := asMap["role"]; !present {
-		asMap["role"] = "STUDENT"
-	}
-	if _, present := asMap["status"]; !present {
-		asMap["status"] = "ACTIVE"
-	}
-
-	for k, v := range asMap {
-		switch k {
-		case "name":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
-			it.Name, err = ec.unmarshalNString2string(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "username":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("username"))
-			it.Username, err = ec.unmarshalNString2string(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "password":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("password"))
-			it.Password, err = ec.unmarshalNString2string(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "phone":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("phone"))
-			it.Phone, err = ec.unmarshalNString2string(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "image":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("image"))
-			it.Image, err = ec.unmarshalOUpload2ᚖgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚐUpload(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "role":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("role"))
-			it.Role, err = ec.unmarshalNRole2githubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚋuserᚐRole(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "status":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("status"))
-			it.Status, err = ec.unmarshalNStatus2githubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚋschemaᚐStatus(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "school_id":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("school_id"))
-			it.SchoolID, err = ec.unmarshalOID2ᚖgithubᚗcomᚋgoogleᚋuuidᚐUUID(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "stage_id":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("stage_id"))
-			it.StageID, err = ec.unmarshalOID2ᚖgithubᚗcomᚋgoogleᚋuuidᚐUUID(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -11879,6 +11879,16 @@ func (ec *executionContext) ___Type(ctx context.Context, sel ast.SelectionSet, o
 
 // region    ***************************** type.gotpl *****************************
 
+func (ec *executionContext) unmarshalNAddSchoolInput2githubᚗcomᚋmsal4ᚋhassah_school_serverᚋgraphᚋmodelᚐAddSchoolInput(ctx context.Context, v interface{}) (model.AddSchoolInput, error) {
+	res, err := ec.unmarshalInputAddSchoolInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNAddUserInput2githubᚗcomᚋmsal4ᚋhassah_school_serverᚋgraphᚋmodelᚐAddUserInput(ctx context.Context, v interface{}) (model.AddUserInput, error) {
+	res, err := ec.unmarshalInputAddUserInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
 func (ec *executionContext) unmarshalNAssignmentSubmissionWhereInput2ᚖgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚐAssignmentSubmissionWhereInput(ctx context.Context, v interface{}) (*ent.AssignmentSubmissionWhereInput, error) {
 	res, err := ec.unmarshalInputAssignmentSubmissionWhereInput(ctx, v)
 	return &res, graphql.ErrorOnPath(ctx, err)
@@ -11912,16 +11922,6 @@ func (ec *executionContext) marshalNBoolean2bool(ctx context.Context, sel ast.Se
 func (ec *executionContext) unmarshalNClassWhereInput2ᚖgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚐClassWhereInput(ctx context.Context, v interface{}) (*ent.ClassWhereInput, error) {
 	res, err := ec.unmarshalInputClassWhereInput(ctx, v)
 	return &res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) unmarshalNCreateSchoolInput2githubᚗcomᚋmsal4ᚋhassah_school_serverᚋgraphᚋmodelᚐCreateSchoolInput(ctx context.Context, v interface{}) (model.CreateSchoolInput, error) {
-	res, err := ec.unmarshalInputCreateSchoolInput(ctx, v)
-	return res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) unmarshalNCreateUserInput2githubᚗcomᚋmsal4ᚋhassah_school_serverᚋgraphᚋmodelᚐCreateUserInput(ctx context.Context, v interface{}) (model.CreateUserInput, error) {
-	res, err := ec.unmarshalInputCreateUserInput(ctx, v)
-	return res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) unmarshalNCursor2githubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚐCursor(ctx context.Context, v interface{}) (ent.Cursor, error) {

@@ -25,7 +25,7 @@ func TestSchoolList(t *testing.T) {
 	t.Run("empty", func(t *testing.T) {
 		defer s.EC.School.Delete().ExecX(ctx)
 
-		conn, err := s.SchoolList(ctx, service.SchoolListOptions{})
+		conn, err := s.Schools(ctx, service.SchoolListOptions{})
 		require.NoError(t, err)
 		require.NotNil(t, conn)
 		require.Zero(t, conn.TotalCount)
@@ -37,7 +37,7 @@ func TestSchoolList(t *testing.T) {
 
 		want := s.EC.School.Create().SetName("school 1").SetImage("s/image").SetDirectory("test_dir").SaveX(ctx)
 
-		conn, err := s.SchoolList(ctx, service.SchoolListOptions{})
+		conn, err := s.Schools(ctx, service.SchoolListOptions{})
 		require.NoError(t, err)
 		require.NotNil(t, conn)
 		require.Equal(t, 1, conn.TotalCount)
@@ -61,7 +61,7 @@ func TestSchoolList(t *testing.T) {
 		b := s.EC.School.Query().Order(ent.Asc(school.FieldCreatedAt))
 		want := b.AllX(ctx)
 
-		conn, err := s.SchoolList(ctx, service.SchoolListOptions{
+		conn, err := s.Schools(ctx, service.SchoolListOptions{
 			OrderBy: &ent.SchoolOrder{Field: ent.SchoolOrderFieldCreatedAt, Direction: ent.OrderDirectionAsc},
 		})
 		require.NoError(t, err)
@@ -81,7 +81,7 @@ func TestSchoolList(t *testing.T) {
 
 		want = b.Where(school.StatusEQ(schema.StatusDisabled)).AllX(ctx)
 
-		conn, err = s.SchoolList(ctx, service.SchoolListOptions{
+		conn, err = s.Schools(ctx, service.SchoolListOptions{
 			Where:   &ent.SchoolWhereInput{Status: ptr.Status(schema.StatusDisabled)},
 			OrderBy: &ent.SchoolOrder{Field: ent.SchoolOrderFieldCreatedAt, Direction: ent.OrderDirectionAsc},
 		})
@@ -112,7 +112,7 @@ func TestSchoolAdd(t *testing.T) {
 	ctx := context.Background()
 
 	t.Run("without image", func(t *testing.T) {
-		got, err := s.SchoolAdd(ctx, model.CreateSchoolInput{Name: "test school"})
+		got, err := s.AddSchool(ctx, model.AddSchoolInput{Name: "test school"})
 		require.Error(t, err)
 		require.Nil(t, got)
 	})
@@ -120,7 +120,7 @@ func TestSchoolAdd(t *testing.T) {
 	t.Run("with image", func(t *testing.T) {
 		f := testutil.OpenFile(t, "../testfiles/stanford.png")
 		defer f.Close()
-		got, err := s.SchoolAdd(ctx, model.CreateSchoolInput{
+		got, err := s.AddSchool(ctx, model.AddSchoolInput{
 			Name:   "test school",
 			Image:  graphql.Upload{File: f, Filename: f.File.Name(), ContentType: f.ContentType, Size: f.Size()},
 			Status: schema.StatusActive,
@@ -136,7 +136,7 @@ func TestSchoolAdd(t *testing.T) {
 	t.Run("with invalid image", func(t *testing.T) {
 		f := testutil.OpenFile(t, "../testfiles/file.txt")
 		defer f.Close()
-		got, err := s.SchoolAdd(ctx, model.CreateSchoolInput{
+		got, err := s.AddSchool(ctx, model.AddSchoolInput{
 			Name:   "test school",
 			Image:  graphql.Upload{File: f, Filename: f.File.Name(), ContentType: f.ContentType, Size: f.Size()},
 			Status: schema.StatusActive,
@@ -155,7 +155,7 @@ func TestSchoolDelete(t *testing.T) {
 	f := testutil.OpenFile(t, "../testfiles/stanford.png")
 	defer f.Close()
 
-	sch, err := s.SchoolAdd(ctx, model.CreateSchoolInput{
+	sch, err := s.AddSchool(ctx, model.AddSchoolInput{
 		Name:   "test school",
 		Image:  graphql.Upload{File: f, Filename: f.File.Name(), ContentType: f.ContentType, Size: f.Size()},
 		Status: schema.StatusActive,
@@ -164,7 +164,7 @@ func TestSchoolDelete(t *testing.T) {
 	require.NotNil(t, sch)
 
 	t.Run("non-existing school", func(t *testing.T) {
-		err := s.SchoolDelete(ctx, uuid.MustParse("2710c203-7842-4356-8d9f-12f9da4722a2"))
+		err := s.DeleteSchool(ctx, uuid.MustParse("2710c203-7842-4356-8d9f-12f9da4722a2"))
 		require.Error(t, err)
 		_, err = s.EC.School.Query().Where(school.ID(sch.ID)).Only(ctx)
 		require.NoError(t, err)
@@ -173,7 +173,7 @@ func TestSchoolDelete(t *testing.T) {
 	})
 
 	t.Run("existing school", func(t *testing.T) {
-		err := s.SchoolDelete(ctx, sch.ID)
+		err := s.DeleteSchool(ctx, sch.ID)
 		require.NoError(t, err)
 		_, err = s.EC.School.Query().Where(school.ID(sch.ID)).Only(ctx)
 		require.Error(t, err)
@@ -192,7 +192,7 @@ func TestSchoolUpdate(t *testing.T) {
 	f := testutil.OpenFile(t, "../testfiles/stanford.png")
 	defer f.Close()
 
-	sch, err := s.SchoolAdd(ctx, model.CreateSchoolInput{
+	sch, err := s.AddSchool(ctx, model.AddSchoolInput{
 		Name:   "test school",
 		Image:  graphql.Upload{File: f, Filename: f.File.Name(), ContentType: f.ContentType, Size: f.Size()},
 		Status: schema.StatusActive,
@@ -201,7 +201,7 @@ func TestSchoolUpdate(t *testing.T) {
 	require.NotNil(t, sch)
 
 	t.Run("name", func(t *testing.T) {
-		newSch, err := s.SchoolUpdate(ctx, sch.ID, model.UpdateSchoolInput{Name: ptr.Str("new name")})
+		newSch, err := s.UpdateSchool(ctx, sch.ID, model.UpdateSchoolInput{Name: ptr.Str("new name")})
 		require.NoError(t, err)
 		require.NotNil(t, newSch)
 		require.Equal(t, newSch.Name, "new name")
@@ -214,7 +214,7 @@ func TestSchoolUpdate(t *testing.T) {
 		f := testutil.OpenFile(t, "../testfiles/harvard.jpg")
 		defer f.Close()
 
-		newSch, err := s.SchoolUpdate(ctx, sch.ID, model.UpdateSchoolInput{Image: &graphql.Upload{
+		newSch, err := s.UpdateSchool(ctx, sch.ID, model.UpdateSchoolInput{Image: &graphql.Upload{
 			File:        f,
 			Filename:    f.File.Name(),
 			ContentType: f.ContentType,
@@ -232,7 +232,7 @@ func TestSchoolUpdate(t *testing.T) {
 		f := testutil.OpenFile(t, "../testfiles/file.txt")
 		defer f.Close()
 
-		newSch, err := s.SchoolUpdate(ctx, sch.ID, model.UpdateSchoolInput{Image: &graphql.Upload{
+		newSch, err := s.UpdateSchool(ctx, sch.ID, model.UpdateSchoolInput{Image: &graphql.Upload{
 			File:        f,
 			Filename:    f.File.Name(),
 			ContentType: f.ContentType,
@@ -246,7 +246,7 @@ func TestSchoolUpdate(t *testing.T) {
 		f := testutil.OpenFile(t, "../testfiles/harvard.jpg")
 		defer f.Close()
 
-		newSch, err := s.SchoolUpdate(ctx, sch.ID, model.UpdateSchoolInput{
+		newSch, err := s.UpdateSchool(ctx, sch.ID, model.UpdateSchoolInput{
 			Name:   ptr.Str("name 2"),
 			Status: ptr.Status(schema.StatusDisabled),
 			Image: &graphql.Upload{

@@ -20,12 +20,12 @@ type UserListOptions struct {
 	Where   *ent.UserWhereInput
 }
 
-func (s *Service) UserList(ctx context.Context, opts UserListOptions) (*ent.UserConnection, error) {
+func (s *Service) Users(ctx context.Context, opts UserListOptions) (*ent.UserConnection, error) {
 	return s.EC.User.Query().Paginate(ctx, opts.After, opts.First, opts.Before, opts.Last,
 		ent.WithUserOrder(opts.OrderBy), ent.WithUserFilter(opts.Where.Filter))
 }
 
-func (s *Service) UserAdd(ctx context.Context, input model.CreateUserInput) (*ent.User, error) {
+func (s *Service) AddUser(ctx context.Context, input model.AddUserInput) (*ent.User, error) {
 	b := s.EC.User.Create().SetName(input.Name).SetUsername(input.Username).
 		SetStatus(input.Status).SetRole(input.Role).SetPassword(input.Password).SetPhone(input.Phone)
 
@@ -78,7 +78,7 @@ func (s *Service) UserAdd(ctx context.Context, input model.CreateUserInput) (*en
 	return b.Save(ctx)
 }
 
-func (s *Service) UserUpdate(ctx context.Context, id uuid.UUID, input model.UpdateUserInput) (*ent.User, error) {
+func (s *Service) UpdateUser(ctx context.Context, id uuid.UUID, input model.UpdateUserInput) (*ent.User, error) {
 	b := s.EC.User.UpdateOneID(id)
 
 	if input.Name != nil {

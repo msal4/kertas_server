@@ -23,7 +23,7 @@ func TestUserList(t *testing.T) {
 	ctx := context.Background()
 
 	t.Run("empty", func(t *testing.T) {
-		users, err := s.UserList(ctx, service.UserListOptions{})
+		users, err := s.Users(ctx, service.UserListOptions{})
 		require.NoError(t, err)
 		require.NotNil(t, users)
 		require.Empty(t, users.Edges)
@@ -35,7 +35,7 @@ func TestUserList(t *testing.T) {
 		want := s.EC.User.Create().SetName("test name").SetUsername("msal").SetPassword("test password").SetPhone("test phone").
 			SetDirectory("testdir").SaveX(ctx)
 
-		users, err := s.UserList(ctx, service.UserListOptions{})
+		users, err := s.Users(ctx, service.UserListOptions{})
 		require.NoError(t, err)
 		require.NotNil(t, users)
 		require.Len(t, users.Edges, 1)
@@ -60,7 +60,7 @@ func TestUserList(t *testing.T) {
 		b := s.EC.User.Query().Order(ent.Asc(user.FieldCreatedAt))
 		want := b.AllX(ctx)
 
-		conn, err := s.UserList(ctx, service.UserListOptions{
+		conn, err := s.Users(ctx, service.UserListOptions{
 			OrderBy: &ent.UserOrder{Field: ent.UserOrderFieldCreatedAt, Direction: ent.OrderDirectionAsc},
 		})
 
@@ -84,7 +84,7 @@ func TestUserList(t *testing.T) {
 
 		want = b.Where(user.StatusEQ(schema.StatusDisabled)).AllX(ctx)
 
-		conn, err = s.UserList(ctx, service.UserListOptions{
+		conn, err = s.Users(ctx, service.UserListOptions{
 			Where:   &ent.UserWhereInput{Status: ptr.Status(schema.StatusDisabled)},
 			OrderBy: &ent.UserOrder{Field: ent.UserOrderFieldCreatedAt, Direction: ent.OrderDirectionAsc},
 		})
@@ -115,7 +115,7 @@ func TestUserAdd(t *testing.T) {
 	ctx := context.Background()
 
 	t.Run("invalid", func(t *testing.T) {
-		got, err := s.UserAdd(ctx, model.CreateUserInput{Name: "test user"})
+		got, err := s.AddUser(ctx, model.AddUserInput{Name: "test user"})
 		require.Error(t, err)
 		require.Nil(t, got)
 	})
@@ -125,7 +125,7 @@ func TestUserAdd(t *testing.T) {
 
 		f := testutil.OpenFile(t, "../testfiles/stanford.png")
 		defer f.Close()
-		got, err := s.UserAdd(ctx, model.CreateUserInput{
+		got, err := s.AddUser(ctx, model.AddUserInput{
 			Name:     "test user",
 			Username: "testusner",
 			Password: "testpassword",
@@ -147,7 +147,7 @@ func TestUserAdd(t *testing.T) {
 
 		f := testutil.OpenFile(t, "../testfiles/file.txt")
 		defer f.Close()
-		got, err := s.UserAdd(ctx, model.CreateUserInput{
+		got, err := s.AddUser(ctx, model.AddUserInput{
 			Name:     "test user",
 			Image:    &graphql.Upload{File: f, Filename: f.File.Name(), ContentType: f.ContentType, Size: f.Size()},
 			Status:   schema.StatusActive,
@@ -163,7 +163,7 @@ func TestUserAdd(t *testing.T) {
 	t.Run("with invalid role & stage", func(t *testing.T) {
 		defer s.EC.User.Delete().ExecX(ctx)
 
-		got, err := s.UserAdd(ctx, model.CreateUserInput{
+		got, err := s.AddUser(ctx, model.AddUserInput{
 			Name:     "test user",
 			Role:     user.RoleSTUDENT,
 			Status:   schema.StatusActive,
@@ -175,7 +175,7 @@ func TestUserAdd(t *testing.T) {
 		require.Error(t, err)
 		require.Nil(t, got)
 
-		got, err = s.UserAdd(ctx, model.CreateUserInput{
+		got, err = s.AddUser(ctx, model.AddUserInput{
 			Name:     "test user",
 			Role:     user.RoleTEACHER,
 			Status:   schema.StatusActive,
@@ -187,7 +187,7 @@ func TestUserAdd(t *testing.T) {
 		require.Error(t, err)
 		require.Nil(t, got)
 
-		got, err = s.UserAdd(ctx, model.CreateUserInput{
+		got, err = s.AddUser(ctx, model.AddUserInput{
 			Name:     "test user",
 			Role:     user.RoleSCHOOL_ADMIN,
 			Status:   schema.StatusActive,
@@ -206,7 +206,7 @@ func TestUserAdd(t *testing.T) {
 		sch := s.EC.School.Create().SetName("hello").SetImage("hi").SetDirectory("testdir").SetStatus(schema.StatusActive).SaveX(ctx)
 		stage := s.EC.Stage.Create().SetName("first stage").SetSchool(sch).SetTuitionAmount(299).SaveX(ctx)
 
-		got, err := s.UserAdd(ctx, model.CreateUserInput{
+		got, err := s.AddUser(ctx, model.AddUserInput{
 			Name:     "test user",
 			Role:     user.RoleSTUDENT,
 			StageID:  &stage.ID,
@@ -235,7 +235,7 @@ func TestUserUpdate(t *testing.T) {
 	defer s.EC.Close()
 	ctx := context.Background()
 
-	u, err := s.UserAdd(ctx, model.CreateUserInput{
+	u, err := s.AddUser(ctx, model.AddUserInput{
 		Name:     "test user",
 		Role:     user.RoleSUPER_ADMIN,
 		Status:   schema.StatusActive,
@@ -246,7 +246,7 @@ func TestUserUpdate(t *testing.T) {
 	require.NoError(t, err)
 
 	t.Run("name", func(t *testing.T) {
-		updated, err := s.UserUpdate(ctx, u.ID, model.UpdateUserInput{Name: ptr.Str("new name")})
+		updated, err := s.UpdateUser(ctx, u.ID, model.UpdateUserInput{Name: ptr.Str("new name")})
 		require.NoError(t, err)
 		require.NotNil(t, updated)
 		require.Equal(t, u.ID, updated.ID)
@@ -255,7 +255,7 @@ func TestUserUpdate(t *testing.T) {
 	})
 
 	t.Run("non existing", func(t *testing.T) {
-		updated, err := s.UserUpdate(ctx, uuid.New(), model.UpdateUserInput{Name: ptr.Str("new name 2")})
+		updated, err := s.UpdateUser(ctx, uuid.New(), model.UpdateUserInput{Name: ptr.Str("new name 2")})
 		require.Error(t, err)
 		require.Nil(t, updated)
 	})
@@ -264,7 +264,7 @@ func TestUserUpdate(t *testing.T) {
 		f := testutil.OpenFile(t, "../testfiles/stanford.png")
 		defer f.Close()
 
-		updated, err := s.UserUpdate(ctx, u.ID, model.UpdateUserInput{Name: ptr.Str("new name 3"), Image: &graphql.Upload{
+		updated, err := s.UpdateUser(ctx, u.ID, model.UpdateUserInput{Name: ptr.Str("new name 3"), Image: &graphql.Upload{
 			File:        f,
 			Filename:    f.File.Name(),
 			Size:        f.Size(),
@@ -284,7 +284,7 @@ func TestUserUpdate(t *testing.T) {
 		f := testutil.OpenFile(t, "../testfiles/stanford.png")
 		defer f.Close()
 
-		updated, err := s.UserUpdate(ctx, u.ID, model.UpdateUserInput{
+		updated, err := s.UpdateUser(ctx, u.ID, model.UpdateUserInput{
 			Name: ptr.Str("new name 3"),
 			Image: &graphql.Upload{
 				File:        f,

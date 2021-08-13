@@ -9,13 +9,13 @@ import (
 	"github.com/msal4/hassah_school_server/ent/user"
 )
 
-type CreateSchoolInput struct {
+type AddSchoolInput struct {
 	Name   string         `json:"name"`
 	Image  graphql.Upload `json:"image"`
 	Status schema.Status  `json:"status"`
 }
 
-type CreateUserInput struct {
+type AddUserInput struct {
 	Name     string          `json:"name"`
 	Username string          `json:"username"`
 	Password string          `json:"password"`

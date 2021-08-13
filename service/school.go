@@ -19,12 +19,12 @@ type SchoolListOptions struct {
 	Where   *ent.SchoolWhereInput
 }
 
-func (s *Service) SchoolList(ctx context.Context, opts SchoolListOptions) (*ent.SchoolConnection, error) {
+func (s *Service) Schools(ctx context.Context, opts SchoolListOptions) (*ent.SchoolConnection, error) {
 	return s.EC.School.Query().Paginate(ctx, opts.After, opts.First, opts.Before, opts.Last, ent.WithSchoolOrder(opts.OrderBy),
 		ent.WithSchoolFilter(opts.Where.Filter))
 }
 
-func (s *Service) SchoolAdd(ctx context.Context, input model.CreateSchoolInput) (*ent.School, error) {
+func (s *Service) AddSchool(ctx context.Context, input model.AddSchoolInput) (*ent.School, error) {
 	dir := s.FormatFilename(input.Name, "")
 
 	info, err := s.PutImage(ctx, PutImageOptions{ParentDir: path.Join(dir, "images"), Upload: input.Image})
@@ -35,7 +35,7 @@ func (s *Service) SchoolAdd(ctx context.Context, input model.CreateSchoolInput) 
 	return s.EC.School.Create().SetName(input.Name).SetStatus(input.Status).SetImage(info.Key).SetDirectory(dir).Save(ctx)
 }
 
-func (s *Service) SchoolDelete(ctx context.Context, id uuid.UUID) error {
+func (s *Service) DeleteSchool(ctx context.Context, id uuid.UUID) error {
 	sch, err := s.EC.School.Get(ctx, id)
 	if err != nil {
 		return err
@@ -49,7 +49,7 @@ func (s *Service) SchoolDelete(ctx context.Context, id uuid.UUID) error {
 	return s.EC.School.DeleteOneID(id).Exec(ctx)
 }
 
-func (s *Service) SchoolUpdate(ctx context.Context, id uuid.UUID, input model.UpdateSchoolInput) (*ent.School, error) {
+func (s *Service) UpdateSchool(ctx context.Context, id uuid.UUID, input model.UpdateSchoolInput) (*ent.School, error) {
 	sch, err := s.EC.School.Get(ctx, id)
 	if err != nil {
 		return nil, err

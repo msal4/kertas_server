@@ -74,7 +74,7 @@ type SchoolConnection {
   edges: [SchoolEdge]
 }
 
-input CreateSchoolInput {
+input AddSchoolInput {
   name: String!
   image: Upload!
   status: Status! = ACTIVE
@@ -122,7 +122,7 @@ type UserConnection {
   edges: [UserEdge]
 }
 
-input CreateUserInput {
+input AddUserInput {
   name: String!
   username: String!
   password: String!
@@ -150,10 +150,10 @@ type Query {
 }
 
 type Mutation {
-  addSchool(input: CreateSchoolInput!): School
+  addSchool(input: AddSchoolInput!): School
   updateSchool(id: ID!, input: UpdateSchoolInput!): School
   deleteSchool(id: ID!): Boolean!
 
-  addUser(input: CreateUserInput!): User
+  addUser(input: AddUserInput!): User
   udpateUser(id: ID!, input: UpdateUserInput!): User
 }

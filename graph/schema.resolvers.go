@@ -13,24 +13,24 @@ import (
 	"github.com/msal4/hassah_school_server/service"
 )
 
-func (r *mutationResolver) AddSchool(ctx context.Context, input model.CreateSchoolInput) (*ent.School, error) {
-	return r.s.SchoolAdd(ctx, input)
+func (r *mutationResolver) AddSchool(ctx context.Context, input model.AddSchoolInput) (*ent.School, error) {
+	return r.s.AddSchool(ctx, input)
 }
 
 func (r *mutationResolver) UpdateSchool(ctx context.Context, id uuid.UUID, input model.UpdateSchoolInput) (*ent.School, error) {
-	return r.s.SchoolUpdate(ctx, id, input)
+	return r.s.UpdateSchool(ctx, id, input)
 }
 
 func (r *mutationResolver) DeleteSchool(ctx context.Context, id uuid.UUID) (bool, error) {
-	return true, r.s.SchoolDelete(ctx, id)
+	return true, r.s.DeleteSchool(ctx, id)
 }
 
-func (r *mutationResolver) AddUser(ctx context.Context, input model.CreateUserInput) (*ent.User, error) {
-	return r.s.UserAdd(ctx, input)
+func (r *mutationResolver) AddUser(ctx context.Context, input model.AddUserInput) (*ent.User, error) {
+	return r.s.AddUser(ctx, input)
 }
 
 func (r *mutationResolver) UdpateUser(ctx context.Context, id uuid.UUID, input model.UpdateUserInput) (*ent.User, error) {
-	return r.s.UserUpdate(ctx, id, input)
+	return r.s.UpdateUser(ctx, id, input)
 }
 
 func (r *queryResolver) School(ctx context.Context, id uuid.UUID) (*ent.School, error) {
@@ -38,7 +38,7 @@ func (r *queryResolver) School(ctx context.Context, id uuid.UUID) (*ent.School, 
 }
 
 func (r *queryResolver) Schools(ctx context.Context, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.SchoolOrder, where *ent.SchoolWhereInput) (*ent.SchoolConnection, error) {
-	return r.s.SchoolList(ctx, service.SchoolListOptions{
+	return r.s.Schools(ctx, service.SchoolListOptions{
 		After: after, First: first, Before: before, Last: last, OrderBy: orderBy, Where: where})
 }
 

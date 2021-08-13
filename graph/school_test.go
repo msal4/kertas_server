@@ -409,8 +409,8 @@ func (s *schoolTestSuite) TestUpdateSchool() {
 
 	f := testutil.OpenFile(s.T(), "../testfiles/harvard.jpg")
 	defer f.Close()
-	sch, err := srv.SchoolAdd(ctx,
-		model.CreateSchoolInput{
+	sch, err := srv.AddSchool(ctx,
+		model.AddSchoolInput{
 			Name: "test schoo",
 			Image: graphql.Upload{
 				File:     f,
