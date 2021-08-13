@@ -4,8 +4,10 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"math/rand"
 	"os"
 	"testing"
+	"time"
 
 	"entgo.io/ent/dialect"
 	_ "github.com/mattn/go-sqlite3"
@@ -14,6 +16,7 @@ import (
 	"github.com/msal4/hassah_school_server/ent"
 	"github.com/msal4/hassah_school_server/ent/enttest"
 	"github.com/msal4/hassah_school_server/service"
+	"github.com/msal4/hassah_school_server/util"
 	"github.com/stretchr/testify/require"
 )
 
@@ -34,7 +37,11 @@ func TestMain(m *testing.M) {
 	os.Exit(m.Run())
 }
 
-func newService(t *testing.T, db string) *service.Service {
+var randomSource = rand.NewSource(time.Now().Unix())
+
+func newService(t *testing.T) *service.Service {
+	db := util.RandomString(randomSource, 6) + time.Now().Format("04-05")
+
 	ec := enttest.Open(t, dialect.SQLite, fmt.Sprintf("file:%s?mode=memory&cache=shared&_fk=1", db), enttest.WithOptions(ent.Log(t.Log)))
 	s, err := service.New(ec, mc, nil)
 	require.NoError(t, err)
