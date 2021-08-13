@@ -29,6 +29,10 @@ func (r *mutationResolver) AddUser(ctx context.Context, input model.CreateUserIn
 	return r.s.UserAdd(ctx, input)
 }
 
+func (r *mutationResolver) UdpateUser(ctx context.Context, id uuid.UUID, input model.UpdateUserInput) (*ent.User, error) {
+	return r.s.UserUpdate(ctx, id, input)
+}
+
 func (r *queryResolver) School(ctx context.Context, id uuid.UUID) (*ent.School, error) {
 	return r.s.EC.School.Get(ctx, id)
 }

@@ -134,6 +134,16 @@ input CreateUserInput {
   stage_id: ID
 }
 
+input UpdateUserInput {
+  name: String
+  username: String
+  password: String
+  phone: String
+  image: Upload
+  status: Status
+  stage_id: ID
+}
+
 type Query {
     school(id: ID!): School
     schools(after: Cursor, first: Int, before: Cursor, last: Int, orderBy: SchoolOrder, where: SchoolWhereInput): SchoolConnection
@@ -145,5 +155,5 @@ type Mutation {
   deleteSchool(id: ID!): Boolean!
 
   addUser(input: CreateUserInput!): User
+  udpateUser(id: ID!, input: UpdateUserInput!): User
 }
-

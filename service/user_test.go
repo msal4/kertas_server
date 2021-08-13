@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/99designs/gqlgen/graphql"
+	"github.com/google/uuid"
 	"github.com/minio/minio-go/v7"
 	"github.com/msal4/hassah_school_server/ent"
 	"github.com/msal4/hassah_school_server/ent/schema"
@@ -226,5 +227,86 @@ func TestUserAdd(t *testing.T) {
 		gotSchool, err := got.School(ctx)
 		require.Equal(t, sch.ID, gotSchool.ID)
 		require.Equal(t, sch.ID, gotSchool.ID)
+	})
+}
+
+func TestUserUpdate(t *testing.T) {
+	s := newService(t)
+	defer s.EC.Close()
+	ctx := context.Background()
+
+	u, err := s.UserAdd(ctx, model.CreateUserInput{
+		Name:     "test user",
+		Role:     user.RoleSUPER_ADMIN,
+		Status:   schema.StatusActive,
+		Username: "testusner",
+		Password: "testpassword",
+		Phone:    "testphone",
+	})
+	require.NoError(t, err)
+
+	t.Run("name", func(t *testing.T) {
+		updated, err := s.UserUpdate(ctx, u.ID, model.UpdateUserInput{Name: ptr.Str("new name")})
+		require.NoError(t, err)
+		require.NotNil(t, updated)
+		require.Equal(t, u.ID, updated.ID)
+		require.Equal(t, "new name", updated.Name)
+		require.Equal(t, u.Username, updated.Username)
+	})
+
+	t.Run("non existing", func(t *testing.T) {
+		updated, err := s.UserUpdate(ctx, uuid.New(), model.UpdateUserInput{Name: ptr.Str("new name 2")})
+		require.Error(t, err)
+		require.Nil(t, updated)
+	})
+
+	t.Run("image", func(t *testing.T) {
+		f := testutil.OpenFile(t, "../testfiles/stanford.png")
+		defer f.Close()
+
+		updated, err := s.UserUpdate(ctx, u.ID, model.UpdateUserInput{Name: ptr.Str("new name 3"), Image: &graphql.Upload{
+			File:        f,
+			Filename:    f.File.Name(),
+			Size:        f.Size(),
+			ContentType: f.ContentType}},
+		)
+		require.NoError(t, err)
+		require.NotNil(t, updated)
+		require.Equal(t, u.ID, updated.ID)
+		require.Equal(t, "new name 3", updated.Name)
+		require.Equal(t, u.Username, updated.Username)
+		require.Equal(t, u.Status, updated.Status)
+		_, err = s.MC.StatObject(ctx, s.Config.RootBucket, updated.Image, minio.StatObjectOptions{})
+		require.NoError(t, err)
+	})
+
+	t.Run("all", func(t *testing.T) {
+		f := testutil.OpenFile(t, "../testfiles/stanford.png")
+		defer f.Close()
+
+		updated, err := s.UserUpdate(ctx, u.ID, model.UpdateUserInput{
+			Name: ptr.Str("new name 3"),
+			Image: &graphql.Upload{
+				File:        f,
+				Filename:    f.File.Name(),
+				Size:        f.Size(),
+				ContentType: f.ContentType,
+			},
+			Phone:    ptr.Str("12345677"),
+			Password: ptr.Str("newpasswort"),
+			Username: ptr.Str("222newusername"),
+			Status:   ptr.Status(schema.StatusDisabled),
+		})
+		require.NoError(t, err)
+		require.NotNil(t, updated)
+		require.Equal(t, u.ID, updated.ID)
+		require.Equal(t, "new name 3", updated.Name)
+		require.Equal(t, "222newusername", updated.Username)
+		require.Equal(t, schema.StatusDisabled, updated.Status)
+		require.Equal(t, "12345677", updated.Phone)
+		require.Equal(t, u.Role, updated.Role)
+
+		_, err = s.MC.StatObject(ctx, s.Config.RootBucket, updated.Image, minio.StatObjectOptions{})
+		require.NoError(t, err)
 	})
 }

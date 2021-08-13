@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"path"
 
+	"github.com/google/uuid"
 	"github.com/msal4/hassah_school_server/ent"
 	"github.com/msal4/hassah_school_server/ent/user"
 	"github.com/msal4/hassah_school_server/graph/model"
@@ -67,6 +68,51 @@ func (s *Service) UserAdd(ctx context.Context, input model.CreateUserInput) (*en
 
 	if input.Image != nil {
 		info, err := s.PutImage(ctx, PutImageOptions{ParentDir: dir, Upload: *input.Image})
+		if err != nil {
+			return nil, err
+		}
+
+		b.SetImage(info.Key)
+	}
+
+	return b.Save(ctx)
+}
+
+func (s *Service) UserUpdate(ctx context.Context, id uuid.UUID, input model.UpdateUserInput) (*ent.User, error) {
+	b := s.EC.User.UpdateOneID(id)
+
+	if input.Name != nil {
+		b.SetName(*input.Name)
+	}
+
+	if input.Username != nil {
+		b.SetUsername(*input.Username)
+	}
+
+	if input.Phone != nil {
+		b.SetPhone(*input.Phone)
+	}
+
+	if input.Password != nil {
+		b.SetPassword(*input.Password)
+	}
+
+	if input.Status != nil {
+		b.SetStatus(*input.Status)
+	}
+
+	if input.Image != nil {
+		u, err := s.EC.User.Get(ctx, id)
+		if err != nil {
+			return nil, err
+		}
+		opts := PutImageOptions{Filename: u.Image, Upload: *input.Image}
+		if opts.Filename == "" {
+			opts.Filename = input.Image.Filename
+			opts.ParentDir = u.Directory
+		}
+
+		info, err := s.PutImage(ctx, opts)
 		if err != nil {
 			return nil, err
 		}

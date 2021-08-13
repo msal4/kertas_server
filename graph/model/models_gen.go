@@ -32,3 +32,13 @@ type UpdateSchoolInput struct {
 	Image  *graphql.Upload `json:"image"`
 	Status *schema.Status  `json:"status"`
 }
+
+type UpdateUserInput struct {
+	Name     *string         `json:"name"`
+	Username *string         `json:"username"`
+	Password *string         `json:"password"`
+	Phone    *string         `json:"phone"`
+	Image    *graphql.Upload `json:"image"`
+	Status   *schema.Status  `json:"status"`
+	StageID  *uuid.UUID      `json:"stage_id"`
+}
