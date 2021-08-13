@@ -25,6 +25,10 @@ func (r *mutationResolver) DeleteSchool(ctx context.Context, id uuid.UUID) (bool
 	return true, r.s.SchoolDelete(ctx, id)
 }
 
+func (r *mutationResolver) AddUser(ctx context.Context, input model.CreateUserInput) (*ent.User, error) {
+	return r.s.UserAdd(ctx, input)
+}
+
 func (r *queryResolver) School(ctx context.Context, id uuid.UUID) (*ent.School, error) {
 	return r.s.EC.School.Get(ctx, id)
 }

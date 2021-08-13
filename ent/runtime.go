@@ -306,8 +306,12 @@ func init() {
 	userDescPhone := userFields[4].Descriptor()
 	// user.PhoneValidator is a validator for the "phone" field. It is called by the builders before save.
 	user.PhoneValidator = userDescPhone.Validators[0].(func(string) error)
+	// userDescDirectory is the schema descriptor for directory field.
+	userDescDirectory := userFields[6].Descriptor()
+	// user.DirectoryValidator is a validator for the "directory" field. It is called by the builders before save.
+	user.DirectoryValidator = userDescDirectory.Validators[0].(func(string) error)
 	// userDescTokenVersion is the schema descriptor for token_version field.
-	userDescTokenVersion := userFields[6].Descriptor()
+	userDescTokenVersion := userFields[7].Descriptor()
 	// user.DefaultTokenVersion holds the default value on creation for the token_version field.
 	user.DefaultTokenVersion = userDescTokenVersion.Default.(int)
 	// userDescID is the schema descriptor for id field.

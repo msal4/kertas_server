@@ -96,6 +96,12 @@ func (uc *UserCreate) SetNillableImage(s *string) *UserCreate {
 	return uc
 }
 
+// SetDirectory sets the "directory" field.
+func (uc *UserCreate) SetDirectory(s string) *UserCreate {
+	uc.mutation.SetDirectory(s)
+	return uc
+}
+
 // SetTokenVersion sets the "token_version" field.
 func (uc *UserCreate) SetTokenVersion(i int) *UserCreate {
 	uc.mutation.SetTokenVersion(i)
@@ -409,6 +415,14 @@ func (uc *UserCreate) check() error {
 			return &ValidationError{Name: "phone", err: fmt.Errorf(`ent: validator failed for field "phone": %w`, err)}
 		}
 	}
+	if _, ok := uc.mutation.Directory(); !ok {
+		return &ValidationError{Name: "directory", err: errors.New(`ent: missing required field "directory"`)}
+	}
+	if v, ok := uc.mutation.Directory(); ok {
+		if err := user.DirectoryValidator(v); err != nil {
+			return &ValidationError{Name: "directory", err: fmt.Errorf(`ent: validator failed for field "directory": %w`, err)}
+		}
+	}
 	if _, ok := uc.mutation.TokenVersion(); !ok {
 		return &ValidationError{Name: "token_version", err: errors.New(`ent: missing required field "token_version"`)}
 	}
@@ -512,6 +526,14 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 			Column: user.FieldImage,
 		})
 		_node.Image = value
+	}
+	if value, ok := uc.mutation.Directory(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: user.FieldDirectory,
+		})
+		_node.Directory = value
 	}
 	if value, ok := uc.mutation.TokenVersion(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{

@@ -7851,6 +7851,7 @@ type UserMutation struct {
 	password           *string
 	phone              *string
 	image              *string
+	directory          *string
 	token_version      *int
 	addtoken_version   *int
 	role               *user.Role
@@ -8231,6 +8232,42 @@ func (m *UserMutation) ImageCleared() bool {
 func (m *UserMutation) ResetImage() {
 	m.image = nil
 	delete(m.clearedFields, user.FieldImage)
+}
+
+// SetDirectory sets the "directory" field.
+func (m *UserMutation) SetDirectory(s string) {
+	m.directory = &s
+}
+
+// Directory returns the value of the "directory" field in the mutation.
+func (m *UserMutation) Directory() (r string, exists bool) {
+	v := m.directory
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDirectory returns the old "directory" field's value of the User entity.
+// If the User object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *UserMutation) OldDirectory(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldDirectory is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldDirectory requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDirectory: %w", err)
+	}
+	return oldValue.Directory, nil
+}
+
+// ResetDirectory resets all changes to the "directory" field.
+func (m *UserMutation) ResetDirectory() {
+	m.directory = nil
 }
 
 // SetTokenVersion sets the "token_version" field.
@@ -8782,7 +8819,7 @@ func (m *UserMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *UserMutation) Fields() []string {
-	fields := make([]string, 0, 10)
+	fields := make([]string, 0, 11)
 	if m.created_at != nil {
 		fields = append(fields, user.FieldCreatedAt)
 	}
@@ -8803,6 +8840,9 @@ func (m *UserMutation) Fields() []string {
 	}
 	if m.image != nil {
 		fields = append(fields, user.FieldImage)
+	}
+	if m.directory != nil {
+		fields = append(fields, user.FieldDirectory)
 	}
 	if m.token_version != nil {
 		fields = append(fields, user.FieldTokenVersion)
@@ -8835,6 +8875,8 @@ func (m *UserMutation) Field(name string) (ent.Value, bool) {
 		return m.Phone()
 	case user.FieldImage:
 		return m.Image()
+	case user.FieldDirectory:
+		return m.Directory()
 	case user.FieldTokenVersion:
 		return m.TokenVersion()
 	case user.FieldRole:
@@ -8864,6 +8906,8 @@ func (m *UserMutation) OldField(ctx context.Context, name string) (ent.Value, er
 		return m.OldPhone(ctx)
 	case user.FieldImage:
 		return m.OldImage(ctx)
+	case user.FieldDirectory:
+		return m.OldDirectory(ctx)
 	case user.FieldTokenVersion:
 		return m.OldTokenVersion(ctx)
 	case user.FieldRole:
@@ -8927,6 +8971,13 @@ func (m *UserMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetImage(v)
+		return nil
+	case user.FieldDirectory:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDirectory(v)
 		return nil
 	case user.FieldTokenVersion:
 		v, ok := value.(int)
@@ -9042,6 +9093,9 @@ func (m *UserMutation) ResetField(name string) error {
 		return nil
 	case user.FieldImage:
 		m.ResetImage()
+		return nil
+	case user.FieldDirectory:
+		m.ResetDirectory()
 		return nil
 	case user.FieldTokenVersion:
 		m.ResetTokenVersion()

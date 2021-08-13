@@ -4,13 +4,27 @@ package model
 
 import (
 	"github.com/99designs/gqlgen/graphql"
+	"github.com/google/uuid"
 	"github.com/msal4/hassah_school_server/ent/schema"
+	"github.com/msal4/hassah_school_server/ent/user"
 )
 
 type CreateSchoolInput struct {
 	Name   string         `json:"name"`
 	Image  graphql.Upload `json:"image"`
 	Status schema.Status  `json:"status"`
+}
+
+type CreateUserInput struct {
+	Name     string          `json:"name"`
+	Username string          `json:"username"`
+	Password string          `json:"password"`
+	Phone    string          `json:"phone"`
+	Image    *graphql.Upload `json:"image"`
+	Role     user.Role       `json:"role"`
+	Status   schema.Status   `json:"status"`
+	SchoolID *uuid.UUID      `json:"school_id"`
+	StageID  *uuid.UUID      `json:"stage_id"`
 }
 
 type UpdateSchoolInput struct {

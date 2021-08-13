@@ -80,6 +80,12 @@ func (uu *UserUpdate) ClearImage() *UserUpdate {
 	return uu
 }
 
+// SetDirectory sets the "directory" field.
+func (uu *UserUpdate) SetDirectory(s string) *UserUpdate {
+	uu.mutation.SetDirectory(s)
+	return uu
+}
+
 // SetTokenVersion sets the "token_version" field.
 func (uu *UserUpdate) SetTokenVersion(i int) *UserUpdate {
 	uu.mutation.ResetTokenVersion()
@@ -491,6 +497,11 @@ func (uu *UserUpdate) check() error {
 			return &ValidationError{Name: "phone", err: fmt.Errorf("ent: validator failed for field \"phone\": %w", err)}
 		}
 	}
+	if v, ok := uu.mutation.Directory(); ok {
+		if err := user.DirectoryValidator(v); err != nil {
+			return &ValidationError{Name: "directory", err: fmt.Errorf("ent: validator failed for field \"directory\": %w", err)}
+		}
+	}
 	if v, ok := uu.mutation.Role(); ok {
 		if err := user.RoleValidator(v); err != nil {
 			return &ValidationError{Name: "role", err: fmt.Errorf("ent: validator failed for field \"role\": %w", err)}
@@ -568,6 +579,13 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
 			Type:   field.TypeString,
 			Column: user.FieldImage,
+		})
+	}
+	if value, ok := uu.mutation.Directory(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: user.FieldDirectory,
 		})
 	}
 	if value, ok := uu.mutation.TokenVersion(); ok {
@@ -1055,6 +1073,12 @@ func (uuo *UserUpdateOne) ClearImage() *UserUpdateOne {
 	return uuo
 }
 
+// SetDirectory sets the "directory" field.
+func (uuo *UserUpdateOne) SetDirectory(s string) *UserUpdateOne {
+	uuo.mutation.SetDirectory(s)
+	return uuo
+}
+
 // SetTokenVersion sets the "token_version" field.
 func (uuo *UserUpdateOne) SetTokenVersion(i int) *UserUpdateOne {
 	uuo.mutation.ResetTokenVersion()
@@ -1473,6 +1497,11 @@ func (uuo *UserUpdateOne) check() error {
 			return &ValidationError{Name: "phone", err: fmt.Errorf("ent: validator failed for field \"phone\": %w", err)}
 		}
 	}
+	if v, ok := uuo.mutation.Directory(); ok {
+		if err := user.DirectoryValidator(v); err != nil {
+			return &ValidationError{Name: "directory", err: fmt.Errorf("ent: validator failed for field \"directory\": %w", err)}
+		}
+	}
 	if v, ok := uuo.mutation.Role(); ok {
 		if err := user.RoleValidator(v); err != nil {
 			return &ValidationError{Name: "role", err: fmt.Errorf("ent: validator failed for field \"role\": %w", err)}
@@ -1567,6 +1596,13 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
 			Type:   field.TypeString,
 			Column: user.FieldImage,
+		})
+	}
+	if value, ok := uuo.mutation.Directory(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: user.FieldDirectory,
 		})
 	}
 	if value, ok := uuo.mutation.TokenVersion(); ok {

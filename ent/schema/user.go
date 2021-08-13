@@ -28,6 +28,7 @@ func (User) Fields() []ent.Field {
 		field.String("password").MinLen(passwordMinLength),
 		field.String("phone").NotEmpty().Annotations(entgql.OrderField("PHONE")),
 		field.String("image").Optional(),
+		field.String("directory").NotEmpty(),
 		field.Int("token_version").Default(0),
 		field.Enum("role").Values("SUPER_ADMIN", "SCHOOL_ADMIN", "TEACHER", "STUDENT").Default("STUDENT").Annotations(entgql.OrderField("ROLE")),
 		field.Enum("status").GoType(Status("")).Default(StatusActive.String()).Annotations(entgql.OrderField("STATUS")),

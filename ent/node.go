@@ -857,7 +857,7 @@ func (u *User) Node(ctx context.Context) (node *Node, err error) {
 	node = &Node{
 		ID:     u.ID,
 		Type:   "User",
-		Fields: make([]*Field, 10),
+		Fields: make([]*Field, 11),
 		Edges:  make([]*Edge, 8),
 	}
 	var buf []byte
@@ -917,10 +917,18 @@ func (u *User) Node(ctx context.Context) (node *Node, err error) {
 		Name:  "image",
 		Value: string(buf),
 	}
-	if buf, err = json.Marshal(u.TokenVersion); err != nil {
+	if buf, err = json.Marshal(u.Directory); err != nil {
 		return nil, err
 	}
 	node.Fields[7] = &Field{
+		Type:  "string",
+		Name:  "directory",
+		Value: string(buf),
+	}
+	if buf, err = json.Marshal(u.TokenVersion); err != nil {
+		return nil, err
+	}
+	node.Fields[8] = &Field{
 		Type:  "int",
 		Name:  "token_version",
 		Value: string(buf),
@@ -928,7 +936,7 @@ func (u *User) Node(ctx context.Context) (node *Node, err error) {
 	if buf, err = json.Marshal(u.Role); err != nil {
 		return nil, err
 	}
-	node.Fields[8] = &Field{
+	node.Fields[9] = &Field{
 		Type:  "user.Role",
 		Name:  "role",
 		Value: string(buf),
@@ -936,7 +944,7 @@ func (u *User) Node(ctx context.Context) (node *Node, err error) {
 	if buf, err = json.Marshal(u.Status); err != nil {
 		return nil, err
 	}
-	node.Fields[9] = &Field{
+	node.Fields[10] = &Field{
 		Type:  "schema.Status",
 		Name:  "status",
 		Value: string(buf),

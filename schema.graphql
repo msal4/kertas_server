@@ -86,6 +86,54 @@ input UpdateSchoolInput {
   status: Status
 }
 
+type Stage implements Node {
+  id: ID!
+  name: String!
+  tuition_amount: Int!
+  status: Status!
+  school: School!
+  createdAt: Time!
+  updatedAt: Time!
+}
+
+type User implements Node {
+  id: ID!
+  name: String!
+  username: String!
+  password: String!
+  phone: String!
+  image: String!
+  role: Role!
+  status: Status!
+  school: School
+  stage: Stage
+  createdAt: Time!
+  updatedAt: Time!
+}
+
+type UserEdge {
+  node: User
+  cursor: Cursor!
+}
+
+type UserConnection {
+  totalCount: Int!
+  pageInfo: PageInfo!
+  edges: [UserEdge]
+}
+
+input CreateUserInput {
+  name: String!
+  username: String!
+  password: String!
+  phone: String!
+  image: Upload
+  role: Role! = STUDENT
+  status: Status! = ACTIVE
+  school_id: ID
+  stage_id: ID
+}
+
 type Query {
     school(id: ID!): School
     schools(after: Cursor, first: Int, before: Cursor, last: Int, orderBy: SchoolOrder, where: SchoolWhereInput): SchoolConnection
@@ -95,5 +143,7 @@ type Mutation {
   addSchool(input: CreateSchoolInput!): School
   updateSchool(id: ID!, input: UpdateSchoolInput!): School
   deleteSchool(id: ID!): Boolean!
+
+  addUser(input: CreateUserInput!): User
 }
 

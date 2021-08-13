@@ -3783,6 +3783,21 @@ type UserWhereInput struct {
 	ImageEqualFold    *string  `json:"imageEqualFold,omitempty"`
 	ImageContainsFold *string  `json:"imageContainsFold,omitempty"`
 
+	// "directory" field predicates.
+	Directory             *string  `json:"directory,omitempty"`
+	DirectoryNEQ          *string  `json:"directoryNEQ,omitempty"`
+	DirectoryIn           []string `json:"directoryIn,omitempty"`
+	DirectoryNotIn        []string `json:"directoryNotIn,omitempty"`
+	DirectoryGT           *string  `json:"directoryGT,omitempty"`
+	DirectoryGTE          *string  `json:"directoryGTE,omitempty"`
+	DirectoryLT           *string  `json:"directoryLT,omitempty"`
+	DirectoryLTE          *string  `json:"directoryLTE,omitempty"`
+	DirectoryContains     *string  `json:"directoryContains,omitempty"`
+	DirectoryHasPrefix    *string  `json:"directoryHasPrefix,omitempty"`
+	DirectoryHasSuffix    *string  `json:"directoryHasSuffix,omitempty"`
+	DirectoryEqualFold    *string  `json:"directoryEqualFold,omitempty"`
+	DirectoryContainsFold *string  `json:"directoryContainsFold,omitempty"`
+
 	// "token_version" field predicates.
 	TokenVersion      *int  `json:"tokenVersion,omitempty"`
 	TokenVersionNEQ   *int  `json:"tokenVersionNEQ,omitempty"`
@@ -4169,6 +4184,45 @@ func (i *UserWhereInput) P() (predicate.User, error) {
 	}
 	if i.ImageContainsFold != nil {
 		predicates = append(predicates, user.ImageContainsFold(*i.ImageContainsFold))
+	}
+	if i.Directory != nil {
+		predicates = append(predicates, user.DirectoryEQ(*i.Directory))
+	}
+	if i.DirectoryNEQ != nil {
+		predicates = append(predicates, user.DirectoryNEQ(*i.DirectoryNEQ))
+	}
+	if len(i.DirectoryIn) > 0 {
+		predicates = append(predicates, user.DirectoryIn(i.DirectoryIn...))
+	}
+	if len(i.DirectoryNotIn) > 0 {
+		predicates = append(predicates, user.DirectoryNotIn(i.DirectoryNotIn...))
+	}
+	if i.DirectoryGT != nil {
+		predicates = append(predicates, user.DirectoryGT(*i.DirectoryGT))
+	}
+	if i.DirectoryGTE != nil {
+		predicates = append(predicates, user.DirectoryGTE(*i.DirectoryGTE))
+	}
+	if i.DirectoryLT != nil {
+		predicates = append(predicates, user.DirectoryLT(*i.DirectoryLT))
+	}
+	if i.DirectoryLTE != nil {
+		predicates = append(predicates, user.DirectoryLTE(*i.DirectoryLTE))
+	}
+	if i.DirectoryContains != nil {
+		predicates = append(predicates, user.DirectoryContains(*i.DirectoryContains))
+	}
+	if i.DirectoryHasPrefix != nil {
+		predicates = append(predicates, user.DirectoryHasPrefix(*i.DirectoryHasPrefix))
+	}
+	if i.DirectoryHasSuffix != nil {
+		predicates = append(predicates, user.DirectoryHasSuffix(*i.DirectoryHasSuffix))
+	}
+	if i.DirectoryEqualFold != nil {
+		predicates = append(predicates, user.DirectoryEqualFold(*i.DirectoryEqualFold))
+	}
+	if i.DirectoryContainsFold != nil {
+		predicates = append(predicates, user.DirectoryContainsFold(*i.DirectoryContainsFold))
 	}
 	if i.TokenVersion != nil {
 		predicates = append(predicates, user.TokenVersionEQ(*i.TokenVersion))

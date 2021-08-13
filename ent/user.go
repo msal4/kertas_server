@@ -34,6 +34,8 @@ type User struct {
 	Phone string `json:"phone,omitempty"`
 	// Image holds the value of the "image" field.
 	Image string `json:"image,omitempty"`
+	// Directory holds the value of the "directory" field.
+	Directory string `json:"directory,omitempty"`
 	// TokenVersion holds the value of the "token_version" field.
 	TokenVersion int `json:"token_version,omitempty"`
 	// Role holds the value of the "role" field.
@@ -159,7 +161,7 @@ func (*User) scanValues(columns []string) ([]interface{}, error) {
 		switch columns[i] {
 		case user.FieldTokenVersion:
 			values[i] = new(sql.NullInt64)
-		case user.FieldName, user.FieldUsername, user.FieldPassword, user.FieldPhone, user.FieldImage, user.FieldRole, user.FieldStatus:
+		case user.FieldName, user.FieldUsername, user.FieldPassword, user.FieldPhone, user.FieldImage, user.FieldDirectory, user.FieldRole, user.FieldStatus:
 			values[i] = new(sql.NullString)
 		case user.FieldCreatedAt, user.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
@@ -231,6 +233,12 @@ func (u *User) assignValues(columns []string, values []interface{}) error {
 				return fmt.Errorf("unexpected type %T for field image", values[i])
 			} else if value.Valid {
 				u.Image = value.String
+			}
+		case user.FieldDirectory:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field directory", values[i])
+			} else if value.Valid {
+				u.Directory = value.String
 			}
 		case user.FieldTokenVersion:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
@@ -346,6 +354,8 @@ func (u *User) String() string {
 	builder.WriteString(u.Phone)
 	builder.WriteString(", image=")
 	builder.WriteString(u.Image)
+	builder.WriteString(", directory=")
+	builder.WriteString(u.Directory)
 	builder.WriteString(", token_version=")
 	builder.WriteString(fmt.Sprintf("%v", u.TokenVersion))
 	builder.WriteString(", role=")

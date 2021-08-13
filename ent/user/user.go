@@ -32,6 +32,8 @@ const (
 	FieldPhone = "phone"
 	// FieldImage holds the string denoting the image field in the database.
 	FieldImage = "image"
+	// FieldDirectory holds the string denoting the directory field in the database.
+	FieldDirectory = "directory"
 	// FieldTokenVersion holds the string denoting the token_version field in the database.
 	FieldTokenVersion = "token_version"
 	// FieldRole holds the string denoting the role field in the database.
@@ -124,6 +126,7 @@ var Columns = []string{
 	FieldPassword,
 	FieldPhone,
 	FieldImage,
+	FieldDirectory,
 	FieldTokenVersion,
 	FieldRole,
 	FieldStatus,
@@ -166,6 +169,8 @@ var (
 	PasswordValidator func(string) error
 	// PhoneValidator is a validator for the "phone" field. It is called by the builders before save.
 	PhoneValidator func(string) error
+	// DirectoryValidator is a validator for the "directory" field. It is called by the builders before save.
+	DirectoryValidator func(string) error
 	// DefaultTokenVersion holds the default value on creation for the "token_version" field.
 	DefaultTokenVersion int
 	// DefaultID holds the default value on creation for the "id" field.
