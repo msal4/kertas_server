@@ -64,6 +64,11 @@ func (s *Service) PutImage(ctx context.Context, opts PutImageOptions) (minio.Upl
 	}
 	opts.Filename = path.Join(opts.ParentDir, opts.Filename)
 
+	if !strings.Contains(opts.Filename, "_w200") {
+		idx := strings.LastIndex(opts.Filename, ".")
+		opts.Filename = opts.Filename[:idx] + "_w200" + opts.Filename[idx:]
+	}
+
 	img, _, err := image.Decode(opts.Upload.File)
 	if err != nil && err != io.EOF {
 		return minio.UploadInfo{}, fmt.Errorf("unsupported image format: %v", err)
