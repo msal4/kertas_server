@@ -144,6 +144,20 @@ func (uc *UserCreate) SetNillableStatus(s *schema.Status) *UserCreate {
 	return uc
 }
 
+// SetDeletedAt sets the "deleted_at" field.
+func (uc *UserCreate) SetDeletedAt(t time.Time) *UserCreate {
+	uc.mutation.SetDeletedAt(t)
+	return uc
+}
+
+// SetNillableDeletedAt sets the "deleted_at" field if the given value is not nil.
+func (uc *UserCreate) SetNillableDeletedAt(t *time.Time) *UserCreate {
+	if t != nil {
+		uc.SetDeletedAt(*t)
+	}
+	return uc
+}
+
 // SetID sets the "id" field.
 func (uc *UserCreate) SetID(u uuid.UUID) *UserCreate {
 	uc.mutation.SetID(u)
@@ -558,6 +572,14 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 			Column: user.FieldStatus,
 		})
 		_node.Status = value
+	}
+	if value, ok := uc.mutation.DeletedAt(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
+			Value:  value,
+			Column: user.FieldDeletedAt,
+		})
+		_node.DeletedAt = &value
 	}
 	if nodes := uc.mutation.StageIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{

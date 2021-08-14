@@ -84,6 +84,20 @@ func (sc *SchoolCreate) SetNillableStatus(s *schema.Status) *SchoolCreate {
 	return sc
 }
 
+// SetDeletedAt sets the "deleted_at" field.
+func (sc *SchoolCreate) SetDeletedAt(t time.Time) *SchoolCreate {
+	sc.mutation.SetDeletedAt(t)
+	return sc
+}
+
+// SetNillableDeletedAt sets the "deleted_at" field if the given value is not nil.
+func (sc *SchoolCreate) SetNillableDeletedAt(t *time.Time) *SchoolCreate {
+	if t != nil {
+		sc.SetDeletedAt(*t)
+	}
+	return sc
+}
+
 // SetID sets the "id" field.
 func (sc *SchoolCreate) SetID(u uuid.UUID) *SchoolCreate {
 	sc.mutation.SetID(u)
@@ -325,6 +339,14 @@ func (sc *SchoolCreate) createSpec() (*School, *sqlgraph.CreateSpec) {
 			Column: school.FieldStatus,
 		})
 		_node.Status = value
+	}
+	if value, ok := sc.mutation.DeletedAt(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
+			Value:  value,
+			Column: school.FieldDeletedAt,
+		})
+		_node.DeletedAt = &value
 	}
 	if nodes := sc.mutation.UsersIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{

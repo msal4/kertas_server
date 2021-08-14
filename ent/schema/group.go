@@ -22,6 +22,7 @@ func (Group) Fields() []ent.Field {
 		field.String("name").Optional().Annotations(entgql.OrderField("NAME")),
 		field.Enum("group_type").Values("PRIVATE", "SHARED").Default("SHARED").Annotations(entgql.OrderField("GROUP_TYPE")),
 		field.Enum("status").GoType(Status("")).Default(StatusActive.String()).Annotations(entgql.OrderField("STATUS")),
+		field.Time("deleted_at").Nillable().Optional(),
 	}
 }
 

@@ -22,6 +22,7 @@ func (Stage) Fields() []ent.Field {
 		field.String("name").NotEmpty().Annotations(entgql.OrderField("NAME")),
 		field.Int("tuition_amount").Annotations(entgql.OrderField("TUITION_AMOUNT")),
 		field.Enum("status").GoType(Status("")).Default(StatusActive.String()).Annotations(entgql.OrderField("STATUS")),
+		field.Time("deleted_at").Nillable().Optional(),
 	}
 }
 

@@ -28,6 +28,8 @@ const (
 	FieldGroupType = "group_type"
 	// FieldStatus holds the string denoting the status field in the database.
 	FieldStatus = "status"
+	// FieldDeletedAt holds the string denoting the deleted_at field in the database.
+	FieldDeletedAt = "deleted_at"
 	// EdgeClass holds the string denoting the class edge name in mutations.
 	EdgeClass = "class"
 	// EdgeMessages holds the string denoting the messages edge name in mutations.
@@ -58,6 +60,7 @@ var Columns = []string{
 	FieldName,
 	FieldGroupType,
 	FieldStatus,
+	FieldDeletedAt,
 }
 
 // ForeignKeys holds the SQL foreign-keys that are owned by the "groups"

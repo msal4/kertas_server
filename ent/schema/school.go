@@ -23,6 +23,7 @@ func (School) Fields() []ent.Field {
 		field.String("image").NotEmpty(),
 		field.String("directory").NotEmpty(),
 		field.Enum("status").GoType(Status("")).Default(StatusActive.String()).Annotations(entgql.OrderField("STATUS")),
+		field.Time("deleted_at").Nillable().Optional(),
 	}
 }
 

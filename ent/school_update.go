@@ -5,6 +5,7 @@ package ent
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
@@ -59,6 +60,26 @@ func (su *SchoolUpdate) SetNillableStatus(s *schema.Status) *SchoolUpdate {
 	if s != nil {
 		su.SetStatus(*s)
 	}
+	return su
+}
+
+// SetDeletedAt sets the "deleted_at" field.
+func (su *SchoolUpdate) SetDeletedAt(t time.Time) *SchoolUpdate {
+	su.mutation.SetDeletedAt(t)
+	return su
+}
+
+// SetNillableDeletedAt sets the "deleted_at" field if the given value is not nil.
+func (su *SchoolUpdate) SetNillableDeletedAt(t *time.Time) *SchoolUpdate {
+	if t != nil {
+		su.SetDeletedAt(*t)
+	}
+	return su
+}
+
+// ClearDeletedAt clears the value of the "deleted_at" field.
+func (su *SchoolUpdate) ClearDeletedAt() *SchoolUpdate {
+	su.mutation.ClearDeletedAt()
 	return su
 }
 
@@ -286,6 +307,19 @@ func (su *SchoolUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Column: school.FieldStatus,
 		})
 	}
+	if value, ok := su.mutation.DeletedAt(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
+			Value:  value,
+			Column: school.FieldDeletedAt,
+		})
+	}
+	if su.mutation.DeletedAtCleared() {
+		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
+			Column: school.FieldDeletedAt,
+		})
+	}
 	if su.mutation.UsersCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
@@ -442,6 +476,26 @@ func (suo *SchoolUpdateOne) SetNillableStatus(s *schema.Status) *SchoolUpdateOne
 	if s != nil {
 		suo.SetStatus(*s)
 	}
+	return suo
+}
+
+// SetDeletedAt sets the "deleted_at" field.
+func (suo *SchoolUpdateOne) SetDeletedAt(t time.Time) *SchoolUpdateOne {
+	suo.mutation.SetDeletedAt(t)
+	return suo
+}
+
+// SetNillableDeletedAt sets the "deleted_at" field if the given value is not nil.
+func (suo *SchoolUpdateOne) SetNillableDeletedAt(t *time.Time) *SchoolUpdateOne {
+	if t != nil {
+		suo.SetDeletedAt(*t)
+	}
+	return suo
+}
+
+// ClearDeletedAt clears the value of the "deleted_at" field.
+func (suo *SchoolUpdateOne) ClearDeletedAt() *SchoolUpdateOne {
+	suo.mutation.ClearDeletedAt()
 	return suo
 }
 
@@ -691,6 +745,19 @@ func (suo *SchoolUpdateOne) sqlSave(ctx context.Context) (_node *School, err err
 			Type:   field.TypeEnum,
 			Value:  value,
 			Column: school.FieldStatus,
+		})
+	}
+	if value, ok := suo.mutation.DeletedAt(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
+			Value:  value,
+			Column: school.FieldDeletedAt,
+		})
+	}
+	if suo.mutation.DeletedAtCleared() {
+		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
+			Column: school.FieldDeletedAt,
 		})
 	}
 	if suo.mutation.UsersCleared() {

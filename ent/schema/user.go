@@ -37,6 +37,7 @@ func (User) Fields() []ent.Field {
 			"Student", "STUDENT",
 		).Default("STUDENT").Annotations(entgql.OrderField("ROLE")),
 		field.Enum("status").GoType(Status("")).Default(StatusActive.String()).Annotations(entgql.OrderField("STATUS")),
+		field.Time("deleted_at").Nillable().Optional(),
 	}
 }
 

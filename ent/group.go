@@ -29,6 +29,8 @@ type Group struct {
 	GroupType group.GroupType `json:"group_type,omitempty"`
 	// Status holds the value of the "status" field.
 	Status schema.Status `json:"status,omitempty"`
+	// DeletedAt holds the value of the "deleted_at" field.
+	DeletedAt *time.Time `json:"deleted_at,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the GroupQuery when eager-loading is set.
 	Edges       GroupEdges `json:"edges"`
@@ -76,7 +78,7 @@ func (*Group) scanValues(columns []string) ([]interface{}, error) {
 		switch columns[i] {
 		case group.FieldName, group.FieldGroupType, group.FieldStatus:
 			values[i] = new(sql.NullString)
-		case group.FieldCreatedAt, group.FieldUpdatedAt:
+		case group.FieldCreatedAt, group.FieldUpdatedAt, group.FieldDeletedAt:
 			values[i] = new(sql.NullTime)
 		case group.FieldID:
 			values[i] = new(uuid.UUID)
@@ -133,6 +135,13 @@ func (gr *Group) assignValues(columns []string, values []interface{}) error {
 			} else if value.Valid {
 				gr.Status = schema.Status(value.String)
 			}
+		case group.FieldDeletedAt:
+			if value, ok := values[i].(*sql.NullTime); !ok {
+				return fmt.Errorf("unexpected type %T for field deleted_at", values[i])
+			} else if value.Valid {
+				gr.DeletedAt = new(time.Time)
+				*gr.DeletedAt = value.Time
+			}
 		case group.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullScanner); !ok {
 				return fmt.Errorf("unexpected type %T for field class_group", values[i])
@@ -188,6 +197,10 @@ func (gr *Group) String() string {
 	builder.WriteString(fmt.Sprintf("%v", gr.GroupType))
 	builder.WriteString(", status=")
 	builder.WriteString(fmt.Sprintf("%v", gr.Status))
+	if v := gr.DeletedAt; v != nil {
+		builder.WriteString(", deleted_at=")
+		builder.WriteString(v.Format(time.ANSIC))
+	}
 	builder.WriteByte(')')
 	return builder.String()
 }

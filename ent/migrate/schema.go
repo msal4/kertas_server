@@ -131,6 +131,7 @@ var (
 		{Name: "updated_at", Type: field.TypeTime},
 		{Name: "name", Type: field.TypeString},
 		{Name: "status", Type: field.TypeEnum, Enums: []string{"DISABLED", "ACTIVE"}, Default: "ACTIVE"},
+		{Name: "deleted_at", Type: field.TypeTime, Nullable: true},
 		{Name: "stage_classes", Type: field.TypeUUID, Nullable: true},
 		{Name: "user_classes", Type: field.TypeUUID, Nullable: true},
 	}
@@ -142,13 +143,13 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "classes_stages_classes",
-				Columns:    []*schema.Column{ClassesColumns[5]},
+				Columns:    []*schema.Column{ClassesColumns[6]},
 				RefColumns: []*schema.Column{StagesColumns[0]},
 				OnDelete:   schema.Cascade,
 			},
 			{
 				Symbol:     "classes_users_classes",
-				Columns:    []*schema.Column{ClassesColumns[6]},
+				Columns:    []*schema.Column{ClassesColumns[7]},
 				RefColumns: []*schema.Column{UsersColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
@@ -157,12 +158,12 @@ var (
 			{
 				Name:    "class_stage_classes",
 				Unique:  false,
-				Columns: []*schema.Column{ClassesColumns[5]},
+				Columns: []*schema.Column{ClassesColumns[6]},
 			},
 			{
 				Name:    "class_user_classes",
 				Unique:  false,
-				Columns: []*schema.Column{ClassesColumns[6]},
+				Columns: []*schema.Column{ClassesColumns[7]},
 			},
 			{
 				Name:    "class_status",
@@ -215,6 +216,7 @@ var (
 		{Name: "name", Type: field.TypeString, Nullable: true},
 		{Name: "group_type", Type: field.TypeEnum, Enums: []string{"PRIVATE", "SHARED"}, Default: "SHARED"},
 		{Name: "status", Type: field.TypeEnum, Enums: []string{"DISABLED", "ACTIVE"}, Default: "ACTIVE"},
+		{Name: "deleted_at", Type: field.TypeTime, Nullable: true},
 		{Name: "class_group", Type: field.TypeUUID, Unique: true, Nullable: true},
 	}
 	// GroupsTable holds the schema information for the "groups" table.
@@ -225,7 +227,7 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "groups_classes_group",
-				Columns:    []*schema.Column{GroupsColumns[6]},
+				Columns:    []*schema.Column{GroupsColumns[7]},
 				RefColumns: []*schema.Column{ClassesColumns[0]},
 				OnDelete:   schema.Cascade,
 			},
@@ -234,7 +236,7 @@ var (
 			{
 				Name:    "group_class_group",
 				Unique:  false,
-				Columns: []*schema.Column{GroupsColumns[6]},
+				Columns: []*schema.Column{GroupsColumns[7]},
 			},
 			{
 				Name:    "group_status",
@@ -339,6 +341,7 @@ var (
 		{Name: "image", Type: field.TypeString},
 		{Name: "directory", Type: field.TypeString},
 		{Name: "status", Type: field.TypeEnum, Enums: []string{"DISABLED", "ACTIVE"}, Default: "ACTIVE"},
+		{Name: "deleted_at", Type: field.TypeTime, Nullable: true},
 	}
 	// SchoolsTable holds the schema information for the "schools" table.
 	SchoolsTable = &schema.Table{
@@ -361,6 +364,7 @@ var (
 		{Name: "name", Type: field.TypeString},
 		{Name: "tuition_amount", Type: field.TypeInt},
 		{Name: "status", Type: field.TypeEnum, Enums: []string{"DISABLED", "ACTIVE"}, Default: "ACTIVE"},
+		{Name: "deleted_at", Type: field.TypeTime, Nullable: true},
 		{Name: "school_stages", Type: field.TypeUUID, Nullable: true},
 	}
 	// StagesTable holds the schema information for the "stages" table.
@@ -371,7 +375,7 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "stages_schools_stages",
-				Columns:    []*schema.Column{StagesColumns[6]},
+				Columns:    []*schema.Column{StagesColumns[7]},
 				RefColumns: []*schema.Column{SchoolsColumns[0]},
 				OnDelete:   schema.Cascade,
 			},
@@ -380,7 +384,7 @@ var (
 			{
 				Name:    "stage_school_stages",
 				Unique:  false,
-				Columns: []*schema.Column{StagesColumns[6]},
+				Columns: []*schema.Column{StagesColumns[7]},
 			},
 			{
 				Name:    "stage_status",
@@ -444,6 +448,7 @@ var (
 		{Name: "token_version", Type: field.TypeInt, Default: 0},
 		{Name: "role", Type: field.TypeEnum, Enums: []string{"SUPER_ADMIN", "SCHOOL_ADMIN", "TEACHER", "STUDENT"}, Default: "STUDENT"},
 		{Name: "status", Type: field.TypeEnum, Enums: []string{"DISABLED", "ACTIVE"}, Default: "ACTIVE"},
+		{Name: "deleted_at", Type: field.TypeTime, Nullable: true},
 		{Name: "school_users", Type: field.TypeUUID, Nullable: true},
 		{Name: "stage_students", Type: field.TypeUUID, Nullable: true},
 	}
@@ -455,13 +460,13 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "users_schools_users",
-				Columns:    []*schema.Column{UsersColumns[12]},
+				Columns:    []*schema.Column{UsersColumns[13]},
 				RefColumns: []*schema.Column{SchoolsColumns[0]},
 				OnDelete:   schema.Cascade,
 			},
 			{
 				Symbol:     "users_stages_students",
-				Columns:    []*schema.Column{UsersColumns[13]},
+				Columns:    []*schema.Column{UsersColumns[14]},
 				RefColumns: []*schema.Column{StagesColumns[0]},
 				OnDelete:   schema.Cascade,
 			},
@@ -470,12 +475,12 @@ var (
 			{
 				Name:    "user_stage_students",
 				Unique:  false,
-				Columns: []*schema.Column{UsersColumns[13]},
+				Columns: []*schema.Column{UsersColumns[14]},
 			},
 			{
 				Name:    "user_school_users",
 				Unique:  false,
-				Columns: []*schema.Column{UsersColumns[12]},
+				Columns: []*schema.Column{UsersColumns[13]},
 			},
 			{
 				Name:    "user_status",

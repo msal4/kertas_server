@@ -287,7 +287,7 @@ func (c *Class) Node(ctx context.Context) (node *Node, err error) {
 	node = &Node{
 		ID:     c.ID,
 		Type:   "Class",
-		Fields: make([]*Field, 4),
+		Fields: make([]*Field, 5),
 		Edges:  make([]*Edge, 6),
 	}
 	var buf []byte
@@ -321,6 +321,14 @@ func (c *Class) Node(ctx context.Context) (node *Node, err error) {
 	node.Fields[3] = &Field{
 		Type:  "schema.Status",
 		Name:  "status",
+		Value: string(buf),
+	}
+	if buf, err = json.Marshal(c.DeletedAt); err != nil {
+		return nil, err
+	}
+	node.Fields[4] = &Field{
+		Type:  "time.Time",
+		Name:  "deleted_at",
 		Value: string(buf),
 	}
 	node.Edges[0] = &Edge{
@@ -445,7 +453,7 @@ func (gr *Group) Node(ctx context.Context) (node *Node, err error) {
 	node = &Node{
 		ID:     gr.ID,
 		Type:   "Group",
-		Fields: make([]*Field, 5),
+		Fields: make([]*Field, 6),
 		Edges:  make([]*Edge, 2),
 	}
 	var buf []byte
@@ -487,6 +495,14 @@ func (gr *Group) Node(ctx context.Context) (node *Node, err error) {
 	node.Fields[4] = &Field{
 		Type:  "schema.Status",
 		Name:  "status",
+		Value: string(buf),
+	}
+	if buf, err = json.Marshal(gr.DeletedAt); err != nil {
+		return nil, err
+	}
+	node.Fields[5] = &Field{
+		Type:  "time.Time",
+		Name:  "deleted_at",
 		Value: string(buf),
 	}
 	node.Edges[0] = &Edge{
@@ -632,7 +648,7 @@ func (s *School) Node(ctx context.Context) (node *Node, err error) {
 	node = &Node{
 		ID:     s.ID,
 		Type:   "School",
-		Fields: make([]*Field, 6),
+		Fields: make([]*Field, 7),
 		Edges:  make([]*Edge, 2),
 	}
 	var buf []byte
@@ -684,6 +700,14 @@ func (s *School) Node(ctx context.Context) (node *Node, err error) {
 		Name:  "status",
 		Value: string(buf),
 	}
+	if buf, err = json.Marshal(s.DeletedAt); err != nil {
+		return nil, err
+	}
+	node.Fields[6] = &Field{
+		Type:  "time.Time",
+		Name:  "deleted_at",
+		Value: string(buf),
+	}
 	node.Edges[0] = &Edge{
 		Type: "User",
 		Name: "users",
@@ -711,7 +735,7 @@ func (s *Stage) Node(ctx context.Context) (node *Node, err error) {
 	node = &Node{
 		ID:     s.ID,
 		Type:   "Stage",
-		Fields: make([]*Field, 5),
+		Fields: make([]*Field, 6),
 		Edges:  make([]*Edge, 4),
 	}
 	var buf []byte
@@ -753,6 +777,14 @@ func (s *Stage) Node(ctx context.Context) (node *Node, err error) {
 	node.Fields[4] = &Field{
 		Type:  "schema.Status",
 		Name:  "status",
+		Value: string(buf),
+	}
+	if buf, err = json.Marshal(s.DeletedAt); err != nil {
+		return nil, err
+	}
+	node.Fields[5] = &Field{
+		Type:  "time.Time",
+		Name:  "deleted_at",
 		Value: string(buf),
 	}
 	node.Edges[0] = &Edge{
@@ -857,7 +889,7 @@ func (u *User) Node(ctx context.Context) (node *Node, err error) {
 	node = &Node{
 		ID:     u.ID,
 		Type:   "User",
-		Fields: make([]*Field, 11),
+		Fields: make([]*Field, 12),
 		Edges:  make([]*Edge, 8),
 	}
 	var buf []byte
@@ -947,6 +979,14 @@ func (u *User) Node(ctx context.Context) (node *Node, err error) {
 	node.Fields[10] = &Field{
 		Type:  "schema.Status",
 		Name:  "status",
+		Value: string(buf),
+	}
+	if buf, err = json.Marshal(u.DeletedAt); err != nil {
+		return nil, err
+	}
+	node.Fields[11] = &Field{
+		Type:  "time.Time",
+		Name:  "deleted_at",
 		Value: string(buf),
 	}
 	node.Edges[0] = &Edge{

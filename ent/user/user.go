@@ -40,6 +40,8 @@ const (
 	FieldRole = "role"
 	// FieldStatus holds the string denoting the status field in the database.
 	FieldStatus = "status"
+	// FieldDeletedAt holds the string denoting the deleted_at field in the database.
+	FieldDeletedAt = "deleted_at"
 	// EdgeStage holds the string denoting the stage edge name in mutations.
 	EdgeStage = "stage"
 	// EdgeSchool holds the string denoting the school edge name in mutations.
@@ -130,6 +132,7 @@ var Columns = []string{
 	FieldTokenVersion,
 	FieldRole,
 	FieldStatus,
+	FieldDeletedAt,
 }
 
 // ForeignKeys holds the SQL foreign-keys that are owned by the "users"

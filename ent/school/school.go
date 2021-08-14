@@ -28,6 +28,8 @@ const (
 	FieldDirectory = "directory"
 	// FieldStatus holds the string denoting the status field in the database.
 	FieldStatus = "status"
+	// FieldDeletedAt holds the string denoting the deleted_at field in the database.
+	FieldDeletedAt = "deleted_at"
 	// EdgeUsers holds the string denoting the users edge name in mutations.
 	EdgeUsers = "users"
 	// EdgeStages holds the string denoting the stages edge name in mutations.
@@ -59,6 +61,7 @@ var Columns = []string{
 	FieldImage,
 	FieldDirectory,
 	FieldStatus,
+	FieldDeletedAt,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).

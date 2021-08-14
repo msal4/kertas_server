@@ -5,6 +5,7 @@ package ent
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
@@ -62,6 +63,26 @@ func (su *StageUpdate) SetNillableStatus(s *schema.Status) *StageUpdate {
 	if s != nil {
 		su.SetStatus(*s)
 	}
+	return su
+}
+
+// SetDeletedAt sets the "deleted_at" field.
+func (su *StageUpdate) SetDeletedAt(t time.Time) *StageUpdate {
+	su.mutation.SetDeletedAt(t)
+	return su
+}
+
+// SetNillableDeletedAt sets the "deleted_at" field if the given value is not nil.
+func (su *StageUpdate) SetNillableDeletedAt(t *time.Time) *StageUpdate {
+	if t != nil {
+		su.SetDeletedAt(*t)
+	}
+	return su
+}
+
+// ClearDeletedAt clears the value of the "deleted_at" field.
+func (su *StageUpdate) ClearDeletedAt() *StageUpdate {
+	su.mutation.ClearDeletedAt()
 	return su
 }
 
@@ -340,6 +361,19 @@ func (su *StageUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Column: stage.FieldStatus,
 		})
 	}
+	if value, ok := su.mutation.DeletedAt(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
+			Value:  value,
+			Column: stage.FieldDeletedAt,
+		})
+	}
+	if su.mutation.DeletedAtCleared() {
+		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
+			Column: stage.FieldDeletedAt,
+		})
+	}
 	if su.mutation.SchoolCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
@@ -586,6 +620,26 @@ func (suo *StageUpdateOne) SetNillableStatus(s *schema.Status) *StageUpdateOne {
 	if s != nil {
 		suo.SetStatus(*s)
 	}
+	return suo
+}
+
+// SetDeletedAt sets the "deleted_at" field.
+func (suo *StageUpdateOne) SetDeletedAt(t time.Time) *StageUpdateOne {
+	suo.mutation.SetDeletedAt(t)
+	return suo
+}
+
+// SetNillableDeletedAt sets the "deleted_at" field if the given value is not nil.
+func (suo *StageUpdateOne) SetNillableDeletedAt(t *time.Time) *StageUpdateOne {
+	if t != nil {
+		suo.SetDeletedAt(*t)
+	}
+	return suo
+}
+
+// ClearDeletedAt clears the value of the "deleted_at" field.
+func (suo *StageUpdateOne) ClearDeletedAt() *StageUpdateOne {
+	suo.mutation.ClearDeletedAt()
 	return suo
 }
 
@@ -886,6 +940,19 @@ func (suo *StageUpdateOne) sqlSave(ctx context.Context) (_node *Stage, err error
 			Type:   field.TypeEnum,
 			Value:  value,
 			Column: stage.FieldStatus,
+		})
+	}
+	if value, ok := suo.mutation.DeletedAt(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
+			Value:  value,
+			Column: stage.FieldDeletedAt,
+		})
+	}
+	if suo.mutation.DeletedAtCleared() {
+		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
+			Column: stage.FieldDeletedAt,
 		})
 	}
 	if suo.mutation.SchoolCleared() {

@@ -132,6 +132,18 @@ input SchoolWhereInput {
   statusIn: [Status!]
   statusNotIn: [Status!]
   
+  """deleted_at field predicates"""
+  deletedAt: Time
+  deletedAtNEQ: Time
+  deletedAtIn: [Time!]
+  deletedAtNotIn: [Time!]
+  deletedAtGT: Time
+  deletedAtGTE: Time
+  deletedAtLT: Time
+  deletedAtLTE: Time
+  deletedAtIsNil: Boolean
+  deletedAtNotNil: Boolean
+  
   """id field predicates"""
   id: ID
   idNEQ: ID
@@ -210,6 +222,18 @@ input StageWhereInput {
   statusNEQ: Status
   statusIn: [Status!]
   statusNotIn: [Status!]
+  
+  """deleted_at field predicates"""
+  deletedAt: Time
+  deletedAtNEQ: Time
+  deletedAtIn: [Time!]
+  deletedAtNotIn: [Time!]
+  deletedAtGT: Time
+  deletedAtGTE: Time
+  deletedAtLT: Time
+  deletedAtLTE: Time
+  deletedAtIsNil: Boolean
+  deletedAtNotNil: Boolean
   
   """id field predicates"""
   id: ID
@@ -380,6 +404,18 @@ input UserWhereInput {
   statusNEQ: Status
   statusIn: [Status!]
   statusNotIn: [Status!]
+  
+  """deleted_at field predicates"""
+  deletedAt: Time
+  deletedAtNEQ: Time
+  deletedAtIn: [Time!]
+  deletedAtNotIn: [Time!]
+  deletedAtGT: Time
+  deletedAtGTE: Time
+  deletedAtLT: Time
+  deletedAtLTE: Time
+  deletedAtIsNil: Boolean
+  deletedAtNotNil: Boolean
   
   """id field predicates"""
   id: ID
@@ -728,6 +764,18 @@ input GroupWhereInput {
   statusIn: [Status!]
   statusNotIn: [Status!]
   
+  """deleted_at field predicates"""
+  deletedAt: Time
+  deletedAtNEQ: Time
+  deletedAtIn: [Time!]
+  deletedAtNotIn: [Time!]
+  deletedAtGT: Time
+  deletedAtGTE: Time
+  deletedAtLT: Time
+  deletedAtLTE: Time
+  deletedAtIsNil: Boolean
+  deletedAtNotNil: Boolean
+  
   """id field predicates"""
   id: ID
   idNEQ: ID
@@ -796,6 +844,18 @@ input ClassWhereInput {
   statusNEQ: Status
   statusIn: [Status!]
   statusNotIn: [Status!]
+  
+  """deleted_at field predicates"""
+  deletedAt: Time
+  deletedAtNEQ: Time
+  deletedAtIn: [Time!]
+  deletedAtNotIn: [Time!]
+  deletedAtGT: Time
+  deletedAtGTE: Time
+  deletedAtLT: Time
+  deletedAtLTE: Time
+  deletedAtIsNil: Boolean
+  deletedAtNotNil: Boolean
   
   """id field predicates"""
   id: ID

@@ -30,6 +30,8 @@ type School struct {
 	Directory string `json:"directory,omitempty"`
 	// Status holds the value of the "status" field.
 	Status schema.Status `json:"status,omitempty"`
+	// DeletedAt holds the value of the "deleted_at" field.
+	DeletedAt *time.Time `json:"deleted_at,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the SchoolQuery when eager-loading is set.
 	Edges SchoolEdges `json:"edges"`
@@ -71,7 +73,7 @@ func (*School) scanValues(columns []string) ([]interface{}, error) {
 		switch columns[i] {
 		case school.FieldName, school.FieldImage, school.FieldDirectory, school.FieldStatus:
 			values[i] = new(sql.NullString)
-		case school.FieldCreatedAt, school.FieldUpdatedAt:
+		case school.FieldCreatedAt, school.FieldUpdatedAt, school.FieldDeletedAt:
 			values[i] = new(sql.NullTime)
 		case school.FieldID:
 			values[i] = new(uuid.UUID)
@@ -132,6 +134,13 @@ func (s *School) assignValues(columns []string, values []interface{}) error {
 			} else if value.Valid {
 				s.Status = schema.Status(value.String)
 			}
+		case school.FieldDeletedAt:
+			if value, ok := values[i].(*sql.NullTime); !ok {
+				return fmt.Errorf("unexpected type %T for field deleted_at", values[i])
+			} else if value.Valid {
+				s.DeletedAt = new(time.Time)
+				*s.DeletedAt = value.Time
+			}
 		}
 	}
 	return nil
@@ -182,6 +191,10 @@ func (s *School) String() string {
 	builder.WriteString(s.Directory)
 	builder.WriteString(", status=")
 	builder.WriteString(fmt.Sprintf("%v", s.Status))
+	if v := s.DeletedAt; v != nil {
+		builder.WriteString(", deleted_at=")
+		builder.WriteString(v.Format(time.ANSIC))
+	}
 	builder.WriteByte(')')
 	return builder.String()
 }

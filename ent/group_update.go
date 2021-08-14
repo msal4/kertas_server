@@ -5,6 +5,7 @@ package ent
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
@@ -75,6 +76,26 @@ func (gu *GroupUpdate) SetNillableStatus(s *schema.Status) *GroupUpdate {
 	if s != nil {
 		gu.SetStatus(*s)
 	}
+	return gu
+}
+
+// SetDeletedAt sets the "deleted_at" field.
+func (gu *GroupUpdate) SetDeletedAt(t time.Time) *GroupUpdate {
+	gu.mutation.SetDeletedAt(t)
+	return gu
+}
+
+// SetNillableDeletedAt sets the "deleted_at" field if the given value is not nil.
+func (gu *GroupUpdate) SetNillableDeletedAt(t *time.Time) *GroupUpdate {
+	if t != nil {
+		gu.SetDeletedAt(*t)
+	}
+	return gu
+}
+
+// ClearDeletedAt clears the value of the "deleted_at" field.
+func (gu *GroupUpdate) ClearDeletedAt() *GroupUpdate {
+	gu.mutation.ClearDeletedAt()
 	return gu
 }
 
@@ -280,6 +301,19 @@ func (gu *GroupUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Column: group.FieldStatus,
 		})
 	}
+	if value, ok := gu.mutation.DeletedAt(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
+			Value:  value,
+			Column: group.FieldDeletedAt,
+		})
+	}
+	if gu.mutation.DeletedAtCleared() {
+		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
+			Column: group.FieldDeletedAt,
+		})
+	}
 	if gu.mutation.ClassCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2O,
@@ -433,6 +467,26 @@ func (guo *GroupUpdateOne) SetNillableStatus(s *schema.Status) *GroupUpdateOne {
 	if s != nil {
 		guo.SetStatus(*s)
 	}
+	return guo
+}
+
+// SetDeletedAt sets the "deleted_at" field.
+func (guo *GroupUpdateOne) SetDeletedAt(t time.Time) *GroupUpdateOne {
+	guo.mutation.SetDeletedAt(t)
+	return guo
+}
+
+// SetNillableDeletedAt sets the "deleted_at" field if the given value is not nil.
+func (guo *GroupUpdateOne) SetNillableDeletedAt(t *time.Time) *GroupUpdateOne {
+	if t != nil {
+		guo.SetDeletedAt(*t)
+	}
+	return guo
+}
+
+// ClearDeletedAt clears the value of the "deleted_at" field.
+func (guo *GroupUpdateOne) ClearDeletedAt() *GroupUpdateOne {
+	guo.mutation.ClearDeletedAt()
 	return guo
 }
 
@@ -660,6 +714,19 @@ func (guo *GroupUpdateOne) sqlSave(ctx context.Context) (_node *Group, err error
 			Type:   field.TypeEnum,
 			Value:  value,
 			Column: group.FieldStatus,
+		})
+	}
+	if value, ok := guo.mutation.DeletedAt(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
+			Value:  value,
+			Column: group.FieldDeletedAt,
+		})
+	}
+	if guo.mutation.DeletedAtCleared() {
+		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
+			Column: group.FieldDeletedAt,
 		})
 	}
 	if guo.mutation.ClassCleared() {

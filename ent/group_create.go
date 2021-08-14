@@ -94,6 +94,20 @@ func (gc *GroupCreate) SetNillableStatus(s *schema.Status) *GroupCreate {
 	return gc
 }
 
+// SetDeletedAt sets the "deleted_at" field.
+func (gc *GroupCreate) SetDeletedAt(t time.Time) *GroupCreate {
+	gc.mutation.SetDeletedAt(t)
+	return gc
+}
+
+// SetNillableDeletedAt sets the "deleted_at" field if the given value is not nil.
+func (gc *GroupCreate) SetNillableDeletedAt(t *time.Time) *GroupCreate {
+	if t != nil {
+		gc.SetDeletedAt(*t)
+	}
+	return gc
+}
+
 // SetID sets the "id" field.
 func (gc *GroupCreate) SetID(u uuid.UUID) *GroupCreate {
 	gc.mutation.SetID(u)
@@ -319,6 +333,14 @@ func (gc *GroupCreate) createSpec() (*Group, *sqlgraph.CreateSpec) {
 			Column: group.FieldStatus,
 		})
 		_node.Status = value
+	}
+	if value, ok := gc.mutation.DeletedAt(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
+			Value:  value,
+			Column: group.FieldDeletedAt,
+		})
+		_node.DeletedAt = &value
 	}
 	if nodes := gc.mutation.ClassIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
