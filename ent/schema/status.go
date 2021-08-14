@@ -12,7 +12,6 @@ const DefaultStatus = StatusActive
 
 // Status values.
 const (
-	StatusDeleted  Status = "DELETED"
 	StatusDisabled Status = "DISABLED"
 	StatusActive   Status = "ACTIVE"
 )
@@ -22,12 +21,12 @@ func (s Status) String() string {
 }
 
 func (Status) Values() []string {
-	return []string{StatusDeleted.String(), StatusDisabled.String(), StatusActive.String()}
+	return []string{StatusDisabled.String(), StatusActive.String()}
 }
 
 func (s Status) IsValid() bool {
 	switch s {
-	case StatusDeleted, StatusDisabled, StatusActive:
+	case StatusDisabled, StatusActive:
 		return true
 	default:
 		return false

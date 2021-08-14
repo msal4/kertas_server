@@ -130,7 +130,7 @@ var (
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime},
 		{Name: "name", Type: field.TypeString},
-		{Name: "status", Type: field.TypeEnum, Enums: []string{"DELETED", "DISABLED", "ACTIVE"}, Default: "ACTIVE"},
+		{Name: "status", Type: field.TypeEnum, Enums: []string{"DISABLED", "ACTIVE"}, Default: "ACTIVE"},
 		{Name: "stage_classes", Type: field.TypeUUID, Nullable: true},
 		{Name: "user_classes", Type: field.TypeUUID, Nullable: true},
 	}
@@ -214,7 +214,7 @@ var (
 		{Name: "updated_at", Type: field.TypeTime},
 		{Name: "name", Type: field.TypeString, Nullable: true},
 		{Name: "group_type", Type: field.TypeEnum, Enums: []string{"PRIVATE", "SHARED"}, Default: "SHARED"},
-		{Name: "status", Type: field.TypeEnum, Enums: []string{"DELETED", "DISABLED", "ACTIVE"}, Default: "ACTIVE"},
+		{Name: "status", Type: field.TypeEnum, Enums: []string{"DISABLED", "ACTIVE"}, Default: "ACTIVE"},
 		{Name: "class_group", Type: field.TypeUUID, Unique: true, Nullable: true},
 	}
 	// GroupsTable holds the schema information for the "groups" table.
@@ -338,7 +338,7 @@ var (
 		{Name: "name", Type: field.TypeString},
 		{Name: "image", Type: field.TypeString},
 		{Name: "directory", Type: field.TypeString},
-		{Name: "status", Type: field.TypeEnum, Enums: []string{"DELETED", "DISABLED", "ACTIVE"}, Default: "ACTIVE"},
+		{Name: "status", Type: field.TypeEnum, Enums: []string{"DISABLED", "ACTIVE"}, Default: "ACTIVE"},
 	}
 	// SchoolsTable holds the schema information for the "schools" table.
 	SchoolsTable = &schema.Table{
@@ -360,7 +360,7 @@ var (
 		{Name: "updated_at", Type: field.TypeTime},
 		{Name: "name", Type: field.TypeString},
 		{Name: "tuition_amount", Type: field.TypeInt},
-		{Name: "status", Type: field.TypeEnum, Enums: []string{"DELETED", "DISABLED", "ACTIVE"}, Default: "ACTIVE"},
+		{Name: "status", Type: field.TypeEnum, Enums: []string{"DISABLED", "ACTIVE"}, Default: "ACTIVE"},
 		{Name: "school_stages", Type: field.TypeUUID, Nullable: true},
 	}
 	// StagesTable holds the schema information for the "stages" table.
@@ -443,7 +443,7 @@ var (
 		{Name: "directory", Type: field.TypeString},
 		{Name: "token_version", Type: field.TypeInt, Default: 0},
 		{Name: "role", Type: field.TypeEnum, Enums: []string{"SUPER_ADMIN", "SCHOOL_ADMIN", "TEACHER", "STUDENT"}, Default: "STUDENT"},
-		{Name: "status", Type: field.TypeEnum, Enums: []string{"DELETED", "DISABLED", "ACTIVE"}, Default: "ACTIVE"},
+		{Name: "status", Type: field.TypeEnum, Enums: []string{"DISABLED", "ACTIVE"}, Default: "ACTIVE"},
 		{Name: "school_users", Type: field.TypeUUID, Nullable: true},
 		{Name: "stage_students", Type: field.TypeUUID, Nullable: true},
 	}

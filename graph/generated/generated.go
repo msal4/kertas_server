@@ -607,7 +607,6 @@ type PageInfo {
 }
 
 enum Status {
-  DELETED
   DISABLED
   ACTIVE
 }

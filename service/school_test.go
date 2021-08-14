@@ -55,7 +55,7 @@ func TestSchoolList(t *testing.T) {
 
 		s.EC.School.Create().SetName("school 1").SetImage("s/image1").SetDirectory("test_dir").SaveX(ctx)
 		s.EC.School.Create().SetName("school 2").SetImage("s/image2").SetDirectory("test_dir").SetStatus(schema.StatusDisabled).SaveX(ctx)
-		s.EC.School.Create().SetName("school 3").SetImage("s/image3").SetDirectory("test_dir").SetStatus(schema.StatusDeleted).SaveX(ctx)
+		s.EC.School.Create().SetName("school 3").SetImage("s/image3").SetDirectory("test_dir").SaveX(ctx)
 		s.EC.School.Create().SetName("school 4").SetImage("s/image4").SetDirectory("test_dir").SetStatus(schema.StatusDisabled).SaveX(ctx)
 
 		b := s.EC.School.Query().Order(ent.Asc(school.FieldCreatedAt))

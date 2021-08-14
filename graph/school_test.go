@@ -129,7 +129,7 @@ func (s *schoolTestSuite) TestSchools() {
 		const expectedLen = 3
 		schools := make([]*ent.School, expectedLen)
 		schools[0] = ec.School.Create().SetName("school 1").SetImage("image/1").SetDirectory("test_dir").SaveX(ctx)
-		schools[1] = ec.School.Create().SetName("school 2").SetImage("image/2").SetDirectory("test_dir").SetStatus(schema.StatusDeleted).SaveX(ctx)
+		schools[1] = ec.School.Create().SetName("school 2").SetImage("image/2").SetDirectory("test_dir").SaveX(ctx)
 		schools[2] = ec.School.Create().SetName("school 3").SetImage("image/3").SetDirectory("test_dir").SetStatus(schema.StatusDisabled).SaveX(ctx)
 
 		var resp response
@@ -186,7 +186,7 @@ func (s *schoolTestSuite) TestSchools() {
 		defer ec.School.Delete().ExecX(ctx)
 
 		ec.School.Create().SetName("school 1").SetImage("image/1").SetDirectory("test_dir").SetCreatedAt(time.Now().Add(time.Minute)).SaveX(ctx)
-		ec.School.Create().SetName("school 2").SetImage("image/2").SetDirectory("test_dir").SetStatus(schema.StatusDeleted).SetCreatedAt(time.Now().Add(time.Hour)).SaveX(ctx)
+		ec.School.Create().SetName("school 2").SetImage("image/2").SetDirectory("test_dir").SetCreatedAt(time.Now().Add(time.Hour)).SaveX(ctx)
 		ec.School.Create().SetName("school 3").SetImage("image/3").SetDirectory("test_dir").SetStatus(schema.StatusDisabled).SaveX(ctx)
 
 		var resp response
@@ -238,7 +238,7 @@ schools(orderBy: {field: CREATED_AT, direction: ASC}) {
 		defer ec.School.Delete().ExecX(ctx)
 
 		ec.School.Create().SetName("school 1").SetDirectory("test_dir").SetImage("image/1").SetCreatedAt(time.Now().Add(time.Minute)).SaveX(ctx)
-		ec.School.Create().SetName("school 2").SetDirectory("test_dir").SetImage("image/2").SetStatus(schema.StatusDeleted).SetCreatedAt(time.Now().Add(time.Hour)).SaveX(ctx)
+		ec.School.Create().SetName("school 2").SetDirectory("test_dir").SetImage("image/2").SetCreatedAt(time.Now().Add(time.Hour)).SaveX(ctx)
 		ec.School.Create().SetName("school 3").SetDirectory("test_dir").SetImage("image/3").SetStatus(schema.StatusDisabled).SaveX(ctx)
 
 		var resp response

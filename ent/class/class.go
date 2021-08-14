@@ -131,7 +131,7 @@ const DefaultStatus schema.Status = "ACTIVE"
 // StatusValidator is a validator for the "status" field enum values. It is called by the builders before save.
 func StatusValidator(s schema.Status) error {
 	switch s {
-	case "DELETED", "DISABLED", "ACTIVE":
+	case "DISABLED", "ACTIVE":
 		return nil
 	default:
 		return fmt.Errorf("class: invalid enum value for status field: %q", s)
