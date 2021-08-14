@@ -172,7 +172,7 @@ func (s *Service) generateTokens(u ent.User) (*model.AuthData, error) {
 		UserID: u.ID,
 		Role:   u.Role,
 	})
-	accessStr, err := token.SignedString(s.Config.AccessSecretKey)
+	access, err := token.SignedString(s.Config.AccessSecretKey)
 	if err != nil {
 		return nil, err
 	}
@@ -184,118 +184,15 @@ func (s *Service) generateTokens(u ent.User) (*model.AuthData, error) {
 		UserID:       u.ID,
 		TokenVersion: u.TokenVersion,
 	})
-	refreshStr, err := token.SignedString(s.Config.RefreshSecretKey)
+	refresh, err := token.SignedString(s.Config.RefreshSecretKey)
 	if err != nil {
 		return nil, err
 	}
 
-	return &model.AuthData{AccessToken: accessStr, RefreshToken: refreshStr}, nil
+	return &model.AuthData{AccessToken: access, RefreshToken: refresh}, nil
 }
 
-var (
-	SchoolDisabledErr = errors.New("school is disabled")
-	StageDisabledErr  = errors.New("stage is disabled")
-	UserDisabledErr   = errors.New("user is disabled")
-	InvalidCredsErr   = errors.New("invalid credentials")
-	NotAllowedErr     = errors.New("not allowed")
-	NotFoundErr       = errors.New("not found")
-	InvalidTokenErr   = errors.New("invalid token")
-)
-
-func (s *Service) LoginAdmin(ctx context.Context, input model.LoginInput) (*model.AuthData, error) {
-	u, err := s.EC.User.Query().Where(user.Username(input.Username), user.Password(input.Password), user.DeletedAtIsNil()).Only(ctx)
-	if err != nil {
-		return nil, InvalidCredsErr
-	}
-
-	if u.Role != user.RoleSuperAdmin && u.Role != user.RoleSchoolAdmin {
-		return nil, NotAllowedErr
-	}
-
-	if !u.Active {
-		return nil, UserDisabledErr
-	}
-
-	sch, err := u.School(ctx)
-	if sch != nil && err == nil {
-		if !sch.Active {
-			return nil, SchoolDisabledErr
-		}
-
-		if sch.DeletedAt != nil {
-			return nil, InvalidCredsErr
-		}
-	}
-
-	return s.generateTokens(*u)
-}
-
-func (s *Service) LoginUser(ctx context.Context, input model.LoginInput) (*model.AuthData, error) {
-	u, err := s.EC.User.Query().Where(user.Username(input.Username), user.Password(input.Password), user.DeletedAtIsNil()).Only(ctx)
-	if err != nil {
-		return nil, InvalidCredsErr
-	}
-
-	if u.Role != user.RoleTeacher && u.Role != user.RoleStudent {
-		return nil, NotAllowedErr
-	}
-
-	if !u.Active {
-		return nil, UserDisabledErr
-	}
-
-	sch, err := u.School(ctx)
-	if err != nil {
-		return nil, err
-	}
-
-	if !sch.Active {
-		return nil, SchoolDisabledErr
-	}
-
-	if sch.DeletedAt != nil {
-		return nil, InvalidCredsErr
-	}
-
-	if u.Role == user.RoleStudent {
-		stage, err := u.Stage(ctx)
-		if err != nil {
-			return nil, err
-		}
-
-		if !stage.Active {
-			return nil, StageDisabledErr
-		}
-
-		if stage.DeletedAt != nil {
-			return nil, InvalidCredsErr
-		}
-	}
-
-	return s.generateTokens(*u)
-}
-
-func (s *Service) RefreshTokens(ctx context.Context, refreshToken string) (*model.AuthData, error) {
-	var claims RefreshClaims
-	token, err := jwt.ParseWithClaims(refreshToken, &claims, func(t *jwt.Token) (interface{}, error) {
-		return s.Config.RefreshSecretKey, nil
-	})
-	if err != nil {
-		return nil, err
-	}
-	if !token.Valid {
-		return nil, errors.New("invalid token")
-	}
-
-	u, err := s.EC.User.Get(ctx, claims.UserID)
-	if err != nil {
-		return nil, err
-	}
-
-	if u.TokenVersion != claims.TokenVersion {
-		return nil, InvalidTokenErr
-	}
-
+func (s *Service) verifyUser(ctx context.Context, u ent.User) (*model.AuthData, error) {
 	if !u.Active {
 		return nil, UserDisabledErr
 	}
@@ -305,7 +202,7 @@ func (s *Service) RefreshTokens(ctx context.Context, refreshToken string) (*mode
 	}
 
 	if u.Role == user.RoleSuperAdmin {
-		return s.generateTokens(*u)
+		return s.generateTokens(u)
 	}
 
 	sch, err := u.School(ctx)
@@ -336,5 +233,79 @@ func (s *Service) RefreshTokens(ctx context.Context, refreshToken string) (*mode
 		}
 	}
 
-	return s.generateTokens(*u)
+	return s.generateTokens(u)
+}
+
+var (
+	SchoolDisabledErr = errors.New("school is disabled")
+	StageDisabledErr  = errors.New("stage is disabled")
+	UserDisabledErr   = errors.New("user is disabled")
+	InvalidCredsErr   = errors.New("invalid credentials")
+	NotAllowedErr     = errors.New("not allowed")
+	NotFoundErr       = errors.New("not found")
+	InvalidTokenErr   = errors.New("invalid token")
+)
+
+func (s *Service) LoginAdmin(ctx context.Context, input model.LoginInput) (*model.AuthData, error) {
+	u, err := s.EC.User.Query().Where(user.Username(input.Username), user.DeletedAtIsNil()).Only(ctx)
+	if err != nil {
+		if ent.IsNotFound(err) {
+			return nil, NotFoundErr
+		}
+		return nil, err
+	}
+
+	if u.Role != user.RoleSuperAdmin && u.Role != user.RoleSchoolAdmin {
+		return nil, NotAllowedErr
+	}
+
+	if input.Password != u.Password {
+		return nil, InvalidCredsErr
+	}
+
+	return s.verifyUser(ctx, *u)
+}
+
+func (s *Service) LoginUser(ctx context.Context, input model.LoginInput) (*model.AuthData, error) {
+	u, err := s.EC.User.Query().Where(user.Username(input.Username), user.DeletedAtIsNil()).Only(ctx)
+	if err != nil {
+		if ent.IsNotFound(err) {
+			return nil, NotFoundErr
+		}
+		return nil, err
+	}
+
+	if u.Role != user.RoleTeacher && u.Role != user.RoleStudent {
+		return nil, NotAllowedErr
+	}
+
+	if input.Password != u.Password {
+		return nil, InvalidCredsErr
+	}
+
+	return s.verifyUser(ctx, *u)
+}
+
+func (s *Service) RefreshTokens(ctx context.Context, refreshToken string) (*model.AuthData, error) {
+	var claims RefreshClaims
+	token, err := jwt.ParseWithClaims(refreshToken, &claims, func(t *jwt.Token) (interface{}, error) {
+		return s.Config.RefreshSecretKey, nil
+	})
+	if err != nil {
+		return nil, err
+	}
+	if !token.Valid {
+		return nil, errors.New("invalid token")
+	}
+
+	u, err := s.EC.User.Get(ctx, claims.UserID)
+	if err != nil {
+		return nil, err
+	}
+
+	if u.TokenVersion != claims.TokenVersion {
+		return nil, InvalidTokenErr
+	}
+
+	return s.verifyUser(ctx, *u)
 }

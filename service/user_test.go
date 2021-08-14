@@ -433,7 +433,7 @@ func TestLoginAdmin(t *testing.T) {
 		})
 		require.Error(t, err)
 		require.Nil(t, resp)
-		require.ErrorIs(t, err, service.InvalidCredsErr)
+		require.ErrorIs(t, err, service.NotFoundErr)
 	})
 
 	t.Run("disabled user", func(t *testing.T) {
@@ -479,7 +479,7 @@ func TestLoginAdmin(t *testing.T) {
 		})
 		require.Error(t, err)
 		require.Nil(t, resp)
-		require.ErrorIs(t, err, service.InvalidCredsErr)
+		require.ErrorIs(t, err, service.NotFoundErr)
 	})
 
 	t.Run("super admin", func(t *testing.T) {
@@ -593,7 +593,7 @@ func TestLoginAdmin(t *testing.T) {
 		})
 		require.Error(t, err)
 		require.Nil(t, resp)
-		require.ErrorIs(t, err, service.InvalidCredsErr)
+		require.ErrorIs(t, err, service.NotFoundErr)
 	})
 
 	t.Run("teacher & student", func(t *testing.T) {
@@ -674,7 +674,7 @@ func TestLoginUser(t *testing.T) {
 		})
 		require.Error(t, err)
 		require.Nil(t, resp)
-		require.ErrorIs(t, err, service.InvalidCredsErr)
+		require.ErrorIs(t, err, service.NotFoundErr)
 	})
 
 	t.Run("disabled user", func(t *testing.T) {
@@ -722,7 +722,7 @@ func TestLoginUser(t *testing.T) {
 		})
 		require.Error(t, err)
 		require.Nil(t, resp)
-		require.ErrorIs(t, err, service.InvalidCredsErr)
+		require.ErrorIs(t, err, service.NotFoundErr)
 	})
 
 	t.Run("student", func(t *testing.T) {
@@ -834,7 +834,7 @@ func TestLoginUser(t *testing.T) {
 		})
 		require.Error(t, err)
 		require.Nil(t, resp)
-		require.ErrorIs(t, err, service.InvalidCredsErr)
+		require.ErrorIs(t, err, service.NotFoundErr)
 	})
 
 	t.Run("disabled stage", func(t *testing.T) {
@@ -868,7 +868,7 @@ func TestLoginUser(t *testing.T) {
 		})
 		require.Error(t, err)
 		require.Nil(t, resp)
-		require.ErrorIs(t, err, service.InvalidCredsErr)
+		require.ErrorIs(t, err, service.NotFoundErr)
 	})
 
 	t.Run("super admin & school admin", func(t *testing.T) {
