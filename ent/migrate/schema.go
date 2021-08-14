@@ -170,6 +170,11 @@ var (
 				Unique:  false,
 				Columns: []*schema.Column{ClassesColumns[4]},
 			},
+			{
+				Name:    "class_deleted_at",
+				Unique:  false,
+				Columns: []*schema.Column{ClassesColumns[5]},
+			},
 		},
 	}
 	// GradesColumns holds the columns for the "grades" table.
@@ -247,6 +252,11 @@ var (
 				Name:    "group_group_type",
 				Unique:  false,
 				Columns: []*schema.Column{GroupsColumns[4]},
+			},
+			{
+				Name:    "group_deleted_at",
+				Unique:  false,
+				Columns: []*schema.Column{GroupsColumns[6]},
 			},
 		},
 	}
@@ -354,6 +364,11 @@ var (
 				Unique:  false,
 				Columns: []*schema.Column{SchoolsColumns[6]},
 			},
+			{
+				Name:    "school_deleted_at",
+				Unique:  false,
+				Columns: []*schema.Column{SchoolsColumns[7]},
+			},
 		},
 	}
 	// StagesColumns holds the columns for the "stages" table.
@@ -390,6 +405,11 @@ var (
 				Name:    "stage_active",
 				Unique:  false,
 				Columns: []*schema.Column{StagesColumns[5]},
+			},
+			{
+				Name:    "stage_deleted_at",
+				Unique:  false,
+				Columns: []*schema.Column{StagesColumns[6]},
 			},
 		},
 	}
@@ -491,6 +511,11 @@ var (
 				Name:    "user_role",
 				Unique:  false,
 				Columns: []*schema.Column{UsersColumns[10]},
+			},
+			{
+				Name:    "user_deleted_at",
+				Unique:  false,
+				Columns: []*schema.Column{UsersColumns[12]},
 			},
 		},
 	}

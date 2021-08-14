@@ -44,5 +44,6 @@ func (School) Edges() []ent.Edge {
 func (School) Indexes() []ent.Index {
 	return []ent.Index{
 		index.Fields("active"),
+		index.Fields("deleted_at"),
 	}
 }

@@ -46,5 +46,6 @@ func (Stage) Indexes() []ent.Index {
 	return []ent.Index{
 		index.Edges("school"),
 		index.Fields("active"),
+		index.Fields("deleted_at"),
 	}
 }

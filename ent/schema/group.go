@@ -45,5 +45,6 @@ func (Group) Indexes() []ent.Index {
 		index.Edges("class"),
 		index.Fields("active"),
 		index.Fields("group_type"),
+		index.Fields("deleted_at"),
 	}
 }

@@ -67,5 +67,6 @@ func (User) Indexes() []ent.Index {
 		index.Edges("school"),
 		index.Fields("active"),
 		index.Fields("role"),
+		index.Fields("deleted_at"),
 	}
 }

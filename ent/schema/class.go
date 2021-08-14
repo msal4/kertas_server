@@ -48,5 +48,6 @@ func (Class) Indexes() []ent.Index {
 		index.Edges("stage"),
 		index.Edges("teacher"),
 		index.Fields("active"),
+		index.Fields("deleted_at"),
 	}
 }
