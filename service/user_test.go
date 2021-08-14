@@ -3,8 +3,10 @@ package service_test
 import (
 	"context"
 	"testing"
+	"time"
 
 	"github.com/99designs/gqlgen/graphql"
+	"github.com/golang-jwt/jwt"
 	"github.com/google/uuid"
 	"github.com/minio/minio-go/v7"
 	"github.com/msal4/hassah_school_server/ent"
@@ -393,5 +395,233 @@ func TestDeleteUserPermanently(t *testing.T) {
 	t.Run("invalid non existing user", func(t *testing.T) {
 		err := s.DeleteUserPermanently(ctx, uuid.New())
 		require.Error(t, err)
+	})
+}
+
+func TestLoginAdmin(t *testing.T) {
+	s := newService(t)
+	defer s.EC.Close()
+	ctx := context.Background()
+
+	input := model.AddUserInput{
+		Name:     "test name",
+		Username: "testusername",
+		Password: "testpassword",
+		Phone:    "07705983835",
+		Role:     user.RoleSuperAdmin,
+		Active:   true,
+	}
+
+	u, err := s.AddUser(ctx, input)
+	require.NoError(t, err)
+	require.NotNil(t, u)
+
+	t.Run("invalid password", func(t *testing.T) {
+		resp, err := s.LoginAdmin(ctx, model.LoginInput{
+			Username: input.Username,
+			Password: "wrongpassword",
+		})
+		require.Error(t, err)
+		require.Nil(t, resp)
+	})
+
+	t.Run("invalid username", func(t *testing.T) {
+		resp, err := s.LoginAdmin(ctx, model.LoginInput{
+			Username: input.Username + "whatever",
+			Password: input.Password,
+		})
+		require.Error(t, err)
+		require.Nil(t, resp)
+	})
+
+	t.Run("disabled user", func(t *testing.T) {
+		input := model.AddUserInput{
+			Name:     "test name",
+			Username: "testusername22",
+			Password: "testpassword",
+			Phone:    "07705983835",
+			Role:     user.RoleSuperAdmin,
+		}
+
+		u, err := s.AddUser(ctx, input)
+		require.NoError(t, err)
+		require.NotNil(t, u)
+
+		resp, err := s.LoginAdmin(ctx, model.LoginInput{
+			Username: input.Username,
+			Password: input.Password,
+		})
+		require.Error(t, err)
+		require.Nil(t, resp)
+	})
+
+	t.Run("deleted user", func(t *testing.T) {
+		input := model.AddUserInput{
+			Name:     "test name",
+			Username: "testusername223",
+			Password: "testpassword",
+			Phone:    "07705983835",
+			Role:     user.RoleSuperAdmin,
+			Active:   true,
+		}
+
+		u, err := s.AddUser(ctx, input)
+		u = u.Update().SetDeletedAt(time.Now()).SaveX(ctx)
+		require.NoError(t, err)
+		require.NotNil(t, u)
+
+		resp, err := s.LoginAdmin(ctx, model.LoginInput{
+			Username: input.Username,
+			Password: input.Password,
+		})
+		require.Error(t, err)
+		require.Nil(t, resp)
+	})
+
+	t.Run("super admin", func(t *testing.T) {
+		resp, err := s.LoginAdmin(ctx, model.LoginInput{
+			Username: input.Username,
+			Password: input.Password,
+		})
+		require.NoError(t, err)
+		require.NotNil(t, resp)
+		require.NotEmpty(t, resp.AccessToken)
+		require.NotEmpty(t, resp.RefreshToken)
+
+		var accessClaims service.AccessClaims
+		token, err := jwt.ParseWithClaims(resp.AccessToken, &accessClaims, func(t *jwt.Token) (interface{}, error) {
+			return s.Config.AccessSecretKey, nil
+		})
+		require.NoError(t, err)
+		require.NotNil(t, token)
+		require.True(t, token.Valid)
+		require.Equal(t, u.ID, accessClaims.UserID)
+		require.Equal(t, u.Role, accessClaims.Role)
+
+		var refreshClaims service.RefreshClaims
+		token, err = jwt.ParseWithClaims(resp.RefreshToken, &refreshClaims, func(t *jwt.Token) (interface{}, error) {
+			return s.Config.RefreshSecretKey, nil
+		})
+		require.NoError(t, err)
+		require.NotNil(t, token)
+		require.True(t, token.Valid)
+		require.Equal(t, u.ID, refreshClaims.UserID)
+		require.Equal(t, u.TokenVersion, refreshClaims.TokenVersion)
+	})
+
+	t.Run("school admin", func(t *testing.T) {
+		sch := s.EC.School.Create().SetName("test school").SetActive(true).SetImage("hello").SetDirectory("whatev").SaveX(ctx)
+
+		input := model.AddUserInput{
+			Name:     "test name",
+			Username: "testusernamesss",
+			Password: "testpassword",
+			Phone:    "07705983835",
+			Role:     user.RoleSchoolAdmin,
+			Active:   true,
+			SchoolID: &sch.ID,
+		}
+
+		u, err := s.AddUser(ctx, input)
+		require.NoError(t, err)
+		require.NotNil(t, u)
+
+		resp, err := s.LoginAdmin(ctx, model.LoginInput{
+			Username: input.Username,
+			Password: input.Password,
+		})
+		require.NoError(t, err)
+		require.NotNil(t, resp)
+		require.NotEmpty(t, resp.AccessToken)
+		require.NotEmpty(t, resp.RefreshToken)
+
+		var accessClaims service.AccessClaims
+		token, err := jwt.ParseWithClaims(resp.AccessToken, &accessClaims, func(t *jwt.Token) (interface{}, error) {
+			return s.Config.AccessSecretKey, nil
+		})
+		require.NoError(t, err)
+		require.NotNil(t, token)
+		require.True(t, token.Valid)
+		require.Equal(t, u.ID, accessClaims.UserID)
+		require.Equal(t, u.Role, accessClaims.Role)
+
+		var refreshClaims service.RefreshClaims
+		token, err = jwt.ParseWithClaims(resp.RefreshToken, &refreshClaims, func(t *jwt.Token) (interface{}, error) {
+			return s.Config.RefreshSecretKey, nil
+		})
+		require.NoError(t, err)
+		require.NotNil(t, token)
+		require.True(t, token.Valid)
+		require.Equal(t, u.ID, refreshClaims.UserID)
+		require.Equal(t, u.TokenVersion, refreshClaims.TokenVersion)
+	})
+
+	t.Run("disabled school", func(t *testing.T) {
+		sch := s.EC.School.Create().SetName("test school").SetActive(false).SetImage("hello").SetDirectory("whatev").SaveX(ctx)
+
+		input := model.AddUserInput{
+			Name:     "test name",
+			Username: "testusernam3242",
+			Password: "testpassword",
+			Phone:    "07705983835",
+			Role:     user.RoleSchoolAdmin,
+			Active:   true,
+			SchoolID: &sch.ID,
+		}
+
+		u, err := s.AddUser(ctx, input)
+		require.NoError(t, err)
+		require.NotNil(t, u)
+
+		resp, err := s.LoginAdmin(ctx, model.LoginInput{
+			Username: input.Username,
+			Password: input.Password,
+		})
+		require.Error(t, err)
+		require.Nil(t, resp)
+
+		sch.Update().SetDeletedAt(time.Now()).SetActive(true).SaveX(ctx)
+
+		resp, err = s.LoginAdmin(ctx, model.LoginInput{
+			Username: input.Username,
+			Password: input.Password,
+		})
+		require.Error(t, err)
+		require.Nil(t, resp)
+	})
+
+	t.Run("teacher & student", func(t *testing.T) {
+		sch := s.EC.School.Create().SetName("test school").SetActive(true).SetImage("hello").SetDirectory("whatev").SaveX(ctx)
+
+		input := model.AddUserInput{
+			Name:     "test name",
+			Username: "22testusernam3242",
+			Password: "testpassword",
+			Phone:    "07705983835",
+			Role:     user.RoleTeacher,
+			Active:   true,
+			SchoolID: &sch.ID,
+		}
+
+		u, err := s.AddUser(ctx, input)
+		require.NoError(t, err)
+		require.NotNil(t, u)
+
+		resp, err := s.LoginAdmin(ctx, model.LoginInput{
+			Username: input.Username,
+			Password: input.Password,
+		})
+		require.Error(t, err)
+		require.Nil(t, resp)
+
+		stage := s.EC.Stage.Create().SetName("1st").SetTuitionAmount(1000).SetActive(true).SaveX(ctx)
+		u.Update().SetStage(stage).SaveX(ctx)
+
+		resp, err = s.LoginAdmin(ctx, model.LoginInput{
+			Username: input.Username,
+			Password: input.Password,
+		})
+		require.Error(t, err)
+		require.Nil(t, resp)
 	})
 }

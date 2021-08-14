@@ -48,6 +48,26 @@ type Config struct {
 	//
 	// If not provided defaultHQImageSize is used.
 	HQImageSize imageSize
+
+	// AccessSecretKey is the key used to sign the access token.
+	//
+	// Default: defaultAccessKey
+	AccessSecretKey []byte
+
+	// RefreshSecretKey is the key used to sign the refresh token.
+	//
+	// Default: defaultRefreshKey
+	RefreshSecretKey []byte
+
+	// AccessTokenLifetime is the duration used to determine the expiration date for the access token.
+	//
+	// Default: defaultAccessTokenLifetime
+	AccessTokenLifetime time.Duration
+
+	// RefreshTokenLifetime is the duration used to determine the expiration date for the refresh token.
+	//
+	// Default: defaultRefreshTokenLifetime
+	RefreshTokenLifetime time.Duration
 }
 
 type Service struct {
@@ -63,12 +83,16 @@ type Service struct {
 
 // Config defaults.
 const (
-	defaultFilenameTimeFormat = "02-01-06_15-04"
-	defaultRootBucket         = "root"
-	defaultMaxFilenameLen     = 6
-	defaultRandStringLen      = 6
-	defaultThumbnailSize      = 200
-	defaultHQImageSize        = 1000
+	defaultFilenameTimeFormat   = "02-01-06_15-04"
+	defaultRootBucket           = "root"
+	defaultMaxFilenameLen       = 6
+	defaultRandStringLen        = 6
+	defaultThumbnailSize        = 200
+	defaultHQImageSize          = 1000
+	defaultAccessKey            = "dontusethedefaultaccesskey"
+	defaultRefreshKey           = "dontusethedefaultrefreshkey"
+	defaultAccessTokenLifetime  = 2 * time.Minute
+	defaultRefreshTokenLifetime = 1 * time.Hour
 )
 
 // New creates a new initialized and configured service.
@@ -102,6 +126,18 @@ func New(ec *ent.Client, mc *minio.Client, cfg *Config) (*Service, error) {
 	}
 	if cfg.HQImageSize.Height == 0 {
 		cfg.HQImageSize.Height = defaultHQImageSize
+	}
+	if len(cfg.AccessSecretKey) == 0 {
+		cfg.AccessSecretKey = []byte(defaultAccessKey)
+	}
+	if len(cfg.RefreshSecretKey) == 0 {
+		cfg.RefreshSecretKey = []byte(defaultRefreshKey)
+	}
+	if cfg.AccessTokenLifetime == 0 {
+		cfg.AccessTokenLifetime = defaultAccessTokenLifetime
+	}
+	if cfg.RefreshTokenLifetime == 0 {
+		cfg.RefreshTokenLifetime = defaultRefreshTokenLifetime
 	}
 
 	ctx := context.Background()

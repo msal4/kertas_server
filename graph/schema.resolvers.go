@@ -45,6 +45,10 @@ func (r *mutationResolver) DeleteUserPermanently(ctx context.Context, id uuid.UU
 	return true, r.s.DeleteUserPermanently(ctx, id)
 }
 
+func (r *mutationResolver) LoginAdmin(ctx context.Context, input model.LoginInput) (*model.AuthData, error) {
+	return r.s.LoginAdmin(ctx, input)
+}
+
 func (r *queryResolver) School(ctx context.Context, id uuid.UUID) (*ent.School, error) {
 	return r.s.EC.School.Get(ctx, id)
 }

@@ -6,6 +6,7 @@ require (
 	entgo.io/contrib v0.0.0-20210726113942-478c3f3c33cb
 	entgo.io/ent v0.9.0
 	github.com/99designs/gqlgen v0.13.0
+	github.com/golang-jwt/jwt v3.2.2+incompatible
 	github.com/google/uuid v1.3.0
 	github.com/hashicorp/go-multierror v1.1.1
 	github.com/lib/pq v1.10.2

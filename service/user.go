@@ -2,11 +2,13 @@ package service
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"path"
 	"strings"
 	"time"
 
+	"github.com/golang-jwt/jwt"
 	"github.com/google/uuid"
 	"github.com/minio/minio-go/v7"
 	"github.com/msal4/hassah_school_server/ent"
@@ -146,4 +148,72 @@ func (s *Service) DeleteUserPermanently(ctx context.Context, id uuid.UUID) error
 	}
 
 	return s.EC.User.DeleteOneID(id).Exec(ctx)
+}
+
+type AccessClaims struct {
+	*jwt.StandardClaims
+
+	UserID uuid.UUID `json:"user_id"`
+	Role   user.Role `json:"role"`
+}
+
+type RefreshClaims struct {
+	*jwt.StandardClaims
+
+	UserID       uuid.UUID `json:"user_id"`
+	TokenVersion int       `json:"token_version"`
+}
+
+func (s *Service) generateTokens(u ent.User) (*model.AuthData, error) {
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, AccessClaims{
+		StandardClaims: &jwt.StandardClaims{
+			ExpiresAt: time.Now().Add(s.Config.AccessTokenLifetime).Unix(),
+		},
+		UserID: u.ID,
+		Role:   u.Role,
+	})
+	accessStr, err := token.SignedString(s.Config.AccessSecretKey)
+	if err != nil {
+		return nil, err
+	}
+
+	token = jwt.NewWithClaims(jwt.SigningMethodHS256, RefreshClaims{
+		StandardClaims: &jwt.StandardClaims{
+			ExpiresAt: time.Now().Add(s.Config.RefreshTokenLifetime).Unix(),
+		},
+		UserID:       u.ID,
+		TokenVersion: u.TokenVersion,
+	})
+	refreshStr, err := token.SignedString(s.Config.RefreshSecretKey)
+	if err != nil {
+		return nil, err
+	}
+
+	return &model.AuthData{AccessToken: accessStr, RefreshToken: refreshStr}, nil
+}
+
+func (s *Service) LoginAdmin(ctx context.Context, input model.LoginInput) (*model.AuthData, error) {
+	u, err := s.EC.User.Query().Where(user.Username(input.Username), user.Password(input.Password)).Only(ctx)
+	if err != nil {
+		return nil, errors.New("invalid username or password")
+	}
+
+	if u.Role != user.RoleSuperAdmin && u.Role != user.RoleSchoolAdmin {
+		return nil, errors.New("not allowed")
+	}
+
+	if !u.Active {
+		return nil, errors.New("this user is disabled")
+	}
+
+	if u.DeletedAt != nil {
+		return nil, &ent.NotFoundError{}
+	}
+
+	sch, err := u.School(ctx)
+	if sch != nil && err == nil && (!sch.Active || sch.DeletedAt != nil) {
+		return nil, errors.New("school is disabled")
+	}
+
+	return s.generateTokens(*u)
 }

@@ -94,7 +94,6 @@ type User implements Node {
   id: ID!
   name: String!
   username: String!
-  password: String!
   phone: String!
   image: String!
   role: Role!
@@ -138,6 +137,16 @@ input UpdateUserInput {
   stage_id: ID
 }
 
+input LoginInput {
+  username: String!
+  password: String!
+}
+
+type AuthData {
+  accessToken: String!
+  refreshToken: String!
+}
+
 type Query {
     school(id: ID!): School
     schools(after: Cursor, first: Int, before: Cursor, last: Int, orderBy: SchoolOrder, where: SchoolWhereInput): SchoolConnection
@@ -153,4 +162,6 @@ type Mutation {
   udpateUser(id: ID!, input: UpdateUserInput!): User
   deleteUser(id: ID!): Boolean!
   deleteUserPermanently(id: ID!): Boolean!
+
+  loginAdmin(input: LoginInput!): AuthData
 }

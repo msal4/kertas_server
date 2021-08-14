@@ -26,6 +26,16 @@ type AddUserInput struct {
 	StageID  *uuid.UUID      `json:"stage_id"`
 }
 
+type AuthData struct {
+	AccessToken  string `json:"accessToken"`
+	RefreshToken string `json:"refreshToken"`
+}
+
+type LoginInput struct {
+	Username string `json:"username"`
+	Password string `json:"password"`
+}
+
 type UpdateSchoolInput struct {
 	Name   *string         `json:"name"`
 	Image  *graphql.Upload `json:"image"`
