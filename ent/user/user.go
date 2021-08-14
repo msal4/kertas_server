@@ -180,15 +180,15 @@ var (
 // Role defines the type for the "role" enum field.
 type Role string
 
-// RoleSTUDENT is the default value of the Role enum.
-const DefaultRole = RoleSTUDENT
+// RoleStudent is the default value of the Role enum.
+const DefaultRole = RoleStudent
 
 // Role values.
 const (
-	RoleSUPER_ADMIN  Role = "SUPER_ADMIN"
-	RoleSCHOOL_ADMIN Role = "SCHOOL_ADMIN"
-	RoleTEACHER      Role = "TEACHER"
-	RoleSTUDENT      Role = "STUDENT"
+	RoleSuperAdmin  Role = "SUPER_ADMIN"
+	RoleSchoolAdmin Role = "SCHOOL_ADMIN"
+	RoleTeacher     Role = "TEACHER"
+	RoleStudent     Role = "STUDENT"
 )
 
 func (r Role) String() string {
@@ -198,7 +198,7 @@ func (r Role) String() string {
 // RoleValidator is a validator for the "role" field enum values. It is called by the builders before save.
 func RoleValidator(r Role) error {
 	switch r {
-	case RoleSUPER_ADMIN, RoleSCHOOL_ADMIN, RoleTEACHER, RoleSTUDENT:
+	case RoleSuperAdmin, RoleSchoolAdmin, RoleTeacher, RoleStudent:
 		return nil
 	default:
 		return fmt.Errorf("user: invalid enum value for role field: %q", r)

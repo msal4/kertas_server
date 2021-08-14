@@ -31,17 +31,17 @@ func (s *Service) AddUser(ctx context.Context, input model.AddUserInput) (*ent.U
 	b := s.EC.User.Create().SetName(input.Name).SetUsername(input.Username).
 		SetStatus(input.Status).SetRole(input.Role).SetPassword(input.Password).SetPhone(input.Phone)
 
-	if input.StageID == nil && input.Role == user.RoleSTUDENT {
+	if input.StageID == nil && input.Role == user.RoleStudent {
 		return nil, fmt.Errorf("stage is required for %q role", input.Role)
 	}
 
-	if input.SchoolID == nil && (input.Role == user.RoleTEACHER || input.Role == user.RoleSCHOOL_ADMIN) {
+	if input.SchoolID == nil && (input.Role == user.RoleTeacher || input.Role == user.RoleSchoolAdmin) {
 		return nil, fmt.Errorf("stage is required for %q role", input.Role)
 	}
 
 	var dir string
 
-	if input.SchoolID != nil && input.Role != user.RoleSUPER_ADMIN {
+	if input.SchoolID != nil && input.Role != user.RoleSuperAdmin {
 		sch, err := s.EC.School.Get(ctx, *input.SchoolID)
 		if err != nil {
 			return nil, err
@@ -52,7 +52,7 @@ func (s *Service) AddUser(ctx context.Context, input model.AddUserInput) (*ent.U
 		b.SetSchoolID(*input.SchoolID)
 	}
 
-	if input.StageID != nil && input.Role == user.RoleSTUDENT {
+	if input.StageID != nil && input.Role == user.RoleStudent {
 		stage, err := s.EC.Stage.Get(ctx, *input.StageID)
 		sch, err := stage.School(ctx)
 		if err != nil {

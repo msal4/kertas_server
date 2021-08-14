@@ -130,7 +130,7 @@ func TestUserAdd(t *testing.T) {
 			Username: "testusner",
 			Password: "testpassword",
 			Phone:    "testphone",
-			Role:     user.RoleSUPER_ADMIN,
+			Role:     user.RoleSuperAdmin,
 			Image:    &graphql.Upload{File: f, Filename: f.File.Name(), ContentType: f.ContentType, Size: f.Size()},
 			Status:   schema.StatusActive,
 		})
@@ -154,7 +154,7 @@ func TestUserAdd(t *testing.T) {
 			Username: "testusner",
 			Password: "testpassword",
 			Phone:    "testphone",
-			Role:     user.RoleSTUDENT,
+			Role:     user.RoleStudent,
 		})
 		require.Error(t, err)
 		require.Nil(t, got)
@@ -165,7 +165,7 @@ func TestUserAdd(t *testing.T) {
 
 		got, err := s.AddUser(ctx, model.AddUserInput{
 			Name:     "test user",
-			Role:     user.RoleSTUDENT,
+			Role:     user.RoleStudent,
 			Status:   schema.StatusActive,
 			Username: "testusner",
 			Password: "testpassword",
@@ -177,7 +177,7 @@ func TestUserAdd(t *testing.T) {
 
 		got, err = s.AddUser(ctx, model.AddUserInput{
 			Name:     "test user",
-			Role:     user.RoleTEACHER,
+			Role:     user.RoleTeacher,
 			Status:   schema.StatusActive,
 			Username: "testusner2",
 			Password: "testpassword",
@@ -189,7 +189,7 @@ func TestUserAdd(t *testing.T) {
 
 		got, err = s.AddUser(ctx, model.AddUserInput{
 			Name:     "test user",
-			Role:     user.RoleSCHOOL_ADMIN,
+			Role:     user.RoleSchoolAdmin,
 			Status:   schema.StatusActive,
 			Username: "testusner2",
 			Password: "testpassword",
@@ -208,7 +208,7 @@ func TestUserAdd(t *testing.T) {
 
 		got, err := s.AddUser(ctx, model.AddUserInput{
 			Name:     "test user",
-			Role:     user.RoleSTUDENT,
+			Role:     user.RoleStudent,
 			StageID:  &stage.ID,
 			Status:   schema.StatusActive,
 			Username: "testusner",
@@ -237,7 +237,7 @@ func TestUserUpdate(t *testing.T) {
 
 	u, err := s.AddUser(ctx, model.AddUserInput{
 		Name:     "test user",
-		Role:     user.RoleSUPER_ADMIN,
+		Role:     user.RoleSuperAdmin,
 		Status:   schema.StatusActive,
 		Username: "testusner",
 		Password: "testpassword",
@@ -322,7 +322,7 @@ func TestDeleteUser(t *testing.T) {
 
 		u, err := s.AddUser(ctx, model.AddUserInput{
 			Name:     "test user",
-			Role:     user.RoleSUPER_ADMIN,
+			Role:     user.RoleSuperAdmin,
 			Status:   schema.StatusActive,
 			Username: "testusner",
 			Password: "testpassword",
