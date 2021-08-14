@@ -14,7 +14,6 @@ import (
 	"github.com/msal4/hassah_school_server/ent/class"
 	"github.com/msal4/hassah_school_server/ent/group"
 	"github.com/msal4/hassah_school_server/ent/message"
-	"github.com/msal4/hassah_school_server/ent/schema"
 )
 
 // GroupCreate is the builder for creating a Group entity.
@@ -80,16 +79,16 @@ func (gc *GroupCreate) SetNillableGroupType(gt *group.GroupType) *GroupCreate {
 	return gc
 }
 
-// SetStatus sets the "status" field.
-func (gc *GroupCreate) SetStatus(s schema.Status) *GroupCreate {
-	gc.mutation.SetStatus(s)
+// SetActive sets the "active" field.
+func (gc *GroupCreate) SetActive(b bool) *GroupCreate {
+	gc.mutation.SetActive(b)
 	return gc
 }
 
-// SetNillableStatus sets the "status" field if the given value is not nil.
-func (gc *GroupCreate) SetNillableStatus(s *schema.Status) *GroupCreate {
-	if s != nil {
-		gc.SetStatus(*s)
+// SetNillableActive sets the "active" field if the given value is not nil.
+func (gc *GroupCreate) SetNillableActive(b *bool) *GroupCreate {
+	if b != nil {
+		gc.SetActive(*b)
 	}
 	return gc
 }
@@ -231,9 +230,9 @@ func (gc *GroupCreate) defaults() {
 		v := group.DefaultGroupType
 		gc.mutation.SetGroupType(v)
 	}
-	if _, ok := gc.mutation.Status(); !ok {
-		v := group.DefaultStatus
-		gc.mutation.SetStatus(v)
+	if _, ok := gc.mutation.Active(); !ok {
+		v := group.DefaultActive
+		gc.mutation.SetActive(v)
 	}
 	if _, ok := gc.mutation.ID(); !ok {
 		v := group.DefaultID()
@@ -257,13 +256,8 @@ func (gc *GroupCreate) check() error {
 			return &ValidationError{Name: "group_type", err: fmt.Errorf(`ent: validator failed for field "group_type": %w`, err)}
 		}
 	}
-	if _, ok := gc.mutation.Status(); !ok {
-		return &ValidationError{Name: "status", err: errors.New(`ent: missing required field "status"`)}
-	}
-	if v, ok := gc.mutation.Status(); ok {
-		if err := group.StatusValidator(v); err != nil {
-			return &ValidationError{Name: "status", err: fmt.Errorf(`ent: validator failed for field "status": %w`, err)}
-		}
+	if _, ok := gc.mutation.Active(); !ok {
+		return &ValidationError{Name: "active", err: errors.New(`ent: missing required field "active"`)}
 	}
 	return nil
 }
@@ -326,13 +320,13 @@ func (gc *GroupCreate) createSpec() (*Group, *sqlgraph.CreateSpec) {
 		})
 		_node.GroupType = value
 	}
-	if value, ok := gc.mutation.Status(); ok {
+	if value, ok := gc.mutation.Active(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeEnum,
+			Type:   field.TypeBool,
 			Value:  value,
-			Column: group.FieldStatus,
+			Column: group.FieldActive,
 		})
-		_node.Status = value
+		_node.Active = value
 	}
 	if value, ok := gc.mutation.DeletedAt(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{

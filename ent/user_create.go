@@ -16,7 +16,6 @@ import (
 	"github.com/msal4/hassah_school_server/ent/class"
 	"github.com/msal4/hassah_school_server/ent/grade"
 	"github.com/msal4/hassah_school_server/ent/message"
-	"github.com/msal4/hassah_school_server/ent/schema"
 	"github.com/msal4/hassah_school_server/ent/school"
 	"github.com/msal4/hassah_school_server/ent/stage"
 	"github.com/msal4/hassah_school_server/ent/tuitionpayment"
@@ -130,16 +129,16 @@ func (uc *UserCreate) SetNillableRole(u *user.Role) *UserCreate {
 	return uc
 }
 
-// SetStatus sets the "status" field.
-func (uc *UserCreate) SetStatus(s schema.Status) *UserCreate {
-	uc.mutation.SetStatus(s)
+// SetActive sets the "active" field.
+func (uc *UserCreate) SetActive(b bool) *UserCreate {
+	uc.mutation.SetActive(b)
 	return uc
 }
 
-// SetNillableStatus sets the "status" field if the given value is not nil.
-func (uc *UserCreate) SetNillableStatus(s *schema.Status) *UserCreate {
-	if s != nil {
-		uc.SetStatus(*s)
+// SetNillableActive sets the "active" field if the given value is not nil.
+func (uc *UserCreate) SetNillableActive(b *bool) *UserCreate {
+	if b != nil {
+		uc.SetActive(*b)
 	}
 	return uc
 }
@@ -379,9 +378,9 @@ func (uc *UserCreate) defaults() {
 		v := user.DefaultRole
 		uc.mutation.SetRole(v)
 	}
-	if _, ok := uc.mutation.Status(); !ok {
-		v := user.DefaultStatus
-		uc.mutation.SetStatus(v)
+	if _, ok := uc.mutation.Active(); !ok {
+		v := user.DefaultActive
+		uc.mutation.SetActive(v)
 	}
 	if _, ok := uc.mutation.ID(); !ok {
 		v := user.DefaultID()
@@ -448,13 +447,8 @@ func (uc *UserCreate) check() error {
 			return &ValidationError{Name: "role", err: fmt.Errorf(`ent: validator failed for field "role": %w`, err)}
 		}
 	}
-	if _, ok := uc.mutation.Status(); !ok {
-		return &ValidationError{Name: "status", err: errors.New(`ent: missing required field "status"`)}
-	}
-	if v, ok := uc.mutation.Status(); ok {
-		if err := user.StatusValidator(v); err != nil {
-			return &ValidationError{Name: "status", err: fmt.Errorf(`ent: validator failed for field "status": %w`, err)}
-		}
+	if _, ok := uc.mutation.Active(); !ok {
+		return &ValidationError{Name: "active", err: errors.New(`ent: missing required field "active"`)}
 	}
 	return nil
 }
@@ -565,13 +559,13 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 		})
 		_node.Role = value
 	}
-	if value, ok := uc.mutation.Status(); ok {
+	if value, ok := uc.mutation.Active(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeEnum,
+			Type:   field.TypeBool,
 			Value:  value,
-			Column: user.FieldStatus,
+			Column: user.FieldActive,
 		})
-		_node.Status = value
+		_node.Active = value
 	}
 	if value, ok := uc.mutation.DeletedAt(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{

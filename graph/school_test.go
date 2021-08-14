@@ -22,7 +22,6 @@ import (
 	"github.com/minio/minio-go/v7/pkg/credentials"
 	"github.com/msal4/hassah_school_server/ent"
 	"github.com/msal4/hassah_school_server/ent/enttest"
-	"github.com/msal4/hassah_school_server/ent/schema"
 	"github.com/msal4/hassah_school_server/ent/school"
 	"github.com/msal4/hassah_school_server/graph"
 	"github.com/msal4/hassah_school_server/graph/model"
@@ -71,7 +70,7 @@ func (s *schoolTestSuite) TestSchools() {
 					ID        string
 					Name      string
 					Image     string
-					Status    schema.Status
+					Active    bool
 					CreatedAt string
 					UpdatedAt string
 				}
@@ -104,7 +103,7 @@ func (s *schoolTestSuite) TestSchools() {
         id
         name
         image
-        status
+        active
         createdAt
         updatedAt
       }
@@ -130,7 +129,7 @@ func (s *schoolTestSuite) TestSchools() {
 		schools := make([]*ent.School, expectedLen)
 		schools[0] = ec.School.Create().SetName("school 1").SetImage("image/1").SetDirectory("test_dir").SaveX(ctx)
 		schools[1] = ec.School.Create().SetName("school 2").SetImage("image/2").SetDirectory("test_dir").SaveX(ctx)
-		schools[2] = ec.School.Create().SetName("school 3").SetImage("image/3").SetDirectory("test_dir").SetStatus(schema.StatusDisabled).SaveX(ctx)
+		schools[2] = ec.School.Create().SetName("school 3").SetImage("image/3").SetDirectory("test_dir").SetActive(false).SaveX(ctx)
 
 		var resp response
 
@@ -148,7 +147,7 @@ func (s *schoolTestSuite) TestSchools() {
         id
         name
         image
-        status
+        active
         createdAt
         updatedAt
       }
@@ -177,7 +176,7 @@ func (s *schoolTestSuite) TestSchools() {
 			require.NotNil(t, currentSchool)
 			require.NotNil(t, edge.Cursor)
 			require.Equal(t, currentSchool.Name, edge.Node.Name)
-			require.Equal(t, currentSchool.Status, edge.Node.Status)
+			require.Equal(t, currentSchool.Active, edge.Node.Active)
 			require.Equal(t, currentSchool.Image, edge.Node.Image)
 		}
 	})
@@ -187,7 +186,7 @@ func (s *schoolTestSuite) TestSchools() {
 
 		ec.School.Create().SetName("school 1").SetImage("image/1").SetDirectory("test_dir").SetCreatedAt(time.Now().Add(time.Minute)).SaveX(ctx)
 		ec.School.Create().SetName("school 2").SetImage("image/2").SetDirectory("test_dir").SetCreatedAt(time.Now().Add(time.Hour)).SaveX(ctx)
-		ec.School.Create().SetName("school 3").SetImage("image/3").SetDirectory("test_dir").SetStatus(schema.StatusDisabled).SaveX(ctx)
+		ec.School.Create().SetName("school 3").SetImage("image/3").SetDirectory("test_dir").SetActive(false).SaveX(ctx)
 
 		var resp response
 
@@ -205,7 +204,7 @@ schools(orderBy: {field: CREATED_AT, direction: ASC}) {
         id
         name
         image
-        status
+        active
         createdAt
         updatedAt
       }
@@ -229,7 +228,7 @@ schools(orderBy: {field: CREATED_AT, direction: ASC}) {
 			require.NotNil(t, edge.Cursor)
 			require.Equal(t, want[i].ID.String(), edge.Node.ID)
 			require.Equal(t, want[i].Name, edge.Node.Name)
-			require.Equal(t, want[i].Status, edge.Node.Status)
+			require.Equal(t, want[i].Active, edge.Node.Active)
 			require.Equal(t, want[i].Image, edge.Node.Image)
 		}
 	})
@@ -239,12 +238,12 @@ schools(orderBy: {field: CREATED_AT, direction: ASC}) {
 
 		ec.School.Create().SetName("school 1").SetDirectory("test_dir").SetImage("image/1").SetCreatedAt(time.Now().Add(time.Minute)).SaveX(ctx)
 		ec.School.Create().SetName("school 2").SetDirectory("test_dir").SetImage("image/2").SetCreatedAt(time.Now().Add(time.Hour)).SaveX(ctx)
-		ec.School.Create().SetName("school 3").SetDirectory("test_dir").SetImage("image/3").SetStatus(schema.StatusDisabled).SaveX(ctx)
+		ec.School.Create().SetName("school 3").SetDirectory("test_dir").SetImage("image/3").SetActive(false).SaveX(ctx)
 
 		var resp response
 
 		const query = `query {
-schools(orderBy: {field: CREATED_AT, direction: ASC}, where: {status: DISABLED}) {
+schools(orderBy: {field: CREATED_AT, direction: ASC}, where: {active: false}) {
     totalCount
     pageInfo {
       hasNextPage
@@ -257,7 +256,7 @@ schools(orderBy: {field: CREATED_AT, direction: ASC}, where: {status: DISABLED})
         id
         name
         image
-        status
+        active
         createdAt
         updatedAt
       }
@@ -266,7 +265,7 @@ schools(orderBy: {field: CREATED_AT, direction: ASC}, where: {status: DISABLED})
   }
 }`
 
-		want := ec.School.Query().Order(ent.Asc(school.FieldCreatedAt)).Where(school.StatusEQ(schema.StatusDisabled)).AllX(ctx)
+		want := ec.School.Query().Order(ent.Asc(school.FieldCreatedAt)).Where(school.Active(false)).AllX(ctx)
 
 		gc.MustPost(query, &resp)
 
@@ -281,7 +280,7 @@ schools(orderBy: {field: CREATED_AT, direction: ASC}, where: {status: DISABLED})
 			require.NotNil(t, edge.Cursor)
 			require.Equal(t, want[i].ID.String(), edge.Node.ID)
 			require.Equal(t, want[i].Name, edge.Node.Name)
-			require.Equal(t, schema.StatusDisabled, edge.Node.Status)
+			require.Equal(t, false, edge.Node.Active)
 			require.Equal(t, want[i].Image, edge.Node.Image)
 		}
 	})
@@ -297,12 +296,12 @@ func (s *schoolTestSuite) TestAddSchool() {
 	type response struct {
 		Data *struct {
 			AddSchool *struct {
-				ID        string        `json:"id"`
-				Name      string        `json:"name"`
-				Image     string        `json:"image"`
-				Status    schema.Status `json:"status"`
-				CreatedAt string        `json:"created_at"`
-				UpdatedAt string        `json:"updated_at"`
+				ID        string `json:"id"`
+				Name      string `json:"name"`
+				Image     string `json:"image"`
+				Active    bool   `json:"active"`
+				CreatedAt string `json:"created_at"`
+				UpdatedAt string `json:"updated_at"`
 			} `json:"addSchool"`
 		} `json:"data"`
 		Errors []struct {
@@ -313,7 +312,7 @@ func (s *schoolTestSuite) TestAddSchool() {
 
 	s.T().Run("missing image", func(t *testing.T) {
 		var resp response
-		err := gc.Post("mutation { addSchool(input: {name: \"a school without an image\"}) { id name image status createdAt updatedAt }}", &resp.Data)
+		err := gc.Post("mutation { addSchool(input: {name: \"a school without an image\"}) { id name image active createdAt updatedAt }}", &resp.Data)
 		require.Error(t, err)
 	})
 
@@ -326,7 +325,7 @@ func (s *schoolTestSuite) TestAddSchool() {
 		require.NoError(t, err)
 
 		operations := `{
-			"query": "mutation ($image: Upload!) { addSchool(input: {name: \"a school with an image\", image: $image}) { id name image status createdAt updatedAt }}", 
+			"query": "mutation ($image: Upload!) { addSchool(input: {name: \"a school with an image\", image: $image}) { id name image active createdAt updatedAt }}", 
 			"variables": {"image": null}
 		}`
 
@@ -386,12 +385,12 @@ func (s *schoolTestSuite) TestUpdateSchool() {
 	type response struct {
 		Data *struct {
 			UpdateSchool *struct {
-				ID        string        `json:"id"`
-				Name      string        `json:"name"`
-				Image     string        `json:"image"`
-				Status    schema.Status `json:"status"`
-				CreatedAt string        `json:"created_at"`
-				UpdatedAt string        `json:"updated_at"`
+				ID        string `json:"id"`
+				Name      string `json:"name"`
+				Image     string `json:"image"`
+				Active    bool   `json:"active"`
+				CreatedAt string `json:"created_at"`
+				UpdatedAt string `json:"updated_at"`
 			} `json:"updateSchool"`
 		} `json:"data"`
 		Errors []struct {
@@ -402,7 +401,7 @@ func (s *schoolTestSuite) TestUpdateSchool() {
 
 	s.T().Run("invalid", func(t *testing.T) {
 		var resp response
-		err := gc.Post(fmt.Sprintf("mutation { updateSchool(id: %q, input: {name: \"a school without an image\"}) { id name image status createdAt updatedAt }}", testID), &resp.Data)
+		err := gc.Post(fmt.Sprintf("mutation { updateSchool(id: %q, input: {name: \"a school without an image\"}) { id name image active createdAt updatedAt }}", testID), &resp.Data)
 		fmt.Println(err)
 		require.Error(t, err)
 	})
@@ -417,7 +416,7 @@ func (s *schoolTestSuite) TestUpdateSchool() {
 				Filename: f.File.Name(),
 				Size:     f.Size(),
 			},
-			Status: schema.StatusActive,
+			Active: true,
 		},
 	)
 	require.NoError(s.T(), err)
@@ -432,7 +431,7 @@ func (s *schoolTestSuite) TestUpdateSchool() {
 		require.NoError(t, err)
 
 		operations := fmt.Sprintf(`{
-"query": "mutation ($image: Upload!) { updateSchool(id: \"%s\", input: {name: \"a school with an image\", image: $image}) { id name image status createdAt updatedAt }}", 
+"query": "mutation ($image: Upload!) { updateSchool(id: \"%s\", input: {name: \"a school with an image\", image: $image}) { id name image active createdAt updatedAt }}", 
 			"variables": {"image": null}
 		}`, sch.ID)
 

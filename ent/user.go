@@ -9,7 +9,6 @@ import (
 
 	"entgo.io/ent/dialect/sql"
 	"github.com/google/uuid"
-	"github.com/msal4/hassah_school_server/ent/schema"
 	"github.com/msal4/hassah_school_server/ent/school"
 	"github.com/msal4/hassah_school_server/ent/stage"
 	"github.com/msal4/hassah_school_server/ent/user"
@@ -40,8 +39,8 @@ type User struct {
 	TokenVersion int `json:"token_version,omitempty"`
 	// Role holds the value of the "role" field.
 	Role user.Role `json:"role,omitempty"`
-	// Status holds the value of the "status" field.
-	Status schema.Status `json:"status,omitempty"`
+	// Active holds the value of the "active" field.
+	Active bool `json:"active,omitempty"`
 	// DeletedAt holds the value of the "deleted_at" field.
 	DeletedAt *time.Time `json:"deleted_at,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
@@ -161,9 +160,11 @@ func (*User) scanValues(columns []string) ([]interface{}, error) {
 	values := make([]interface{}, len(columns))
 	for i := range columns {
 		switch columns[i] {
+		case user.FieldActive:
+			values[i] = new(sql.NullBool)
 		case user.FieldTokenVersion:
 			values[i] = new(sql.NullInt64)
-		case user.FieldName, user.FieldUsername, user.FieldPassword, user.FieldPhone, user.FieldImage, user.FieldDirectory, user.FieldRole, user.FieldStatus:
+		case user.FieldName, user.FieldUsername, user.FieldPassword, user.FieldPhone, user.FieldImage, user.FieldDirectory, user.FieldRole:
 			values[i] = new(sql.NullString)
 		case user.FieldCreatedAt, user.FieldUpdatedAt, user.FieldDeletedAt:
 			values[i] = new(sql.NullTime)
@@ -254,11 +255,11 @@ func (u *User) assignValues(columns []string, values []interface{}) error {
 			} else if value.Valid {
 				u.Role = user.Role(value.String)
 			}
-		case user.FieldStatus:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field status", values[i])
+		case user.FieldActive:
+			if value, ok := values[i].(*sql.NullBool); !ok {
+				return fmt.Errorf("unexpected type %T for field active", values[i])
 			} else if value.Valid {
-				u.Status = schema.Status(value.String)
+				u.Active = value.Bool
 			}
 		case user.FieldDeletedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
@@ -369,8 +370,8 @@ func (u *User) String() string {
 	builder.WriteString(fmt.Sprintf("%v", u.TokenVersion))
 	builder.WriteString(", role=")
 	builder.WriteString(fmt.Sprintf("%v", u.Role))
-	builder.WriteString(", status=")
-	builder.WriteString(fmt.Sprintf("%v", u.Status))
+	builder.WriteString(", active=")
+	builder.WriteString(fmt.Sprintf("%v", u.Active))
 	if v := u.DeletedAt; v != nil {
 		builder.WriteString(", deleted_at=")
 		builder.WriteString(v.Format(time.ANSIC))

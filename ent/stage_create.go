@@ -12,7 +12,6 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/google/uuid"
 	"github.com/msal4/hassah_school_server/ent/class"
-	"github.com/msal4/hassah_school_server/ent/schema"
 	"github.com/msal4/hassah_school_server/ent/school"
 	"github.com/msal4/hassah_school_server/ent/stage"
 	"github.com/msal4/hassah_school_server/ent/tuitionpayment"
@@ -66,16 +65,16 @@ func (sc *StageCreate) SetTuitionAmount(i int) *StageCreate {
 	return sc
 }
 
-// SetStatus sets the "status" field.
-func (sc *StageCreate) SetStatus(s schema.Status) *StageCreate {
-	sc.mutation.SetStatus(s)
+// SetActive sets the "active" field.
+func (sc *StageCreate) SetActive(b bool) *StageCreate {
+	sc.mutation.SetActive(b)
 	return sc
 }
 
-// SetNillableStatus sets the "status" field if the given value is not nil.
-func (sc *StageCreate) SetNillableStatus(s *schema.Status) *StageCreate {
-	if s != nil {
-		sc.SetStatus(*s)
+// SetNillableActive sets the "active" field if the given value is not nil.
+func (sc *StageCreate) SetNillableActive(b *bool) *StageCreate {
+	if b != nil {
+		sc.SetActive(*b)
 	}
 	return sc
 }
@@ -243,9 +242,9 @@ func (sc *StageCreate) defaults() {
 		v := stage.DefaultUpdatedAt()
 		sc.mutation.SetUpdatedAt(v)
 	}
-	if _, ok := sc.mutation.Status(); !ok {
-		v := stage.DefaultStatus
-		sc.mutation.SetStatus(v)
+	if _, ok := sc.mutation.Active(); !ok {
+		v := stage.DefaultActive
+		sc.mutation.SetActive(v)
 	}
 	if _, ok := sc.mutation.ID(); !ok {
 		v := stage.DefaultID()
@@ -272,13 +271,8 @@ func (sc *StageCreate) check() error {
 	if _, ok := sc.mutation.TuitionAmount(); !ok {
 		return &ValidationError{Name: "tuition_amount", err: errors.New(`ent: missing required field "tuition_amount"`)}
 	}
-	if _, ok := sc.mutation.Status(); !ok {
-		return &ValidationError{Name: "status", err: errors.New(`ent: missing required field "status"`)}
-	}
-	if v, ok := sc.mutation.Status(); ok {
-		if err := stage.StatusValidator(v); err != nil {
-			return &ValidationError{Name: "status", err: fmt.Errorf(`ent: validator failed for field "status": %w`, err)}
-		}
+	if _, ok := sc.mutation.Active(); !ok {
+		return &ValidationError{Name: "active", err: errors.New(`ent: missing required field "active"`)}
 	}
 	return nil
 }
@@ -341,13 +335,13 @@ func (sc *StageCreate) createSpec() (*Stage, *sqlgraph.CreateSpec) {
 		})
 		_node.TuitionAmount = value
 	}
-	if value, ok := sc.mutation.Status(); ok {
+	if value, ok := sc.mutation.Active(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeEnum,
+			Type:   field.TypeBool,
 			Value:  value,
-			Column: stage.FieldStatus,
+			Column: stage.FieldActive,
 		})
-		_node.Status = value
+		_node.Active = value
 	}
 	if value, ok := sc.mutation.DeletedAt(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{

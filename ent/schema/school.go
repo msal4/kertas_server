@@ -22,7 +22,7 @@ func (School) Fields() []ent.Field {
 		field.String("name").NotEmpty().Annotations(entgql.OrderField("NAME")),
 		field.String("image").NotEmpty(),
 		field.String("directory").NotEmpty(),
-		field.Enum("status").GoType(Status("")).Default(StatusActive.String()).Annotations(entgql.OrderField("STATUS")),
+		field.Bool("active").Default(true),
 		field.Time("deleted_at").Nillable().Optional(),
 	}
 }
@@ -43,6 +43,6 @@ func (School) Edges() []ent.Edge {
 
 func (School) Indexes() []ent.Index {
 	return []ent.Index{
-		index.Fields("status"),
+		index.Fields("active"),
 	}
 }

@@ -13,7 +13,6 @@ import (
 	"github.com/google/uuid"
 	"github.com/msal4/hassah_school_server/ent/class"
 	"github.com/msal4/hassah_school_server/ent/predicate"
-	"github.com/msal4/hassah_school_server/ent/schema"
 	"github.com/msal4/hassah_school_server/ent/school"
 	"github.com/msal4/hassah_school_server/ent/stage"
 	"github.com/msal4/hassah_school_server/ent/tuitionpayment"
@@ -52,16 +51,16 @@ func (su *StageUpdate) AddTuitionAmount(i int) *StageUpdate {
 	return su
 }
 
-// SetStatus sets the "status" field.
-func (su *StageUpdate) SetStatus(s schema.Status) *StageUpdate {
-	su.mutation.SetStatus(s)
+// SetActive sets the "active" field.
+func (su *StageUpdate) SetActive(b bool) *StageUpdate {
+	su.mutation.SetActive(b)
 	return su
 }
 
-// SetNillableStatus sets the "status" field if the given value is not nil.
-func (su *StageUpdate) SetNillableStatus(s *schema.Status) *StageUpdate {
-	if s != nil {
-		su.SetStatus(*s)
+// SetNillableActive sets the "active" field if the given value is not nil.
+func (su *StageUpdate) SetNillableActive(b *bool) *StageUpdate {
+	if b != nil {
+		su.SetActive(*b)
 	}
 	return su
 }
@@ -300,11 +299,6 @@ func (su *StageUpdate) check() error {
 			return &ValidationError{Name: "name", err: fmt.Errorf("ent: validator failed for field \"name\": %w", err)}
 		}
 	}
-	if v, ok := su.mutation.Status(); ok {
-		if err := stage.StatusValidator(v); err != nil {
-			return &ValidationError{Name: "status", err: fmt.Errorf("ent: validator failed for field \"status\": %w", err)}
-		}
-	}
 	return nil
 }
 
@@ -354,11 +348,11 @@ func (su *StageUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Column: stage.FieldTuitionAmount,
 		})
 	}
-	if value, ok := su.mutation.Status(); ok {
+	if value, ok := su.mutation.Active(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeEnum,
+			Type:   field.TypeBool,
 			Value:  value,
-			Column: stage.FieldStatus,
+			Column: stage.FieldActive,
 		})
 	}
 	if value, ok := su.mutation.DeletedAt(); ok {
@@ -609,16 +603,16 @@ func (suo *StageUpdateOne) AddTuitionAmount(i int) *StageUpdateOne {
 	return suo
 }
 
-// SetStatus sets the "status" field.
-func (suo *StageUpdateOne) SetStatus(s schema.Status) *StageUpdateOne {
-	suo.mutation.SetStatus(s)
+// SetActive sets the "active" field.
+func (suo *StageUpdateOne) SetActive(b bool) *StageUpdateOne {
+	suo.mutation.SetActive(b)
 	return suo
 }
 
-// SetNillableStatus sets the "status" field if the given value is not nil.
-func (suo *StageUpdateOne) SetNillableStatus(s *schema.Status) *StageUpdateOne {
-	if s != nil {
-		suo.SetStatus(*s)
+// SetNillableActive sets the "active" field if the given value is not nil.
+func (suo *StageUpdateOne) SetNillableActive(b *bool) *StageUpdateOne {
+	if b != nil {
+		suo.SetActive(*b)
 	}
 	return suo
 }
@@ -864,11 +858,6 @@ func (suo *StageUpdateOne) check() error {
 			return &ValidationError{Name: "name", err: fmt.Errorf("ent: validator failed for field \"name\": %w", err)}
 		}
 	}
-	if v, ok := suo.mutation.Status(); ok {
-		if err := stage.StatusValidator(v); err != nil {
-			return &ValidationError{Name: "status", err: fmt.Errorf("ent: validator failed for field \"status\": %w", err)}
-		}
-	}
 	return nil
 }
 
@@ -935,11 +924,11 @@ func (suo *StageUpdateOne) sqlSave(ctx context.Context) (_node *Stage, err error
 			Column: stage.FieldTuitionAmount,
 		})
 	}
-	if value, ok := suo.mutation.Status(); ok {
+	if value, ok := suo.mutation.Active(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeEnum,
+			Type:   field.TypeBool,
 			Value:  value,
-			Column: stage.FieldStatus,
+			Column: stage.FieldActive,
 		})
 	}
 	if value, ok := suo.mutation.DeletedAt(); ok {

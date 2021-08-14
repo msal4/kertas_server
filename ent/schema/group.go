@@ -21,7 +21,7 @@ func (Group) Fields() []ent.Field {
 		field.UUID("id", uuid.UUID{}).Default(uuid.New),
 		field.String("name").Optional().Annotations(entgql.OrderField("NAME")),
 		field.Enum("group_type").Values("PRIVATE", "SHARED").Default("SHARED").Annotations(entgql.OrderField("GROUP_TYPE")),
-		field.Enum("status").GoType(Status("")).Default(StatusActive.String()).Annotations(entgql.OrderField("STATUS")),
+		field.Bool("active").Default(true),
 		field.Time("deleted_at").Nillable().Optional(),
 	}
 }
@@ -43,7 +43,7 @@ func (Group) Edges() []ent.Edge {
 func (Group) Indexes() []ent.Index {
 	return []ent.Index{
 		index.Edges("class"),
-		index.Fields("status"),
+		index.Fields("active"),
 		index.Fields("group_type"),
 	}
 }

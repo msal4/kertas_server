@@ -130,7 +130,7 @@ var (
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime},
 		{Name: "name", Type: field.TypeString},
-		{Name: "status", Type: field.TypeEnum, Enums: []string{"DISABLED", "ACTIVE"}, Default: "ACTIVE"},
+		{Name: "active", Type: field.TypeBool, Default: true},
 		{Name: "deleted_at", Type: field.TypeTime, Nullable: true},
 		{Name: "stage_classes", Type: field.TypeUUID, Nullable: true},
 		{Name: "user_classes", Type: field.TypeUUID, Nullable: true},
@@ -166,7 +166,7 @@ var (
 				Columns: []*schema.Column{ClassesColumns[7]},
 			},
 			{
-				Name:    "class_status",
+				Name:    "class_active",
 				Unique:  false,
 				Columns: []*schema.Column{ClassesColumns[4]},
 			},
@@ -215,7 +215,7 @@ var (
 		{Name: "updated_at", Type: field.TypeTime},
 		{Name: "name", Type: field.TypeString, Nullable: true},
 		{Name: "group_type", Type: field.TypeEnum, Enums: []string{"PRIVATE", "SHARED"}, Default: "SHARED"},
-		{Name: "status", Type: field.TypeEnum, Enums: []string{"DISABLED", "ACTIVE"}, Default: "ACTIVE"},
+		{Name: "active", Type: field.TypeBool, Default: true},
 		{Name: "deleted_at", Type: field.TypeTime, Nullable: true},
 		{Name: "class_group", Type: field.TypeUUID, Unique: true, Nullable: true},
 	}
@@ -239,7 +239,7 @@ var (
 				Columns: []*schema.Column{GroupsColumns[7]},
 			},
 			{
-				Name:    "group_status",
+				Name:    "group_active",
 				Unique:  false,
 				Columns: []*schema.Column{GroupsColumns[5]},
 			},
@@ -340,7 +340,7 @@ var (
 		{Name: "name", Type: field.TypeString},
 		{Name: "image", Type: field.TypeString},
 		{Name: "directory", Type: field.TypeString},
-		{Name: "status", Type: field.TypeEnum, Enums: []string{"DISABLED", "ACTIVE"}, Default: "ACTIVE"},
+		{Name: "active", Type: field.TypeBool, Default: true},
 		{Name: "deleted_at", Type: field.TypeTime, Nullable: true},
 	}
 	// SchoolsTable holds the schema information for the "schools" table.
@@ -350,7 +350,7 @@ var (
 		PrimaryKey: []*schema.Column{SchoolsColumns[0]},
 		Indexes: []*schema.Index{
 			{
-				Name:    "school_status",
+				Name:    "school_active",
 				Unique:  false,
 				Columns: []*schema.Column{SchoolsColumns[6]},
 			},
@@ -363,7 +363,7 @@ var (
 		{Name: "updated_at", Type: field.TypeTime},
 		{Name: "name", Type: field.TypeString},
 		{Name: "tuition_amount", Type: field.TypeInt},
-		{Name: "status", Type: field.TypeEnum, Enums: []string{"DISABLED", "ACTIVE"}, Default: "ACTIVE"},
+		{Name: "active", Type: field.TypeBool, Default: true},
 		{Name: "deleted_at", Type: field.TypeTime, Nullable: true},
 		{Name: "school_stages", Type: field.TypeUUID, Nullable: true},
 	}
@@ -387,7 +387,7 @@ var (
 				Columns: []*schema.Column{StagesColumns[7]},
 			},
 			{
-				Name:    "stage_status",
+				Name:    "stage_active",
 				Unique:  false,
 				Columns: []*schema.Column{StagesColumns[5]},
 			},
@@ -447,7 +447,7 @@ var (
 		{Name: "directory", Type: field.TypeString},
 		{Name: "token_version", Type: field.TypeInt, Default: 0},
 		{Name: "role", Type: field.TypeEnum, Enums: []string{"SUPER_ADMIN", "SCHOOL_ADMIN", "TEACHER", "STUDENT"}, Default: "STUDENT"},
-		{Name: "status", Type: field.TypeEnum, Enums: []string{"DISABLED", "ACTIVE"}, Default: "ACTIVE"},
+		{Name: "active", Type: field.TypeBool, Default: true},
 		{Name: "deleted_at", Type: field.TypeTime, Nullable: true},
 		{Name: "school_users", Type: field.TypeUUID, Nullable: true},
 		{Name: "stage_students", Type: field.TypeUUID, Nullable: true},
@@ -483,7 +483,7 @@ var (
 				Columns: []*schema.Column{UsersColumns[13]},
 			},
 			{
-				Name:    "user_status",
+				Name:    "user_active",
 				Unique:  false,
 				Columns: []*schema.Column{UsersColumns[11]},
 			},

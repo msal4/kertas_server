@@ -315,12 +315,12 @@ func (c *Class) Node(ctx context.Context) (node *Node, err error) {
 		Name:  "name",
 		Value: string(buf),
 	}
-	if buf, err = json.Marshal(c.Status); err != nil {
+	if buf, err = json.Marshal(c.Active); err != nil {
 		return nil, err
 	}
 	node.Fields[3] = &Field{
-		Type:  "schema.Status",
-		Name:  "status",
+		Type:  "bool",
+		Name:  "active",
 		Value: string(buf),
 	}
 	if buf, err = json.Marshal(c.DeletedAt); err != nil {
@@ -489,12 +489,12 @@ func (gr *Group) Node(ctx context.Context) (node *Node, err error) {
 		Name:  "group_type",
 		Value: string(buf),
 	}
-	if buf, err = json.Marshal(gr.Status); err != nil {
+	if buf, err = json.Marshal(gr.Active); err != nil {
 		return nil, err
 	}
 	node.Fields[4] = &Field{
-		Type:  "schema.Status",
-		Name:  "status",
+		Type:  "bool",
+		Name:  "active",
 		Value: string(buf),
 	}
 	if buf, err = json.Marshal(gr.DeletedAt); err != nil {
@@ -692,12 +692,12 @@ func (s *School) Node(ctx context.Context) (node *Node, err error) {
 		Name:  "directory",
 		Value: string(buf),
 	}
-	if buf, err = json.Marshal(s.Status); err != nil {
+	if buf, err = json.Marshal(s.Active); err != nil {
 		return nil, err
 	}
 	node.Fields[5] = &Field{
-		Type:  "schema.Status",
-		Name:  "status",
+		Type:  "bool",
+		Name:  "active",
 		Value: string(buf),
 	}
 	if buf, err = json.Marshal(s.DeletedAt); err != nil {
@@ -771,12 +771,12 @@ func (s *Stage) Node(ctx context.Context) (node *Node, err error) {
 		Name:  "tuition_amount",
 		Value: string(buf),
 	}
-	if buf, err = json.Marshal(s.Status); err != nil {
+	if buf, err = json.Marshal(s.Active); err != nil {
 		return nil, err
 	}
 	node.Fields[4] = &Field{
-		Type:  "schema.Status",
-		Name:  "status",
+		Type:  "bool",
+		Name:  "active",
 		Value: string(buf),
 	}
 	if buf, err = json.Marshal(s.DeletedAt); err != nil {
@@ -973,12 +973,12 @@ func (u *User) Node(ctx context.Context) (node *Node, err error) {
 		Name:  "role",
 		Value: string(buf),
 	}
-	if buf, err = json.Marshal(u.Status); err != nil {
+	if buf, err = json.Marshal(u.Active); err != nil {
 		return nil, err
 	}
 	node.Fields[10] = &Field{
-		Type:  "schema.Status",
-		Name:  "status",
+		Type:  "bool",
+		Name:  "active",
 		Value: string(buf),
 	}
 	if buf, err = json.Marshal(u.DeletedAt); err != nil {

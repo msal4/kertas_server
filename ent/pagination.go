@@ -1432,16 +1432,6 @@ var (
 			}
 		},
 	}
-	// ClassOrderFieldStatus orders Class by status.
-	ClassOrderFieldStatus = &ClassOrderField{
-		field: class.FieldStatus,
-		toCursor: func(c *Class) Cursor {
-			return Cursor{
-				ID:    c.ID,
-				Value: c.Status,
-			}
-		},
-	}
 )
 
 // String implement fmt.Stringer interface.
@@ -1454,8 +1444,6 @@ func (f ClassOrderField) String() string {
 		str = "UPDATED_AT"
 	case class.FieldName:
 		str = "NAME"
-	case class.FieldStatus:
-		str = "STATUS"
 	}
 	return str
 }
@@ -1478,8 +1466,6 @@ func (f *ClassOrderField) UnmarshalGQL(v interface{}) error {
 		*f = *ClassOrderFieldUpdatedAt
 	case "NAME":
 		*f = *ClassOrderFieldName
-	case "STATUS":
-		*f = *ClassOrderFieldStatus
 	default:
 		return fmt.Errorf("%s is not a valid ClassOrderField", str)
 	}
@@ -2052,16 +2038,6 @@ var (
 			}
 		},
 	}
-	// GroupOrderFieldStatus orders Group by status.
-	GroupOrderFieldStatus = &GroupOrderField{
-		field: group.FieldStatus,
-		toCursor: func(gr *Group) Cursor {
-			return Cursor{
-				ID:    gr.ID,
-				Value: gr.Status,
-			}
-		},
-	}
 )
 
 // String implement fmt.Stringer interface.
@@ -2076,8 +2052,6 @@ func (f GroupOrderField) String() string {
 		str = "NAME"
 	case group.FieldGroupType:
 		str = "GROUP_TYPE"
-	case group.FieldStatus:
-		str = "STATUS"
 	}
 	return str
 }
@@ -2102,8 +2076,6 @@ func (f *GroupOrderField) UnmarshalGQL(v interface{}) error {
 		*f = *GroupOrderFieldName
 	case "GROUP_TYPE":
 		*f = *GroupOrderFieldGroupType
-	case "STATUS":
-		*f = *GroupOrderFieldStatus
 	default:
 		return fmt.Errorf("%s is not a valid GroupOrderField", str)
 	}
@@ -2964,16 +2936,6 @@ var (
 			}
 		},
 	}
-	// SchoolOrderFieldStatus orders School by status.
-	SchoolOrderFieldStatus = &SchoolOrderField{
-		field: school.FieldStatus,
-		toCursor: func(s *School) Cursor {
-			return Cursor{
-				ID:    s.ID,
-				Value: s.Status,
-			}
-		},
-	}
 )
 
 // String implement fmt.Stringer interface.
@@ -2986,8 +2948,6 @@ func (f SchoolOrderField) String() string {
 		str = "UPDATED_AT"
 	case school.FieldName:
 		str = "NAME"
-	case school.FieldStatus:
-		str = "STATUS"
 	}
 	return str
 }
@@ -3010,8 +2970,6 @@ func (f *SchoolOrderField) UnmarshalGQL(v interface{}) error {
 		*f = *SchoolOrderFieldUpdatedAt
 	case "NAME":
 		*f = *SchoolOrderFieldName
-	case "STATUS":
-		*f = *SchoolOrderFieldStatus
 	default:
 		return fmt.Errorf("%s is not a valid SchoolOrderField", str)
 	}
@@ -3286,16 +3244,6 @@ var (
 			}
 		},
 	}
-	// StageOrderFieldStatus orders Stage by status.
-	StageOrderFieldStatus = &StageOrderField{
-		field: stage.FieldStatus,
-		toCursor: func(s *Stage) Cursor {
-			return Cursor{
-				ID:    s.ID,
-				Value: s.Status,
-			}
-		},
-	}
 )
 
 // String implement fmt.Stringer interface.
@@ -3310,8 +3258,6 @@ func (f StageOrderField) String() string {
 		str = "NAME"
 	case stage.FieldTuitionAmount:
 		str = "TUITION_AMOUNT"
-	case stage.FieldStatus:
-		str = "STATUS"
 	}
 	return str
 }
@@ -3336,8 +3282,6 @@ func (f *StageOrderField) UnmarshalGQL(v interface{}) error {
 		*f = *StageOrderFieldName
 	case "TUITION_AMOUNT":
 		*f = *StageOrderFieldTuitionAmount
-	case "STATUS":
-		*f = *StageOrderFieldStatus
 	default:
 		return fmt.Errorf("%s is not a valid StageOrderField", str)
 	}
@@ -3930,16 +3874,6 @@ var (
 			}
 		},
 	}
-	// UserOrderFieldStatus orders User by status.
-	UserOrderFieldStatus = &UserOrderField{
-		field: user.FieldStatus,
-		toCursor: func(u *User) Cursor {
-			return Cursor{
-				ID:    u.ID,
-				Value: u.Status,
-			}
-		},
-	}
 )
 
 // String implement fmt.Stringer interface.
@@ -3958,8 +3892,6 @@ func (f UserOrderField) String() string {
 		str = "PHONE"
 	case user.FieldRole:
 		str = "ROLE"
-	case user.FieldStatus:
-		str = "STATUS"
 	}
 	return str
 }
@@ -3988,8 +3920,6 @@ func (f *UserOrderField) UnmarshalGQL(v interface{}) error {
 		*f = *UserOrderFieldPhone
 	case "ROLE":
 		*f = *UserOrderFieldRole
-	case "STATUS":
-		*f = *UserOrderFieldStatus
 	default:
 		return fmt.Errorf("%s is not a valid UserOrderField", str)
 	}

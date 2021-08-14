@@ -32,7 +32,7 @@ func (s *Service) AddSchool(ctx context.Context, input model.AddSchoolInput) (*e
 		return nil, err
 	}
 
-	return s.EC.School.Create().SetName(input.Name).SetStatus(input.Status).SetImage(info.Key).SetDirectory(dir).Save(ctx)
+	return s.EC.School.Create().SetName(input.Name).SetActive(input.Active).SetImage(info.Key).SetDirectory(dir).Save(ctx)
 }
 
 func (s *Service) DeleteSchool(ctx context.Context, id uuid.UUID) error {
@@ -59,8 +59,8 @@ func (s *Service) UpdateSchool(ctx context.Context, id uuid.UUID, input model.Up
 	if input.Name != nil {
 		b.SetName(*input.Name)
 	}
-	if input.Status != nil {
-		b.SetStatus(*input.Status)
+	if input.Active != nil {
+		b.SetActive(*input.Active)
 	}
 
 	if input.Image != nil {

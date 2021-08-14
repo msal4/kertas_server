@@ -11,7 +11,6 @@ import (
 	"github.com/google/uuid"
 	"github.com/msal4/hassah_school_server/ent/class"
 	"github.com/msal4/hassah_school_server/ent/group"
-	"github.com/msal4/hassah_school_server/ent/schema"
 )
 
 // Group is the model entity for the Group schema.
@@ -27,8 +26,8 @@ type Group struct {
 	Name string `json:"name,omitempty"`
 	// GroupType holds the value of the "group_type" field.
 	GroupType group.GroupType `json:"group_type,omitempty"`
-	// Status holds the value of the "status" field.
-	Status schema.Status `json:"status,omitempty"`
+	// Active holds the value of the "active" field.
+	Active bool `json:"active,omitempty"`
 	// DeletedAt holds the value of the "deleted_at" field.
 	DeletedAt *time.Time `json:"deleted_at,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
@@ -76,7 +75,9 @@ func (*Group) scanValues(columns []string) ([]interface{}, error) {
 	values := make([]interface{}, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case group.FieldName, group.FieldGroupType, group.FieldStatus:
+		case group.FieldActive:
+			values[i] = new(sql.NullBool)
+		case group.FieldName, group.FieldGroupType:
 			values[i] = new(sql.NullString)
 		case group.FieldCreatedAt, group.FieldUpdatedAt, group.FieldDeletedAt:
 			values[i] = new(sql.NullTime)
@@ -129,11 +130,11 @@ func (gr *Group) assignValues(columns []string, values []interface{}) error {
 			} else if value.Valid {
 				gr.GroupType = group.GroupType(value.String)
 			}
-		case group.FieldStatus:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field status", values[i])
+		case group.FieldActive:
+			if value, ok := values[i].(*sql.NullBool); !ok {
+				return fmt.Errorf("unexpected type %T for field active", values[i])
 			} else if value.Valid {
-				gr.Status = schema.Status(value.String)
+				gr.Active = value.Bool
 			}
 		case group.FieldDeletedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
@@ -195,8 +196,8 @@ func (gr *Group) String() string {
 	builder.WriteString(gr.Name)
 	builder.WriteString(", group_type=")
 	builder.WriteString(fmt.Sprintf("%v", gr.GroupType))
-	builder.WriteString(", status=")
-	builder.WriteString(fmt.Sprintf("%v", gr.Status))
+	builder.WriteString(", active=")
+	builder.WriteString(fmt.Sprintf("%v", gr.Active))
 	if v := gr.DeletedAt; v != nil {
 		builder.WriteString(", deleted_at=")
 		builder.WriteString(v.Format(time.ANSIC))

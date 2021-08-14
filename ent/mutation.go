@@ -18,7 +18,6 @@ import (
 	"github.com/msal4/hassah_school_server/ent/message"
 	"github.com/msal4/hassah_school_server/ent/predicate"
 	"github.com/msal4/hassah_school_server/ent/schedule"
-	"github.com/msal4/hassah_school_server/ent/schema"
 	"github.com/msal4/hassah_school_server/ent/school"
 	"github.com/msal4/hassah_school_server/ent/stage"
 	"github.com/msal4/hassah_school_server/ent/tuitionpayment"
@@ -2265,7 +2264,7 @@ type ClassMutation struct {
 	created_at         *time.Time
 	updated_at         *time.Time
 	name               *string
-	status             *schema.Status
+	active             *bool
 	deleted_at         *time.Time
 	clearedFields      map[string]struct{}
 	stage              *uuid.UUID
@@ -2481,40 +2480,40 @@ func (m *ClassMutation) ResetName() {
 	m.name = nil
 }
 
-// SetStatus sets the "status" field.
-func (m *ClassMutation) SetStatus(s schema.Status) {
-	m.status = &s
+// SetActive sets the "active" field.
+func (m *ClassMutation) SetActive(b bool) {
+	m.active = &b
 }
 
-// Status returns the value of the "status" field in the mutation.
-func (m *ClassMutation) Status() (r schema.Status, exists bool) {
-	v := m.status
+// Active returns the value of the "active" field in the mutation.
+func (m *ClassMutation) Active() (r bool, exists bool) {
+	v := m.active
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldStatus returns the old "status" field's value of the Class entity.
+// OldActive returns the old "active" field's value of the Class entity.
 // If the Class object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ClassMutation) OldStatus(ctx context.Context) (v schema.Status, err error) {
+func (m *ClassMutation) OldActive(ctx context.Context) (v bool, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, fmt.Errorf("OldStatus is only allowed on UpdateOne operations")
+		return v, fmt.Errorf("OldActive is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, fmt.Errorf("OldStatus requires an ID field in the mutation")
+		return v, fmt.Errorf("OldActive requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldStatus: %w", err)
+		return v, fmt.Errorf("querying old value for OldActive: %w", err)
 	}
-	return oldValue.Status, nil
+	return oldValue.Active, nil
 }
 
-// ResetStatus resets all changes to the "status" field.
-func (m *ClassMutation) ResetStatus() {
-	m.status = nil
+// ResetActive resets all changes to the "active" field.
+func (m *ClassMutation) ResetActive() {
+	m.active = nil
 }
 
 // SetDeletedAt sets the "deleted_at" field.
@@ -2874,8 +2873,8 @@ func (m *ClassMutation) Fields() []string {
 	if m.name != nil {
 		fields = append(fields, class.FieldName)
 	}
-	if m.status != nil {
-		fields = append(fields, class.FieldStatus)
+	if m.active != nil {
+		fields = append(fields, class.FieldActive)
 	}
 	if m.deleted_at != nil {
 		fields = append(fields, class.FieldDeletedAt)
@@ -2894,8 +2893,8 @@ func (m *ClassMutation) Field(name string) (ent.Value, bool) {
 		return m.UpdatedAt()
 	case class.FieldName:
 		return m.Name()
-	case class.FieldStatus:
-		return m.Status()
+	case class.FieldActive:
+		return m.Active()
 	case class.FieldDeletedAt:
 		return m.DeletedAt()
 	}
@@ -2913,8 +2912,8 @@ func (m *ClassMutation) OldField(ctx context.Context, name string) (ent.Value, e
 		return m.OldUpdatedAt(ctx)
 	case class.FieldName:
 		return m.OldName(ctx)
-	case class.FieldStatus:
-		return m.OldStatus(ctx)
+	case class.FieldActive:
+		return m.OldActive(ctx)
 	case class.FieldDeletedAt:
 		return m.OldDeletedAt(ctx)
 	}
@@ -2947,12 +2946,12 @@ func (m *ClassMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetName(v)
 		return nil
-	case class.FieldStatus:
-		v, ok := value.(schema.Status)
+	case class.FieldActive:
+		v, ok := value.(bool)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetStatus(v)
+		m.SetActive(v)
 		return nil
 	case class.FieldDeletedAt:
 		v, ok := value.(time.Time)
@@ -3028,8 +3027,8 @@ func (m *ClassMutation) ResetField(name string) error {
 	case class.FieldName:
 		m.ResetName()
 		return nil
-	case class.FieldStatus:
-		m.ResetStatus()
+	case class.FieldActive:
+		m.ResetActive()
 		return nil
 	case class.FieldDeletedAt:
 		m.ResetDeletedAt()
@@ -3808,7 +3807,7 @@ type GroupMutation struct {
 	updated_at      *time.Time
 	name            *string
 	group_type      *group.GroupType
-	status          *schema.Status
+	active          *bool
 	deleted_at      *time.Time
 	clearedFields   map[string]struct{}
 	class           *uuid.UUID
@@ -4063,40 +4062,40 @@ func (m *GroupMutation) ResetGroupType() {
 	m.group_type = nil
 }
 
-// SetStatus sets the "status" field.
-func (m *GroupMutation) SetStatus(s schema.Status) {
-	m.status = &s
+// SetActive sets the "active" field.
+func (m *GroupMutation) SetActive(b bool) {
+	m.active = &b
 }
 
-// Status returns the value of the "status" field in the mutation.
-func (m *GroupMutation) Status() (r schema.Status, exists bool) {
-	v := m.status
+// Active returns the value of the "active" field in the mutation.
+func (m *GroupMutation) Active() (r bool, exists bool) {
+	v := m.active
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldStatus returns the old "status" field's value of the Group entity.
+// OldActive returns the old "active" field's value of the Group entity.
 // If the Group object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *GroupMutation) OldStatus(ctx context.Context) (v schema.Status, err error) {
+func (m *GroupMutation) OldActive(ctx context.Context) (v bool, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, fmt.Errorf("OldStatus is only allowed on UpdateOne operations")
+		return v, fmt.Errorf("OldActive is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, fmt.Errorf("OldStatus requires an ID field in the mutation")
+		return v, fmt.Errorf("OldActive requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldStatus: %w", err)
+		return v, fmt.Errorf("querying old value for OldActive: %w", err)
 	}
-	return oldValue.Status, nil
+	return oldValue.Active, nil
 }
 
-// ResetStatus resets all changes to the "status" field.
-func (m *GroupMutation) ResetStatus() {
-	m.status = nil
+// ResetActive resets all changes to the "active" field.
+func (m *GroupMutation) ResetActive() {
+	m.active = nil
 }
 
 // SetDeletedAt sets the "deleted_at" field.
@@ -4273,8 +4272,8 @@ func (m *GroupMutation) Fields() []string {
 	if m.group_type != nil {
 		fields = append(fields, group.FieldGroupType)
 	}
-	if m.status != nil {
-		fields = append(fields, group.FieldStatus)
+	if m.active != nil {
+		fields = append(fields, group.FieldActive)
 	}
 	if m.deleted_at != nil {
 		fields = append(fields, group.FieldDeletedAt)
@@ -4295,8 +4294,8 @@ func (m *GroupMutation) Field(name string) (ent.Value, bool) {
 		return m.Name()
 	case group.FieldGroupType:
 		return m.GroupType()
-	case group.FieldStatus:
-		return m.Status()
+	case group.FieldActive:
+		return m.Active()
 	case group.FieldDeletedAt:
 		return m.DeletedAt()
 	}
@@ -4316,8 +4315,8 @@ func (m *GroupMutation) OldField(ctx context.Context, name string) (ent.Value, e
 		return m.OldName(ctx)
 	case group.FieldGroupType:
 		return m.OldGroupType(ctx)
-	case group.FieldStatus:
-		return m.OldStatus(ctx)
+	case group.FieldActive:
+		return m.OldActive(ctx)
 	case group.FieldDeletedAt:
 		return m.OldDeletedAt(ctx)
 	}
@@ -4357,12 +4356,12 @@ func (m *GroupMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetGroupType(v)
 		return nil
-	case group.FieldStatus:
-		v, ok := value.(schema.Status)
+	case group.FieldActive:
+		v, ok := value.(bool)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetStatus(v)
+		m.SetActive(v)
 		return nil
 	case group.FieldDeletedAt:
 		v, ok := value.(time.Time)
@@ -4447,8 +4446,8 @@ func (m *GroupMutation) ResetField(name string) error {
 	case group.FieldGroupType:
 		m.ResetGroupType()
 		return nil
-	case group.FieldStatus:
-		m.ResetStatus()
+	case group.FieldActive:
+		m.ResetActive()
 		return nil
 	case group.FieldDeletedAt:
 		m.ResetDeletedAt()
@@ -5816,7 +5815,7 @@ type SchoolMutation struct {
 	name          *string
 	image         *string
 	directory     *string
-	status        *schema.Status
+	active        *bool
 	deleted_at    *time.Time
 	clearedFields map[string]struct{}
 	users         map[uuid.UUID]struct{}
@@ -6095,40 +6094,40 @@ func (m *SchoolMutation) ResetDirectory() {
 	m.directory = nil
 }
 
-// SetStatus sets the "status" field.
-func (m *SchoolMutation) SetStatus(s schema.Status) {
-	m.status = &s
+// SetActive sets the "active" field.
+func (m *SchoolMutation) SetActive(b bool) {
+	m.active = &b
 }
 
-// Status returns the value of the "status" field in the mutation.
-func (m *SchoolMutation) Status() (r schema.Status, exists bool) {
-	v := m.status
+// Active returns the value of the "active" field in the mutation.
+func (m *SchoolMutation) Active() (r bool, exists bool) {
+	v := m.active
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldStatus returns the old "status" field's value of the School entity.
+// OldActive returns the old "active" field's value of the School entity.
 // If the School object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *SchoolMutation) OldStatus(ctx context.Context) (v schema.Status, err error) {
+func (m *SchoolMutation) OldActive(ctx context.Context) (v bool, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, fmt.Errorf("OldStatus is only allowed on UpdateOne operations")
+		return v, fmt.Errorf("OldActive is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, fmt.Errorf("OldStatus requires an ID field in the mutation")
+		return v, fmt.Errorf("OldActive requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldStatus: %w", err)
+		return v, fmt.Errorf("querying old value for OldActive: %w", err)
 	}
-	return oldValue.Status, nil
+	return oldValue.Active, nil
 }
 
-// ResetStatus resets all changes to the "status" field.
-func (m *SchoolMutation) ResetStatus() {
-	m.status = nil
+// ResetActive resets all changes to the "active" field.
+func (m *SchoolMutation) ResetActive() {
+	m.active = nil
 }
 
 // SetDeletedAt sets the "deleted_at" field.
@@ -6323,8 +6322,8 @@ func (m *SchoolMutation) Fields() []string {
 	if m.directory != nil {
 		fields = append(fields, school.FieldDirectory)
 	}
-	if m.status != nil {
-		fields = append(fields, school.FieldStatus)
+	if m.active != nil {
+		fields = append(fields, school.FieldActive)
 	}
 	if m.deleted_at != nil {
 		fields = append(fields, school.FieldDeletedAt)
@@ -6347,8 +6346,8 @@ func (m *SchoolMutation) Field(name string) (ent.Value, bool) {
 		return m.Image()
 	case school.FieldDirectory:
 		return m.Directory()
-	case school.FieldStatus:
-		return m.Status()
+	case school.FieldActive:
+		return m.Active()
 	case school.FieldDeletedAt:
 		return m.DeletedAt()
 	}
@@ -6370,8 +6369,8 @@ func (m *SchoolMutation) OldField(ctx context.Context, name string) (ent.Value, 
 		return m.OldImage(ctx)
 	case school.FieldDirectory:
 		return m.OldDirectory(ctx)
-	case school.FieldStatus:
-		return m.OldStatus(ctx)
+	case school.FieldActive:
+		return m.OldActive(ctx)
 	case school.FieldDeletedAt:
 		return m.OldDeletedAt(ctx)
 	}
@@ -6418,12 +6417,12 @@ func (m *SchoolMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetDirectory(v)
 		return nil
-	case school.FieldStatus:
-		v, ok := value.(schema.Status)
+	case school.FieldActive:
+		v, ok := value.(bool)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetStatus(v)
+		m.SetActive(v)
 		return nil
 	case school.FieldDeletedAt:
 		v, ok := value.(time.Time)
@@ -6505,8 +6504,8 @@ func (m *SchoolMutation) ResetField(name string) error {
 	case school.FieldDirectory:
 		m.ResetDirectory()
 		return nil
-	case school.FieldStatus:
-		m.ResetStatus()
+	case school.FieldActive:
+		m.ResetActive()
 		return nil
 	case school.FieldDeletedAt:
 		m.ResetDeletedAt()
@@ -6636,7 +6635,7 @@ type StageMutation struct {
 	name              *string
 	tuition_amount    *int
 	addtuition_amount *int
-	status            *schema.Status
+	active            *bool
 	deleted_at        *time.Time
 	clearedFields     map[string]struct{}
 	school            *uuid.UUID
@@ -6904,40 +6903,40 @@ func (m *StageMutation) ResetTuitionAmount() {
 	m.addtuition_amount = nil
 }
 
-// SetStatus sets the "status" field.
-func (m *StageMutation) SetStatus(s schema.Status) {
-	m.status = &s
+// SetActive sets the "active" field.
+func (m *StageMutation) SetActive(b bool) {
+	m.active = &b
 }
 
-// Status returns the value of the "status" field in the mutation.
-func (m *StageMutation) Status() (r schema.Status, exists bool) {
-	v := m.status
+// Active returns the value of the "active" field in the mutation.
+func (m *StageMutation) Active() (r bool, exists bool) {
+	v := m.active
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldStatus returns the old "status" field's value of the Stage entity.
+// OldActive returns the old "active" field's value of the Stage entity.
 // If the Stage object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *StageMutation) OldStatus(ctx context.Context) (v schema.Status, err error) {
+func (m *StageMutation) OldActive(ctx context.Context) (v bool, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, fmt.Errorf("OldStatus is only allowed on UpdateOne operations")
+		return v, fmt.Errorf("OldActive is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, fmt.Errorf("OldStatus requires an ID field in the mutation")
+		return v, fmt.Errorf("OldActive requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldStatus: %w", err)
+		return v, fmt.Errorf("querying old value for OldActive: %w", err)
 	}
-	return oldValue.Status, nil
+	return oldValue.Active, nil
 }
 
-// ResetStatus resets all changes to the "status" field.
-func (m *StageMutation) ResetStatus() {
-	m.status = nil
+// ResetActive resets all changes to the "active" field.
+func (m *StageMutation) ResetActive() {
+	m.active = nil
 }
 
 // SetDeletedAt sets the "deleted_at" field.
@@ -7222,8 +7221,8 @@ func (m *StageMutation) Fields() []string {
 	if m.tuition_amount != nil {
 		fields = append(fields, stage.FieldTuitionAmount)
 	}
-	if m.status != nil {
-		fields = append(fields, stage.FieldStatus)
+	if m.active != nil {
+		fields = append(fields, stage.FieldActive)
 	}
 	if m.deleted_at != nil {
 		fields = append(fields, stage.FieldDeletedAt)
@@ -7244,8 +7243,8 @@ func (m *StageMutation) Field(name string) (ent.Value, bool) {
 		return m.Name()
 	case stage.FieldTuitionAmount:
 		return m.TuitionAmount()
-	case stage.FieldStatus:
-		return m.Status()
+	case stage.FieldActive:
+		return m.Active()
 	case stage.FieldDeletedAt:
 		return m.DeletedAt()
 	}
@@ -7265,8 +7264,8 @@ func (m *StageMutation) OldField(ctx context.Context, name string) (ent.Value, e
 		return m.OldName(ctx)
 	case stage.FieldTuitionAmount:
 		return m.OldTuitionAmount(ctx)
-	case stage.FieldStatus:
-		return m.OldStatus(ctx)
+	case stage.FieldActive:
+		return m.OldActive(ctx)
 	case stage.FieldDeletedAt:
 		return m.OldDeletedAt(ctx)
 	}
@@ -7306,12 +7305,12 @@ func (m *StageMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetTuitionAmount(v)
 		return nil
-	case stage.FieldStatus:
-		v, ok := value.(schema.Status)
+	case stage.FieldActive:
+		v, ok := value.(bool)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetStatus(v)
+		m.SetActive(v)
 		return nil
 	case stage.FieldDeletedAt:
 		v, ok := value.(time.Time)
@@ -7405,8 +7404,8 @@ func (m *StageMutation) ResetField(name string) error {
 	case stage.FieldTuitionAmount:
 		m.ResetTuitionAmount()
 		return nil
-	case stage.FieldStatus:
-		m.ResetStatus()
+	case stage.FieldActive:
+		m.ResetActive()
 		return nil
 	case stage.FieldDeletedAt:
 		m.ResetDeletedAt()
@@ -8156,7 +8155,7 @@ type UserMutation struct {
 	token_version      *int
 	addtoken_version   *int
 	role               *user.Role
-	status             *schema.Status
+	active             *bool
 	deleted_at         *time.Time
 	clearedFields      map[string]struct{}
 	stage              *uuid.UUID
@@ -8664,40 +8663,40 @@ func (m *UserMutation) ResetRole() {
 	m.role = nil
 }
 
-// SetStatus sets the "status" field.
-func (m *UserMutation) SetStatus(s schema.Status) {
-	m.status = &s
+// SetActive sets the "active" field.
+func (m *UserMutation) SetActive(b bool) {
+	m.active = &b
 }
 
-// Status returns the value of the "status" field in the mutation.
-func (m *UserMutation) Status() (r schema.Status, exists bool) {
-	v := m.status
+// Active returns the value of the "active" field in the mutation.
+func (m *UserMutation) Active() (r bool, exists bool) {
+	v := m.active
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldStatus returns the old "status" field's value of the User entity.
+// OldActive returns the old "active" field's value of the User entity.
 // If the User object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *UserMutation) OldStatus(ctx context.Context) (v schema.Status, err error) {
+func (m *UserMutation) OldActive(ctx context.Context) (v bool, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, fmt.Errorf("OldStatus is only allowed on UpdateOne operations")
+		return v, fmt.Errorf("OldActive is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, fmt.Errorf("OldStatus requires an ID field in the mutation")
+		return v, fmt.Errorf("OldActive requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldStatus: %w", err)
+		return v, fmt.Errorf("querying old value for OldActive: %w", err)
 	}
-	return oldValue.Status, nil
+	return oldValue.Active, nil
 }
 
-// ResetStatus resets all changes to the "status" field.
-func (m *UserMutation) ResetStatus() {
-	m.status = nil
+// ResetActive resets all changes to the "active" field.
+func (m *UserMutation) ResetActive() {
+	m.active = nil
 }
 
 // SetDeletedAt sets the "deleted_at" field.
@@ -9201,8 +9200,8 @@ func (m *UserMutation) Fields() []string {
 	if m.role != nil {
 		fields = append(fields, user.FieldRole)
 	}
-	if m.status != nil {
-		fields = append(fields, user.FieldStatus)
+	if m.active != nil {
+		fields = append(fields, user.FieldActive)
 	}
 	if m.deleted_at != nil {
 		fields = append(fields, user.FieldDeletedAt)
@@ -9235,8 +9234,8 @@ func (m *UserMutation) Field(name string) (ent.Value, bool) {
 		return m.TokenVersion()
 	case user.FieldRole:
 		return m.Role()
-	case user.FieldStatus:
-		return m.Status()
+	case user.FieldActive:
+		return m.Active()
 	case user.FieldDeletedAt:
 		return m.DeletedAt()
 	}
@@ -9268,8 +9267,8 @@ func (m *UserMutation) OldField(ctx context.Context, name string) (ent.Value, er
 		return m.OldTokenVersion(ctx)
 	case user.FieldRole:
 		return m.OldRole(ctx)
-	case user.FieldStatus:
-		return m.OldStatus(ctx)
+	case user.FieldActive:
+		return m.OldActive(ctx)
 	case user.FieldDeletedAt:
 		return m.OldDeletedAt(ctx)
 	}
@@ -9351,12 +9350,12 @@ func (m *UserMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetRole(v)
 		return nil
-	case user.FieldStatus:
-		v, ok := value.(schema.Status)
+	case user.FieldActive:
+		v, ok := value.(bool)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetStatus(v)
+		m.SetActive(v)
 		return nil
 	case user.FieldDeletedAt:
 		v, ok := value.(time.Time)
@@ -9474,8 +9473,8 @@ func (m *UserMutation) ResetField(name string) error {
 	case user.FieldRole:
 		m.ResetRole()
 		return nil
-	case user.FieldStatus:
-		m.ResetStatus()
+	case user.FieldActive:
+		m.ResetActive()
 		return nil
 	case user.FieldDeletedAt:
 		m.ResetDeletedAt()

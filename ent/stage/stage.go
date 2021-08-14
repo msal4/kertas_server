@@ -3,12 +3,9 @@
 package stage
 
 import (
-	"fmt"
 	"time"
 
-	"github.com/99designs/gqlgen/graphql"
 	"github.com/google/uuid"
-	"github.com/msal4/hassah_school_server/ent/schema"
 )
 
 const (
@@ -24,8 +21,8 @@ const (
 	FieldName = "name"
 	// FieldTuitionAmount holds the string denoting the tuition_amount field in the database.
 	FieldTuitionAmount = "tuition_amount"
-	// FieldStatus holds the string denoting the status field in the database.
-	FieldStatus = "status"
+	// FieldActive holds the string denoting the active field in the database.
+	FieldActive = "active"
 	// FieldDeletedAt holds the string denoting the deleted_at field in the database.
 	FieldDeletedAt = "deleted_at"
 	// EdgeSchool holds the string denoting the school edge name in mutations.
@@ -75,7 +72,7 @@ var Columns = []string{
 	FieldUpdatedAt,
 	FieldName,
 	FieldTuitionAmount,
-	FieldStatus,
+	FieldActive,
 	FieldDeletedAt,
 }
 
@@ -109,25 +106,8 @@ var (
 	UpdateDefaultUpdatedAt func() time.Time
 	// NameValidator is a validator for the "name" field. It is called by the builders before save.
 	NameValidator func(string) error
+	// DefaultActive holds the default value on creation for the "active" field.
+	DefaultActive bool
 	// DefaultID holds the default value on creation for the "id" field.
 	DefaultID func() uuid.UUID
-)
-
-const DefaultStatus schema.Status = "ACTIVE"
-
-// StatusValidator is a validator for the "status" field enum values. It is called by the builders before save.
-func StatusValidator(s schema.Status) error {
-	switch s {
-	case "DISABLED", "ACTIVE":
-		return nil
-	default:
-		return fmt.Errorf("stage: invalid enum value for status field: %q", s)
-	}
-}
-
-var (
-	// schema.Status must implement graphql.Marshaler.
-	_ graphql.Marshaler = schema.Status("")
-	// schema.Status must implement graphql.Unmarshaler.
-	_ graphql.Unmarshaler = (*schema.Status)(nil)
 )

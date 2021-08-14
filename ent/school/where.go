@@ -9,7 +9,6 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/google/uuid"
 	"github.com/msal4/hassah_school_server/ent/predicate"
-	"github.com/msal4/hassah_school_server/ent/schema"
 )
 
 // ID filters vertices based on their ID field.
@@ -127,6 +126,13 @@ func Image(v string) predicate.School {
 func Directory(v string) predicate.School {
 	return predicate.School(func(s *sql.Selector) {
 		s.Where(sql.EQ(s.C(FieldDirectory), v))
+	})
+}
+
+// Active applies equality check predicate on the "active" field. It's identical to ActiveEQ.
+func Active(v bool) predicate.School {
+	return predicate.School(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldActive), v))
 	})
 }
 
@@ -622,53 +628,17 @@ func DirectoryContainsFold(v string) predicate.School {
 	})
 }
 
-// StatusEQ applies the EQ predicate on the "status" field.
-func StatusEQ(v schema.Status) predicate.School {
-	vc := v
+// ActiveEQ applies the EQ predicate on the "active" field.
+func ActiveEQ(v bool) predicate.School {
 	return predicate.School(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldStatus), vc))
+		s.Where(sql.EQ(s.C(FieldActive), v))
 	})
 }
 
-// StatusNEQ applies the NEQ predicate on the "status" field.
-func StatusNEQ(v schema.Status) predicate.School {
-	vc := v
+// ActiveNEQ applies the NEQ predicate on the "active" field.
+func ActiveNEQ(v bool) predicate.School {
 	return predicate.School(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldStatus), vc))
-	})
-}
-
-// StatusIn applies the In predicate on the "status" field.
-func StatusIn(vs ...schema.Status) predicate.School {
-	v := make([]interface{}, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.School(func(s *sql.Selector) {
-		// if not arguments were provided, append the FALSE constants,
-		// since we can't apply "IN ()". This will make this predicate falsy.
-		if len(v) == 0 {
-			s.Where(sql.False())
-			return
-		}
-		s.Where(sql.In(s.C(FieldStatus), v...))
-	})
-}
-
-// StatusNotIn applies the NotIn predicate on the "status" field.
-func StatusNotIn(vs ...schema.Status) predicate.School {
-	v := make([]interface{}, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.School(func(s *sql.Selector) {
-		// if not arguments were provided, append the FALSE constants,
-		// since we can't apply "IN ()". This will make this predicate falsy.
-		if len(v) == 0 {
-			s.Where(sql.False())
-			return
-		}
-		s.Where(sql.NotIn(s.C(FieldStatus), v...))
+		s.Where(sql.NEQ(s.C(FieldActive), v))
 	})
 }
 

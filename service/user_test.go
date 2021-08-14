@@ -8,7 +8,6 @@ import (
 	"github.com/google/uuid"
 	"github.com/minio/minio-go/v7"
 	"github.com/msal4/hassah_school_server/ent"
-	"github.com/msal4/hassah_school_server/ent/schema"
 	"github.com/msal4/hassah_school_server/ent/user"
 	"github.com/msal4/hassah_school_server/graph/model"
 	"github.com/msal4/hassah_school_server/service"
@@ -76,16 +75,16 @@ func TestUserList(t *testing.T) {
 			require.Equal(t, edge.Node.Name, want[i].Name)
 			require.Equal(t, edge.Node.Username, want[i].Username)
 			require.Equal(t, edge.Node.Phone, want[i].Phone)
-			require.Equal(t, edge.Node.Status, want[i].Status)
+			require.Equal(t, edge.Node.Active, want[i].Active)
 			require.Equal(t, edge.Node.Image, want[i].Image)
 			require.Equal(t, edge.Node.CreatedAt, want[i].CreatedAt)
 			require.Equal(t, edge.Node.UpdatedAt, want[i].UpdatedAt)
 		}
 
-		want = b.Where(user.StatusEQ(schema.StatusDisabled)).AllX(ctx)
+		want = b.Where(user.Active(false)).AllX(ctx)
 
 		conn, err = s.Users(ctx, service.UserListOptions{
-			Where:   &ent.UserWhereInput{Status: ptr.Status(schema.StatusDisabled)},
+			Where:   &ent.UserWhereInput{Active: ptr.Bool(false)},
 			OrderBy: &ent.UserOrder{Field: ent.UserOrderFieldCreatedAt, Direction: ent.OrderDirectionAsc},
 		})
 		require.NoError(t, err)
@@ -101,7 +100,7 @@ func TestUserList(t *testing.T) {
 			require.NotNil(t, e.Node)
 			require.Equal(t, e.Node.ID, w.ID)
 			require.Equal(t, e.Node.Name, w.Name)
-			require.Equal(t, e.Node.Status, w.Status)
+			require.Equal(t, e.Node.Active, w.Active)
 			require.Equal(t, e.Node.Image, w.Image)
 			require.Equal(t, e.Node.CreatedAt, w.CreatedAt)
 		}
@@ -132,7 +131,7 @@ func TestUserAdd(t *testing.T) {
 			Phone:    "testphone",
 			Role:     user.RoleSuperAdmin,
 			Image:    &graphql.Upload{File: f, Filename: f.File.Name(), ContentType: f.ContentType, Size: f.Size()},
-			Status:   schema.StatusActive,
+			Active:   true,
 		})
 		require.NoError(t, err)
 		require.NotNil(t, got)
@@ -150,7 +149,7 @@ func TestUserAdd(t *testing.T) {
 		got, err := s.AddUser(ctx, model.AddUserInput{
 			Name:     "test user",
 			Image:    &graphql.Upload{File: f, Filename: f.File.Name(), ContentType: f.ContentType, Size: f.Size()},
-			Status:   schema.StatusActive,
+			Active:   true,
 			Username: "testusner",
 			Password: "testpassword",
 			Phone:    "testphone",
@@ -166,7 +165,7 @@ func TestUserAdd(t *testing.T) {
 		got, err := s.AddUser(ctx, model.AddUserInput{
 			Name:     "test user",
 			Role:     user.RoleStudent,
-			Status:   schema.StatusActive,
+			Active:   true,
 			Username: "testusner",
 			Password: "testpassword",
 			Phone:    "testphone",
@@ -178,7 +177,7 @@ func TestUserAdd(t *testing.T) {
 		got, err = s.AddUser(ctx, model.AddUserInput{
 			Name:     "test user",
 			Role:     user.RoleTeacher,
-			Status:   schema.StatusActive,
+			Active:   true,
 			Username: "testusner2",
 			Password: "testpassword",
 			Phone:    "testphone",
@@ -190,7 +189,7 @@ func TestUserAdd(t *testing.T) {
 		got, err = s.AddUser(ctx, model.AddUserInput{
 			Name:     "test user",
 			Role:     user.RoleSchoolAdmin,
-			Status:   schema.StatusActive,
+			Active:   true,
 			Username: "testusner2",
 			Password: "testpassword",
 			Phone:    "testphone",
@@ -203,14 +202,14 @@ func TestUserAdd(t *testing.T) {
 	t.Run("with valid role & stage", func(t *testing.T) {
 		defer s.EC.User.Delete().ExecX(ctx)
 
-		sch := s.EC.School.Create().SetName("hello").SetImage("hi").SetDirectory("testdir").SetStatus(schema.StatusActive).SaveX(ctx)
+		sch := s.EC.School.Create().SetName("hello").SetImage("hi").SetDirectory("testdir").SetActive(true).SaveX(ctx)
 		stage := s.EC.Stage.Create().SetName("first stage").SetSchool(sch).SetTuitionAmount(299).SaveX(ctx)
 
 		got, err := s.AddUser(ctx, model.AddUserInput{
 			Name:     "test user",
 			Role:     user.RoleStudent,
 			StageID:  &stage.ID,
-			Status:   schema.StatusActive,
+			Active:   true,
 			Username: "testusner",
 			Password: "testpassword",
 			Phone:    "testphone",
@@ -238,7 +237,7 @@ func TestUserUpdate(t *testing.T) {
 	u, err := s.AddUser(ctx, model.AddUserInput{
 		Name:     "test user",
 		Role:     user.RoleSuperAdmin,
-		Status:   schema.StatusActive,
+		Active:   true,
 		Username: "testusner",
 		Password: "testpassword",
 		Phone:    "testphone",
@@ -275,7 +274,7 @@ func TestUserUpdate(t *testing.T) {
 		require.Equal(t, u.ID, updated.ID)
 		require.Equal(t, "new name 3", updated.Name)
 		require.Equal(t, u.Username, updated.Username)
-		require.Equal(t, u.Status, updated.Status)
+		require.Equal(t, u.Active, updated.Active)
 		_, err = s.MC.StatObject(ctx, s.Config.RootBucket, updated.Image, minio.StatObjectOptions{})
 		require.NoError(t, err)
 	})
@@ -295,14 +294,14 @@ func TestUserUpdate(t *testing.T) {
 			Phone:    ptr.Str("12345677"),
 			Password: ptr.Str("newpasswort"),
 			Username: ptr.Str("222newusername"),
-			Status:   ptr.Status(schema.StatusDisabled),
+			Active:   ptr.Bool(false),
 		})
 		require.NoError(t, err)
 		require.NotNil(t, updated)
 		require.Equal(t, u.ID, updated.ID)
 		require.Equal(t, "new name 3", updated.Name)
 		require.Equal(t, "222newusername", updated.Username)
-		require.Equal(t, schema.StatusDisabled, updated.Status)
+		require.Equal(t, false, updated.Active)
 		require.Equal(t, "12345677", updated.Phone)
 		require.Equal(t, u.Role, updated.Role)
 
@@ -323,7 +322,7 @@ func TestDeleteUser(t *testing.T) {
 		u, err := s.AddUser(ctx, model.AddUserInput{
 			Name:     "test user",
 			Role:     user.RoleSuperAdmin,
-			Status:   schema.StatusActive,
+			Active:   true,
 			Username: "testusner",
 			Password: "testpassword",
 			Phone:    "testphone",

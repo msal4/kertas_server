@@ -8,9 +8,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/99designs/gqlgen/graphql"
 	"github.com/google/uuid"
-	"github.com/msal4/hassah_school_server/ent/schema"
 )
 
 const (
@@ -38,8 +36,8 @@ const (
 	FieldTokenVersion = "token_version"
 	// FieldRole holds the string denoting the role field in the database.
 	FieldRole = "role"
-	// FieldStatus holds the string denoting the status field in the database.
-	FieldStatus = "status"
+	// FieldActive holds the string denoting the active field in the database.
+	FieldActive = "active"
 	// FieldDeletedAt holds the string denoting the deleted_at field in the database.
 	FieldDeletedAt = "deleted_at"
 	// EdgeStage holds the string denoting the stage edge name in mutations.
@@ -131,7 +129,7 @@ var Columns = []string{
 	FieldDirectory,
 	FieldTokenVersion,
 	FieldRole,
-	FieldStatus,
+	FieldActive,
 	FieldDeletedAt,
 }
 
@@ -176,6 +174,8 @@ var (
 	DirectoryValidator func(string) error
 	// DefaultTokenVersion holds the default value on creation for the "token_version" field.
 	DefaultTokenVersion int
+	// DefaultActive holds the default value on creation for the "active" field.
+	DefaultActive bool
 	// DefaultID holds the default value on creation for the "id" field.
 	DefaultID func() uuid.UUID
 )
@@ -208,18 +208,6 @@ func RoleValidator(r Role) error {
 	}
 }
 
-const DefaultStatus schema.Status = "ACTIVE"
-
-// StatusValidator is a validator for the "status" field enum values. It is called by the builders before save.
-func StatusValidator(s schema.Status) error {
-	switch s {
-	case "DISABLED", "ACTIVE":
-		return nil
-	default:
-		return fmt.Errorf("user: invalid enum value for status field: %q", s)
-	}
-}
-
 // MarshalGQL implements graphql.Marshaler interface.
 func (r Role) MarshalGQL(w io.Writer) {
 	io.WriteString(w, strconv.Quote(r.String()))
@@ -237,10 +225,3 @@ func (r *Role) UnmarshalGQL(val interface{}) error {
 	}
 	return nil
 }
-
-var (
-	// schema.Status must implement graphql.Marshaler.
-	_ graphql.Marshaler = schema.Status("")
-	// schema.Status must implement graphql.Unmarshaler.
-	_ graphql.Unmarshaler = (*schema.Status)(nil)
-)

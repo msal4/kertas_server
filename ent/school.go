@@ -9,7 +9,6 @@ import (
 
 	"entgo.io/ent/dialect/sql"
 	"github.com/google/uuid"
-	"github.com/msal4/hassah_school_server/ent/schema"
 	"github.com/msal4/hassah_school_server/ent/school"
 )
 
@@ -28,8 +27,8 @@ type School struct {
 	Image string `json:"image,omitempty"`
 	// Directory holds the value of the "directory" field.
 	Directory string `json:"directory,omitempty"`
-	// Status holds the value of the "status" field.
-	Status schema.Status `json:"status,omitempty"`
+	// Active holds the value of the "active" field.
+	Active bool `json:"active,omitempty"`
 	// DeletedAt holds the value of the "deleted_at" field.
 	DeletedAt *time.Time `json:"deleted_at,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
@@ -71,7 +70,9 @@ func (*School) scanValues(columns []string) ([]interface{}, error) {
 	values := make([]interface{}, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case school.FieldName, school.FieldImage, school.FieldDirectory, school.FieldStatus:
+		case school.FieldActive:
+			values[i] = new(sql.NullBool)
+		case school.FieldName, school.FieldImage, school.FieldDirectory:
 			values[i] = new(sql.NullString)
 		case school.FieldCreatedAt, school.FieldUpdatedAt, school.FieldDeletedAt:
 			values[i] = new(sql.NullTime)
@@ -128,11 +129,11 @@ func (s *School) assignValues(columns []string, values []interface{}) error {
 			} else if value.Valid {
 				s.Directory = value.String
 			}
-		case school.FieldStatus:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field status", values[i])
+		case school.FieldActive:
+			if value, ok := values[i].(*sql.NullBool); !ok {
+				return fmt.Errorf("unexpected type %T for field active", values[i])
 			} else if value.Valid {
-				s.Status = schema.Status(value.String)
+				s.Active = value.Bool
 			}
 		case school.FieldDeletedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
@@ -189,8 +190,8 @@ func (s *School) String() string {
 	builder.WriteString(s.Image)
 	builder.WriteString(", directory=")
 	builder.WriteString(s.Directory)
-	builder.WriteString(", status=")
-	builder.WriteString(fmt.Sprintf("%v", s.Status))
+	builder.WriteString(", active=")
+	builder.WriteString(fmt.Sprintf("%v", s.Active))
 	if v := s.DeletedAt; v != nil {
 		builder.WriteString(", deleted_at=")
 		builder.WriteString(v.Format(time.ANSIC))

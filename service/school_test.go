@@ -8,7 +8,6 @@ import (
 	"github.com/google/uuid"
 	"github.com/minio/minio-go/v7"
 	"github.com/msal4/hassah_school_server/ent"
-	"github.com/msal4/hassah_school_server/ent/schema"
 	"github.com/msal4/hassah_school_server/ent/school"
 	"github.com/msal4/hassah_school_server/graph/model"
 	"github.com/msal4/hassah_school_server/service"
@@ -54,9 +53,9 @@ func TestSchoolList(t *testing.T) {
 		defer s.EC.School.Delete().ExecX(ctx)
 
 		s.EC.School.Create().SetName("school 1").SetImage("s/image1").SetDirectory("test_dir").SaveX(ctx)
-		s.EC.School.Create().SetName("school 2").SetImage("s/image2").SetDirectory("test_dir").SetStatus(schema.StatusDisabled).SaveX(ctx)
+		s.EC.School.Create().SetName("school 2").SetImage("s/image2").SetDirectory("test_dir").SetActive(false).SaveX(ctx)
 		s.EC.School.Create().SetName("school 3").SetImage("s/image3").SetDirectory("test_dir").SaveX(ctx)
-		s.EC.School.Create().SetName("school 4").SetImage("s/image4").SetDirectory("test_dir").SetStatus(schema.StatusDisabled).SaveX(ctx)
+		s.EC.School.Create().SetName("school 4").SetImage("s/image4").SetDirectory("test_dir").SetActive(false).SaveX(ctx)
 
 		b := s.EC.School.Query().Order(ent.Asc(school.FieldCreatedAt))
 		want := b.AllX(ctx)
@@ -74,15 +73,15 @@ func TestSchoolList(t *testing.T) {
 			require.NotNil(t, edge.Node)
 			require.Equal(t, edge.Node.ID, want[i].ID)
 			require.Equal(t, edge.Node.Name, want[i].Name)
-			require.Equal(t, edge.Node.Status, want[i].Status)
+			require.Equal(t, edge.Node.Active, want[i].Active)
 			require.Equal(t, edge.Node.Image, want[i].Image)
 			require.Equal(t, edge.Node.CreatedAt, want[i].CreatedAt)
 		}
 
-		want = b.Where(school.StatusEQ(schema.StatusDisabled)).AllX(ctx)
+		want = b.Where(school.Active(false)).AllX(ctx)
 
 		conn, err = s.Schools(ctx, service.SchoolListOptions{
-			Where:   &ent.SchoolWhereInput{Status: ptr.Status(schema.StatusDisabled)},
+			Where:   &ent.SchoolWhereInput{Active: ptr.Bool(false)},
 			OrderBy: &ent.SchoolOrder{Field: ent.SchoolOrderFieldCreatedAt, Direction: ent.OrderDirectionAsc},
 		})
 		require.NoError(t, err)
@@ -98,7 +97,7 @@ func TestSchoolList(t *testing.T) {
 			require.NotNil(t, e.Node)
 			require.Equal(t, e.Node.ID, w.ID)
 			require.Equal(t, e.Node.Name, w.Name)
-			require.Equal(t, e.Node.Status, w.Status)
+			require.Equal(t, e.Node.Active, w.Active)
 			require.Equal(t, e.Node.Image, w.Image)
 			require.Equal(t, e.Node.CreatedAt, w.CreatedAt)
 		}
@@ -121,9 +120,8 @@ func TestSchoolAdd(t *testing.T) {
 		f := testutil.OpenFile(t, "../testfiles/stanford.png")
 		defer f.Close()
 		got, err := s.AddSchool(ctx, model.AddSchoolInput{
-			Name:   "test school",
-			Image:  graphql.Upload{File: f, Filename: f.File.Name(), ContentType: f.ContentType, Size: f.Size()},
-			Status: schema.StatusActive,
+			Name:  "test school",
+			Image: graphql.Upload{File: f, Filename: f.File.Name(), ContentType: f.ContentType, Size: f.Size()},
 		})
 		require.NoError(t, err)
 		require.NotNil(t, got)
@@ -137,9 +135,8 @@ func TestSchoolAdd(t *testing.T) {
 		f := testutil.OpenFile(t, "../testfiles/file.txt")
 		defer f.Close()
 		got, err := s.AddSchool(ctx, model.AddSchoolInput{
-			Name:   "test school",
-			Image:  graphql.Upload{File: f, Filename: f.File.Name(), ContentType: f.ContentType, Size: f.Size()},
-			Status: schema.StatusActive,
+			Name:  "test school",
+			Image: graphql.Upload{File: f, Filename: f.File.Name(), ContentType: f.ContentType, Size: f.Size()},
 		})
 		require.Error(t, err)
 		require.Nil(t, got)
@@ -156,9 +153,8 @@ func TestSchoolDelete(t *testing.T) {
 	defer f.Close()
 
 	sch, err := s.AddSchool(ctx, model.AddSchoolInput{
-		Name:   "test school",
-		Image:  graphql.Upload{File: f, Filename: f.File.Name(), ContentType: f.ContentType, Size: f.Size()},
-		Status: schema.StatusActive,
+		Name:  "test school",
+		Image: graphql.Upload{File: f, Filename: f.File.Name(), ContentType: f.ContentType, Size: f.Size()},
 	})
 	require.NoError(t, err)
 	require.NotNil(t, sch)
@@ -193,9 +189,8 @@ func TestSchoolUpdate(t *testing.T) {
 	defer f.Close()
 
 	sch, err := s.AddSchool(ctx, model.AddSchoolInput{
-		Name:   "test school",
-		Image:  graphql.Upload{File: f, Filename: f.File.Name(), ContentType: f.ContentType, Size: f.Size()},
-		Status: schema.StatusActive,
+		Name:  "test school",
+		Image: graphql.Upload{File: f, Filename: f.File.Name(), ContentType: f.ContentType, Size: f.Size()},
 	})
 	require.NoError(t, err)
 	require.NotNil(t, sch)
@@ -205,7 +200,7 @@ func TestSchoolUpdate(t *testing.T) {
 		require.NoError(t, err)
 		require.NotNil(t, newSch)
 		require.Equal(t, newSch.Name, "new name")
-		require.Equal(t, newSch.Status, sch.Status)
+		require.Equal(t, newSch.Active, sch.Active)
 		require.Equal(t, newSch.Image, sch.Image)
 		require.Equal(t, newSch.Directory, sch.Directory)
 	})
@@ -248,7 +243,7 @@ func TestSchoolUpdate(t *testing.T) {
 
 		newSch, err := s.UpdateSchool(ctx, sch.ID, model.UpdateSchoolInput{
 			Name:   ptr.Str("name 2"),
-			Status: ptr.Status(schema.StatusDisabled),
+			Active: ptr.Bool(false),
 			Image: &graphql.Upload{
 				File:        f,
 				Filename:    f.File.Name(),
@@ -259,7 +254,7 @@ func TestSchoolUpdate(t *testing.T) {
 		require.NoError(t, err)
 		require.NotNil(t, newSch)
 		require.Equal(t, "name 2", newSch.Name)
-		require.Equal(t, schema.StatusDisabled, newSch.Status)
+		require.Equal(t, false, newSch.Active)
 		require.Equal(t, sch.Image, newSch.Image)
 		require.Equal(t, sch.Directory, newSch.Directory)
 	})

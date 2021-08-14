@@ -12,7 +12,6 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/google/uuid"
 	"github.com/msal4/hassah_school_server/ent/predicate"
-	"github.com/msal4/hassah_school_server/ent/schema"
 	"github.com/msal4/hassah_school_server/ent/school"
 	"github.com/msal4/hassah_school_server/ent/stage"
 	"github.com/msal4/hassah_school_server/ent/user"
@@ -49,16 +48,16 @@ func (su *SchoolUpdate) SetDirectory(s string) *SchoolUpdate {
 	return su
 }
 
-// SetStatus sets the "status" field.
-func (su *SchoolUpdate) SetStatus(s schema.Status) *SchoolUpdate {
-	su.mutation.SetStatus(s)
+// SetActive sets the "active" field.
+func (su *SchoolUpdate) SetActive(b bool) *SchoolUpdate {
+	su.mutation.SetActive(b)
 	return su
 }
 
-// SetNillableStatus sets the "status" field if the given value is not nil.
-func (su *SchoolUpdate) SetNillableStatus(s *schema.Status) *SchoolUpdate {
-	if s != nil {
-		su.SetStatus(*s)
+// SetNillableActive sets the "active" field if the given value is not nil.
+func (su *SchoolUpdate) SetNillableActive(b *bool) *SchoolUpdate {
+	if b != nil {
+		su.SetActive(*b)
 	}
 	return su
 }
@@ -246,11 +245,6 @@ func (su *SchoolUpdate) check() error {
 			return &ValidationError{Name: "directory", err: fmt.Errorf("ent: validator failed for field \"directory\": %w", err)}
 		}
 	}
-	if v, ok := su.mutation.Status(); ok {
-		if err := school.StatusValidator(v); err != nil {
-			return &ValidationError{Name: "status", err: fmt.Errorf("ent: validator failed for field \"status\": %w", err)}
-		}
-	}
 	return nil
 }
 
@@ -300,11 +294,11 @@ func (su *SchoolUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Column: school.FieldDirectory,
 		})
 	}
-	if value, ok := su.mutation.Status(); ok {
+	if value, ok := su.mutation.Active(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeEnum,
+			Type:   field.TypeBool,
 			Value:  value,
-			Column: school.FieldStatus,
+			Column: school.FieldActive,
 		})
 	}
 	if value, ok := su.mutation.DeletedAt(); ok {
@@ -465,16 +459,16 @@ func (suo *SchoolUpdateOne) SetDirectory(s string) *SchoolUpdateOne {
 	return suo
 }
 
-// SetStatus sets the "status" field.
-func (suo *SchoolUpdateOne) SetStatus(s schema.Status) *SchoolUpdateOne {
-	suo.mutation.SetStatus(s)
+// SetActive sets the "active" field.
+func (suo *SchoolUpdateOne) SetActive(b bool) *SchoolUpdateOne {
+	suo.mutation.SetActive(b)
 	return suo
 }
 
-// SetNillableStatus sets the "status" field if the given value is not nil.
-func (suo *SchoolUpdateOne) SetNillableStatus(s *schema.Status) *SchoolUpdateOne {
-	if s != nil {
-		suo.SetStatus(*s)
+// SetNillableActive sets the "active" field if the given value is not nil.
+func (suo *SchoolUpdateOne) SetNillableActive(b *bool) *SchoolUpdateOne {
+	if b != nil {
+		suo.SetActive(*b)
 	}
 	return suo
 }
@@ -669,11 +663,6 @@ func (suo *SchoolUpdateOne) check() error {
 			return &ValidationError{Name: "directory", err: fmt.Errorf("ent: validator failed for field \"directory\": %w", err)}
 		}
 	}
-	if v, ok := suo.mutation.Status(); ok {
-		if err := school.StatusValidator(v); err != nil {
-			return &ValidationError{Name: "status", err: fmt.Errorf("ent: validator failed for field \"status\": %w", err)}
-		}
-	}
 	return nil
 }
 
@@ -740,11 +729,11 @@ func (suo *SchoolUpdateOne) sqlSave(ctx context.Context) (_node *School, err err
 			Column: school.FieldDirectory,
 		})
 	}
-	if value, ok := suo.mutation.Status(); ok {
+	if value, ok := suo.mutation.Active(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeEnum,
+			Type:   field.TypeBool,
 			Value:  value,
-			Column: school.FieldStatus,
+			Column: school.FieldActive,
 		})
 	}
 	if value, ok := suo.mutation.DeletedAt(); ok {

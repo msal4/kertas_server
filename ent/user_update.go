@@ -17,7 +17,6 @@ import (
 	"github.com/msal4/hassah_school_server/ent/grade"
 	"github.com/msal4/hassah_school_server/ent/message"
 	"github.com/msal4/hassah_school_server/ent/predicate"
-	"github.com/msal4/hassah_school_server/ent/schema"
 	"github.com/msal4/hassah_school_server/ent/school"
 	"github.com/msal4/hassah_school_server/ent/stage"
 	"github.com/msal4/hassah_school_server/ent/tuitionpayment"
@@ -122,16 +121,16 @@ func (uu *UserUpdate) SetNillableRole(u *user.Role) *UserUpdate {
 	return uu
 }
 
-// SetStatus sets the "status" field.
-func (uu *UserUpdate) SetStatus(s schema.Status) *UserUpdate {
-	uu.mutation.SetStatus(s)
+// SetActive sets the "active" field.
+func (uu *UserUpdate) SetActive(b bool) *UserUpdate {
+	uu.mutation.SetActive(b)
 	return uu
 }
 
-// SetNillableStatus sets the "status" field if the given value is not nil.
-func (uu *UserUpdate) SetNillableStatus(s *schema.Status) *UserUpdate {
-	if s != nil {
-		uu.SetStatus(*s)
+// SetNillableActive sets the "active" field if the given value is not nil.
+func (uu *UserUpdate) SetNillableActive(b *bool) *UserUpdate {
+	if b != nil {
+		uu.SetActive(*b)
 	}
 	return uu
 }
@@ -528,11 +527,6 @@ func (uu *UserUpdate) check() error {
 			return &ValidationError{Name: "role", err: fmt.Errorf("ent: validator failed for field \"role\": %w", err)}
 		}
 	}
-	if v, ok := uu.mutation.Status(); ok {
-		if err := user.StatusValidator(v); err != nil {
-			return &ValidationError{Name: "status", err: fmt.Errorf("ent: validator failed for field \"status\": %w", err)}
-		}
-	}
 	return nil
 }
 
@@ -630,11 +624,11 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Column: user.FieldRole,
 		})
 	}
-	if value, ok := uu.mutation.Status(); ok {
+	if value, ok := uu.mutation.Active(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeEnum,
+			Type:   field.TypeBool,
 			Value:  value,
-			Column: user.FieldStatus,
+			Column: user.FieldActive,
 		})
 	}
 	if value, ok := uu.mutation.DeletedAt(); ok {
@@ -1148,16 +1142,16 @@ func (uuo *UserUpdateOne) SetNillableRole(u *user.Role) *UserUpdateOne {
 	return uuo
 }
 
-// SetStatus sets the "status" field.
-func (uuo *UserUpdateOne) SetStatus(s schema.Status) *UserUpdateOne {
-	uuo.mutation.SetStatus(s)
+// SetActive sets the "active" field.
+func (uuo *UserUpdateOne) SetActive(b bool) *UserUpdateOne {
+	uuo.mutation.SetActive(b)
 	return uuo
 }
 
-// SetNillableStatus sets the "status" field if the given value is not nil.
-func (uuo *UserUpdateOne) SetNillableStatus(s *schema.Status) *UserUpdateOne {
-	if s != nil {
-		uuo.SetStatus(*s)
+// SetNillableActive sets the "active" field if the given value is not nil.
+func (uuo *UserUpdateOne) SetNillableActive(b *bool) *UserUpdateOne {
+	if b != nil {
+		uuo.SetActive(*b)
 	}
 	return uuo
 }
@@ -1561,11 +1555,6 @@ func (uuo *UserUpdateOne) check() error {
 			return &ValidationError{Name: "role", err: fmt.Errorf("ent: validator failed for field \"role\": %w", err)}
 		}
 	}
-	if v, ok := uuo.mutation.Status(); ok {
-		if err := user.StatusValidator(v); err != nil {
-			return &ValidationError{Name: "status", err: fmt.Errorf("ent: validator failed for field \"status\": %w", err)}
-		}
-	}
 	return nil
 }
 
@@ -1680,11 +1669,11 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 			Column: user.FieldRole,
 		})
 	}
-	if value, ok := uuo.mutation.Status(); ok {
+	if value, ok := uuo.mutation.Active(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeEnum,
+			Type:   field.TypeBool,
 			Value:  value,
-			Column: user.FieldStatus,
+			Column: user.FieldActive,
 		})
 	}
 	if value, ok := uuo.mutation.DeletedAt(); ok {

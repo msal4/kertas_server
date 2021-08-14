@@ -21,7 +21,7 @@ func (Stage) Fields() []ent.Field {
 		field.UUID("id", uuid.UUID{}).Default(uuid.New),
 		field.String("name").NotEmpty().Annotations(entgql.OrderField("NAME")),
 		field.Int("tuition_amount").Annotations(entgql.OrderField("TUITION_AMOUNT")),
-		field.Enum("status").GoType(Status("")).Default(StatusActive.String()).Annotations(entgql.OrderField("STATUS")),
+		field.Bool("active").Default(true),
 		field.Time("deleted_at").Nillable().Optional(),
 	}
 }
@@ -45,6 +45,6 @@ func (Stage) Edges() []ent.Edge {
 func (Stage) Indexes() []ent.Index {
 	return []ent.Index{
 		index.Edges("school"),
-		index.Fields("status"),
+		index.Fields("active"),
 	}
 }

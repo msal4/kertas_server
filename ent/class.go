@@ -11,7 +11,6 @@ import (
 	"github.com/google/uuid"
 	"github.com/msal4/hassah_school_server/ent/class"
 	"github.com/msal4/hassah_school_server/ent/group"
-	"github.com/msal4/hassah_school_server/ent/schema"
 	"github.com/msal4/hassah_school_server/ent/stage"
 	"github.com/msal4/hassah_school_server/ent/user"
 )
@@ -27,8 +26,8 @@ type Class struct {
 	UpdatedAt time.Time `json:"updated_at,omitempty"`
 	// Name holds the value of the "name" field.
 	Name string `json:"name,omitempty"`
-	// Status holds the value of the "status" field.
-	Status schema.Status `json:"status,omitempty"`
+	// Active holds the value of the "active" field.
+	Active bool `json:"active,omitempty"`
 	// DeletedAt holds the value of the "deleted_at" field.
 	DeletedAt *time.Time `json:"deleted_at,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
@@ -131,7 +130,9 @@ func (*Class) scanValues(columns []string) ([]interface{}, error) {
 	values := make([]interface{}, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case class.FieldName, class.FieldStatus:
+		case class.FieldActive:
+			values[i] = new(sql.NullBool)
+		case class.FieldName:
 			values[i] = new(sql.NullString)
 		case class.FieldCreatedAt, class.FieldUpdatedAt, class.FieldDeletedAt:
 			values[i] = new(sql.NullTime)
@@ -180,11 +181,11 @@ func (c *Class) assignValues(columns []string, values []interface{}) error {
 			} else if value.Valid {
 				c.Name = value.String
 			}
-		case class.FieldStatus:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field status", values[i])
+		case class.FieldActive:
+			if value, ok := values[i].(*sql.NullBool); !ok {
+				return fmt.Errorf("unexpected type %T for field active", values[i])
 			} else if value.Valid {
-				c.Status = schema.Status(value.String)
+				c.Active = value.Bool
 			}
 		case class.FieldDeletedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
@@ -271,8 +272,8 @@ func (c *Class) String() string {
 	builder.WriteString(c.UpdatedAt.Format(time.ANSIC))
 	builder.WriteString(", name=")
 	builder.WriteString(c.Name)
-	builder.WriteString(", status=")
-	builder.WriteString(fmt.Sprintf("%v", c.Status))
+	builder.WriteString(", active=")
+	builder.WriteString(fmt.Sprintf("%v", c.Active))
 	if v := c.DeletedAt; v != nil {
 		builder.WriteString(", deleted_at=")
 		builder.WriteString(v.Format(time.ANSIC))

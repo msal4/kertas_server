@@ -16,7 +16,6 @@ import (
 	"github.com/msal4/hassah_school_server/ent/message"
 	"github.com/msal4/hassah_school_server/ent/predicate"
 	"github.com/msal4/hassah_school_server/ent/schedule"
-	"github.com/msal4/hassah_school_server/ent/schema"
 	"github.com/msal4/hassah_school_server/ent/school"
 	"github.com/msal4/hassah_school_server/ent/stage"
 	"github.com/msal4/hassah_school_server/ent/tuitionpayment"
@@ -1103,11 +1102,9 @@ type ClassWhereInput struct {
 	NameEqualFold    *string  `json:"nameEqualFold,omitempty"`
 	NameContainsFold *string  `json:"nameContainsFold,omitempty"`
 
-	// "status" field predicates.
-	Status      *schema.Status  `json:"status,omitempty"`
-	StatusNEQ   *schema.Status  `json:"statusNEQ,omitempty"`
-	StatusIn    []schema.Status `json:"statusIn,omitempty"`
-	StatusNotIn []schema.Status `json:"statusNotIn,omitempty"`
+	// "active" field predicates.
+	Active    *bool `json:"active,omitempty"`
+	ActiveNEQ *bool `json:"activeNEQ,omitempty"`
 
 	// "deleted_at" field predicates.
 	DeletedAt       *time.Time  `json:"deletedAt,omitempty"`
@@ -1316,17 +1313,11 @@ func (i *ClassWhereInput) P() (predicate.Class, error) {
 	if i.NameContainsFold != nil {
 		predicates = append(predicates, class.NameContainsFold(*i.NameContainsFold))
 	}
-	if i.Status != nil {
-		predicates = append(predicates, class.StatusEQ(*i.Status))
+	if i.Active != nil {
+		predicates = append(predicates, class.ActiveEQ(*i.Active))
 	}
-	if i.StatusNEQ != nil {
-		predicates = append(predicates, class.StatusNEQ(*i.StatusNEQ))
-	}
-	if len(i.StatusIn) > 0 {
-		predicates = append(predicates, class.StatusIn(i.StatusIn...))
-	}
-	if len(i.StatusNotIn) > 0 {
-		predicates = append(predicates, class.StatusNotIn(i.StatusNotIn...))
+	if i.ActiveNEQ != nil {
+		predicates = append(predicates, class.ActiveNEQ(*i.ActiveNEQ))
 	}
 	if i.DeletedAt != nil {
 		predicates = append(predicates, class.DeletedAtEQ(*i.DeletedAt))
@@ -1793,11 +1784,9 @@ type GroupWhereInput struct {
 	GroupTypeIn    []group.GroupType `json:"groupTypeIn,omitempty"`
 	GroupTypeNotIn []group.GroupType `json:"groupTypeNotIn,omitempty"`
 
-	// "status" field predicates.
-	Status      *schema.Status  `json:"status,omitempty"`
-	StatusNEQ   *schema.Status  `json:"statusNEQ,omitempty"`
-	StatusIn    []schema.Status `json:"statusIn,omitempty"`
-	StatusNotIn []schema.Status `json:"statusNotIn,omitempty"`
+	// "active" field predicates.
+	Active    *bool `json:"active,omitempty"`
+	ActiveNEQ *bool `json:"activeNEQ,omitempty"`
 
 	// "deleted_at" field predicates.
 	DeletedAt       *time.Time  `json:"deletedAt,omitempty"`
@@ -2008,17 +1997,11 @@ func (i *GroupWhereInput) P() (predicate.Group, error) {
 	if len(i.GroupTypeNotIn) > 0 {
 		predicates = append(predicates, group.GroupTypeNotIn(i.GroupTypeNotIn...))
 	}
-	if i.Status != nil {
-		predicates = append(predicates, group.StatusEQ(*i.Status))
+	if i.Active != nil {
+		predicates = append(predicates, group.ActiveEQ(*i.Active))
 	}
-	if i.StatusNEQ != nil {
-		predicates = append(predicates, group.StatusNEQ(*i.StatusNEQ))
-	}
-	if len(i.StatusIn) > 0 {
-		predicates = append(predicates, group.StatusIn(i.StatusIn...))
-	}
-	if len(i.StatusNotIn) > 0 {
-		predicates = append(predicates, group.StatusNotIn(i.StatusNotIn...))
+	if i.ActiveNEQ != nil {
+		predicates = append(predicates, group.ActiveNEQ(*i.ActiveNEQ))
 	}
 	if i.DeletedAt != nil {
 		predicates = append(predicates, group.DeletedAtEQ(*i.DeletedAt))
@@ -2802,11 +2785,9 @@ type SchoolWhereInput struct {
 	DirectoryEqualFold    *string  `json:"directoryEqualFold,omitempty"`
 	DirectoryContainsFold *string  `json:"directoryContainsFold,omitempty"`
 
-	// "status" field predicates.
-	Status      *schema.Status  `json:"status,omitempty"`
-	StatusNEQ   *schema.Status  `json:"statusNEQ,omitempty"`
-	StatusIn    []schema.Status `json:"statusIn,omitempty"`
-	StatusNotIn []schema.Status `json:"statusNotIn,omitempty"`
+	// "active" field predicates.
+	Active    *bool `json:"active,omitempty"`
+	ActiveNEQ *bool `json:"activeNEQ,omitempty"`
 
 	// "deleted_at" field predicates.
 	DeletedAt       *time.Time  `json:"deletedAt,omitempty"`
@@ -3077,17 +3058,11 @@ func (i *SchoolWhereInput) P() (predicate.School, error) {
 	if i.DirectoryContainsFold != nil {
 		predicates = append(predicates, school.DirectoryContainsFold(*i.DirectoryContainsFold))
 	}
-	if i.Status != nil {
-		predicates = append(predicates, school.StatusEQ(*i.Status))
+	if i.Active != nil {
+		predicates = append(predicates, school.ActiveEQ(*i.Active))
 	}
-	if i.StatusNEQ != nil {
-		predicates = append(predicates, school.StatusNEQ(*i.StatusNEQ))
-	}
-	if len(i.StatusIn) > 0 {
-		predicates = append(predicates, school.StatusIn(i.StatusIn...))
-	}
-	if len(i.StatusNotIn) > 0 {
-		predicates = append(predicates, school.StatusNotIn(i.StatusNotIn...))
+	if i.ActiveNEQ != nil {
+		predicates = append(predicates, school.ActiveNEQ(*i.ActiveNEQ))
 	}
 	if i.DeletedAt != nil {
 		predicates = append(predicates, school.DeletedAtEQ(*i.DeletedAt))
@@ -3227,11 +3202,9 @@ type StageWhereInput struct {
 	TuitionAmountLT    *int  `json:"tuitionAmountLT,omitempty"`
 	TuitionAmountLTE   *int  `json:"tuitionAmountLTE,omitempty"`
 
-	// "status" field predicates.
-	Status      *schema.Status  `json:"status,omitempty"`
-	StatusNEQ   *schema.Status  `json:"statusNEQ,omitempty"`
-	StatusIn    []schema.Status `json:"statusIn,omitempty"`
-	StatusNotIn []schema.Status `json:"statusNotIn,omitempty"`
+	// "active" field predicates.
+	Active    *bool `json:"active,omitempty"`
+	ActiveNEQ *bool `json:"activeNEQ,omitempty"`
 
 	// "deleted_at" field predicates.
 	DeletedAt       *time.Time  `json:"deletedAt,omitempty"`
@@ -3456,17 +3429,11 @@ func (i *StageWhereInput) P() (predicate.Stage, error) {
 	if i.TuitionAmountLTE != nil {
 		predicates = append(predicates, stage.TuitionAmountLTE(*i.TuitionAmountLTE))
 	}
-	if i.Status != nil {
-		predicates = append(predicates, stage.StatusEQ(*i.Status))
+	if i.Active != nil {
+		predicates = append(predicates, stage.ActiveEQ(*i.Active))
 	}
-	if i.StatusNEQ != nil {
-		predicates = append(predicates, stage.StatusNEQ(*i.StatusNEQ))
-	}
-	if len(i.StatusIn) > 0 {
-		predicates = append(predicates, stage.StatusIn(i.StatusIn...))
-	}
-	if len(i.StatusNotIn) > 0 {
-		predicates = append(predicates, stage.StatusNotIn(i.StatusNotIn...))
+	if i.ActiveNEQ != nil {
+		predicates = append(predicates, stage.ActiveNEQ(*i.ActiveNEQ))
 	}
 	if i.DeletedAt != nil {
 		predicates = append(predicates, stage.DeletedAtEQ(*i.DeletedAt))
@@ -3982,11 +3949,9 @@ type UserWhereInput struct {
 	RoleIn    []user.Role `json:"roleIn,omitempty"`
 	RoleNotIn []user.Role `json:"roleNotIn,omitempty"`
 
-	// "status" field predicates.
-	Status      *schema.Status  `json:"status,omitempty"`
-	StatusNEQ   *schema.Status  `json:"statusNEQ,omitempty"`
-	StatusIn    []schema.Status `json:"statusIn,omitempty"`
-	StatusNotIn []schema.Status `json:"statusNotIn,omitempty"`
+	// "active" field predicates.
+	Active    *bool `json:"active,omitempty"`
+	ActiveNEQ *bool `json:"activeNEQ,omitempty"`
 
 	// "deleted_at" field predicates.
 	DeletedAt       *time.Time  `json:"deletedAt,omitempty"`
@@ -4440,17 +4405,11 @@ func (i *UserWhereInput) P() (predicate.User, error) {
 	if len(i.RoleNotIn) > 0 {
 		predicates = append(predicates, user.RoleNotIn(i.RoleNotIn...))
 	}
-	if i.Status != nil {
-		predicates = append(predicates, user.StatusEQ(*i.Status))
+	if i.Active != nil {
+		predicates = append(predicates, user.ActiveEQ(*i.Active))
 	}
-	if i.StatusNEQ != nil {
-		predicates = append(predicates, user.StatusNEQ(*i.StatusNEQ))
-	}
-	if len(i.StatusIn) > 0 {
-		predicates = append(predicates, user.StatusIn(i.StatusIn...))
-	}
-	if len(i.StatusNotIn) > 0 {
-		predicates = append(predicates, user.StatusNotIn(i.StatusNotIn...))
+	if i.ActiveNEQ != nil {
+		predicates = append(predicates, user.ActiveNEQ(*i.ActiveNEQ))
 	}
 	if i.DeletedAt != nil {
 		predicates = append(predicates, user.DeletedAtEQ(*i.DeletedAt))

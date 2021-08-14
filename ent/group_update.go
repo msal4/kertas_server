@@ -15,7 +15,6 @@ import (
 	"github.com/msal4/hassah_school_server/ent/group"
 	"github.com/msal4/hassah_school_server/ent/message"
 	"github.com/msal4/hassah_school_server/ent/predicate"
-	"github.com/msal4/hassah_school_server/ent/schema"
 )
 
 // GroupUpdate is the builder for updating Group entities.
@@ -65,16 +64,16 @@ func (gu *GroupUpdate) SetNillableGroupType(gt *group.GroupType) *GroupUpdate {
 	return gu
 }
 
-// SetStatus sets the "status" field.
-func (gu *GroupUpdate) SetStatus(s schema.Status) *GroupUpdate {
-	gu.mutation.SetStatus(s)
+// SetActive sets the "active" field.
+func (gu *GroupUpdate) SetActive(b bool) *GroupUpdate {
+	gu.mutation.SetActive(b)
 	return gu
 }
 
-// SetNillableStatus sets the "status" field if the given value is not nil.
-func (gu *GroupUpdate) SetNillableStatus(s *schema.Status) *GroupUpdate {
-	if s != nil {
-		gu.SetStatus(*s)
+// SetNillableActive sets the "active" field if the given value is not nil.
+func (gu *GroupUpdate) SetNillableActive(b *bool) *GroupUpdate {
+	if b != nil {
+		gu.SetActive(*b)
 	}
 	return gu
 }
@@ -241,11 +240,6 @@ func (gu *GroupUpdate) check() error {
 			return &ValidationError{Name: "group_type", err: fmt.Errorf("ent: validator failed for field \"group_type\": %w", err)}
 		}
 	}
-	if v, ok := gu.mutation.Status(); ok {
-		if err := group.StatusValidator(v); err != nil {
-			return &ValidationError{Name: "status", err: fmt.Errorf("ent: validator failed for field \"status\": %w", err)}
-		}
-	}
 	return nil
 }
 
@@ -294,11 +288,11 @@ func (gu *GroupUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Column: group.FieldGroupType,
 		})
 	}
-	if value, ok := gu.mutation.Status(); ok {
+	if value, ok := gu.mutation.Active(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeEnum,
+			Type:   field.TypeBool,
 			Value:  value,
-			Column: group.FieldStatus,
+			Column: group.FieldActive,
 		})
 	}
 	if value, ok := gu.mutation.DeletedAt(); ok {
@@ -456,16 +450,16 @@ func (guo *GroupUpdateOne) SetNillableGroupType(gt *group.GroupType) *GroupUpdat
 	return guo
 }
 
-// SetStatus sets the "status" field.
-func (guo *GroupUpdateOne) SetStatus(s schema.Status) *GroupUpdateOne {
-	guo.mutation.SetStatus(s)
+// SetActive sets the "active" field.
+func (guo *GroupUpdateOne) SetActive(b bool) *GroupUpdateOne {
+	guo.mutation.SetActive(b)
 	return guo
 }
 
-// SetNillableStatus sets the "status" field if the given value is not nil.
-func (guo *GroupUpdateOne) SetNillableStatus(s *schema.Status) *GroupUpdateOne {
-	if s != nil {
-		guo.SetStatus(*s)
+// SetNillableActive sets the "active" field if the given value is not nil.
+func (guo *GroupUpdateOne) SetNillableActive(b *bool) *GroupUpdateOne {
+	if b != nil {
+		guo.SetActive(*b)
 	}
 	return guo
 }
@@ -639,11 +633,6 @@ func (guo *GroupUpdateOne) check() error {
 			return &ValidationError{Name: "group_type", err: fmt.Errorf("ent: validator failed for field \"group_type\": %w", err)}
 		}
 	}
-	if v, ok := guo.mutation.Status(); ok {
-		if err := group.StatusValidator(v); err != nil {
-			return &ValidationError{Name: "status", err: fmt.Errorf("ent: validator failed for field \"status\": %w", err)}
-		}
-	}
 	return nil
 }
 
@@ -709,11 +698,11 @@ func (guo *GroupUpdateOne) sqlSave(ctx context.Context) (_node *Group, err error
 			Column: group.FieldGroupType,
 		})
 	}
-	if value, ok := guo.mutation.Status(); ok {
+	if value, ok := guo.mutation.Active(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeEnum,
+			Type:   field.TypeBool,
 			Value:  value,
-			Column: group.FieldStatus,
+			Column: group.FieldActive,
 		})
 	}
 	if value, ok := guo.mutation.DeletedAt(); ok {

@@ -8,9 +8,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/99designs/gqlgen/graphql"
 	"github.com/google/uuid"
-	"github.com/msal4/hassah_school_server/ent/schema"
 )
 
 const (
@@ -26,8 +24,8 @@ const (
 	FieldName = "name"
 	// FieldGroupType holds the string denoting the group_type field in the database.
 	FieldGroupType = "group_type"
-	// FieldStatus holds the string denoting the status field in the database.
-	FieldStatus = "status"
+	// FieldActive holds the string denoting the active field in the database.
+	FieldActive = "active"
 	// FieldDeletedAt holds the string denoting the deleted_at field in the database.
 	FieldDeletedAt = "deleted_at"
 	// EdgeClass holds the string denoting the class edge name in mutations.
@@ -59,7 +57,7 @@ var Columns = []string{
 	FieldUpdatedAt,
 	FieldName,
 	FieldGroupType,
-	FieldStatus,
+	FieldActive,
 	FieldDeletedAt,
 }
 
@@ -91,6 +89,8 @@ var (
 	DefaultUpdatedAt func() time.Time
 	// UpdateDefaultUpdatedAt holds the default value on update for the "updated_at" field.
 	UpdateDefaultUpdatedAt func() time.Time
+	// DefaultActive holds the default value on creation for the "active" field.
+	DefaultActive bool
 	// DefaultID holds the default value on creation for the "id" field.
 	DefaultID func() uuid.UUID
 )
@@ -121,18 +121,6 @@ func GroupTypeValidator(gt GroupType) error {
 	}
 }
 
-const DefaultStatus schema.Status = "ACTIVE"
-
-// StatusValidator is a validator for the "status" field enum values. It is called by the builders before save.
-func StatusValidator(s schema.Status) error {
-	switch s {
-	case "DISABLED", "ACTIVE":
-		return nil
-	default:
-		return fmt.Errorf("group: invalid enum value for status field: %q", s)
-	}
-}
-
 // MarshalGQL implements graphql.Marshaler interface.
 func (gt GroupType) MarshalGQL(w io.Writer) {
 	io.WriteString(w, strconv.Quote(gt.String()))
@@ -150,10 +138,3 @@ func (gt *GroupType) UnmarshalGQL(val interface{}) error {
 	}
 	return nil
 }
-
-var (
-	// schema.Status must implement graphql.Marshaler.
-	_ graphql.Marshaler = schema.Status("")
-	// schema.Status must implement graphql.Unmarshaler.
-	_ graphql.Unmarshaler = (*schema.Status)(nil)
-)

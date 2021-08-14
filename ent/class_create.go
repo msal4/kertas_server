@@ -16,7 +16,6 @@ import (
 	"github.com/msal4/hassah_school_server/ent/class"
 	"github.com/msal4/hassah_school_server/ent/group"
 	"github.com/msal4/hassah_school_server/ent/schedule"
-	"github.com/msal4/hassah_school_server/ent/schema"
 	"github.com/msal4/hassah_school_server/ent/stage"
 	"github.com/msal4/hassah_school_server/ent/user"
 )
@@ -62,16 +61,16 @@ func (cc *ClassCreate) SetName(s string) *ClassCreate {
 	return cc
 }
 
-// SetStatus sets the "status" field.
-func (cc *ClassCreate) SetStatus(s schema.Status) *ClassCreate {
-	cc.mutation.SetStatus(s)
+// SetActive sets the "active" field.
+func (cc *ClassCreate) SetActive(b bool) *ClassCreate {
+	cc.mutation.SetActive(b)
 	return cc
 }
 
-// SetNillableStatus sets the "status" field if the given value is not nil.
-func (cc *ClassCreate) SetNillableStatus(s *schema.Status) *ClassCreate {
-	if s != nil {
-		cc.SetStatus(*s)
+// SetNillableActive sets the "active" field if the given value is not nil.
+func (cc *ClassCreate) SetNillableActive(b *bool) *ClassCreate {
+	if b != nil {
+		cc.SetActive(*b)
 	}
 	return cc
 }
@@ -253,9 +252,9 @@ func (cc *ClassCreate) defaults() {
 		v := class.DefaultUpdatedAt()
 		cc.mutation.SetUpdatedAt(v)
 	}
-	if _, ok := cc.mutation.Status(); !ok {
-		v := class.DefaultStatus
-		cc.mutation.SetStatus(v)
+	if _, ok := cc.mutation.Active(); !ok {
+		v := class.DefaultActive
+		cc.mutation.SetActive(v)
 	}
 	if _, ok := cc.mutation.ID(); !ok {
 		v := class.DefaultID()
@@ -279,13 +278,8 @@ func (cc *ClassCreate) check() error {
 			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "name": %w`, err)}
 		}
 	}
-	if _, ok := cc.mutation.Status(); !ok {
-		return &ValidationError{Name: "status", err: errors.New(`ent: missing required field "status"`)}
-	}
-	if v, ok := cc.mutation.Status(); ok {
-		if err := class.StatusValidator(v); err != nil {
-			return &ValidationError{Name: "status", err: fmt.Errorf(`ent: validator failed for field "status": %w`, err)}
-		}
+	if _, ok := cc.mutation.Active(); !ok {
+		return &ValidationError{Name: "active", err: errors.New(`ent: missing required field "active"`)}
 	}
 	if _, ok := cc.mutation.StageID(); !ok {
 		return &ValidationError{Name: "stage", err: errors.New("ent: missing required edge \"stage\"")}
@@ -349,13 +343,13 @@ func (cc *ClassCreate) createSpec() (*Class, *sqlgraph.CreateSpec) {
 		})
 		_node.Name = value
 	}
-	if value, ok := cc.mutation.Status(); ok {
+	if value, ok := cc.mutation.Active(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeEnum,
+			Type:   field.TypeBool,
 			Value:  value,
-			Column: class.FieldStatus,
+			Column: class.FieldActive,
 		})
-		_node.Status = value
+		_node.Active = value
 	}
 	if value, ok := cc.mutation.DeletedAt(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{

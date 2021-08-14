@@ -29,7 +29,7 @@ func (s *Service) Users(ctx context.Context, opts UserListOptions) (*ent.UserCon
 
 func (s *Service) AddUser(ctx context.Context, input model.AddUserInput) (*ent.User, error) {
 	b := s.EC.User.Create().SetName(input.Name).SetUsername(input.Username).
-		SetStatus(input.Status).SetRole(input.Role).SetPassword(input.Password).SetPhone(input.Phone)
+		SetActive(input.Active).SetRole(input.Role).SetPassword(input.Password).SetPhone(input.Phone)
 
 	if input.StageID == nil && input.Role == user.RoleStudent {
 		return nil, fmt.Errorf("stage is required for %q role", input.Role)
@@ -99,8 +99,8 @@ func (s *Service) UpdateUser(ctx context.Context, id uuid.UUID, input model.Upda
 		b.SetPassword(*input.Password)
 	}
 
-	if input.Status != nil {
-		b.SetStatus(*input.Status)
+	if input.Active != nil {
+		b.SetActive(*input.Active)
 	}
 
 	if input.Image != nil {

@@ -20,7 +20,7 @@ func (Class) Fields() []ent.Field {
 	return []ent.Field{
 		field.UUID("id", uuid.UUID{}).Default(uuid.New),
 		field.String("name").NotEmpty().Annotations(entgql.OrderField("NAME")),
-		field.Enum("status").GoType(Status("")).Default(StatusActive.String()).Annotations(entgql.OrderField("STATUS")),
+		field.Bool("active").Default(true),
 		field.Time("deleted_at").Nillable().Optional(),
 	}
 }
@@ -47,6 +47,6 @@ func (Class) Indexes() []ent.Index {
 	return []ent.Index{
 		index.Edges("stage"),
 		index.Edges("teacher"),
-		index.Fields("status"),
+		index.Fields("active"),
 	}
 }

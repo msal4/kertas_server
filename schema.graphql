@@ -13,11 +13,6 @@ type PageInfo {
   endCursor: Cursor
 }
 
-enum Status {
-  DISABLED
-  ACTIVE
-}
-
 enum State {
   PRESENT
   ABSENT
@@ -55,7 +50,7 @@ input SchoolOrder {
 
 type School implements Node {
   id: ID!
-  status: Status!
+  active: Boolean!
   name: String!
   image: String
   createdAt: Time!
@@ -76,20 +71,20 @@ type SchoolConnection {
 input AddSchoolInput {
   name: String!
   image: Upload!
-  status: Status! = ACTIVE
+  active: Boolean! = true
 }
 
 input UpdateSchoolInput {
   name: String
   image: Upload
-  status: Status
+  active: Boolean
 }
 
 type Stage implements Node {
   id: ID!
   name: String!
   tuition_amount: Int!
-  status: Status!
+  active: Boolean!
   school: School!
   createdAt: Time!
   updatedAt: Time!
@@ -103,7 +98,7 @@ type User implements Node {
   phone: String!
   image: String!
   role: Role!
-  status: Status!
+  active: Boolean!
   school: School
   stage: Stage
   createdAt: Time!
@@ -128,7 +123,7 @@ input AddUserInput {
   phone: String!
   image: Upload
   role: Role! = STUDENT
-  status: Status! = ACTIVE
+  active: Boolean! = true
   school_id: ID
   stage_id: ID
 }
@@ -139,7 +134,7 @@ input UpdateUserInput {
   password: String
   phone: String
   image: Upload
-  status: Status
+  active: Boolean
   stage_id: ID
 }
 

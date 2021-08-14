@@ -36,7 +36,7 @@ func (User) Fields() []ent.Field {
 			"Teacher", "TEACHER",
 			"Student", "STUDENT",
 		).Default("STUDENT").Annotations(entgql.OrderField("ROLE")),
-		field.Enum("status").GoType(Status("")).Default(StatusActive.String()).Annotations(entgql.OrderField("STATUS")),
+		field.Bool("active").Default(true),
 		field.Time("deleted_at").Nillable().Optional(),
 	}
 }
@@ -65,7 +65,7 @@ func (User) Indexes() []ent.Index {
 	return []ent.Index{
 		index.Edges("stage"),
 		index.Edges("school"),
-		index.Fields("status"),
+		index.Fields("active"),
 		index.Fields("role"),
 	}
 }

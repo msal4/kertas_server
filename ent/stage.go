@@ -9,7 +9,6 @@ import (
 
 	"entgo.io/ent/dialect/sql"
 	"github.com/google/uuid"
-	"github.com/msal4/hassah_school_server/ent/schema"
 	"github.com/msal4/hassah_school_server/ent/school"
 	"github.com/msal4/hassah_school_server/ent/stage"
 )
@@ -27,8 +26,8 @@ type Stage struct {
 	Name string `json:"name,omitempty"`
 	// TuitionAmount holds the value of the "tuition_amount" field.
 	TuitionAmount int `json:"tuition_amount,omitempty"`
-	// Status holds the value of the "status" field.
-	Status schema.Status `json:"status,omitempty"`
+	// Active holds the value of the "active" field.
+	Active bool `json:"active,omitempty"`
 	// DeletedAt holds the value of the "deleted_at" field.
 	DeletedAt *time.Time `json:"deleted_at,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
@@ -98,9 +97,11 @@ func (*Stage) scanValues(columns []string) ([]interface{}, error) {
 	values := make([]interface{}, len(columns))
 	for i := range columns {
 		switch columns[i] {
+		case stage.FieldActive:
+			values[i] = new(sql.NullBool)
 		case stage.FieldTuitionAmount:
 			values[i] = new(sql.NullInt64)
-		case stage.FieldName, stage.FieldStatus:
+		case stage.FieldName:
 			values[i] = new(sql.NullString)
 		case stage.FieldCreatedAt, stage.FieldUpdatedAt, stage.FieldDeletedAt:
 			values[i] = new(sql.NullTime)
@@ -153,11 +154,11 @@ func (s *Stage) assignValues(columns []string, values []interface{}) error {
 			} else if value.Valid {
 				s.TuitionAmount = int(value.Int64)
 			}
-		case stage.FieldStatus:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field status", values[i])
+		case stage.FieldActive:
+			if value, ok := values[i].(*sql.NullBool); !ok {
+				return fmt.Errorf("unexpected type %T for field active", values[i])
 			} else if value.Valid {
-				s.Status = schema.Status(value.String)
+				s.Active = value.Bool
 			}
 		case stage.FieldDeletedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
@@ -229,8 +230,8 @@ func (s *Stage) String() string {
 	builder.WriteString(s.Name)
 	builder.WriteString(", tuition_amount=")
 	builder.WriteString(fmt.Sprintf("%v", s.TuitionAmount))
-	builder.WriteString(", status=")
-	builder.WriteString(fmt.Sprintf("%v", s.Status))
+	builder.WriteString(", active=")
+	builder.WriteString(fmt.Sprintf("%v", s.Active))
 	if v := s.DeletedAt; v != nil {
 		builder.WriteString(", deleted_at=")
 		builder.WriteString(v.Format(time.ANSIC))

@@ -18,7 +18,6 @@ import (
 	"github.com/msal4/hassah_school_server/ent"
 	"github.com/msal4/hassah_school_server/ent/attendance"
 	"github.com/msal4/hassah_school_server/ent/group"
-	"github.com/msal4/hassah_school_server/ent/schema"
 	"github.com/msal4/hassah_school_server/ent/schema/uuidgql"
 	"github.com/msal4/hassah_school_server/ent/user"
 	"github.com/msal4/hassah_school_server/graph/model"
@@ -74,11 +73,11 @@ type ComplexityRoot struct {
 	}
 
 	School struct {
+		Active    func(childComplexity int) int
 		CreatedAt func(childComplexity int) int
 		ID        func(childComplexity int) int
 		Image     func(childComplexity int) int
 		Name      func(childComplexity int) int
-		Status    func(childComplexity int) int
 		UpdatedAt func(childComplexity int) int
 	}
 
@@ -94,16 +93,17 @@ type ComplexityRoot struct {
 	}
 
 	Stage struct {
+		Active        func(childComplexity int) int
 		CreatedAt     func(childComplexity int) int
 		ID            func(childComplexity int) int
 		Name          func(childComplexity int) int
 		School        func(childComplexity int) int
-		Status        func(childComplexity int) int
 		TuitionAmount func(childComplexity int) int
 		UpdatedAt     func(childComplexity int) int
 	}
 
 	User struct {
+		Active    func(childComplexity int) int
 		CreatedAt func(childComplexity int) int
 		ID        func(childComplexity int) int
 		Image     func(childComplexity int) int
@@ -113,7 +113,6 @@ type ComplexityRoot struct {
 		Role      func(childComplexity int) int
 		School    func(childComplexity int) int
 		Stage     func(childComplexity int) int
-		Status    func(childComplexity int) int
 		UpdatedAt func(childComplexity int) int
 		Username  func(childComplexity int) int
 	}
@@ -282,6 +281,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Query.Schools(childComplexity, args["after"].(*ent.Cursor), args["first"].(*int), args["before"].(*ent.Cursor), args["last"].(*int), args["orderBy"].(*ent.SchoolOrder), args["where"].(*ent.SchoolWhereInput)), true
 
+	case "School.active":
+		if e.complexity.School.Active == nil {
+			break
+		}
+
+		return e.complexity.School.Active(childComplexity), true
+
 	case "School.createdAt":
 		if e.complexity.School.CreatedAt == nil {
 			break
@@ -309,13 +315,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.School.Name(childComplexity), true
-
-	case "School.status":
-		if e.complexity.School.Status == nil {
-			break
-		}
-
-		return e.complexity.School.Status(childComplexity), true
 
 	case "School.updatedAt":
 		if e.complexity.School.UpdatedAt == nil {
@@ -359,6 +358,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.SchoolEdge.Node(childComplexity), true
 
+	case "Stage.active":
+		if e.complexity.Stage.Active == nil {
+			break
+		}
+
+		return e.complexity.Stage.Active(childComplexity), true
+
 	case "Stage.createdAt":
 		if e.complexity.Stage.CreatedAt == nil {
 			break
@@ -387,13 +393,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Stage.School(childComplexity), true
 
-	case "Stage.status":
-		if e.complexity.Stage.Status == nil {
-			break
-		}
-
-		return e.complexity.Stage.Status(childComplexity), true
-
 	case "Stage.tuition_amount":
 		if e.complexity.Stage.TuitionAmount == nil {
 			break
@@ -407,6 +406,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Stage.UpdatedAt(childComplexity), true
+
+	case "User.active":
+		if e.complexity.User.Active == nil {
+			break
+		}
+
+		return e.complexity.User.Active(childComplexity), true
 
 	case "User.createdAt":
 		if e.complexity.User.CreatedAt == nil {
@@ -470,13 +476,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.User.Stage(childComplexity), true
-
-	case "User.status":
-		if e.complexity.User.Status == nil {
-			break
-		}
-
-		return e.complexity.User.Status(childComplexity), true
 
 	case "User.updatedAt":
 		if e.complexity.User.UpdatedAt == nil {
@@ -606,11 +605,6 @@ type PageInfo {
   endCursor: Cursor
 }
 
-enum Status {
-  DISABLED
-  ACTIVE
-}
-
 enum State {
   PRESENT
   ABSENT
@@ -648,7 +642,7 @@ input SchoolOrder {
 
 type School implements Node {
   id: ID!
-  status: Status!
+  active: Boolean!
   name: String!
   image: String
   createdAt: Time!
@@ -669,20 +663,20 @@ type SchoolConnection {
 input AddSchoolInput {
   name: String!
   image: Upload!
-  status: Status! = ACTIVE
+  active: Boolean! = true
 }
 
 input UpdateSchoolInput {
   name: String
   image: Upload
-  status: Status
+  active: Boolean
 }
 
 type Stage implements Node {
   id: ID!
   name: String!
   tuition_amount: Int!
-  status: Status!
+  active: Boolean!
   school: School!
   createdAt: Time!
   updatedAt: Time!
@@ -696,7 +690,7 @@ type User implements Node {
   phone: String!
   image: String!
   role: Role!
-  status: Status!
+  active: Boolean!
   school: School
   stage: Stage
   createdAt: Time!
@@ -721,7 +715,7 @@ input AddUserInput {
   phone: String!
   image: Upload
   role: Role! = STUDENT
-  status: Status! = ACTIVE
+  active: Boolean! = true
   school_id: ID
   stage_id: ID
 }
@@ -732,7 +726,7 @@ input UpdateUserInput {
   password: String
   phone: String
   image: Upload
-  status: Status
+  active: Boolean
   stage_id: ID
 }
 
@@ -752,33 +746,79 @@ type Mutation {
 }
 `, BuiltIn: false},
 	{Name: "ent.graphql", Input: `"""
-ScheduleWhereInput is used for filtering Schedule objects.
+AssignmentWhereInput is used for filtering Assignment objects.
 Input was generated by ent.
 """
-input ScheduleWhereInput {
-  not: ScheduleWhereInput
-  and: [ScheduleWhereInput!]
-  or: [ScheduleWhereInput!]
+input AssignmentWhereInput {
+  not: AssignmentWhereInput
+  and: [AssignmentWhereInput!]
+  or: [AssignmentWhereInput!]
   
-  """weekday field predicates"""
-  weekday: Int
-  weekdayNEQ: Int
-  weekdayIn: [Int!]
-  weekdayNotIn: [Int!]
-  weekdayGT: Int
-  weekdayGTE: Int
-  weekdayLT: Int
-  weekdayLTE: Int
+  """created_at field predicates"""
+  createdAt: Time
+  createdAtNEQ: Time
+  createdAtIn: [Time!]
+  createdAtNotIn: [Time!]
+  createdAtGT: Time
+  createdAtGTE: Time
+  createdAtLT: Time
+  createdAtLTE: Time
   
-  """starts_at field predicates"""
-  startsAt: Time
-  startsAtNEQ: Time
-  startsAtIn: [Time!]
-  startsAtNotIn: [Time!]
-  startsAtGT: Time
-  startsAtGTE: Time
-  startsAtLT: Time
-  startsAtLTE: Time
+  """updated_at field predicates"""
+  updatedAt: Time
+  updatedAtNEQ: Time
+  updatedAtIn: [Time!]
+  updatedAtNotIn: [Time!]
+  updatedAtGT: Time
+  updatedAtGTE: Time
+  updatedAtLT: Time
+  updatedAtLTE: Time
+  
+  """name field predicates"""
+  name: String
+  nameNEQ: String
+  nameIn: [String!]
+  nameNotIn: [String!]
+  nameGT: String
+  nameGTE: String
+  nameLT: String
+  nameLTE: String
+  nameContains: String
+  nameHasPrefix: String
+  nameHasSuffix: String
+  nameEqualFold: String
+  nameContainsFold: String
+  
+  """description field predicates"""
+  description: String
+  descriptionNEQ: String
+  descriptionIn: [String!]
+  descriptionNotIn: [String!]
+  descriptionGT: String
+  descriptionGTE: String
+  descriptionLT: String
+  descriptionLTE: String
+  descriptionContains: String
+  descriptionHasPrefix: String
+  descriptionHasSuffix: String
+  descriptionIsNil: Boolean
+  descriptionNotNil: Boolean
+  descriptionEqualFold: String
+  descriptionContainsFold: String
+  
+  """is_exam field predicates"""
+  isExam: Boolean
+  isExamNEQ: Boolean
+  
+  """due_date field predicates"""
+  dueDate: Time
+  dueDateNEQ: Time
+  dueDateIn: [Time!]
+  dueDateNotIn: [Time!]
+  dueDateGT: Time
+  dueDateGTE: Time
+  dueDateLT: Time
+  dueDateLTE: Time
   
   """duration field predicates"""
   duration: Int
@@ -789,6 +829,20 @@ input ScheduleWhereInput {
   durationGTE: Int
   durationLT: Int
   durationLTE: Int
+  durationIsNil: Boolean
+  durationNotNil: Boolean
+  
+  """deleted_at field predicates"""
+  deletedAt: Time
+  deletedAtNEQ: Time
+  deletedAtIn: [Time!]
+  deletedAtNotIn: [Time!]
+  deletedAtGT: Time
+  deletedAtGTE: Time
+  deletedAtLT: Time
+  deletedAtLTE: Time
+  deletedAtIsNil: Boolean
+  deletedAtNotNil: Boolean
   
   """id field predicates"""
   id: ID
@@ -803,16 +857,146 @@ input ScheduleWhereInput {
   """class edge predicates"""
   hasClass: Boolean
   hasClassWith: [ClassWhereInput!]
+  
+  """submissions edge predicates"""
+  hasSubmissions: Boolean
+  hasSubmissionsWith: [AssignmentSubmissionWhereInput!]
+  
+  """grades edge predicates"""
+  hasGrades: Boolean
+  hasGradesWith: [GradeWhereInput!]
 }
 
 """
-SchoolWhereInput is used for filtering School objects.
+AttendanceWhereInput is used for filtering Attendance objects.
 Input was generated by ent.
 """
-input SchoolWhereInput {
-  not: SchoolWhereInput
-  and: [SchoolWhereInput!]
-  or: [SchoolWhereInput!]
+input AttendanceWhereInput {
+  not: AttendanceWhereInput
+  and: [AttendanceWhereInput!]
+  or: [AttendanceWhereInput!]
+  
+  """created_at field predicates"""
+  createdAt: Time
+  createdAtNEQ: Time
+  createdAtIn: [Time!]
+  createdAtNotIn: [Time!]
+  createdAtGT: Time
+  createdAtGTE: Time
+  createdAtLT: Time
+  createdAtLTE: Time
+  
+  """updated_at field predicates"""
+  updatedAt: Time
+  updatedAtNEQ: Time
+  updatedAtIn: [Time!]
+  updatedAtNotIn: [Time!]
+  updatedAtGT: Time
+  updatedAtGTE: Time
+  updatedAtLT: Time
+  updatedAtLTE: Time
+  
+  """date field predicates"""
+  date: Time
+  dateNEQ: Time
+  dateIn: [Time!]
+  dateNotIn: [Time!]
+  dateGT: Time
+  dateGTE: Time
+  dateLT: Time
+  dateLTE: Time
+  
+  """state field predicates"""
+  state: State
+  stateNEQ: State
+  stateIn: [State!]
+  stateNotIn: [State!]
+  
+  """id field predicates"""
+  id: ID
+  idNEQ: ID
+  idIn: [ID!]
+  idNotIn: [ID!]
+  idGT: ID
+  idGTE: ID
+  idLT: ID
+  idLTE: ID
+  
+  """class edge predicates"""
+  hasClass: Boolean
+  hasClassWith: [ClassWhereInput!]
+  
+  """student edge predicates"""
+  hasStudent: Boolean
+  hasStudentWith: [UserWhereInput!]
+}
+
+"""
+GradeWhereInput is used for filtering Grade objects.
+Input was generated by ent.
+"""
+input GradeWhereInput {
+  not: GradeWhereInput
+  and: [GradeWhereInput!]
+  or: [GradeWhereInput!]
+  
+  """created_at field predicates"""
+  createdAt: Time
+  createdAtNEQ: Time
+  createdAtIn: [Time!]
+  createdAtNotIn: [Time!]
+  createdAtGT: Time
+  createdAtGTE: Time
+  createdAtLT: Time
+  createdAtLTE: Time
+  
+  """updated_at field predicates"""
+  updatedAt: Time
+  updatedAtNEQ: Time
+  updatedAtIn: [Time!]
+  updatedAtNotIn: [Time!]
+  updatedAtGT: Time
+  updatedAtGTE: Time
+  updatedAtLT: Time
+  updatedAtLTE: Time
+  
+  """exam_grade field predicates"""
+  examGrade: Int
+  examGradeNEQ: Int
+  examGradeIn: [Int!]
+  examGradeNotIn: [Int!]
+  examGradeGT: Int
+  examGradeGTE: Int
+  examGradeLT: Int
+  examGradeLTE: Int
+  
+  """id field predicates"""
+  id: ID
+  idNEQ: ID
+  idIn: [ID!]
+  idNotIn: [ID!]
+  idGT: ID
+  idGTE: ID
+  idLT: ID
+  idLTE: ID
+  
+  """student edge predicates"""
+  hasStudent: Boolean
+  hasStudentWith: [UserWhereInput!]
+  
+  """exam edge predicates"""
+  hasExam: Boolean
+  hasExamWith: [AssignmentWhereInput!]
+}
+
+"""
+GroupWhereInput is used for filtering Group objects.
+Input was generated by ent.
+"""
+input GroupWhereInput {
+  not: GroupWhereInput
+  and: [GroupWhereInput!]
+  or: [GroupWhereInput!]
   
   """created_at field predicates"""
   createdAt: Time
@@ -846,44 +1030,20 @@ input SchoolWhereInput {
   nameContains: String
   nameHasPrefix: String
   nameHasSuffix: String
+  nameIsNil: Boolean
+  nameNotNil: Boolean
   nameEqualFold: String
   nameContainsFold: String
   
-  """image field predicates"""
-  image: String
-  imageNEQ: String
-  imageIn: [String!]
-  imageNotIn: [String!]
-  imageGT: String
-  imageGTE: String
-  imageLT: String
-  imageLTE: String
-  imageContains: String
-  imageHasPrefix: String
-  imageHasSuffix: String
-  imageEqualFold: String
-  imageContainsFold: String
+  """group_type field predicates"""
+  groupType: GroupType
+  groupTypeNEQ: GroupType
+  groupTypeIn: [GroupType!]
+  groupTypeNotIn: [GroupType!]
   
-  """directory field predicates"""
-  directory: String
-  directoryNEQ: String
-  directoryIn: [String!]
-  directoryNotIn: [String!]
-  directoryGT: String
-  directoryGTE: String
-  directoryLT: String
-  directoryLTE: String
-  directoryContains: String
-  directoryHasPrefix: String
-  directoryHasSuffix: String
-  directoryEqualFold: String
-  directoryContainsFold: String
-  
-  """status field predicates"""
-  status: Status
-  statusNEQ: Status
-  statusIn: [Status!]
-  statusNotIn: [Status!]
+  """active field predicates"""
+  active: Boolean
+  activeNEQ: Boolean
   
   """deleted_at field predicates"""
   deletedAt: Time
@@ -907,112 +1067,13 @@ input SchoolWhereInput {
   idLT: ID
   idLTE: ID
   
-  """users edge predicates"""
-  hasUsers: Boolean
-  hasUsersWith: [UserWhereInput!]
+  """class edge predicates"""
+  hasClass: Boolean
+  hasClassWith: [ClassWhereInput!]
   
-  """stages edge predicates"""
-  hasStages: Boolean
-  hasStagesWith: [StageWhereInput!]
-}
-
-"""
-StageWhereInput is used for filtering Stage objects.
-Input was generated by ent.
-"""
-input StageWhereInput {
-  not: StageWhereInput
-  and: [StageWhereInput!]
-  or: [StageWhereInput!]
-  
-  """created_at field predicates"""
-  createdAt: Time
-  createdAtNEQ: Time
-  createdAtIn: [Time!]
-  createdAtNotIn: [Time!]
-  createdAtGT: Time
-  createdAtGTE: Time
-  createdAtLT: Time
-  createdAtLTE: Time
-  
-  """updated_at field predicates"""
-  updatedAt: Time
-  updatedAtNEQ: Time
-  updatedAtIn: [Time!]
-  updatedAtNotIn: [Time!]
-  updatedAtGT: Time
-  updatedAtGTE: Time
-  updatedAtLT: Time
-  updatedAtLTE: Time
-  
-  """name field predicates"""
-  name: String
-  nameNEQ: String
-  nameIn: [String!]
-  nameNotIn: [String!]
-  nameGT: String
-  nameGTE: String
-  nameLT: String
-  nameLTE: String
-  nameContains: String
-  nameHasPrefix: String
-  nameHasSuffix: String
-  nameEqualFold: String
-  nameContainsFold: String
-  
-  """tuition_amount field predicates"""
-  tuitionAmount: Int
-  tuitionAmountNEQ: Int
-  tuitionAmountIn: [Int!]
-  tuitionAmountNotIn: [Int!]
-  tuitionAmountGT: Int
-  tuitionAmountGTE: Int
-  tuitionAmountLT: Int
-  tuitionAmountLTE: Int
-  
-  """status field predicates"""
-  status: Status
-  statusNEQ: Status
-  statusIn: [Status!]
-  statusNotIn: [Status!]
-  
-  """deleted_at field predicates"""
-  deletedAt: Time
-  deletedAtNEQ: Time
-  deletedAtIn: [Time!]
-  deletedAtNotIn: [Time!]
-  deletedAtGT: Time
-  deletedAtGTE: Time
-  deletedAtLT: Time
-  deletedAtLTE: Time
-  deletedAtIsNil: Boolean
-  deletedAtNotNil: Boolean
-  
-  """id field predicates"""
-  id: ID
-  idNEQ: ID
-  idIn: [ID!]
-  idNotIn: [ID!]
-  idGT: ID
-  idGTE: ID
-  idLT: ID
-  idLTE: ID
-  
-  """school edge predicates"""
-  hasSchool: Boolean
-  hasSchoolWith: [SchoolWhereInput!]
-  
-  """classes edge predicates"""
-  hasClasses: Boolean
-  hasClassesWith: [ClassWhereInput!]
-  
-  """payments edge predicates"""
-  hasPayments: Boolean
-  hasPaymentsWith: [TuitionPaymentWhereInput!]
-  
-  """students edge predicates"""
-  hasStudents: Boolean
-  hasStudentsWith: [UserWhereInput!]
+  """messages edge predicates"""
+  hasMessages: Boolean
+  hasMessagesWith: [MessageWhereInput!]
 }
 
 """
@@ -1152,11 +1213,9 @@ input UserWhereInput {
   roleIn: [Role!]
   roleNotIn: [Role!]
   
-  """status field predicates"""
-  status: Status
-  statusNEQ: Status
-  statusIn: [Status!]
-  statusNotIn: [Status!]
+  """active field predicates"""
+  active: Boolean
+  activeNEQ: Boolean
   
   """deleted_at field predicates"""
   deletedAt: Time
@@ -1207,128 +1266,6 @@ input UserWhereInput {
   """payments edge predicates"""
   hasPayments: Boolean
   hasPaymentsWith: [TuitionPaymentWhereInput!]
-  
-  """grades edge predicates"""
-  hasGrades: Boolean
-  hasGradesWith: [GradeWhereInput!]
-}
-
-"""
-AssignmentWhereInput is used for filtering Assignment objects.
-Input was generated by ent.
-"""
-input AssignmentWhereInput {
-  not: AssignmentWhereInput
-  and: [AssignmentWhereInput!]
-  or: [AssignmentWhereInput!]
-  
-  """created_at field predicates"""
-  createdAt: Time
-  createdAtNEQ: Time
-  createdAtIn: [Time!]
-  createdAtNotIn: [Time!]
-  createdAtGT: Time
-  createdAtGTE: Time
-  createdAtLT: Time
-  createdAtLTE: Time
-  
-  """updated_at field predicates"""
-  updatedAt: Time
-  updatedAtNEQ: Time
-  updatedAtIn: [Time!]
-  updatedAtNotIn: [Time!]
-  updatedAtGT: Time
-  updatedAtGTE: Time
-  updatedAtLT: Time
-  updatedAtLTE: Time
-  
-  """name field predicates"""
-  name: String
-  nameNEQ: String
-  nameIn: [String!]
-  nameNotIn: [String!]
-  nameGT: String
-  nameGTE: String
-  nameLT: String
-  nameLTE: String
-  nameContains: String
-  nameHasPrefix: String
-  nameHasSuffix: String
-  nameEqualFold: String
-  nameContainsFold: String
-  
-  """description field predicates"""
-  description: String
-  descriptionNEQ: String
-  descriptionIn: [String!]
-  descriptionNotIn: [String!]
-  descriptionGT: String
-  descriptionGTE: String
-  descriptionLT: String
-  descriptionLTE: String
-  descriptionContains: String
-  descriptionHasPrefix: String
-  descriptionHasSuffix: String
-  descriptionIsNil: Boolean
-  descriptionNotNil: Boolean
-  descriptionEqualFold: String
-  descriptionContainsFold: String
-  
-  """is_exam field predicates"""
-  isExam: Boolean
-  isExamNEQ: Boolean
-  
-  """due_date field predicates"""
-  dueDate: Time
-  dueDateNEQ: Time
-  dueDateIn: [Time!]
-  dueDateNotIn: [Time!]
-  dueDateGT: Time
-  dueDateGTE: Time
-  dueDateLT: Time
-  dueDateLTE: Time
-  
-  """duration field predicates"""
-  duration: Int
-  durationNEQ: Int
-  durationIn: [Int!]
-  durationNotIn: [Int!]
-  durationGT: Int
-  durationGTE: Int
-  durationLT: Int
-  durationLTE: Int
-  durationIsNil: Boolean
-  durationNotNil: Boolean
-  
-  """deleted_at field predicates"""
-  deletedAt: Time
-  deletedAtNEQ: Time
-  deletedAtIn: [Time!]
-  deletedAtNotIn: [Time!]
-  deletedAtGT: Time
-  deletedAtGTE: Time
-  deletedAtLT: Time
-  deletedAtLTE: Time
-  deletedAtIsNil: Boolean
-  deletedAtNotNil: Boolean
-  
-  """id field predicates"""
-  id: ID
-  idNEQ: ID
-  idIn: [ID!]
-  idNotIn: [ID!]
-  idGT: ID
-  idGTE: ID
-  idLT: ID
-  idLTE: ID
-  
-  """class edge predicates"""
-  hasClass: Boolean
-  hasClassWith: [ClassWhereInput!]
-  
-  """submissions edge predicates"""
-  hasSubmissions: Boolean
-  hasSubmissionsWith: [AssignmentSubmissionWhereInput!]
   
   """grades edge predicates"""
   hasGrades: Boolean
@@ -1396,159 +1333,6 @@ input AssignmentSubmissionWhereInput {
 }
 
 """
-AttendanceWhereInput is used for filtering Attendance objects.
-Input was generated by ent.
-"""
-input AttendanceWhereInput {
-  not: AttendanceWhereInput
-  and: [AttendanceWhereInput!]
-  or: [AttendanceWhereInput!]
-  
-  """created_at field predicates"""
-  createdAt: Time
-  createdAtNEQ: Time
-  createdAtIn: [Time!]
-  createdAtNotIn: [Time!]
-  createdAtGT: Time
-  createdAtGTE: Time
-  createdAtLT: Time
-  createdAtLTE: Time
-  
-  """updated_at field predicates"""
-  updatedAt: Time
-  updatedAtNEQ: Time
-  updatedAtIn: [Time!]
-  updatedAtNotIn: [Time!]
-  updatedAtGT: Time
-  updatedAtGTE: Time
-  updatedAtLT: Time
-  updatedAtLTE: Time
-  
-  """date field predicates"""
-  date: Time
-  dateNEQ: Time
-  dateIn: [Time!]
-  dateNotIn: [Time!]
-  dateGT: Time
-  dateGTE: Time
-  dateLT: Time
-  dateLTE: Time
-  
-  """state field predicates"""
-  state: State
-  stateNEQ: State
-  stateIn: [State!]
-  stateNotIn: [State!]
-  
-  """id field predicates"""
-  id: ID
-  idNEQ: ID
-  idIn: [ID!]
-  idNotIn: [ID!]
-  idGT: ID
-  idGTE: ID
-  idLT: ID
-  idLTE: ID
-  
-  """class edge predicates"""
-  hasClass: Boolean
-  hasClassWith: [ClassWhereInput!]
-  
-  """student edge predicates"""
-  hasStudent: Boolean
-  hasStudentWith: [UserWhereInput!]
-}
-
-"""
-GroupWhereInput is used for filtering Group objects.
-Input was generated by ent.
-"""
-input GroupWhereInput {
-  not: GroupWhereInput
-  and: [GroupWhereInput!]
-  or: [GroupWhereInput!]
-  
-  """created_at field predicates"""
-  createdAt: Time
-  createdAtNEQ: Time
-  createdAtIn: [Time!]
-  createdAtNotIn: [Time!]
-  createdAtGT: Time
-  createdAtGTE: Time
-  createdAtLT: Time
-  createdAtLTE: Time
-  
-  """updated_at field predicates"""
-  updatedAt: Time
-  updatedAtNEQ: Time
-  updatedAtIn: [Time!]
-  updatedAtNotIn: [Time!]
-  updatedAtGT: Time
-  updatedAtGTE: Time
-  updatedAtLT: Time
-  updatedAtLTE: Time
-  
-  """name field predicates"""
-  name: String
-  nameNEQ: String
-  nameIn: [String!]
-  nameNotIn: [String!]
-  nameGT: String
-  nameGTE: String
-  nameLT: String
-  nameLTE: String
-  nameContains: String
-  nameHasPrefix: String
-  nameHasSuffix: String
-  nameIsNil: Boolean
-  nameNotNil: Boolean
-  nameEqualFold: String
-  nameContainsFold: String
-  
-  """group_type field predicates"""
-  groupType: GroupType
-  groupTypeNEQ: GroupType
-  groupTypeIn: [GroupType!]
-  groupTypeNotIn: [GroupType!]
-  
-  """status field predicates"""
-  status: Status
-  statusNEQ: Status
-  statusIn: [Status!]
-  statusNotIn: [Status!]
-  
-  """deleted_at field predicates"""
-  deletedAt: Time
-  deletedAtNEQ: Time
-  deletedAtIn: [Time!]
-  deletedAtNotIn: [Time!]
-  deletedAtGT: Time
-  deletedAtGTE: Time
-  deletedAtLT: Time
-  deletedAtLTE: Time
-  deletedAtIsNil: Boolean
-  deletedAtNotNil: Boolean
-  
-  """id field predicates"""
-  id: ID
-  idNEQ: ID
-  idIn: [ID!]
-  idNotIn: [ID!]
-  idGT: ID
-  idGTE: ID
-  idLT: ID
-  idLTE: ID
-  
-  """class edge predicates"""
-  hasClass: Boolean
-  hasClassWith: [ClassWhereInput!]
-  
-  """messages edge predicates"""
-  hasMessages: Boolean
-  hasMessagesWith: [MessageWhereInput!]
-}
-
-"""
 ClassWhereInput is used for filtering Class objects.
 Input was generated by ent.
 """
@@ -1592,11 +1376,9 @@ input ClassWhereInput {
   nameEqualFold: String
   nameContainsFold: String
   
-  """status field predicates"""
-  status: Status
-  statusNEQ: Status
-  statusIn: [Status!]
-  statusNotIn: [Status!]
+  """active field predicates"""
+  active: Boolean
+  activeNEQ: Boolean
   
   """deleted_at field predicates"""
   deletedAt: Time
@@ -1643,64 +1425,6 @@ input ClassWhereInput {
   """schedules edge predicates"""
   hasSchedules: Boolean
   hasSchedulesWith: [ScheduleWhereInput!]
-}
-
-"""
-GradeWhereInput is used for filtering Grade objects.
-Input was generated by ent.
-"""
-input GradeWhereInput {
-  not: GradeWhereInput
-  and: [GradeWhereInput!]
-  or: [GradeWhereInput!]
-  
-  """created_at field predicates"""
-  createdAt: Time
-  createdAtNEQ: Time
-  createdAtIn: [Time!]
-  createdAtNotIn: [Time!]
-  createdAtGT: Time
-  createdAtGTE: Time
-  createdAtLT: Time
-  createdAtLTE: Time
-  
-  """updated_at field predicates"""
-  updatedAt: Time
-  updatedAtNEQ: Time
-  updatedAtIn: [Time!]
-  updatedAtNotIn: [Time!]
-  updatedAtGT: Time
-  updatedAtGTE: Time
-  updatedAtLT: Time
-  updatedAtLTE: Time
-  
-  """exam_grade field predicates"""
-  examGrade: Int
-  examGradeNEQ: Int
-  examGradeIn: [Int!]
-  examGradeNotIn: [Int!]
-  examGradeGT: Int
-  examGradeGTE: Int
-  examGradeLT: Int
-  examGradeLTE: Int
-  
-  """id field predicates"""
-  id: ID
-  idNEQ: ID
-  idIn: [ID!]
-  idNotIn: [ID!]
-  idGT: ID
-  idGTE: ID
-  idLT: ID
-  idLTE: ID
-  
-  """student edge predicates"""
-  hasStudent: Boolean
-  hasStudentWith: [UserWhereInput!]
-  
-  """exam edge predicates"""
-  hasExam: Boolean
-  hasExamWith: [AssignmentWhereInput!]
 }
 
 """
@@ -1795,6 +1519,266 @@ input MessageWhereInput {
   """owner edge predicates"""
   hasOwner: Boolean
   hasOwnerWith: [UserWhereInput!]
+}
+
+"""
+ScheduleWhereInput is used for filtering Schedule objects.
+Input was generated by ent.
+"""
+input ScheduleWhereInput {
+  not: ScheduleWhereInput
+  and: [ScheduleWhereInput!]
+  or: [ScheduleWhereInput!]
+  
+  """weekday field predicates"""
+  weekday: Int
+  weekdayNEQ: Int
+  weekdayIn: [Int!]
+  weekdayNotIn: [Int!]
+  weekdayGT: Int
+  weekdayGTE: Int
+  weekdayLT: Int
+  weekdayLTE: Int
+  
+  """starts_at field predicates"""
+  startsAt: Time
+  startsAtNEQ: Time
+  startsAtIn: [Time!]
+  startsAtNotIn: [Time!]
+  startsAtGT: Time
+  startsAtGTE: Time
+  startsAtLT: Time
+  startsAtLTE: Time
+  
+  """duration field predicates"""
+  duration: Int
+  durationNEQ: Int
+  durationIn: [Int!]
+  durationNotIn: [Int!]
+  durationGT: Int
+  durationGTE: Int
+  durationLT: Int
+  durationLTE: Int
+  
+  """id field predicates"""
+  id: ID
+  idNEQ: ID
+  idIn: [ID!]
+  idNotIn: [ID!]
+  idGT: ID
+  idGTE: ID
+  idLT: ID
+  idLTE: ID
+  
+  """class edge predicates"""
+  hasClass: Boolean
+  hasClassWith: [ClassWhereInput!]
+}
+
+"""
+SchoolWhereInput is used for filtering School objects.
+Input was generated by ent.
+"""
+input SchoolWhereInput {
+  not: SchoolWhereInput
+  and: [SchoolWhereInput!]
+  or: [SchoolWhereInput!]
+  
+  """created_at field predicates"""
+  createdAt: Time
+  createdAtNEQ: Time
+  createdAtIn: [Time!]
+  createdAtNotIn: [Time!]
+  createdAtGT: Time
+  createdAtGTE: Time
+  createdAtLT: Time
+  createdAtLTE: Time
+  
+  """updated_at field predicates"""
+  updatedAt: Time
+  updatedAtNEQ: Time
+  updatedAtIn: [Time!]
+  updatedAtNotIn: [Time!]
+  updatedAtGT: Time
+  updatedAtGTE: Time
+  updatedAtLT: Time
+  updatedAtLTE: Time
+  
+  """name field predicates"""
+  name: String
+  nameNEQ: String
+  nameIn: [String!]
+  nameNotIn: [String!]
+  nameGT: String
+  nameGTE: String
+  nameLT: String
+  nameLTE: String
+  nameContains: String
+  nameHasPrefix: String
+  nameHasSuffix: String
+  nameEqualFold: String
+  nameContainsFold: String
+  
+  """image field predicates"""
+  image: String
+  imageNEQ: String
+  imageIn: [String!]
+  imageNotIn: [String!]
+  imageGT: String
+  imageGTE: String
+  imageLT: String
+  imageLTE: String
+  imageContains: String
+  imageHasPrefix: String
+  imageHasSuffix: String
+  imageEqualFold: String
+  imageContainsFold: String
+  
+  """directory field predicates"""
+  directory: String
+  directoryNEQ: String
+  directoryIn: [String!]
+  directoryNotIn: [String!]
+  directoryGT: String
+  directoryGTE: String
+  directoryLT: String
+  directoryLTE: String
+  directoryContains: String
+  directoryHasPrefix: String
+  directoryHasSuffix: String
+  directoryEqualFold: String
+  directoryContainsFold: String
+  
+  """active field predicates"""
+  active: Boolean
+  activeNEQ: Boolean
+  
+  """deleted_at field predicates"""
+  deletedAt: Time
+  deletedAtNEQ: Time
+  deletedAtIn: [Time!]
+  deletedAtNotIn: [Time!]
+  deletedAtGT: Time
+  deletedAtGTE: Time
+  deletedAtLT: Time
+  deletedAtLTE: Time
+  deletedAtIsNil: Boolean
+  deletedAtNotNil: Boolean
+  
+  """id field predicates"""
+  id: ID
+  idNEQ: ID
+  idIn: [ID!]
+  idNotIn: [ID!]
+  idGT: ID
+  idGTE: ID
+  idLT: ID
+  idLTE: ID
+  
+  """users edge predicates"""
+  hasUsers: Boolean
+  hasUsersWith: [UserWhereInput!]
+  
+  """stages edge predicates"""
+  hasStages: Boolean
+  hasStagesWith: [StageWhereInput!]
+}
+
+"""
+StageWhereInput is used for filtering Stage objects.
+Input was generated by ent.
+"""
+input StageWhereInput {
+  not: StageWhereInput
+  and: [StageWhereInput!]
+  or: [StageWhereInput!]
+  
+  """created_at field predicates"""
+  createdAt: Time
+  createdAtNEQ: Time
+  createdAtIn: [Time!]
+  createdAtNotIn: [Time!]
+  createdAtGT: Time
+  createdAtGTE: Time
+  createdAtLT: Time
+  createdAtLTE: Time
+  
+  """updated_at field predicates"""
+  updatedAt: Time
+  updatedAtNEQ: Time
+  updatedAtIn: [Time!]
+  updatedAtNotIn: [Time!]
+  updatedAtGT: Time
+  updatedAtGTE: Time
+  updatedAtLT: Time
+  updatedAtLTE: Time
+  
+  """name field predicates"""
+  name: String
+  nameNEQ: String
+  nameIn: [String!]
+  nameNotIn: [String!]
+  nameGT: String
+  nameGTE: String
+  nameLT: String
+  nameLTE: String
+  nameContains: String
+  nameHasPrefix: String
+  nameHasSuffix: String
+  nameEqualFold: String
+  nameContainsFold: String
+  
+  """tuition_amount field predicates"""
+  tuitionAmount: Int
+  tuitionAmountNEQ: Int
+  tuitionAmountIn: [Int!]
+  tuitionAmountNotIn: [Int!]
+  tuitionAmountGT: Int
+  tuitionAmountGTE: Int
+  tuitionAmountLT: Int
+  tuitionAmountLTE: Int
+  
+  """active field predicates"""
+  active: Boolean
+  activeNEQ: Boolean
+  
+  """deleted_at field predicates"""
+  deletedAt: Time
+  deletedAtNEQ: Time
+  deletedAtIn: [Time!]
+  deletedAtNotIn: [Time!]
+  deletedAtGT: Time
+  deletedAtGTE: Time
+  deletedAtLT: Time
+  deletedAtLTE: Time
+  deletedAtIsNil: Boolean
+  deletedAtNotNil: Boolean
+  
+  """id field predicates"""
+  id: ID
+  idNEQ: ID
+  idIn: [ID!]
+  idNotIn: [ID!]
+  idGT: ID
+  idGTE: ID
+  idLT: ID
+  idLTE: ID
+  
+  """school edge predicates"""
+  hasSchool: Boolean
+  hasSchoolWith: [SchoolWhereInput!]
+  
+  """classes edge predicates"""
+  hasClasses: Boolean
+  hasClassesWith: [ClassWhereInput!]
+  
+  """payments edge predicates"""
+  hasPayments: Boolean
+  hasPaymentsWith: [TuitionPaymentWhereInput!]
+  
+  """students edge predicates"""
+  hasStudents: Boolean
+  hasStudentsWith: [UserWhereInput!]
 }
 
 """
@@ -2656,7 +2640,7 @@ func (ec *executionContext) _School_id(ctx context.Context, field graphql.Collec
 	return ec.marshalNID2githubᚗcomᚋgoogleᚋuuidᚐUUID(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _School_status(ctx context.Context, field graphql.CollectedField, obj *ent.School) (ret graphql.Marshaler) {
+func (ec *executionContext) _School_active(ctx context.Context, field graphql.CollectedField, obj *ent.School) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -2674,7 +2658,7 @@ func (ec *executionContext) _School_status(ctx context.Context, field graphql.Co
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Status, nil
+		return obj.Active, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2686,9 +2670,9 @@ func (ec *executionContext) _School_status(ctx context.Context, field graphql.Co
 		}
 		return graphql.Null
 	}
-	res := resTmp.(schema.Status)
+	res := resTmp.(bool)
 	fc.Result = res
-	return ec.marshalNStatus2githubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚋschemaᚐStatus(ctx, field.Selections, res)
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _School_name(ctx context.Context, field graphql.CollectedField, obj *ent.School) (ret graphql.Marshaler) {
@@ -3102,7 +3086,7 @@ func (ec *executionContext) _Stage_tuition_amount(ctx context.Context, field gra
 	return ec.marshalNInt2int(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Stage_status(ctx context.Context, field graphql.CollectedField, obj *ent.Stage) (ret graphql.Marshaler) {
+func (ec *executionContext) _Stage_active(ctx context.Context, field graphql.CollectedField, obj *ent.Stage) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -3120,7 +3104,7 @@ func (ec *executionContext) _Stage_status(ctx context.Context, field graphql.Col
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Status, nil
+		return obj.Active, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -3132,9 +3116,9 @@ func (ec *executionContext) _Stage_status(ctx context.Context, field graphql.Col
 		}
 		return graphql.Null
 	}
-	res := resTmp.(schema.Status)
+	res := resTmp.(bool)
 	fc.Result = res
-	return ec.marshalNStatus2githubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚋschemaᚐStatus(ctx, field.Selections, res)
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Stage_school(ctx context.Context, field graphql.CollectedField, obj *ent.Stage) (ret graphql.Marshaler) {
@@ -3487,7 +3471,7 @@ func (ec *executionContext) _User_role(ctx context.Context, field graphql.Collec
 	return ec.marshalNRole2githubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚋuserᚐRole(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _User_status(ctx context.Context, field graphql.CollectedField, obj *ent.User) (ret graphql.Marshaler) {
+func (ec *executionContext) _User_active(ctx context.Context, field graphql.CollectedField, obj *ent.User) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -3505,7 +3489,7 @@ func (ec *executionContext) _User_status(ctx context.Context, field graphql.Coll
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Status, nil
+		return obj.Active, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -3517,9 +3501,9 @@ func (ec *executionContext) _User_status(ctx context.Context, field graphql.Coll
 		}
 		return graphql.Null
 	}
-	res := resTmp.(schema.Status)
+	res := resTmp.(bool)
 	fc.Result = res
-	return ec.marshalNStatus2githubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚋschemaᚐStatus(ctx, field.Selections, res)
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _User_school(ctx context.Context, field graphql.CollectedField, obj *ent.User) (ret graphql.Marshaler) {
@@ -4916,8 +4900,8 @@ func (ec *executionContext) unmarshalInputAddSchoolInput(ctx context.Context, ob
 	var it model.AddSchoolInput
 	var asMap = obj.(map[string]interface{})
 
-	if _, present := asMap["status"]; !present {
-		asMap["status"] = "ACTIVE"
+	if _, present := asMap["active"]; !present {
+		asMap["active"] = true
 	}
 
 	for k, v := range asMap {
@@ -4938,11 +4922,11 @@ func (ec *executionContext) unmarshalInputAddSchoolInput(ctx context.Context, ob
 			if err != nil {
 				return it, err
 			}
-		case "status":
+		case "active":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("status"))
-			it.Status, err = ec.unmarshalNStatus2githubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚋschemaᚐStatus(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("active"))
+			it.Active, err = ec.unmarshalNBoolean2bool(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -4959,8 +4943,8 @@ func (ec *executionContext) unmarshalInputAddUserInput(ctx context.Context, obj 
 	if _, present := asMap["role"]; !present {
 		asMap["role"] = "STUDENT"
 	}
-	if _, present := asMap["status"]; !present {
-		asMap["status"] = "ACTIVE"
+	if _, present := asMap["active"]; !present {
+		asMap["active"] = true
 	}
 
 	for k, v := range asMap {
@@ -5013,11 +4997,11 @@ func (ec *executionContext) unmarshalInputAddUserInput(ctx context.Context, obj 
 			if err != nil {
 				return it, err
 			}
-		case "status":
+		case "active":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("status"))
-			it.Status, err = ec.unmarshalNStatus2githubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚋschemaᚐStatus(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("active"))
+			it.Active, err = ec.unmarshalNBoolean2bool(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -6741,35 +6725,19 @@ func (ec *executionContext) unmarshalInputClassWhereInput(ctx context.Context, o
 			if err != nil {
 				return it, err
 			}
-		case "status":
+		case "active":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("status"))
-			it.Status, err = ec.unmarshalOStatus2ᚖgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚋschemaᚐStatus(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("active"))
+			it.Active, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
 			if err != nil {
 				return it, err
 			}
-		case "statusNEQ":
+		case "activeNEQ":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("statusNEQ"))
-			it.StatusNEQ, err = ec.unmarshalOStatus2ᚖgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚋschemaᚐStatus(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "statusIn":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("statusIn"))
-			it.StatusIn, err = ec.unmarshalOStatus2ᚕgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚋschemaᚐStatusᚄ(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "statusNotIn":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("statusNotIn"))
-			it.StatusNotIn, err = ec.unmarshalOStatus2ᚕgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚋschemaᚐStatusᚄ(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("activeNEQ"))
+			it.ActiveNEQ, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -7653,35 +7621,19 @@ func (ec *executionContext) unmarshalInputGroupWhereInput(ctx context.Context, o
 			if err != nil {
 				return it, err
 			}
-		case "status":
+		case "active":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("status"))
-			it.Status, err = ec.unmarshalOStatus2ᚖgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚋschemaᚐStatus(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("active"))
+			it.Active, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
 			if err != nil {
 				return it, err
 			}
-		case "statusNEQ":
+		case "activeNEQ":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("statusNEQ"))
-			it.StatusNEQ, err = ec.unmarshalOStatus2ᚖgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚋschemaᚐStatus(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "statusIn":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("statusIn"))
-			it.StatusIn, err = ec.unmarshalOStatus2ᚕgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚋschemaᚐStatusᚄ(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "statusNotIn":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("statusNotIn"))
-			it.StatusNotIn, err = ec.unmarshalOStatus2ᚕgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚋschemaᚐStatusᚄ(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("activeNEQ"))
+			it.ActiveNEQ, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -9253,35 +9205,19 @@ func (ec *executionContext) unmarshalInputSchoolWhereInput(ctx context.Context, 
 			if err != nil {
 				return it, err
 			}
-		case "status":
+		case "active":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("status"))
-			it.Status, err = ec.unmarshalOStatus2ᚖgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚋschemaᚐStatus(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("active"))
+			it.Active, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
 			if err != nil {
 				return it, err
 			}
-		case "statusNEQ":
+		case "activeNEQ":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("statusNEQ"))
-			it.StatusNEQ, err = ec.unmarshalOStatus2ᚖgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚋschemaᚐStatus(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "statusIn":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("statusIn"))
-			it.StatusIn, err = ec.unmarshalOStatus2ᚕgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚋschemaᚐStatusᚄ(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "statusNotIn":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("statusNotIn"))
-			it.StatusNotIn, err = ec.unmarshalOStatus2ᚕgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚋschemaᚐStatusᚄ(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("activeNEQ"))
+			it.ActiveNEQ, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -9793,35 +9729,19 @@ func (ec *executionContext) unmarshalInputStageWhereInput(ctx context.Context, o
 			if err != nil {
 				return it, err
 			}
-		case "status":
+		case "active":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("status"))
-			it.Status, err = ec.unmarshalOStatus2ᚖgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚋschemaᚐStatus(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("active"))
+			it.Active, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
 			if err != nil {
 				return it, err
 			}
-		case "statusNEQ":
+		case "activeNEQ":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("statusNEQ"))
-			it.StatusNEQ, err = ec.unmarshalOStatus2ᚖgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚋschemaᚐStatus(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "statusIn":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("statusIn"))
-			it.StatusIn, err = ec.unmarshalOStatus2ᚕgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚋschemaᚐStatusᚄ(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "statusNotIn":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("statusNotIn"))
-			it.StatusNotIn, err = ec.unmarshalOStatus2ᚕgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚋschemaᚐStatusᚄ(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("activeNEQ"))
+			it.ActiveNEQ, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -10385,11 +10305,11 @@ func (ec *executionContext) unmarshalInputUpdateSchoolInput(ctx context.Context,
 			if err != nil {
 				return it, err
 			}
-		case "status":
+		case "active":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("status"))
-			it.Status, err = ec.unmarshalOStatus2ᚖgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚋschemaᚐStatus(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("active"))
+			it.Active, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -10445,11 +10365,11 @@ func (ec *executionContext) unmarshalInputUpdateUserInput(ctx context.Context, o
 			if err != nil {
 				return it, err
 			}
-		case "status":
+		case "active":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("status"))
-			it.Status, err = ec.unmarshalOStatus2ᚖgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚋschemaᚐStatus(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("active"))
+			it.Active, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -11361,35 +11281,19 @@ func (ec *executionContext) unmarshalInputUserWhereInput(ctx context.Context, ob
 			if err != nil {
 				return it, err
 			}
-		case "status":
+		case "active":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("status"))
-			it.Status, err = ec.unmarshalOStatus2ᚖgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚋschemaᚐStatus(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("active"))
+			it.Active, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
 			if err != nil {
 				return it, err
 			}
-		case "statusNEQ":
+		case "activeNEQ":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("statusNEQ"))
-			it.StatusNEQ, err = ec.unmarshalOStatus2ᚖgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚋschemaᚐStatus(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "statusIn":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("statusIn"))
-			it.StatusIn, err = ec.unmarshalOStatus2ᚕgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚋschemaᚐStatusᚄ(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "statusNotIn":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("statusNotIn"))
-			it.StatusNotIn, err = ec.unmarshalOStatus2ᚕgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚋschemaᚐStatusᚄ(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("activeNEQ"))
+			it.ActiveNEQ, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -11851,8 +11755,8 @@ func (ec *executionContext) _School(ctx context.Context, sel ast.SelectionSet, o
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
-		case "status":
-			out.Values[i] = ec._School_status(ctx, field, obj)
+		case "active":
+			out.Values[i] = ec._School_active(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -11973,8 +11877,8 @@ func (ec *executionContext) _Stage(ctx context.Context, sel ast.SelectionSet, ob
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
-		case "status":
-			out.Values[i] = ec._Stage_status(ctx, field, obj)
+		case "active":
+			out.Values[i] = ec._Stage_active(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
@@ -12059,8 +11963,8 @@ func (ec *executionContext) _User(ctx context.Context, sel ast.SelectionSet, obj
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
-		case "status":
-			out.Values[i] = ec._User_status(ctx, field, obj)
+		case "active":
+			out.Values[i] = ec._User_active(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
@@ -12581,16 +12485,6 @@ func (ec *executionContext) unmarshalNState2githubᚗcomᚋmsal4ᚋhassah_school
 }
 
 func (ec *executionContext) marshalNState2githubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚋattendanceᚐState(ctx context.Context, sel ast.SelectionSet, v attendance.State) graphql.Marshaler {
-	return v
-}
-
-func (ec *executionContext) unmarshalNStatus2githubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚋschemaᚐStatus(ctx context.Context, v interface{}) (schema.Status, error) {
-	var res schema.Status
-	err := res.UnmarshalGQL(v)
-	return res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) marshalNStatus2githubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚋschemaᚐStatus(ctx context.Context, sel ast.SelectionSet, v schema.Status) graphql.Marshaler {
 	return v
 }
 
@@ -13676,86 +13570,6 @@ func (ec *executionContext) unmarshalOState2ᚖgithubᚗcomᚋmsal4ᚋhassah_sch
 }
 
 func (ec *executionContext) marshalOState2ᚖgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚋattendanceᚐState(ctx context.Context, sel ast.SelectionSet, v *attendance.State) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	return v
-}
-
-func (ec *executionContext) unmarshalOStatus2ᚕgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚋschemaᚐStatusᚄ(ctx context.Context, v interface{}) ([]schema.Status, error) {
-	if v == nil {
-		return nil, nil
-	}
-	var vSlice []interface{}
-	if v != nil {
-		if tmp1, ok := v.([]interface{}); ok {
-			vSlice = tmp1
-		} else {
-			vSlice = []interface{}{v}
-		}
-	}
-	var err error
-	res := make([]schema.Status, len(vSlice))
-	for i := range vSlice {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
-		res[i], err = ec.unmarshalNStatus2githubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚋschemaᚐStatus(ctx, vSlice[i])
-		if err != nil {
-			return nil, err
-		}
-	}
-	return res, nil
-}
-
-func (ec *executionContext) marshalOStatus2ᚕgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚋschemaᚐStatusᚄ(ctx context.Context, sel ast.SelectionSet, v []schema.Status) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	ret := make(graphql.Array, len(v))
-	var wg sync.WaitGroup
-	isLen1 := len(v) == 1
-	if !isLen1 {
-		wg.Add(len(v))
-	}
-	for i := range v {
-		i := i
-		fc := &graphql.FieldContext{
-			Index:  &i,
-			Result: &v[i],
-		}
-		ctx := graphql.WithFieldContext(ctx, fc)
-		f := func(i int) {
-			defer func() {
-				if r := recover(); r != nil {
-					ec.Error(ctx, ec.Recover(ctx, r))
-					ret = nil
-				}
-			}()
-			if !isLen1 {
-				defer wg.Done()
-			}
-			ret[i] = ec.marshalNStatus2githubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚋschemaᚐStatus(ctx, sel, v[i])
-		}
-		if isLen1 {
-			f(i)
-		} else {
-			go f(i)
-		}
-
-	}
-	wg.Wait()
-	return ret
-}
-
-func (ec *executionContext) unmarshalOStatus2ᚖgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚋschemaᚐStatus(ctx context.Context, v interface{}) (*schema.Status, error) {
-	if v == nil {
-		return nil, nil
-	}
-	var res = new(schema.Status)
-	err := res.UnmarshalGQL(v)
-	return res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) marshalOStatus2ᚖgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚋschemaᚐStatus(ctx context.Context, sel ast.SelectionSet, v *schema.Status) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}

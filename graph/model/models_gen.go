@@ -5,14 +5,13 @@ package model
 import (
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/google/uuid"
-	"github.com/msal4/hassah_school_server/ent/schema"
 	"github.com/msal4/hassah_school_server/ent/user"
 )
 
 type AddSchoolInput struct {
 	Name   string         `json:"name"`
 	Image  graphql.Upload `json:"image"`
-	Status schema.Status  `json:"status"`
+	Active bool           `json:"active"`
 }
 
 type AddUserInput struct {
@@ -22,7 +21,7 @@ type AddUserInput struct {
 	Phone    string          `json:"phone"`
 	Image    *graphql.Upload `json:"image"`
 	Role     user.Role       `json:"role"`
-	Status   schema.Status   `json:"status"`
+	Active   bool            `json:"active"`
 	SchoolID *uuid.UUID      `json:"school_id"`
 	StageID  *uuid.UUID      `json:"stage_id"`
 }
@@ -30,7 +29,7 @@ type AddUserInput struct {
 type UpdateSchoolInput struct {
 	Name   *string         `json:"name"`
 	Image  *graphql.Upload `json:"image"`
-	Status *schema.Status  `json:"status"`
+	Active *bool           `json:"active"`
 }
 
 type UpdateUserInput struct {
@@ -39,6 +38,6 @@ type UpdateUserInput struct {
 	Password *string         `json:"password"`
 	Phone    *string         `json:"phone"`
 	Image    *graphql.Upload `json:"image"`
-	Status   *schema.Status  `json:"status"`
+	Active   *bool           `json:"active"`
 	StageID  *uuid.UUID      `json:"stage_id"`
 }

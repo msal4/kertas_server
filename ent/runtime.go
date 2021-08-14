@@ -109,6 +109,10 @@ func init() {
 	classDescName := classFields[1].Descriptor()
 	// class.NameValidator is a validator for the "name" field. It is called by the builders before save.
 	class.NameValidator = classDescName.Validators[0].(func(string) error)
+	// classDescActive is the schema descriptor for active field.
+	classDescActive := classFields[2].Descriptor()
+	// class.DefaultActive holds the default value on creation for the active field.
+	class.DefaultActive = classDescActive.Default.(bool)
 	// classDescID is the schema descriptor for id field.
 	classDescID := classFields[0].Descriptor()
 	// class.DefaultID holds the default value on creation for the id field.
@@ -151,6 +155,10 @@ func init() {
 	group.DefaultUpdatedAt = groupDescUpdatedAt.Default.(func() time.Time)
 	// group.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
 	group.UpdateDefaultUpdatedAt = groupDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// groupDescActive is the schema descriptor for active field.
+	groupDescActive := groupFields[3].Descriptor()
+	// group.DefaultActive holds the default value on creation for the active field.
+	group.DefaultActive = groupDescActive.Default.(bool)
 	// groupDescID is the schema descriptor for id field.
 	groupDescID := groupFields[0].Descriptor()
 	// group.DefaultID holds the default value on creation for the id field.
@@ -229,6 +237,10 @@ func init() {
 	schoolDescDirectory := schoolFields[3].Descriptor()
 	// school.DirectoryValidator is a validator for the "directory" field. It is called by the builders before save.
 	school.DirectoryValidator = schoolDescDirectory.Validators[0].(func(string) error)
+	// schoolDescActive is the schema descriptor for active field.
+	schoolDescActive := schoolFields[4].Descriptor()
+	// school.DefaultActive holds the default value on creation for the active field.
+	school.DefaultActive = schoolDescActive.Default.(bool)
 	// schoolDescID is the schema descriptor for id field.
 	schoolDescID := schoolFields[0].Descriptor()
 	// school.DefaultID holds the default value on creation for the id field.
@@ -252,6 +264,10 @@ func init() {
 	stageDescName := stageFields[1].Descriptor()
 	// stage.NameValidator is a validator for the "name" field. It is called by the builders before save.
 	stage.NameValidator = stageDescName.Validators[0].(func(string) error)
+	// stageDescActive is the schema descriptor for active field.
+	stageDescActive := stageFields[3].Descriptor()
+	// stage.DefaultActive holds the default value on creation for the active field.
+	stage.DefaultActive = stageDescActive.Default.(bool)
 	// stageDescID is the schema descriptor for id field.
 	stageDescID := stageFields[0].Descriptor()
 	// stage.DefaultID holds the default value on creation for the id field.
@@ -314,6 +330,10 @@ func init() {
 	userDescTokenVersion := userFields[7].Descriptor()
 	// user.DefaultTokenVersion holds the default value on creation for the token_version field.
 	user.DefaultTokenVersion = userDescTokenVersion.Default.(int)
+	// userDescActive is the schema descriptor for active field.
+	userDescActive := userFields[9].Descriptor()
+	// user.DefaultActive holds the default value on creation for the active field.
+	user.DefaultActive = userDescActive.Default.(bool)
 	// userDescID is the schema descriptor for id field.
 	userDescID := userFields[0].Descriptor()
 	// user.DefaultID holds the default value on creation for the id field.

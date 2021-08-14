@@ -18,7 +18,6 @@ import (
 	"github.com/msal4/hassah_school_server/ent/group"
 	"github.com/msal4/hassah_school_server/ent/predicate"
 	"github.com/msal4/hassah_school_server/ent/schedule"
-	"github.com/msal4/hassah_school_server/ent/schema"
 	"github.com/msal4/hassah_school_server/ent/stage"
 	"github.com/msal4/hassah_school_server/ent/user"
 )
@@ -42,16 +41,16 @@ func (cu *ClassUpdate) SetName(s string) *ClassUpdate {
 	return cu
 }
 
-// SetStatus sets the "status" field.
-func (cu *ClassUpdate) SetStatus(s schema.Status) *ClassUpdate {
-	cu.mutation.SetStatus(s)
+// SetActive sets the "active" field.
+func (cu *ClassUpdate) SetActive(b bool) *ClassUpdate {
+	cu.mutation.SetActive(b)
 	return cu
 }
 
-// SetNillableStatus sets the "status" field if the given value is not nil.
-func (cu *ClassUpdate) SetNillableStatus(s *schema.Status) *ClassUpdate {
-	if s != nil {
-		cu.SetStatus(*s)
+// SetNillableActive sets the "active" field if the given value is not nil.
+func (cu *ClassUpdate) SetNillableActive(b *bool) *ClassUpdate {
+	if b != nil {
+		cu.SetActive(*b)
 	}
 	return cu
 }
@@ -316,11 +315,6 @@ func (cu *ClassUpdate) check() error {
 			return &ValidationError{Name: "name", err: fmt.Errorf("ent: validator failed for field \"name\": %w", err)}
 		}
 	}
-	if v, ok := cu.mutation.Status(); ok {
-		if err := class.StatusValidator(v); err != nil {
-			return &ValidationError{Name: "status", err: fmt.Errorf("ent: validator failed for field \"status\": %w", err)}
-		}
-	}
 	if _, ok := cu.mutation.StageID(); cu.mutation.StageCleared() && !ok {
 		return errors.New("ent: clearing a required unique edge \"stage\"")
 	}
@@ -365,11 +359,11 @@ func (cu *ClassUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Column: class.FieldName,
 		})
 	}
-	if value, ok := cu.mutation.Status(); ok {
+	if value, ok := cu.mutation.Active(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeEnum,
+			Type:   field.TypeBool,
 			Value:  value,
-			Column: class.FieldStatus,
+			Column: class.FieldActive,
 		})
 	}
 	if value, ok := cu.mutation.DeletedAt(); ok {
@@ -677,16 +671,16 @@ func (cuo *ClassUpdateOne) SetName(s string) *ClassUpdateOne {
 	return cuo
 }
 
-// SetStatus sets the "status" field.
-func (cuo *ClassUpdateOne) SetStatus(s schema.Status) *ClassUpdateOne {
-	cuo.mutation.SetStatus(s)
+// SetActive sets the "active" field.
+func (cuo *ClassUpdateOne) SetActive(b bool) *ClassUpdateOne {
+	cuo.mutation.SetActive(b)
 	return cuo
 }
 
-// SetNillableStatus sets the "status" field if the given value is not nil.
-func (cuo *ClassUpdateOne) SetNillableStatus(s *schema.Status) *ClassUpdateOne {
-	if s != nil {
-		cuo.SetStatus(*s)
+// SetNillableActive sets the "active" field if the given value is not nil.
+func (cuo *ClassUpdateOne) SetNillableActive(b *bool) *ClassUpdateOne {
+	if b != nil {
+		cuo.SetActive(*b)
 	}
 	return cuo
 }
@@ -958,11 +952,6 @@ func (cuo *ClassUpdateOne) check() error {
 			return &ValidationError{Name: "name", err: fmt.Errorf("ent: validator failed for field \"name\": %w", err)}
 		}
 	}
-	if v, ok := cuo.mutation.Status(); ok {
-		if err := class.StatusValidator(v); err != nil {
-			return &ValidationError{Name: "status", err: fmt.Errorf("ent: validator failed for field \"status\": %w", err)}
-		}
-	}
 	if _, ok := cuo.mutation.StageID(); cuo.mutation.StageCleared() && !ok {
 		return errors.New("ent: clearing a required unique edge \"stage\"")
 	}
@@ -1024,11 +1013,11 @@ func (cuo *ClassUpdateOne) sqlSave(ctx context.Context) (_node *Class, err error
 			Column: class.FieldName,
 		})
 	}
-	if value, ok := cuo.mutation.Status(); ok {
+	if value, ok := cuo.mutation.Active(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeEnum,
+			Type:   field.TypeBool,
 			Value:  value,
-			Column: class.FieldStatus,
+			Column: class.FieldActive,
 		})
 	}
 	if value, ok := cuo.mutation.DeletedAt(); ok {
