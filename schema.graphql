@@ -156,4 +156,5 @@ type Mutation {
 
   addUser(input: AddUserInput!): User
   udpateUser(id: ID!, input: UpdateUserInput!): User
+  deleteUser(id: ID!): Boolean!
 }

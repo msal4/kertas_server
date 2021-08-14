@@ -33,6 +33,10 @@ func (r *mutationResolver) UdpateUser(ctx context.Context, id uuid.UUID, input m
 	return r.s.UpdateUser(ctx, id, input)
 }
 
+func (r *mutationResolver) DeleteUser(ctx context.Context, id uuid.UUID) (bool, error) {
+	return true, r.s.DeleteSchool(ctx, id)
+}
+
 func (r *queryResolver) School(ctx context.Context, id uuid.UUID) (*ent.School, error) {
 	return r.s.EC.School.Get(ctx, id)
 }

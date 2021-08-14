@@ -310,3 +310,46 @@ func TestUserUpdate(t *testing.T) {
 		require.NoError(t, err)
 	})
 }
+
+func TestDeleteUser(t *testing.T) {
+	s := newService(t)
+	defer s.EC.Close()
+	ctx := context.Background()
+
+	t.Run("valid", func(t *testing.T) {
+		f := testutil.OpenFile(t, "../testfiles/stanford.png")
+		defer f.Close()
+
+		u, err := s.AddUser(ctx, model.AddUserInput{
+			Name:     "test user",
+			Role:     user.RoleSUPER_ADMIN,
+			Status:   schema.StatusActive,
+			Username: "testusner",
+			Password: "testpassword",
+			Phone:    "testphone",
+			Image: &graphql.Upload{
+				File:        f,
+				Filename:    f.File.Name(),
+				Size:        f.Size(),
+				ContentType: f.ContentType,
+			},
+		})
+		require.NoError(t, err)
+		require.NotNil(t, u)
+
+		err = s.DeleteUser(ctx, u.ID)
+		require.NoError(t, err)
+
+		deleted, err := s.EC.User.Get(ctx, u.ID)
+		require.Error(t, err)
+		require.Nil(t, deleted)
+
+		_, err = s.MC.StatObject(ctx, s.Config.RootBucket, u.Image, minio.StatObjectOptions{})
+		require.Error(t, err)
+	})
+
+	t.Run("invalid non existing user", func(t *testing.T) {
+		err := s.DeleteUser(ctx, uuid.New())
+		require.Error(t, err)
+	})
+}

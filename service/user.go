@@ -4,8 +4,10 @@ import (
 	"context"
 	"fmt"
 	"path"
+	"strings"
 
 	"github.com/google/uuid"
+	"github.com/minio/minio-go/v7"
 	"github.com/msal4/hassah_school_server/ent"
 	"github.com/msal4/hassah_school_server/ent/user"
 	"github.com/msal4/hassah_school_server/graph/model"
@@ -121,4 +123,22 @@ func (s *Service) UpdateUser(ctx context.Context, id uuid.UUID, input model.Upda
 	}
 
 	return b.Save(ctx)
+}
+
+func (s *Service) DeleteUser(ctx context.Context, id uuid.UUID) error {
+	u, err := s.EC.User.Get(ctx, id)
+	if err != nil {
+		return err
+	}
+
+	if u.Image != "" {
+		if err := s.MC.RemoveObject(ctx, s.Config.RootBucket, u.Image, minio.RemoveObjectOptions{}); err != nil {
+			return err
+		}
+		if err := s.MC.RemoveObject(ctx, s.Config.RootBucket, strings.Replace(u.Image, thumbnailSuffix, hqSuffix, 1), minio.RemoveObjectOptions{}); err != nil {
+			return err
+		}
+	}
+
+	return s.EC.User.DeleteOneID(id).Exec(ctx)
 }
