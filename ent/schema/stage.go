@@ -35,7 +35,7 @@ func (Stage) Mixin() []ent.Mixin {
 // Edges of the Stage.
 func (Stage) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.From("school", School.Type).Ref("stages").Unique(),
+		edge.From("school", School.Type).Ref("stages").Unique().Required(),
 		edge.To("classes", Class.Type).Annotations(entsql.Annotation{OnDelete: entsql.Cascade}),
 		edge.To("payments", TuitionPayment.Type).Annotations(entsql.Annotation{OnDelete: entsql.Cascade}),
 		edge.To("students", User.Type).Annotations(entsql.Annotation{OnDelete: entsql.Cascade}),

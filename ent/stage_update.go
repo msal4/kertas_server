@@ -4,6 +4,7 @@ package ent
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"time"
 
@@ -88,14 +89,6 @@ func (su *StageUpdate) ClearDeletedAt() *StageUpdate {
 // SetSchoolID sets the "school" edge to the School entity by ID.
 func (su *StageUpdate) SetSchoolID(id uuid.UUID) *StageUpdate {
 	su.mutation.SetSchoolID(id)
-	return su
-}
-
-// SetNillableSchoolID sets the "school" edge to the School entity by ID if the given value is not nil.
-func (su *StageUpdate) SetNillableSchoolID(id *uuid.UUID) *StageUpdate {
-	if id != nil {
-		su = su.SetSchoolID(*id)
-	}
 	return su
 }
 
@@ -298,6 +291,9 @@ func (su *StageUpdate) check() error {
 		if err := stage.NameValidator(v); err != nil {
 			return &ValidationError{Name: "name", err: fmt.Errorf("ent: validator failed for field \"name\": %w", err)}
 		}
+	}
+	if _, ok := su.mutation.SchoolID(); su.mutation.SchoolCleared() && !ok {
+		return errors.New("ent: clearing a required unique edge \"school\"")
 	}
 	return nil
 }
@@ -643,14 +639,6 @@ func (suo *StageUpdateOne) SetSchoolID(id uuid.UUID) *StageUpdateOne {
 	return suo
 }
 
-// SetNillableSchoolID sets the "school" edge to the School entity by ID if the given value is not nil.
-func (suo *StageUpdateOne) SetNillableSchoolID(id *uuid.UUID) *StageUpdateOne {
-	if id != nil {
-		suo = suo.SetSchoolID(*id)
-	}
-	return suo
-}
-
 // SetSchool sets the "school" edge to the School entity.
 func (suo *StageUpdateOne) SetSchool(s *School) *StageUpdateOne {
 	return suo.SetSchoolID(s.ID)
@@ -857,6 +845,9 @@ func (suo *StageUpdateOne) check() error {
 		if err := stage.NameValidator(v); err != nil {
 			return &ValidationError{Name: "name", err: fmt.Errorf("ent: validator failed for field \"name\": %w", err)}
 		}
+	}
+	if _, ok := suo.mutation.SchoolID(); suo.mutation.SchoolCleared() && !ok {
+		return errors.New("ent: clearing a required unique edge \"school\"")
 	}
 	return nil
 }

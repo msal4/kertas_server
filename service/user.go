@@ -192,27 +192,82 @@ func (s *Service) generateTokens(u ent.User) (*model.AuthData, error) {
 	return &model.AuthData{AccessToken: accessStr, RefreshToken: refreshStr}, nil
 }
 
+var (
+	SchoolDisabledErr = errors.New("school is disabled")
+	StageDisabledErr  = errors.New("stage is disabled")
+	UserDisabledErr   = errors.New("user is disabled")
+	InvalidCredsErr   = errors.New("invalid credentials")
+	NotAllowedErr     = errors.New("not allowed")
+)
+
 func (s *Service) LoginAdmin(ctx context.Context, input model.LoginInput) (*model.AuthData, error) {
-	u, err := s.EC.User.Query().Where(user.Username(input.Username), user.Password(input.Password)).Only(ctx)
+	u, err := s.EC.User.Query().Where(user.Username(input.Username), user.Password(input.Password), user.DeletedAtIsNil()).Only(ctx)
 	if err != nil {
-		return nil, errors.New("invalid username or password")
+		return nil, InvalidCredsErr
 	}
 
 	if u.Role != user.RoleSuperAdmin && u.Role != user.RoleSchoolAdmin {
-		return nil, errors.New("not allowed")
+		return nil, NotAllowedErr
 	}
 
 	if !u.Active {
-		return nil, errors.New("this user is disabled")
-	}
-
-	if u.DeletedAt != nil {
-		return nil, &ent.NotFoundError{}
+		return nil, UserDisabledErr
 	}
 
 	sch, err := u.School(ctx)
-	if sch != nil && err == nil && (!sch.Active || sch.DeletedAt != nil) {
-		return nil, errors.New("school is disabled")
+	if sch != nil && err == nil {
+		if !sch.Active {
+			return nil, SchoolDisabledErr
+		}
+
+		if sch.DeletedAt != nil {
+			return nil, InvalidCredsErr
+		}
+	}
+
+	return s.generateTokens(*u)
+}
+
+func (s *Service) LoginUser(ctx context.Context, input model.LoginInput) (*model.AuthData, error) {
+	u, err := s.EC.User.Query().Where(user.Username(input.Username), user.Password(input.Password), user.DeletedAtIsNil()).Only(ctx)
+	if err != nil {
+		return nil, InvalidCredsErr
+	}
+
+	if u.Role != user.RoleTeacher && u.Role != user.RoleStudent {
+		return nil, NotAllowedErr
+	}
+
+	if !u.Active {
+		return nil, UserDisabledErr
+	}
+
+	sch, err := u.School(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	if !sch.Active {
+		return nil, SchoolDisabledErr
+	}
+
+	if sch.DeletedAt != nil {
+		return nil, InvalidCredsErr
+	}
+
+	if u.Role == user.RoleStudent {
+		stage, err := u.Stage(ctx)
+		if err != nil {
+			return nil, err
+		}
+
+		if !stage.Active {
+			return nil, StageDisabledErr
+		}
+
+		if stage.DeletedAt != nil {
+			return nil, InvalidCredsErr
+		}
 	}
 
 	return s.generateTokens(*u)

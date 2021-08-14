@@ -185,7 +185,7 @@ func (s *Stage) School(ctx context.Context) (*School, error) {
 	if IsNotLoaded(err) {
 		result, err = s.QuerySchool().Only(ctx)
 	}
-	return result, MaskNotFound(err)
+	return result, err
 }
 
 func (s *Stage) Classes(ctx context.Context) ([]*Class, error) {

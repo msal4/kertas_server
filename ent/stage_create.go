@@ -105,14 +105,6 @@ func (sc *StageCreate) SetSchoolID(id uuid.UUID) *StageCreate {
 	return sc
 }
 
-// SetNillableSchoolID sets the "school" edge to the School entity by ID if the given value is not nil.
-func (sc *StageCreate) SetNillableSchoolID(id *uuid.UUID) *StageCreate {
-	if id != nil {
-		sc = sc.SetSchoolID(*id)
-	}
-	return sc
-}
-
 // SetSchool sets the "school" edge to the School entity.
 func (sc *StageCreate) SetSchool(s *School) *StageCreate {
 	return sc.SetSchoolID(s.ID)
@@ -273,6 +265,9 @@ func (sc *StageCreate) check() error {
 	}
 	if _, ok := sc.mutation.Active(); !ok {
 		return &ValidationError{Name: "active", err: errors.New(`ent: missing required field "active"`)}
+	}
+	if _, ok := sc.mutation.SchoolID(); !ok {
+		return &ValidationError{Name: "school", err: errors.New("ent: missing required edge \"school\"")}
 	}
 	return nil
 }

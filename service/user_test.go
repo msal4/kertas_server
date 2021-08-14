@@ -423,6 +423,7 @@ func TestLoginAdmin(t *testing.T) {
 		})
 		require.Error(t, err)
 		require.Nil(t, resp)
+		require.ErrorIs(t, err, service.InvalidCredsErr)
 	})
 
 	t.Run("invalid username", func(t *testing.T) {
@@ -432,6 +433,7 @@ func TestLoginAdmin(t *testing.T) {
 		})
 		require.Error(t, err)
 		require.Nil(t, resp)
+		require.ErrorIs(t, err, service.InvalidCredsErr)
 	})
 
 	t.Run("disabled user", func(t *testing.T) {
@@ -453,6 +455,7 @@ func TestLoginAdmin(t *testing.T) {
 		})
 		require.Error(t, err)
 		require.Nil(t, resp)
+		require.ErrorIs(t, err, service.UserDisabledErr)
 	})
 
 	t.Run("deleted user", func(t *testing.T) {
@@ -476,6 +479,7 @@ func TestLoginAdmin(t *testing.T) {
 		})
 		require.Error(t, err)
 		require.Nil(t, resp)
+		require.ErrorIs(t, err, service.InvalidCredsErr)
 	})
 
 	t.Run("super admin", func(t *testing.T) {
@@ -579,6 +583,7 @@ func TestLoginAdmin(t *testing.T) {
 		})
 		require.Error(t, err)
 		require.Nil(t, resp)
+		require.ErrorIs(t, err, service.SchoolDisabledErr)
 
 		sch.Update().SetDeletedAt(time.Now()).SetActive(true).SaveX(ctx)
 
@@ -588,6 +593,7 @@ func TestLoginAdmin(t *testing.T) {
 		})
 		require.Error(t, err)
 		require.Nil(t, resp)
+		require.ErrorIs(t, err, service.InvalidCredsErr)
 	})
 
 	t.Run("teacher & student", func(t *testing.T) {
@@ -613,8 +619,9 @@ func TestLoginAdmin(t *testing.T) {
 		})
 		require.Error(t, err)
 		require.Nil(t, resp)
+		require.ErrorIs(t, err, service.NotAllowedErr)
 
-		stage := s.EC.Stage.Create().SetName("1st").SetTuitionAmount(1000).SetActive(true).SaveX(ctx)
+		stage := s.EC.Stage.Create().SetName("1st").SetTuitionAmount(1000).SetActive(true).SetSchool(sch).SaveX(ctx)
 		u.Update().SetStage(stage).SaveX(ctx)
 
 		resp, err = s.LoginAdmin(ctx, model.LoginInput{
@@ -623,5 +630,279 @@ func TestLoginAdmin(t *testing.T) {
 		})
 		require.Error(t, err)
 		require.Nil(t, resp)
+		require.ErrorIs(t, err, service.NotAllowedErr)
+	})
+}
+
+func TestLoginUser(t *testing.T) {
+	s := newService(t)
+	defer s.EC.Close()
+	ctx := context.Background()
+
+	sch := s.EC.School.Create().SetName("test school").SetActive(true).SetImage("hello").SetDirectory("whatev").SaveX(ctx)
+	stage := s.EC.Stage.Create().SetName("1st").SetTuitionAmount(1000).SetActive(true).SetSchool(sch).SaveX(ctx)
+
+	input := model.AddUserInput{
+		Name:     "test name",
+		Username: "testusername",
+		Password: "testpassword",
+		Phone:    "07705983835",
+		Role:     user.RoleStudent,
+		Active:   true,
+		SchoolID: &sch.ID,
+		StageID:  &stage.ID,
+	}
+
+	u, err := s.AddUser(ctx, input)
+	require.NoError(t, err)
+	require.NotNil(t, u)
+
+	t.Run("invalid password", func(t *testing.T) {
+		resp, err := s.LoginUser(ctx, model.LoginInput{
+			Username: input.Username,
+			Password: "wrongpassword",
+		})
+		require.Error(t, err)
+		require.Nil(t, resp)
+		require.ErrorIs(t, err, service.InvalidCredsErr)
+	})
+
+	t.Run("invalid username", func(t *testing.T) {
+		resp, err := s.LoginUser(ctx, model.LoginInput{
+			Username: input.Username + "whatever",
+			Password: input.Password,
+		})
+		require.Error(t, err)
+		require.Nil(t, resp)
+		require.ErrorIs(t, err, service.InvalidCredsErr)
+	})
+
+	t.Run("disabled user", func(t *testing.T) {
+		input := model.AddUserInput{
+			Name:     "test name",
+			Username: "stestusername22",
+			Password: "testpassword",
+			Phone:    "07705983835",
+			Role:     user.RoleStudent,
+			StageID:  &stage.ID,
+		}
+
+		u, err := s.AddUser(ctx, input)
+		require.NoError(t, err)
+		require.NotNil(t, u)
+
+		resp, err := s.LoginUser(ctx, model.LoginInput{
+			Username: input.Username,
+			Password: input.Password,
+		})
+		require.Error(t, err)
+		require.Nil(t, resp)
+		require.ErrorIs(t, err, service.UserDisabledErr)
+	})
+
+	t.Run("deleted user", func(t *testing.T) {
+		input := model.AddUserInput{
+			Name:     "test name",
+			Username: "test4username223",
+			Password: "testpassword",
+			Phone:    "07705983835",
+			Role:     user.RoleTeacher,
+			SchoolID: &sch.ID,
+			Active:   true,
+		}
+
+		u, err := s.AddUser(ctx, input)
+		u = u.Update().SetDeletedAt(time.Now()).SaveX(ctx)
+		require.NoError(t, err)
+		require.NotNil(t, u)
+
+		resp, err := s.LoginUser(ctx, model.LoginInput{
+			Username: input.Username,
+			Password: input.Password,
+		})
+		require.Error(t, err)
+		require.Nil(t, resp)
+		require.ErrorIs(t, err, service.InvalidCredsErr)
+	})
+
+	t.Run("student", func(t *testing.T) {
+		resp, err := s.LoginUser(ctx, model.LoginInput{
+			Username: input.Username,
+			Password: input.Password,
+		})
+		require.NoError(t, err)
+		require.NotNil(t, resp)
+		require.NotEmpty(t, resp.AccessToken)
+		require.NotEmpty(t, resp.RefreshToken)
+
+		var accessClaims service.AccessClaims
+		token, err := jwt.ParseWithClaims(resp.AccessToken, &accessClaims, func(t *jwt.Token) (interface{}, error) {
+			return s.Config.AccessSecretKey, nil
+		})
+		require.NoError(t, err)
+		require.NotNil(t, token)
+		require.True(t, token.Valid)
+		require.Equal(t, u.ID, accessClaims.UserID)
+		require.Equal(t, u.Role, accessClaims.Role)
+
+		var refreshClaims service.RefreshClaims
+		token, err = jwt.ParseWithClaims(resp.RefreshToken, &refreshClaims, func(t *jwt.Token) (interface{}, error) {
+			return s.Config.RefreshSecretKey, nil
+		})
+		require.NoError(t, err)
+		require.NotNil(t, token)
+		require.True(t, token.Valid)
+		require.Equal(t, u.ID, refreshClaims.UserID)
+		require.Equal(t, u.TokenVersion, refreshClaims.TokenVersion)
+	})
+
+	t.Run("teacher", func(t *testing.T) {
+		input := model.AddUserInput{
+			Name:     "test name",
+			Username: "testusernamesss",
+			Password: "testpassword",
+			Phone:    "07705983835",
+			Role:     user.RoleTeacher,
+			Active:   true,
+			SchoolID: &sch.ID,
+		}
+
+		u, err := s.AddUser(ctx, input)
+		require.NoError(t, err)
+		require.NotNil(t, u)
+
+		resp, err := s.LoginUser(ctx, model.LoginInput{
+			Username: input.Username,
+			Password: input.Password,
+		})
+		require.NoError(t, err)
+		require.NotNil(t, resp)
+		require.NotEmpty(t, resp.AccessToken)
+		require.NotEmpty(t, resp.RefreshToken)
+
+		var accessClaims service.AccessClaims
+		token, err := jwt.ParseWithClaims(resp.AccessToken, &accessClaims, func(t *jwt.Token) (interface{}, error) {
+			return s.Config.AccessSecretKey, nil
+		})
+		require.NoError(t, err)
+		require.NotNil(t, token)
+		require.True(t, token.Valid)
+		require.Equal(t, u.ID, accessClaims.UserID)
+		require.Equal(t, u.Role, accessClaims.Role)
+
+		var refreshClaims service.RefreshClaims
+		token, err = jwt.ParseWithClaims(resp.RefreshToken, &refreshClaims, func(t *jwt.Token) (interface{}, error) {
+			return s.Config.RefreshSecretKey, nil
+		})
+		require.NoError(t, err)
+		require.NotNil(t, token)
+		require.True(t, token.Valid)
+		require.Equal(t, u.ID, refreshClaims.UserID)
+		require.Equal(t, u.TokenVersion, refreshClaims.TokenVersion)
+	})
+
+	t.Run("disabled school", func(t *testing.T) {
+		sch := s.EC.School.Create().SetName("test school").SetActive(false).SetImage("hello").SetDirectory("whatev").SaveX(ctx)
+
+		input := model.AddUserInput{
+			Name:     "test name",
+			Username: "testusernam3242",
+			Password: "testpassword",
+			Phone:    "07705983835",
+			Role:     user.RoleTeacher,
+			Active:   true,
+			SchoolID: &sch.ID,
+		}
+
+		u, err := s.AddUser(ctx, input)
+		require.NoError(t, err)
+		require.NotNil(t, u)
+
+		resp, err := s.LoginUser(ctx, model.LoginInput{
+			Username: input.Username,
+			Password: input.Password,
+		})
+		require.Error(t, err)
+		require.Nil(t, resp)
+		require.ErrorIs(t, err, service.SchoolDisabledErr)
+
+		sch.Update().SetDeletedAt(time.Now()).SetActive(true).SaveX(ctx)
+
+		resp, err = s.LoginUser(ctx, model.LoginInput{
+			Username: input.Username,
+			Password: input.Password,
+		})
+		require.Error(t, err)
+		require.Nil(t, resp)
+		require.ErrorIs(t, err, service.InvalidCredsErr)
+	})
+
+	t.Run("disabled stage", func(t *testing.T) {
+		stage := s.EC.Stage.Create().SetName("test naem").SetActive(false).SetSchool(sch).SetTuitionAmount(100).SaveX(ctx)
+		input := model.AddUserInput{
+			Name:     "test name",
+			Username: "s3stestusernam3242",
+			Password: "testpassword",
+			Phone:    "07705983835",
+			Role:     user.RoleStudent,
+			Active:   true,
+			StageID:  &stage.ID,
+		}
+		u, err := s.AddUser(ctx, input)
+		require.NoError(t, err)
+		require.NotNil(t, u)
+
+		resp, err := s.LoginUser(ctx, model.LoginInput{
+			Username: input.Username,
+			Password: input.Password,
+		})
+		require.Error(t, err)
+		require.Nil(t, resp)
+		require.ErrorIs(t, err, service.StageDisabledErr)
+
+		stage.Update().SetDeletedAt(time.Now()).SetActive(true).SaveX(ctx)
+
+		resp, err = s.LoginUser(ctx, model.LoginInput{
+			Username: input.Username,
+			Password: input.Password,
+		})
+		require.Error(t, err)
+		require.Nil(t, resp)
+		require.ErrorIs(t, err, service.InvalidCredsErr)
+	})
+
+	t.Run("super admin & school admin", func(t *testing.T) {
+		sch := s.EC.School.Create().SetName("test school").SetActive(true).SetImage("hello").SetDirectory("whatev").SaveX(ctx)
+
+		input := model.AddUserInput{
+			Name:     "test name",
+			Username: "22testusernam3242",
+			Password: "testpassword",
+			Phone:    "07705983835",
+			Role:     user.RoleSuperAdmin,
+			Active:   true,
+		}
+
+		u, err := s.AddUser(ctx, input)
+		require.NoError(t, err)
+		require.NotNil(t, u)
+
+		resp, err := s.LoginUser(ctx, model.LoginInput{
+			Username: input.Username,
+			Password: input.Password,
+		})
+		require.Error(t, err)
+		require.Nil(t, resp)
+		require.ErrorIs(t, err, service.NotAllowedErr)
+
+		u.Update().SetRole(user.RoleSuperAdmin).SetSchool(sch).SaveX(ctx)
+
+		resp, err = s.LoginUser(ctx, model.LoginInput{
+			Username: input.Username,
+			Password: input.Password,
+		})
+		require.Error(t, err)
+		require.Nil(t, resp)
+		require.ErrorIs(t, err, service.NotAllowedErr)
 	})
 }

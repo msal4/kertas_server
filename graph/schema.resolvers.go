@@ -49,6 +49,10 @@ func (r *mutationResolver) LoginAdmin(ctx context.Context, input model.LoginInpu
 	return r.s.LoginAdmin(ctx, input)
 }
 
+func (r *mutationResolver) LoginUser(ctx context.Context, input model.LoginInput) (*model.AuthData, error) {
+	return r.s.LoginUser(ctx, input)
+}
+
 func (r *queryResolver) School(ctx context.Context, id uuid.UUID) (*ent.School, error) {
 	return r.s.EC.School.Get(ctx, id)
 }

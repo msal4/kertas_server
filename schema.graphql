@@ -164,4 +164,5 @@ type Mutation {
   deleteUserPermanently(id: ID!): Boolean!
 
   loginAdmin(input: LoginInput!): AuthData
+  loginUser(input: LoginInput!): AuthData
 }
