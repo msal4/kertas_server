@@ -165,4 +165,5 @@ type Mutation {
 
   loginAdmin(input: LoginInput!): AuthData
   loginUser(input: LoginInput!): AuthData
+  refreshTokens(token: String!): AuthData
 }

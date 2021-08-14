@@ -65,6 +65,7 @@ type ComplexityRoot struct {
 		DeleteUserPermanently   func(childComplexity int, id uuid.UUID) int
 		LoginAdmin              func(childComplexity int, input model.LoginInput) int
 		LoginUser               func(childComplexity int, input model.LoginInput) int
+		RefreshTokens           func(childComplexity int, token string) int
 		UdpateUser              func(childComplexity int, id uuid.UUID, input model.UpdateUserInput) int
 		UpdateSchool            func(childComplexity int, id uuid.UUID, input model.UpdateSchoolInput) int
 	}
@@ -148,6 +149,7 @@ type MutationResolver interface {
 	DeleteUserPermanently(ctx context.Context, id uuid.UUID) (bool, error)
 	LoginAdmin(ctx context.Context, input model.LoginInput) (*model.AuthData, error)
 	LoginUser(ctx context.Context, input model.LoginInput) (*model.AuthData, error)
+	RefreshTokens(ctx context.Context, token string) (*model.AuthData, error)
 }
 type QueryResolver interface {
 	School(ctx context.Context, id uuid.UUID) (*ent.School, error)
@@ -278,6 +280,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.LoginUser(childComplexity, args["input"].(model.LoginInput)), true
+
+	case "Mutation.refreshTokens":
+		if e.complexity.Mutation.RefreshTokens == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_refreshTokens_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.RefreshTokens(childComplexity, args["token"].(string)), true
 
 	case "Mutation.udpateUser":
 		if e.complexity.Mutation.UdpateUser == nil {
@@ -824,6 +838,7 @@ type Mutation {
 
   loginAdmin(input: LoginInput!): AuthData
   loginUser(input: LoginInput!): AuthData
+  refreshTokens(token: String!): AuthData
 }
 `, BuiltIn: false},
 	{Name: "ent.graphql", Input: `"""
@@ -2047,6 +2062,21 @@ func (ec *executionContext) field_Mutation_loginUser_args(ctx context.Context, r
 	return args, nil
 }
 
+func (ec *executionContext) field_Mutation_refreshTokens_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["token"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("token"))
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["token"] = arg0
+	return args, nil
+}
+
 func (ec *executionContext) field_Mutation_udpateUser_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -2682,6 +2712,45 @@ func (ec *executionContext) _Mutation_loginUser(ctx context.Context, field graph
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.Mutation().LoginUser(rctx, args["input"].(model.LoginInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.AuthData)
+	fc.Result = res
+	return ec.marshalOAuthData2ᚖgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋgraphᚋmodelᚐAuthData(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_refreshTokens(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_refreshTokens_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().RefreshTokens(rctx, args["token"].(string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -12052,6 +12121,8 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			out.Values[i] = ec._Mutation_loginAdmin(ctx, field)
 		case "loginUser":
 			out.Values[i] = ec._Mutation_loginUser(ctx, field)
+		case "refreshTokens":
+			out.Values[i] = ec._Mutation_refreshTokens(ctx, field)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}

@@ -906,3 +906,151 @@ func TestLoginUser(t *testing.T) {
 		require.ErrorIs(t, err, service.NotAllowedErr)
 	})
 }
+
+func TestRefreshTokens(t *testing.T) {
+	s := newService(t)
+	ctx := context.Background()
+
+	t.Run("valid", func(t *testing.T) {
+		input := model.AddUserInput{
+			Name:     "test name",
+			Username: "testusernamesss",
+			Password: "testpassword",
+			Phone:    "07705983835",
+			Role:     user.RoleSuperAdmin,
+			Active:   true,
+		}
+
+		u, err := s.AddUser(ctx, input)
+		require.NoError(t, err)
+		require.NotNil(t, u)
+
+		resp, err := s.LoginAdmin(ctx, model.LoginInput{
+			Username: input.Username,
+			Password: input.Password,
+		})
+		require.NoError(t, err)
+		require.NotNil(t, resp)
+
+		data, err := s.RefreshTokens(ctx, resp.RefreshToken)
+		require.NoError(t, err)
+		require.NotNil(t, data)
+		require.NotEmpty(t, data.AccessToken)
+		require.NotEmpty(t, data.RefreshToken)
+
+		var accessClaims service.AccessClaims
+		token, err := jwt.ParseWithClaims(data.AccessToken, &accessClaims, func(t *jwt.Token) (interface{}, error) {
+			return s.Config.AccessSecretKey, nil
+		})
+		require.NoError(t, err)
+		require.NotNil(t, token)
+		require.True(t, token.Valid)
+		require.Equal(t, u.ID, accessClaims.UserID)
+		require.Equal(t, u.Role, accessClaims.Role)
+
+		var refreshClaims service.RefreshClaims
+		token, err = jwt.ParseWithClaims(resp.RefreshToken, &refreshClaims, func(t *jwt.Token) (interface{}, error) {
+			return s.Config.RefreshSecretKey, nil
+		})
+		require.NoError(t, err)
+		require.NotNil(t, token)
+		require.True(t, token.Valid)
+		require.Equal(t, u.ID, refreshClaims.UserID)
+		require.Equal(t, u.TokenVersion, refreshClaims.TokenVersion)
+	})
+
+	t.Run("expired token", func(t *testing.T) {
+		s := newService(t)
+		s.Config.RefreshTokenLifetime = -time.Second
+
+		input := model.AddUserInput{
+			Name:     "test name",
+			Username: "testusernamess4s2",
+			Password: "testpassword",
+			Phone:    "07705983835",
+			Role:     user.RoleSuperAdmin,
+			Active:   true,
+		}
+
+		u, err := s.AddUser(ctx, input)
+		require.NoError(t, err)
+		require.NotNil(t, u)
+
+		resp, err := s.LoginAdmin(ctx, model.LoginInput{
+			Username: input.Username,
+			Password: input.Password,
+		})
+		require.NoError(t, err)
+		require.NotNil(t, resp)
+
+		data, err := s.RefreshTokens(ctx, resp.RefreshToken)
+		require.Error(t, err)
+		require.Nil(t, data)
+	})
+
+	t.Run("disabled user", func(t *testing.T) {
+		s := newService(t)
+		input := model.AddUserInput{
+			Name:     "test name",
+			Username: "sstestusernamess4s2",
+			Password: "testpassword",
+			Phone:    "07705983835",
+			Role:     user.RoleSuperAdmin,
+			Active:   true,
+		}
+
+		u, err := s.AddUser(ctx, input)
+		require.NoError(t, err)
+		require.NotNil(t, u)
+
+		resp, err := s.LoginAdmin(ctx, model.LoginInput{
+			Username: input.Username,
+			Password: input.Password,
+		})
+		require.NoError(t, err)
+		require.NotNil(t, resp)
+
+		u.Update().SetActive(false).SaveX(ctx)
+
+		data, err := s.RefreshTokens(ctx, resp.RefreshToken)
+		require.Error(t, err)
+		require.Nil(t, data)
+		require.ErrorIs(t, err, service.UserDisabledErr)
+
+		u.Update().SetActive(true).SetDeletedAt(time.Now()).SaveX(ctx)
+		data, err = s.RefreshTokens(ctx, resp.RefreshToken)
+		require.Error(t, err)
+		require.Nil(t, data)
+		require.ErrorIs(t, err, service.NotFoundErr)
+	})
+
+	t.Run("token version mismatch", func(t *testing.T) {
+		s := newService(t)
+
+		input := model.AddUserInput{
+			Name:     "test name",
+			Username: "testusernamess4s2",
+			Password: "testpassword",
+			Phone:    "07705983835",
+			Role:     user.RoleSuperAdmin,
+			Active:   true,
+		}
+
+		u, err := s.AddUser(ctx, input)
+		require.NoError(t, err)
+		require.NotNil(t, u)
+
+		resp, err := s.LoginAdmin(ctx, model.LoginInput{
+			Username: input.Username,
+			Password: input.Password,
+		})
+		require.NoError(t, err)
+		require.NotNil(t, resp)
+
+		u.Update().SetTokenVersion(4).SaveX(ctx)
+
+		data, err := s.RefreshTokens(ctx, resp.RefreshToken)
+		require.Error(t, err)
+		require.Nil(t, data)
+	})
+}
