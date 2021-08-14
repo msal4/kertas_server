@@ -81,64 +81,9 @@ type Service struct {
 	Config *Config
 }
 
-// Config defaults.
-const (
-	defaultFilenameTimeFormat   = "02-01-06_15-04"
-	defaultRootBucket           = "root"
-	defaultMaxFilenameLen       = 6
-	defaultRandStringLen        = 6
-	defaultThumbnailSize        = 200
-	defaultHQImageSize          = 1000
-	defaultAccessKey            = "dontusethedefaultaccesskey"
-	defaultRefreshKey           = "dontusethedefaultrefreshkey"
-	defaultAccessTokenLifetime  = 2 * time.Minute
-	defaultRefreshTokenLifetime = 1 * time.Hour
-)
-
 // New creates a new initialized and configured service.
 func New(ec *ent.Client, mc *minio.Client, cfg *Config) (*Service, error) {
-	if cfg == nil {
-		cfg = &Config{}
-	}
-	if cfg.RS == nil {
-		cfg.RS = rand.NewSource(time.Now().Unix())
-	}
-	if cfg.RootBucket == "" {
-		cfg.RootBucket = defaultRootBucket
-	}
-	if cfg.FilenameTimeFormat == "" {
-		cfg.FilenameTimeFormat = defaultFilenameTimeFormat
-	}
-	if cfg.RandStringLen <= 0 {
-		cfg.RandStringLen = defaultRandStringLen
-	}
-	if cfg.MaxFilenameLen <= 0 {
-		cfg.MaxFilenameLen = defaultMaxFilenameLen
-	}
-	if cfg.ThumbnailSize.Width == 0 {
-		cfg.ThumbnailSize.Width = defaultHQImageSize
-	}
-	if cfg.ThumbnailSize.Height == 0 {
-		cfg.ThumbnailSize.Height = defaultHQImageSize
-	}
-	if cfg.HQImageSize.Width == 0 {
-		cfg.HQImageSize.Width = defaultHQImageSize
-	}
-	if cfg.HQImageSize.Height == 0 {
-		cfg.HQImageSize.Height = defaultHQImageSize
-	}
-	if len(cfg.AccessSecretKey) == 0 {
-		cfg.AccessSecretKey = []byte(defaultAccessKey)
-	}
-	if len(cfg.RefreshSecretKey) == 0 {
-		cfg.RefreshSecretKey = []byte(defaultRefreshKey)
-	}
-	if cfg.AccessTokenLifetime == 0 {
-		cfg.AccessTokenLifetime = defaultAccessTokenLifetime
-	}
-	if cfg.RefreshTokenLifetime == 0 {
-		cfg.RefreshTokenLifetime = defaultRefreshTokenLifetime
-	}
+	cfg = getConfig(cfg)
 
 	ctx := context.Background()
 	exists, err := mc.BucketExists(ctx, cfg.RootBucket)
@@ -155,4 +100,78 @@ func New(ec *ent.Client, mc *minio.Client, cfg *Config) (*Service, error) {
 	}
 
 	return &Service{EC: ec, MC: mc, Config: cfg}, nil
+}
+
+// Config defaults.
+const (
+	defaultFilenameTimeFormat   = "02-01-06_15-04"
+	defaultRootBucket           = "root"
+	defaultMaxFilenameLen       = 6
+	defaultRandStringLen        = 6
+	defaultThumbnailSize        = 200
+	defaultHQImageSize          = 1000
+	defaultAccessKey            = "dontusethedefaultaccesskey"
+	defaultRefreshKey           = "dontusethedefaultrefreshkey"
+	defaultAccessTokenLifetime  = 2 * time.Minute
+	defaultRefreshTokenLifetime = 1 * time.Hour
+)
+
+func getConfig(cfg *Config) *Config {
+	if cfg == nil {
+		cfg = &Config{}
+	}
+
+	if cfg.RS == nil {
+		cfg.RS = rand.NewSource(time.Now().Unix())
+	}
+
+	if cfg.RootBucket == "" {
+		cfg.RootBucket = defaultRootBucket
+	}
+
+	if cfg.FilenameTimeFormat == "" {
+		cfg.FilenameTimeFormat = defaultFilenameTimeFormat
+	}
+
+	if cfg.RandStringLen <= 0 {
+		cfg.RandStringLen = defaultRandStringLen
+	}
+
+	if cfg.MaxFilenameLen <= 0 {
+		cfg.MaxFilenameLen = defaultMaxFilenameLen
+	}
+
+	if cfg.ThumbnailSize.Width == 0 {
+		cfg.ThumbnailSize.Width = defaultHQImageSize
+	}
+
+	if cfg.ThumbnailSize.Height == 0 {
+		cfg.ThumbnailSize.Height = defaultHQImageSize
+	}
+
+	if cfg.HQImageSize.Width == 0 {
+		cfg.HQImageSize.Width = defaultHQImageSize
+	}
+
+	if cfg.HQImageSize.Height == 0 {
+		cfg.HQImageSize.Height = defaultHQImageSize
+	}
+
+	if len(cfg.AccessSecretKey) == 0 {
+		cfg.AccessSecretKey = []byte(defaultAccessKey)
+	}
+
+	if len(cfg.RefreshSecretKey) == 0 {
+		cfg.RefreshSecretKey = []byte(defaultRefreshKey)
+	}
+
+	if cfg.AccessTokenLifetime == 0 {
+		cfg.AccessTokenLifetime = defaultAccessTokenLifetime
+	}
+
+	if cfg.RefreshTokenLifetime == 0 {
+		cfg.RefreshTokenLifetime = defaultRefreshTokenLifetime
+	}
+
+	return cfg
 }
