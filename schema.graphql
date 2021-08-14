@@ -148,8 +148,9 @@ type AuthData {
 }
 
 type Query {
-    school(id: ID!): School
-    schools(after: Cursor, first: Int, before: Cursor, last: Int, orderBy: SchoolOrder, where: SchoolWhereInput): SchoolConnection
+  user(id: ID!): User
+  school(id: ID!): School
+  schools(after: Cursor, first: Int, before: Cursor, last: Int, orderBy: SchoolOrder, where: SchoolWhereInput): SchoolConnection
 }
 
 type Mutation {

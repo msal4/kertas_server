@@ -57,6 +57,10 @@ func (r *mutationResolver) RefreshTokens(ctx context.Context, token string) (*mo
 	return r.s.RefreshTokens(ctx, token)
 }
 
+func (r *queryResolver) User(ctx context.Context, id uuid.UUID) (*ent.User, error) {
+	return r.s.EC.User.Get(ctx, id)
+}
+
 func (r *queryResolver) School(ctx context.Context, id uuid.UUID) (*ent.School, error) {
 	return r.s.EC.School.Get(ctx, id)
 }

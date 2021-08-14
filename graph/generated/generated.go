@@ -80,6 +80,7 @@ type ComplexityRoot struct {
 	Query struct {
 		School  func(childComplexity int, id uuid.UUID) int
 		Schools func(childComplexity int, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.SchoolOrder, where *ent.SchoolWhereInput) int
+		User    func(childComplexity int, id uuid.UUID) int
 	}
 
 	School struct {
@@ -152,6 +153,7 @@ type MutationResolver interface {
 	RefreshTokens(ctx context.Context, token string) (*model.AuthData, error)
 }
 type QueryResolver interface {
+	User(ctx context.Context, id uuid.UUID) (*ent.User, error)
 	School(ctx context.Context, id uuid.UUID) (*ent.School, error)
 	Schools(ctx context.Context, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.SchoolOrder, where *ent.SchoolWhereInput) (*ent.SchoolConnection, error)
 }
@@ -368,6 +370,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Query.Schools(childComplexity, args["after"].(*ent.Cursor), args["first"].(*int), args["before"].(*ent.Cursor), args["last"].(*int), args["orderBy"].(*ent.SchoolOrder), args["where"].(*ent.SchoolWhereInput)), true
+
+	case "Query.user":
+		if e.complexity.Query.User == nil {
+			break
+		}
+
+		args, err := ec.field_Query_user_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.User(childComplexity, args["id"].(uuid.UUID)), true
 
 	case "School.active":
 		if e.complexity.School.Active == nil {
@@ -821,8 +835,9 @@ type AuthData {
 }
 
 type Query {
-    school(id: ID!): School
-    schools(after: Cursor, first: Int, before: Cursor, last: Int, orderBy: SchoolOrder, where: SchoolWhereInput): SchoolConnection
+  user(id: ID!): User
+  school(id: ID!): School
+  schools(after: Cursor, first: Int, before: Cursor, last: Int, orderBy: SchoolOrder, where: SchoolWhereInput): SchoolConnection
 }
 
 type Mutation {
@@ -2215,6 +2230,21 @@ func (ec *executionContext) field_Query_schools_args(ctx context.Context, rawArg
 	return args, nil
 }
 
+func (ec *executionContext) field_Query_user_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 uuid.UUID
+	if tmp, ok := rawArgs["id"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+		arg0, err = ec.unmarshalNID2githubᚗcomᚋgoogleᚋuuidᚐUUID(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["id"] = arg0
+	return args, nil
+}
+
 func (ec *executionContext) field___Type_enumValues_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -2896,6 +2926,45 @@ func (ec *executionContext) _PageInfo_endCursor(ctx context.Context, field graph
 	res := resTmp.(*ent.Cursor)
 	fc.Result = res
 	return ec.marshalOCursor2ᚖgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚐCursor(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Query_user(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Query_user_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().User(rctx, args["id"].(uuid.UUID))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*ent.User)
+	fc.Result = res
+	return ec.marshalOUser2ᚖgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚐUser(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_school(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -12185,6 +12254,17 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Query")
+		case "user":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_user(ctx, field)
+				return res
+			})
 		case "school":
 			field := field
 			out.Concurrently(i, func() (res graphql.Marshaler) {
