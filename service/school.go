@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"path"
+	"time"
 
 	"github.com/google/uuid"
 	"github.com/minio/minio-go/v7"
@@ -36,6 +37,10 @@ func (s *Service) AddSchool(ctx context.Context, input model.AddSchoolInput) (*e
 }
 
 func (s *Service) DeleteSchool(ctx context.Context, id uuid.UUID) error {
+	return s.EC.School.UpdateOneID(id).SetDeletedAt(time.Now()).Exec(ctx)
+}
+
+func (s *Service) DeleteSchoolPermanently(ctx context.Context, id uuid.UUID) error {
 	sch, err := s.EC.School.Get(ctx, id)
 	if err != nil {
 		return err

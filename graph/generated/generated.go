@@ -52,12 +52,14 @@ type DirectiveRoot struct {
 
 type ComplexityRoot struct {
 	Mutation struct {
-		AddSchool    func(childComplexity int, input model.AddSchoolInput) int
-		AddUser      func(childComplexity int, input model.AddUserInput) int
-		DeleteSchool func(childComplexity int, id uuid.UUID) int
-		DeleteUser   func(childComplexity int, id uuid.UUID) int
-		UdpateUser   func(childComplexity int, id uuid.UUID, input model.UpdateUserInput) int
-		UpdateSchool func(childComplexity int, id uuid.UUID, input model.UpdateSchoolInput) int
+		AddSchool               func(childComplexity int, input model.AddSchoolInput) int
+		AddUser                 func(childComplexity int, input model.AddUserInput) int
+		DeleteSchool            func(childComplexity int, id uuid.UUID) int
+		DeleteSchoolPermanently func(childComplexity int, id uuid.UUID) int
+		DeleteUser              func(childComplexity int, id uuid.UUID) int
+		DeleteUserPermanently   func(childComplexity int, id uuid.UUID) int
+		UdpateUser              func(childComplexity int, id uuid.UUID, input model.UpdateUserInput) int
+		UpdateSchool            func(childComplexity int, id uuid.UUID, input model.UpdateSchoolInput) int
 	}
 
 	PageInfo struct {
@@ -133,9 +135,11 @@ type MutationResolver interface {
 	AddSchool(ctx context.Context, input model.AddSchoolInput) (*ent.School, error)
 	UpdateSchool(ctx context.Context, id uuid.UUID, input model.UpdateSchoolInput) (*ent.School, error)
 	DeleteSchool(ctx context.Context, id uuid.UUID) (bool, error)
+	DeleteSchoolPermanently(ctx context.Context, id uuid.UUID) (bool, error)
 	AddUser(ctx context.Context, input model.AddUserInput) (*ent.User, error)
 	UdpateUser(ctx context.Context, id uuid.UUID, input model.UpdateUserInput) (*ent.User, error)
 	DeleteUser(ctx context.Context, id uuid.UUID) (bool, error)
+	DeleteUserPermanently(ctx context.Context, id uuid.UUID) (bool, error)
 }
 type QueryResolver interface {
 	School(ctx context.Context, id uuid.UUID) (*ent.School, error)
@@ -193,6 +197,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.DeleteSchool(childComplexity, args["id"].(uuid.UUID)), true
 
+	case "Mutation.deleteSchoolPermanently":
+		if e.complexity.Mutation.DeleteSchoolPermanently == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_deleteSchoolPermanently_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.DeleteSchoolPermanently(childComplexity, args["id"].(uuid.UUID)), true
+
 	case "Mutation.deleteUser":
 		if e.complexity.Mutation.DeleteUser == nil {
 			break
@@ -204,6 +220,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.DeleteUser(childComplexity, args["id"].(uuid.UUID)), true
+
+	case "Mutation.deleteUserPermanently":
+		if e.complexity.Mutation.DeleteUserPermanently == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_deleteUserPermanently_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.DeleteUserPermanently(childComplexity, args["id"].(uuid.UUID)), true
 
 	case "Mutation.udpateUser":
 		if e.complexity.Mutation.UdpateUser == nil {
@@ -739,10 +767,12 @@ type Mutation {
   addSchool(input: AddSchoolInput!): School
   updateSchool(id: ID!, input: UpdateSchoolInput!): School
   deleteSchool(id: ID!): Boolean!
+  deleteSchoolPermanently(id: ID!): Boolean!
 
   addUser(input: AddUserInput!): User
   udpateUser(id: ID!, input: UpdateUserInput!): User
   deleteUser(id: ID!): Boolean!
+  deleteUserPermanently(id: ID!): Boolean!
 }
 `, BuiltIn: false},
 	{Name: "ent.graphql", Input: `"""
@@ -1876,7 +1906,37 @@ func (ec *executionContext) field_Mutation_addUser_args(ctx context.Context, raw
 	return args, nil
 }
 
+func (ec *executionContext) field_Mutation_deleteSchoolPermanently_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 uuid.UUID
+	if tmp, ok := rawArgs["id"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+		arg0, err = ec.unmarshalNID2githubᚗcomᚋgoogleᚋuuidᚐUUID(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["id"] = arg0
+	return args, nil
+}
+
 func (ec *executionContext) field_Mutation_deleteSchool_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 uuid.UUID
+	if tmp, ok := rawArgs["id"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+		arg0, err = ec.unmarshalNID2githubᚗcomᚋgoogleᚋuuidᚐUUID(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["id"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_deleteUserPermanently_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
 	var arg0 uuid.UUID
@@ -2202,6 +2262,48 @@ func (ec *executionContext) _Mutation_deleteSchool(ctx context.Context, field gr
 	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _Mutation_deleteSchoolPermanently(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_deleteSchoolPermanently_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().DeleteSchoolPermanently(rctx, args["id"].(uuid.UUID))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _Mutation_addUser(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -2306,6 +2408,48 @@ func (ec *executionContext) _Mutation_deleteUser(ctx context.Context, field grap
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.Mutation().DeleteUser(rctx, args["id"].(uuid.UUID))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_deleteUserPermanently(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_deleteUserPermanently_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().DeleteUserPermanently(rctx, args["id"].(uuid.UUID))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -11631,12 +11775,22 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		case "deleteSchoolPermanently":
+			out.Values[i] = ec._Mutation_deleteSchoolPermanently(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		case "addUser":
 			out.Values[i] = ec._Mutation_addUser(ctx, field)
 		case "udpateUser":
 			out.Values[i] = ec._Mutation_udpateUser(ctx, field)
 		case "deleteUser":
 			out.Values[i] = ec._Mutation_deleteUser(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "deleteUserPermanently":
+			out.Values[i] = ec._Mutation_deleteUserPermanently(ctx, field)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}

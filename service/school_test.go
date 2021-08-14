@@ -143,7 +143,7 @@ func TestSchoolAdd(t *testing.T) {
 	})
 }
 
-func TestSchoolDelete(t *testing.T) {
+func TestDeleteSchool(t *testing.T) {
 	s := newService(t)
 	defer s.EC.Close()
 
@@ -162,6 +162,44 @@ func TestSchoolDelete(t *testing.T) {
 	t.Run("non-existing school", func(t *testing.T) {
 		err := s.DeleteSchool(ctx, uuid.MustParse("2710c203-7842-4356-8d9f-12f9da4722a2"))
 		require.Error(t, err)
+		got, err := s.EC.School.Get(ctx, sch.ID)
+		require.NoError(t, err)
+		require.Nil(t, got.DeletedAt)
+		_, err = s.MC.StatObject(ctx, s.Config.RootBucket, sch.Image, minio.StatObjectOptions{})
+		require.NoError(t, err)
+	})
+
+	t.Run("existing school", func(t *testing.T) {
+		err := s.DeleteSchool(ctx, sch.ID)
+		require.NoError(t, err)
+		got, err := s.EC.School.Get(ctx, sch.ID)
+		require.NoError(t, err)
+		require.NotNil(t, got.DeletedAt)
+
+		_, err = s.MC.StatObject(ctx, s.Config.RootBucket, sch.Image, minio.StatObjectOptions{})
+		require.NoError(t, err)
+	})
+}
+
+func TestDeleteSchoolPermanently(t *testing.T) {
+	s := newService(t)
+	defer s.EC.Close()
+
+	ctx := context.Background()
+
+	f := testutil.OpenFile(t, "../testfiles/stanford.png")
+	defer f.Close()
+
+	sch, err := s.AddSchool(ctx, model.AddSchoolInput{
+		Name:  "test school",
+		Image: graphql.Upload{File: f, Filename: f.File.Name(), ContentType: f.ContentType, Size: f.Size()},
+	})
+	require.NoError(t, err)
+	require.NotNil(t, sch)
+
+	t.Run("non-existing school", func(t *testing.T) {
+		err := s.DeleteSchoolPermanently(ctx, uuid.MustParse("2710c203-7842-4356-8d9f-12f9da4722a2"))
+		require.Error(t, err)
 		_, err = s.EC.School.Query().Where(school.ID(sch.ID)).Only(ctx)
 		require.NoError(t, err)
 		_, err = s.MC.StatObject(ctx, s.Config.RootBucket, sch.Image, minio.StatObjectOptions{})
@@ -169,7 +207,7 @@ func TestSchoolDelete(t *testing.T) {
 	})
 
 	t.Run("existing school", func(t *testing.T) {
-		err := s.DeleteSchool(ctx, sch.ID)
+		err := s.DeleteSchoolPermanently(ctx, sch.ID)
 		require.NoError(t, err)
 		_, err = s.EC.School.Query().Where(school.ID(sch.ID)).Only(ctx)
 		require.Error(t, err)

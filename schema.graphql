@@ -147,8 +147,10 @@ type Mutation {
   addSchool(input: AddSchoolInput!): School
   updateSchool(id: ID!, input: UpdateSchoolInput!): School
   deleteSchool(id: ID!): Boolean!
+  deleteSchoolPermanently(id: ID!): Boolean!
 
   addUser(input: AddUserInput!): User
   udpateUser(id: ID!, input: UpdateUserInput!): User
   deleteUser(id: ID!): Boolean!
+  deleteUserPermanently(id: ID!): Boolean!
 }

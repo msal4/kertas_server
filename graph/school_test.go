@@ -454,7 +454,7 @@ func (s *schoolTestSuite) TestUpdateSchool() {
 	})
 }
 
-func (s *schoolTestSuite) TestDeleteSchool() {
+func (s *schoolTestSuite) TestDeleteSchoolPermanently() {
 	srv := s.newService("rsdj2")
 	ec := srv.EC
 	server := handler.NewDefaultServer(graph.NewSchema(srv))
@@ -462,7 +462,7 @@ func (s *schoolTestSuite) TestDeleteSchool() {
 	ctx := context.Background()
 
 	type response struct {
-		DeleteSchool bool
+		DeleteSchoolPermanently bool
 	}
 
 	s.T().Run("exists", func(t *testing.T) {
@@ -471,8 +471,8 @@ func (s *schoolTestSuite) TestDeleteSchool() {
 		sch := ec.School.Create().SetName("test school").SetDirectory("test_dir").SetImage("test/image").SaveX(ctx)
 
 		var resp response
-		gc.MustPost(fmt.Sprintf(`mutation { deleteSchool(id:"%s") } `, sch.ID.String()), &resp)
-		require.True(t, resp.DeleteSchool)
+		gc.MustPost(fmt.Sprintf(`mutation { deleteSchoolPermanently(id:"%s") }`, sch.ID.String()), &resp)
+		require.True(t, resp.DeleteSchoolPermanently)
 
 		schools := ec.School.Query().AllX(ctx)
 		require.Empty(t, schools)
@@ -484,10 +484,10 @@ func (s *schoolTestSuite) TestDeleteSchool() {
 		ec.School.Create().SetName("test school").SetDirectory("test_dir").SetImage("test/image").SaveX(ctx)
 
 		var resp response
-		err := gc.Post(`mutation { deleteSchool(id:"2710c203-7842-4356-8d9f-12f9da4722a2") } `, &resp)
+		err := gc.Post(`mutation { deleteSchoolPermanently(id:"2710c203-7842-4356-8d9f-12f9da4722a2") } `, &resp)
 		require.Error(t, err)
 
 		schools := ec.School.Query().AllX(ctx)
-		require.Len(t, schools, 1)
+		require.NotEmpty(t, schools)
 	})
 }

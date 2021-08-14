@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"path"
 	"strings"
+	"time"
 
 	"github.com/google/uuid"
 	"github.com/minio/minio-go/v7"
@@ -126,6 +127,10 @@ func (s *Service) UpdateUser(ctx context.Context, id uuid.UUID, input model.Upda
 }
 
 func (s *Service) DeleteUser(ctx context.Context, id uuid.UUID) error {
+	return s.EC.User.UpdateOneID(id).SetDeletedAt(time.Now()).Exec(ctx)
+}
+
+func (s *Service) DeleteUserPermanently(ctx context.Context, id uuid.UUID) error {
 	u, err := s.EC.User.Get(ctx, id)
 	if err != nil {
 		return err

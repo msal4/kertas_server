@@ -25,6 +25,10 @@ func (r *mutationResolver) DeleteSchool(ctx context.Context, id uuid.UUID) (bool
 	return true, r.s.DeleteSchool(ctx, id)
 }
 
+func (r *mutationResolver) DeleteSchoolPermanently(ctx context.Context, id uuid.UUID) (bool, error) {
+	return true, r.s.DeleteSchoolPermanently(ctx, id)
+}
+
 func (r *mutationResolver) AddUser(ctx context.Context, input model.AddUserInput) (*ent.User, error) {
 	return r.s.AddUser(ctx, input)
 }
@@ -34,7 +38,11 @@ func (r *mutationResolver) UdpateUser(ctx context.Context, id uuid.UUID, input m
 }
 
 func (r *mutationResolver) DeleteUser(ctx context.Context, id uuid.UUID) (bool, error) {
-	return true, r.s.DeleteSchool(ctx, id)
+	return true, r.s.DeleteUser(ctx, id)
+}
+
+func (r *mutationResolver) DeleteUserPermanently(ctx context.Context, id uuid.UUID) (bool, error) {
+	return true, r.s.DeleteUserPermanently(ctx, id)
 }
 
 func (r *queryResolver) School(ctx context.Context, id uuid.UUID) (*ent.School, error) {
