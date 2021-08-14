@@ -402,7 +402,6 @@ func (s *schoolTestSuite) TestUpdateSchool() {
 	s.T().Run("invalid", func(t *testing.T) {
 		var resp response
 		err := gc.Post(fmt.Sprintf("mutation { updateSchool(id: %q, input: {name: \"a school without an image\"}) { id name image active createdAt updatedAt }}", testID), &resp.Data)
-		fmt.Println(err)
 		require.Error(t, err)
 	})
 

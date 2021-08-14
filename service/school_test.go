@@ -16,7 +16,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestSchoolList(t *testing.T) {
+func TestListSchool(t *testing.T) {
 	s := newService(t)
 	defer s.EC.Close()
 	ctx := context.Background()
@@ -105,7 +105,7 @@ func TestSchoolList(t *testing.T) {
 	})
 }
 
-func TestSchoolAdd(t *testing.T) {
+func TestAddSchool(t *testing.T) {
 	s := newService(t)
 	defer s.EC.Close()
 	ctx := context.Background()
@@ -217,7 +217,7 @@ func TestDeleteSchoolPermanently(t *testing.T) {
 	})
 }
 
-func TestSchoolUpdate(t *testing.T) {
+func TestUpdateSchool(t *testing.T) {
 	s := newService(t)
 	defer s.EC.Close()
 

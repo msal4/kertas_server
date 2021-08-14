@@ -18,7 +18,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestUserList(t *testing.T) {
+func TestUsers(t *testing.T) {
 	s := newService(t)
 	defer s.EC.Close()
 	ctx := context.Background()
@@ -110,7 +110,7 @@ func TestUserList(t *testing.T) {
 	})
 }
 
-func TestUserAdd(t *testing.T) {
+func TestAddUser(t *testing.T) {
 	s := newService(t)
 	defer s.EC.Close()
 	ctx := context.Background()
@@ -231,7 +231,7 @@ func TestUserAdd(t *testing.T) {
 	})
 }
 
-func TestUserUpdate(t *testing.T) {
+func TestUpdateUser(t *testing.T) {
 	s := newService(t)
 	defer s.EC.Close()
 	ctx := context.Background()
