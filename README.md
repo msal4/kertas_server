@@ -6,6 +6,6 @@
 - [x] Setup minio and file upload
 - [x] Setup tests
 - [x] Refactor
-- [ ] Setup authorization
+- [x] Setup authorization
 - [ ] Implement chat
 - [ ] Fulltext search

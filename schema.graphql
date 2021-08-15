@@ -90,6 +90,20 @@ type Stage implements Node {
   updatedAt: Time!
 }
 
+enum UserOrderField {
+    NAME
+    USERNAME
+    PHONE
+    ROLE
+    CREATED_AT
+    UPDATED_AT
+}
+
+input UserOrder {
+    field: UserOrderField
+    direction: OrderDirection!
+}
+
 type User implements Node {
   id: ID!
   name: String!
@@ -148,9 +162,11 @@ type AuthData {
 }
 
 type Query {
-  user(id: ID!): User
   school(id: ID!): School
   schools(after: Cursor, first: Int, before: Cursor, last: Int, orderBy: SchoolOrder, where: SchoolWhereInput): SchoolConnection
+
+  user(id: ID!): User
+  users(after: Cursor, first: Int, before: Cursor, last: Int, orderBy: UserOrder, where: UserWhereInput): UserConnection
 }
 
 type Mutation {

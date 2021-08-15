@@ -74,10 +74,6 @@ func (r *mutationResolver) RefreshTokens(ctx context.Context, token string) (*mo
 	return r.s.RefreshTokens(ctx, token)
 }
 
-func (r *queryResolver) User(ctx context.Context, id uuid.UUID) (*ent.User, error) {
-	return r.s.EC.User.Get(ctx, id)
-}
-
 func (r *queryResolver) School(ctx context.Context, id uuid.UUID) (*ent.School, error) {
 	return r.s.EC.School.Get(ctx, id)
 }
@@ -89,6 +85,25 @@ func (r *queryResolver) Schools(ctx context.Context, after *ent.Cursor, first *i
 
 	return r.s.Schools(ctx, service.SchoolListOptions{
 		After: after, First: first, Before: before, Last: last, OrderBy: orderBy, Where: where})
+}
+
+func (r *queryResolver) User(ctx context.Context, id uuid.UUID) (*ent.User, error) {
+	return r.s.EC.User.Get(ctx, id)
+}
+
+func (r *queryResolver) Users(ctx context.Context, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.UserOrder, where *ent.UserWhereInput) (*ent.UserConnection, error) {
+	if !auth.IsSuperAdmin(ctx) {
+		return nil, auth.UnauthorizedErr
+	}
+
+	return r.s.Users(ctx, service.UserListOptions{
+		After:   after,
+		First:   first,
+		Before:  before,
+		Last:    last,
+		OrderBy: orderBy,
+		Where:   where,
+	})
 }
 
 // Mutation returns generated.MutationResolver implementation.

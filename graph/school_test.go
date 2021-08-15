@@ -5,8 +5,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"io"
-	"mime/multipart"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -246,44 +244,12 @@ func TestAddSchool(t *testing.T) {
 	})
 }
 
-type file struct {
-	mapKey string
-	*os.File
-}
-
-func createRequest(t *testing.T, query, variables string) *http.Request {
-	b := bytes.NewBuffer([]byte(fmt.Sprintf(`{"query": %q, "variables": %s}`, query, variables)))
-	r := httptest.NewRequest(http.MethodPost, "/graphql", b)
-	r.Header.Set("content-type", "application/json")
-
-	return r
-}
-
-func createMultipartRequest(t *testing.T, operations, mapData string, f file) *http.Request {
-	b := new(bytes.Buffer)
-	w := multipart.NewWriter(b)
-	require.NoError(t, w.WriteField("operations", operations))
-	require.NoError(t, w.WriteField("map", mapData))
-
-	ff, err := w.CreateFormFile(f.mapKey, f.Name())
-	require.NoError(t, err)
-	_, err = io.Copy(ff, f)
-	require.NoError(t, err)
-
-	require.NoError(t, w.Close())
-
-	r := httptest.NewRequest(http.MethodPost, "/graphql", b)
-
-	r.Header.Set("content-type", w.FormDataContentType())
-
-	return r
-}
-
 const testID = "2710c203-7842-4356-8d9f-12f9da4722a2"
 
 func TestUpdateSchool(t *testing.T) {
 	s := newService(t)
 	defer s.EC.Close()
+
 	srv := graph.NewServer(s, false)
 	ctx := context.Background()
 
@@ -393,6 +359,8 @@ func TestUpdateSchool(t *testing.T) {
 
 func TestDeleteSchoolPermanently(t *testing.T) {
 	s := newService(t)
+	defer s.EC.Close()
+
 	ec := s.EC
 	srv := graph.NewServer(s, false)
 	ctx := context.Background()
@@ -455,6 +423,8 @@ func TestDeleteSchoolPermanently(t *testing.T) {
 
 func TestDeleteSchool(t *testing.T) {
 	s := newService(t)
+	defer s.EC.Close()
+
 	ec := s.EC
 	srv := graph.NewServer(s, false)
 	ctx := context.Background()

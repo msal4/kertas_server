@@ -1,10 +1,16 @@
 package graph_test
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
 	"fmt"
+	"io"
 	"log"
 	"math/rand"
+	"mime/multipart"
+	"net/http"
+	"net/http/httptest"
 	"os"
 	"testing"
 	"time"
@@ -45,4 +51,41 @@ func newService(t *testing.T) *service.Service {
 	s, err := service.New(ec, mc, nil)
 	require.NoError(t, err)
 	return s
+}
+
+type file struct {
+	mapKey string
+	*os.File
+}
+
+func createRequest(t *testing.T, query, variables string) *http.Request {
+	b := bytes.NewBuffer([]byte(fmt.Sprintf(`{"query": %q, "variables": %s}`, query, variables)))
+	r := httptest.NewRequest(http.MethodPost, "/graphql", b)
+	r.Header.Set("content-type", "application/json")
+
+	return r
+}
+
+func createMultipartRequest(t *testing.T, operations, mapData string, f file) *http.Request {
+	b := new(bytes.Buffer)
+	w := multipart.NewWriter(b)
+	require.NoError(t, w.WriteField("operations", operations))
+	require.NoError(t, w.WriteField("map", mapData))
+
+	ff, err := w.CreateFormFile(f.mapKey, f.Name())
+	require.NoError(t, err)
+	_, err = io.Copy(ff, f)
+	require.NoError(t, err)
+
+	require.NoError(t, w.Close())
+
+	r := httptest.NewRequest(http.MethodPost, "/graphql", b)
+
+	r.Header.Set("content-type", w.FormDataContentType())
+
+	return r
+}
+
+func parseBody(t testing.TB, w *httptest.ResponseRecorder, v interface{}) {
+	require.NoError(t, json.NewDecoder(w.Body).Decode(v))
 }
