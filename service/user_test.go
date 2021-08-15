@@ -9,6 +9,7 @@ import (
 	"github.com/golang-jwt/jwt"
 	"github.com/google/uuid"
 	"github.com/minio/minio-go/v7"
+	"github.com/msal4/hassah_school_server/auth"
 	"github.com/msal4/hassah_school_server/ent"
 	"github.com/msal4/hassah_school_server/ent/user"
 	"github.com/msal4/hassah_school_server/graph/model"
@@ -492,7 +493,7 @@ func TestLoginAdmin(t *testing.T) {
 		require.NotEmpty(t, resp.AccessToken)
 		require.NotEmpty(t, resp.RefreshToken)
 
-		var accessClaims service.AccessClaims
+		var accessClaims auth.AccessClaims
 		token, err := jwt.ParseWithClaims(resp.AccessToken, &accessClaims, func(t *jwt.Token) (interface{}, error) {
 			return s.Config.AccessSecretKey, nil
 		})
@@ -502,7 +503,7 @@ func TestLoginAdmin(t *testing.T) {
 		require.Equal(t, u.ID, accessClaims.UserID)
 		require.Equal(t, u.Role, accessClaims.Role)
 
-		var refreshClaims service.RefreshClaims
+		var refreshClaims auth.RefreshClaims
 		token, err = jwt.ParseWithClaims(resp.RefreshToken, &refreshClaims, func(t *jwt.Token) (interface{}, error) {
 			return s.Config.RefreshSecretKey, nil
 		})
@@ -539,7 +540,7 @@ func TestLoginAdmin(t *testing.T) {
 		require.NotEmpty(t, resp.AccessToken)
 		require.NotEmpty(t, resp.RefreshToken)
 
-		var accessClaims service.AccessClaims
+		var accessClaims auth.AccessClaims
 		token, err := jwt.ParseWithClaims(resp.AccessToken, &accessClaims, func(t *jwt.Token) (interface{}, error) {
 			return s.Config.AccessSecretKey, nil
 		})
@@ -549,7 +550,7 @@ func TestLoginAdmin(t *testing.T) {
 		require.Equal(t, u.ID, accessClaims.UserID)
 		require.Equal(t, u.Role, accessClaims.Role)
 
-		var refreshClaims service.RefreshClaims
+		var refreshClaims auth.RefreshClaims
 		token, err = jwt.ParseWithClaims(resp.RefreshToken, &refreshClaims, func(t *jwt.Token) (interface{}, error) {
 			return s.Config.RefreshSecretKey, nil
 		})
@@ -735,7 +736,7 @@ func TestLoginUser(t *testing.T) {
 		require.NotEmpty(t, resp.AccessToken)
 		require.NotEmpty(t, resp.RefreshToken)
 
-		var accessClaims service.AccessClaims
+		var accessClaims auth.AccessClaims
 		token, err := jwt.ParseWithClaims(resp.AccessToken, &accessClaims, func(t *jwt.Token) (interface{}, error) {
 			return s.Config.AccessSecretKey, nil
 		})
@@ -745,7 +746,7 @@ func TestLoginUser(t *testing.T) {
 		require.Equal(t, u.ID, accessClaims.UserID)
 		require.Equal(t, u.Role, accessClaims.Role)
 
-		var refreshClaims service.RefreshClaims
+		var refreshClaims auth.RefreshClaims
 		token, err = jwt.ParseWithClaims(resp.RefreshToken, &refreshClaims, func(t *jwt.Token) (interface{}, error) {
 			return s.Config.RefreshSecretKey, nil
 		})
@@ -780,7 +781,7 @@ func TestLoginUser(t *testing.T) {
 		require.NotEmpty(t, resp.AccessToken)
 		require.NotEmpty(t, resp.RefreshToken)
 
-		var accessClaims service.AccessClaims
+		var accessClaims auth.AccessClaims
 		token, err := jwt.ParseWithClaims(resp.AccessToken, &accessClaims, func(t *jwt.Token) (interface{}, error) {
 			return s.Config.AccessSecretKey, nil
 		})
@@ -790,7 +791,7 @@ func TestLoginUser(t *testing.T) {
 		require.Equal(t, u.ID, accessClaims.UserID)
 		require.Equal(t, u.Role, accessClaims.Role)
 
-		var refreshClaims service.RefreshClaims
+		var refreshClaims auth.RefreshClaims
 		token, err = jwt.ParseWithClaims(resp.RefreshToken, &refreshClaims, func(t *jwt.Token) (interface{}, error) {
 			return s.Config.RefreshSecretKey, nil
 		})
@@ -938,7 +939,7 @@ func TestRefreshTokens(t *testing.T) {
 		require.NotEmpty(t, data.AccessToken)
 		require.NotEmpty(t, data.RefreshToken)
 
-		var accessClaims service.AccessClaims
+		var accessClaims auth.AccessClaims
 		token, err := jwt.ParseWithClaims(data.AccessToken, &accessClaims, func(t *jwt.Token) (interface{}, error) {
 			return s.Config.AccessSecretKey, nil
 		})
@@ -948,7 +949,7 @@ func TestRefreshTokens(t *testing.T) {
 		require.Equal(t, u.ID, accessClaims.UserID)
 		require.Equal(t, u.Role, accessClaims.Role)
 
-		var refreshClaims service.RefreshClaims
+		var refreshClaims auth.RefreshClaims
 		token, err = jwt.ParseWithClaims(resp.RefreshToken, &refreshClaims, func(t *jwt.Token) (interface{}, error) {
 			return s.Config.RefreshSecretKey, nil
 		})

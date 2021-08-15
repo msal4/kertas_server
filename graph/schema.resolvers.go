@@ -7,6 +7,7 @@ import (
 	"context"
 
 	"github.com/google/uuid"
+	"github.com/msal4/hassah_school_server/auth"
 	"github.com/msal4/hassah_school_server/ent"
 	"github.com/msal4/hassah_school_server/graph/generated"
 	"github.com/msal4/hassah_school_server/graph/model"
@@ -14,18 +15,34 @@ import (
 )
 
 func (r *mutationResolver) AddSchool(ctx context.Context, input model.AddSchoolInput) (*ent.School, error) {
+	if !auth.IsSuperAdmin(ctx) {
+		return nil, auth.UnauthorizedErr
+	}
+
 	return r.s.AddSchool(ctx, input)
 }
 
 func (r *mutationResolver) UpdateSchool(ctx context.Context, id uuid.UUID, input model.UpdateSchoolInput) (*ent.School, error) {
+	if !auth.IsSuperAdmin(ctx) {
+		return nil, auth.UnauthorizedErr
+	}
+
 	return r.s.UpdateSchool(ctx, id, input)
 }
 
 func (r *mutationResolver) DeleteSchool(ctx context.Context, id uuid.UUID) (bool, error) {
+	if !auth.IsSuperAdmin(ctx) {
+		return false, auth.UnauthorizedErr
+	}
+
 	return true, r.s.DeleteSchool(ctx, id)
 }
 
 func (r *mutationResolver) DeleteSchoolPermanently(ctx context.Context, id uuid.UUID) (bool, error) {
+	if !auth.IsSuperAdmin(ctx) {
+		return false, auth.UnauthorizedErr
+	}
+
 	return true, r.s.DeleteSchoolPermanently(ctx, id)
 }
 
@@ -66,6 +83,10 @@ func (r *queryResolver) School(ctx context.Context, id uuid.UUID) (*ent.School, 
 }
 
 func (r *queryResolver) Schools(ctx context.Context, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.SchoolOrder, where *ent.SchoolWhereInput) (*ent.SchoolConnection, error) {
+	if !auth.IsSuperAdmin(ctx) {
+		return nil, auth.UnauthorizedErr
+	}
+
 	return r.s.Schools(ctx, service.SchoolListOptions{
 		After: after, First: first, Before: before, Last: last, OrderBy: orderBy, Where: where})
 }

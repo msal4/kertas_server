@@ -5,11 +5,7 @@ import (
 	"log"
 	"net/http"
 
-	"entgo.io/contrib/entgql"
 	"entgo.io/ent/dialect"
-	"github.com/99designs/gqlgen/graphql/handler"
-	"github.com/99designs/gqlgen/graphql/handler/debug"
-	"github.com/99designs/gqlgen/graphql/playground"
 	_ "github.com/lib/pq"
 	"github.com/minio/minio-go/v7"
 	"github.com/minio/minio-go/v7/pkg/credentials"
@@ -51,14 +47,8 @@ func main() {
 		log.Fatalf("initializing service: %v", err)
 	}
 
-	srv := handler.NewDefaultServer(graph.NewSchema(s))
-	srv.Use(entgql.Transactioner{TxOpener: ec})
-	if debg {
-		srv.Use(&debug.Tracer{})
-	}
-	http.Handle("/", playground.Handler("School", "/graphql"))
-	http.Handle("/graphql", srv)
+	srv := graph.NewServer(s, debg)
 
 	log.Println("listening on :3000")
-	log.Fatal(http.ListenAndServe(":3000", nil))
+	log.Fatal(http.ListenAndServe(":3000", srv))
 }

@@ -11,6 +11,7 @@ import (
 	"github.com/golang-jwt/jwt"
 	"github.com/google/uuid"
 	"github.com/minio/minio-go/v7"
+	"github.com/msal4/hassah_school_server/auth"
 	"github.com/msal4/hassah_school_server/ent"
 	"github.com/msal4/hassah_school_server/ent/user"
 	"github.com/msal4/hassah_school_server/graph/model"
@@ -150,48 +151,6 @@ func (s *Service) DeleteUserPermanently(ctx context.Context, id uuid.UUID) error
 	return s.EC.User.DeleteOneID(id).Exec(ctx)
 }
 
-type AccessClaims struct {
-	*jwt.StandardClaims
-
-	UserID uuid.UUID `json:"user_id"`
-	Role   user.Role `json:"role"`
-}
-
-type RefreshClaims struct {
-	*jwt.StandardClaims
-
-	UserID       uuid.UUID `json:"user_id"`
-	TokenVersion int       `json:"token_version"`
-}
-
-func (s *Service) generateTokens(u ent.User) (*model.AuthData, error) {
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, AccessClaims{
-		StandardClaims: &jwt.StandardClaims{
-			ExpiresAt: time.Now().Add(s.Config.AccessTokenLifetime).Unix(),
-		},
-		UserID: u.ID,
-		Role:   u.Role,
-	})
-	access, err := token.SignedString(s.Config.AccessSecretKey)
-	if err != nil {
-		return nil, err
-	}
-
-	token = jwt.NewWithClaims(jwt.SigningMethodHS256, RefreshClaims{
-		StandardClaims: &jwt.StandardClaims{
-			ExpiresAt: time.Now().Add(s.Config.RefreshTokenLifetime).Unix(),
-		},
-		UserID:       u.ID,
-		TokenVersion: u.TokenVersion,
-	})
-	refresh, err := token.SignedString(s.Config.RefreshSecretKey)
-	if err != nil {
-		return nil, err
-	}
-
-	return &model.AuthData{AccessToken: access, RefreshToken: refresh}, nil
-}
-
 func (s *Service) verifyUser(ctx context.Context, u ent.User) (*model.AuthData, error) {
 	if !u.Active {
 		return nil, UserDisabledErr
@@ -202,7 +161,7 @@ func (s *Service) verifyUser(ctx context.Context, u ent.User) (*model.AuthData, 
 	}
 
 	if u.Role == user.RoleSuperAdmin {
-		return s.generateTokens(u)
+		return auth.GenerateTokens(u, s.Config.AuthConfig)
 	}
 
 	sch, err := u.School(ctx)
@@ -233,7 +192,7 @@ func (s *Service) verifyUser(ctx context.Context, u ent.User) (*model.AuthData, 
 		}
 	}
 
-	return s.generateTokens(u)
+	return auth.GenerateTokens(u, s.Config.AuthConfig)
 }
 
 var (
@@ -287,7 +246,7 @@ func (s *Service) LoginUser(ctx context.Context, input model.LoginInput) (*model
 }
 
 func (s *Service) RefreshTokens(ctx context.Context, refreshToken string) (*model.AuthData, error) {
-	var claims RefreshClaims
+	var claims auth.RefreshClaims
 	token, err := jwt.ParseWithClaims(refreshToken, &claims, func(t *jwt.Token) (interface{}, error) {
 		return s.Config.RefreshSecretKey, nil
 	})

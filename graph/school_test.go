@@ -11,286 +11,136 @@ import (
 	"net/http/httptest"
 	"os"
 	"testing"
-	"time"
 
-	"entgo.io/ent/dialect"
-	"github.com/99designs/gqlgen/client"
 	"github.com/99designs/gqlgen/graphql"
-	"github.com/99designs/gqlgen/graphql/handler"
 	_ "github.com/mattn/go-sqlite3"
-	"github.com/minio/minio-go/v7"
-	"github.com/minio/minio-go/v7/pkg/credentials"
+	"github.com/msal4/hassah_school_server/auth"
 	"github.com/msal4/hassah_school_server/ent"
-	"github.com/msal4/hassah_school_server/ent/enttest"
-	"github.com/msal4/hassah_school_server/ent/school"
+	"github.com/msal4/hassah_school_server/ent/user"
 	"github.com/msal4/hassah_school_server/graph"
 	"github.com/msal4/hassah_school_server/graph/model"
 	"github.com/msal4/hassah_school_server/service"
 	"github.com/msal4/hassah_school_server/testutil"
 	"github.com/stretchr/testify/require"
-	"github.com/stretchr/testify/suite"
 )
 
-type schoolTestSuite struct {
-	suite.Suite
-	mc *minio.Client
-}
+func TestSchools(t *testing.T) {
+	s := newService(t)
+	defer s.EC.Close()
 
-func (s *schoolTestSuite) newService(db string) *service.Service {
-	ec := enttest.Open(s.T(), dialect.SQLite, fmt.Sprintf("file:%s?mode=memory&cache=shared&_fk=1", db), enttest.WithOptions(ent.Log(s.T().Log)))
-	srv, err := service.New(ec, s.mc, nil)
-	s.Require().NoError(err)
-	return srv
-}
-
-func TestSchool(t *testing.T) {
-	suite.Run(t, &schoolTestSuite{})
-}
-
-func (s *schoolTestSuite) SetupTest() {
-	var err error
-	s.mc, err = minio.New("localhost:9000", &minio.Options{
-		Creds: credentials.NewStaticV4("minioadmin", "minioadmin", ""),
-	})
-	s.Require().Nilf(err, "instantiating minio client: %v", err)
-	_, err = s.mc.ListBuckets(context.Background())
-	s.Require().Nilf(err, "connecting to minio: %v", err)
-}
-
-func (s *schoolTestSuite) TestSchools() {
-	srv := s.newService("123rand")
-	gc := client.New(handler.NewDefaultServer(graph.NewSchema(srv)))
-	ec := srv.EC
-
-	type response struct {
-		Schools struct {
-			TotalCount int
-			Edges      []struct {
-				Node struct {
-					ID        string
-					Name      string
-					Image     string
-					Active    bool
-					CreatedAt string
-					UpdatedAt string
-				}
-				Cursor string
-			}
-			PageInfo struct {
-				HasNextPage     bool
-				HasPreviousPage bool
-				StartCursor     *string
-				EndCursor       *string
-			}
-		}
-	}
+	srv := graph.NewServer(s, false)
 	ctx := context.Background()
 
-	s.T().Run("empty", func(t *testing.T) {
-		var resp response
+	type response struct {
+		Data *struct {
+			Schools *struct {
+				TotalCount int
+				Edges      []struct {
+					Node struct {
+						ID        string `json:"id"`
+						Name      string `json:"name"`
+						Image     string `json:"image"`
+						Active    bool   `json:"active"`
+						CreatedAt string `json:"created_at"`
+						UpdatedAt string `json:"udpated_at"`
+					} `json:"edges"`
+					Cursor *string
+				} `json:"edges"`
+				PageInfo struct {
+					HasNextPage     bool
+					HasPreviousPage bool
+					StartCursor     *string
+					EndCursor       *string
+				} `json:"pageInfo"`
+			} `json:"schools"`
+		} `json:"data"`
 
-		const query = `query {
-  schools {
-    totalCount
-    pageInfo {
-      hasNextPage
-      hasPreviousPage
-      startCursor
-      endCursor
-    }
-    edges {
-      node {
-        id
-        name
-        image
-        active
-        createdAt
-        updatedAt
-      }
-      cursor
-    }
-  }
-}`
+		Errors []struct {
+			Message string   `json:"message"`
+			Path    []string `json:"path"`
+		} `json:"errors,omitempty"`
+	}
 
-		gc.MustPost(query, &resp)
+	operations := []byte(`{
+		"query": "{ schools { totalCount pageInfo { hasNextPage hasPreviousPage startCursor endCursor } edges { node { id name image active createdAt updatedAt } cursor } } }"
+		}`)
 
-		require.Empty(t, resp.Schools.Edges)
-		require.Zero(t, resp.Schools.TotalCount)
-		require.False(t, resp.Schools.PageInfo.HasNextPage)
-		require.False(t, resp.Schools.PageInfo.HasPreviousPage)
-		require.Nil(t, resp.Schools.PageInfo.EndCursor)
-		require.Nil(t, resp.Schools.PageInfo.StartCursor)
+	t.Run("unauthorized", func(t *testing.T) {
+		r := httptest.NewRequest(http.MethodPost, "/graphql", bytes.NewBuffer(operations))
+		w := httptest.NewRecorder()
+
+		srv.ServeHTTP(w, r)
+
+		require.Equal(t, http.StatusUnauthorized, w.Result().StatusCode)
 	})
 
-	s.T().Run("unordered", func(t *testing.T) {
-		defer srv.EC.School.Delete().ExecX(ctx)
-
-		const expectedLen = 3
-		schools := make([]*ent.School, expectedLen)
-		schools[0] = ec.School.Create().SetName("school 1").SetImage("image/1").SetDirectory("test_dir").SaveX(ctx)
-		schools[1] = ec.School.Create().SetName("school 2").SetImage("image/2").SetDirectory("test_dir").SaveX(ctx)
-		schools[2] = ec.School.Create().SetName("school 3").SetImage("image/3").SetDirectory("test_dir").SetActive(false).SaveX(ctx)
-
+	t.Run("super admin", func(t *testing.T) {
 		var resp response
 
-		const query = `query {
-  schools {
-    totalCount
-    pageInfo {
-      hasNextPage
-      hasPreviousPage
-      startCursor
-      endCursor
-    }
-    edges {
-      node {
-        id
-        name
-        image
-        active
-        createdAt
-        updatedAt
-      }
-      cursor
-    }
-  }
-}`
+		r := httptest.NewRequest(http.MethodPost, "/graphql", bytes.NewBuffer(operations))
+		w := httptest.NewRecorder()
+		r.Header.Set("content-type", "application/json")
 
-		gc.MustPost(query, &resp)
+		u := createSuperAdmin(ctx, s, "testuser223")
+		data, err := auth.GenerateTokens(*u, s.Config.AuthConfig)
+		require.NoError(t, err)
+		require.NotNil(t, data)
 
-		require.Len(t, resp.Schools.Edges, expectedLen)
-		require.Equal(t, resp.Schools.TotalCount, expectedLen)
-		require.False(t, resp.Schools.PageInfo.HasNextPage)
-		require.False(t, resp.Schools.PageInfo.HasPreviousPage)
-		require.NotNil(t, resp.Schools.PageInfo.EndCursor)
-		require.NotNil(t, resp.Schools.PageInfo.StartCursor)
+		r.Header.Set("authorization", fmt.Sprintf("Bearer %s", data.AccessToken))
 
-		for _, edge := range resp.Schools.Edges {
-			var currentSchool *ent.School
-			for _, school := range schools {
-				if school.ID.String() == edge.Node.ID {
-					currentSchool = school
-					break
-				}
-			}
-			require.NotNil(t, currentSchool)
-			require.NotNil(t, edge.Cursor)
-			require.Equal(t, currentSchool.Name, edge.Node.Name)
-			require.Equal(t, currentSchool.Active, edge.Node.Active)
-			require.Equal(t, currentSchool.Image, edge.Node.Image)
-		}
+		srv.ServeHTTP(w, r)
+
+		require.Equal(t, http.StatusOK, w.Result().StatusCode)
+
+		err = json.NewDecoder(w.Body).Decode(&resp)
+		require.NoError(t, err)
+
+		require.NotNil(t, resp.Data)
+		require.NotNil(t, resp.Data.Schools)
+		require.Empty(t, resp.Data.Schools.Edges)
+		require.Nil(t, resp.Errors)
 	})
 
-	s.T().Run("order", func(t *testing.T) {
-		defer ec.School.Delete().ExecX(ctx)
+	t.Run("student", func(t *testing.T) {
+		r := httptest.NewRequest(http.MethodPost, "/graphql", bytes.NewBuffer(operations))
+		w := httptest.NewRecorder()
+		r.Header.Set("content-type", "application/json")
 
-		ec.School.Create().SetName("school 1").SetImage("image/1").SetDirectory("test_dir").SetCreatedAt(time.Now().Add(time.Minute)).SaveX(ctx)
-		ec.School.Create().SetName("school 2").SetImage("image/2").SetDirectory("test_dir").SetCreatedAt(time.Now().Add(time.Hour)).SaveX(ctx)
-		ec.School.Create().SetName("school 3").SetImage("image/3").SetDirectory("test_dir").SetActive(false).SaveX(ctx)
+		u := createStudent(ctx, s, "22testuser223")
+		data, err := auth.GenerateTokens(*u, s.Config.AuthConfig)
+		require.NoError(t, err)
+		require.NotNil(t, data)
 
-		var resp response
+		r.Header.Set("authorization", fmt.Sprintf("Bearer %s", data.AccessToken))
 
-		const query = `query {
-schools(orderBy: {field: CREATED_AT, direction: ASC}) {
-    totalCount
-    pageInfo {
-      hasNextPage
-      hasPreviousPage
-      startCursor
-      endCursor
-    }
-    edges {
-      node {
-        id
-        name
-        image
-        active
-        createdAt
-        updatedAt
-      }
-      cursor
-    }
-  }
-}`
-
-		want := ec.School.Query().Order(ent.Asc(school.FieldCreatedAt)).AllX(ctx)
-
-		gc.MustPost(query, &resp)
-
-		require.Len(t, resp.Schools.Edges, len(want))
-		require.Equal(t, resp.Schools.TotalCount, len(want))
-		require.False(t, resp.Schools.PageInfo.HasNextPage)
-		require.False(t, resp.Schools.PageInfo.HasPreviousPage)
-		require.NotNil(t, resp.Schools.PageInfo.EndCursor)
-		require.NotNil(t, resp.Schools.PageInfo.StartCursor)
-
-		for i, edge := range resp.Schools.Edges {
-			require.NotNil(t, edge.Cursor)
-			require.Equal(t, want[i].ID.String(), edge.Node.ID)
-			require.Equal(t, want[i].Name, edge.Node.Name)
-			require.Equal(t, want[i].Active, edge.Node.Active)
-			require.Equal(t, want[i].Image, edge.Node.Image)
-		}
-	})
-
-	s.T().Run("order & filter", func(t *testing.T) {
-		defer ec.School.Delete().ExecX(ctx)
-
-		ec.School.Create().SetName("school 1").SetDirectory("test_dir").SetImage("image/1").SetCreatedAt(time.Now().Add(time.Minute)).SaveX(ctx)
-		ec.School.Create().SetName("school 2").SetDirectory("test_dir").SetImage("image/2").SetCreatedAt(time.Now().Add(time.Hour)).SaveX(ctx)
-		ec.School.Create().SetName("school 3").SetDirectory("test_dir").SetImage("image/3").SetActive(false).SaveX(ctx)
+		srv.ServeHTTP(w, r)
 
 		var resp response
+		err = json.NewDecoder(w.Body).Decode(&resp)
+		require.NoError(t, err)
 
-		const query = `query {
-schools(orderBy: {field: CREATED_AT, direction: ASC}, where: {active: false}) {
-    totalCount
-    pageInfo {
-      hasNextPage
-      hasPreviousPage
-      startCursor
-      endCursor
-    }
-    edges {
-      node {
-        id
-        name
-        image
-        active
-        createdAt
-        updatedAt
-      }
-      cursor
-    }
-  }
-}`
-
-		want := ec.School.Query().Order(ent.Asc(school.FieldCreatedAt)).Where(school.Active(false)).AllX(ctx)
-
-		gc.MustPost(query, &resp)
-
-		require.Len(t, resp.Schools.Edges, len(want))
-		require.Equal(t, resp.Schools.TotalCount, len(want))
-		require.False(t, resp.Schools.PageInfo.HasNextPage)
-		require.False(t, resp.Schools.PageInfo.HasPreviousPage)
-		require.NotNil(t, resp.Schools.PageInfo.EndCursor)
-		require.NotNil(t, resp.Schools.PageInfo.StartCursor)
-
-		for i, edge := range resp.Schools.Edges {
-			require.NotNil(t, edge.Cursor)
-			require.Equal(t, want[i].ID.String(), edge.Node.ID)
-			require.Equal(t, want[i].Name, edge.Node.Name)
-			require.Equal(t, false, edge.Node.Active)
-			require.Equal(t, want[i].Image, edge.Node.Image)
-		}
+		require.Nil(t, resp.Data.Schools)
+		require.NotEmpty(t, resp.Errors)
+		require.Equal(t, auth.UnauthorizedErr.Error(), resp.Errors[0].Message)
 	})
 }
 
-func (s *schoolTestSuite) TestAddSchool() {
-	srv := s.newService("tesw2")
-	server := handler.NewDefaultServer(graph.NewSchema(srv))
-	gc := client.New(server)
-	ec := srv.EC
+func createSuperAdmin(ctx context.Context, s *service.Service, username string) *ent.User {
+	return s.EC.User.Create().SetName("test userd" + username).SetUsername(username).
+		SetPhone("077059333812").SetDirectory("diresss22").SetRole(user.RoleSuperAdmin).SetImage("sss").SetPassword("mipassword22@@@@5").SaveX(ctx)
+}
+
+func createStudent(ctx context.Context, s *service.Service, username string) *ent.User {
+	sch := s.EC.School.Create().SetName("schooltest").SetDirectory("fsss").SetImage("fss").SaveX(ctx)
+	stage := s.EC.Stage.Create().SetName("2nd").SetTuitionAmount(122).SetSchool(sch).SaveX(ctx)
+	return s.EC.User.Create().SetName("test userd" + username).SetUsername(username).
+		SetPhone("077059333812").SetDirectory("diresss22").SetPassword("mipassword22@@@@5").SetSchool(sch).SetStage(stage).SaveX(ctx)
+}
+
+func TestAddSchool(t *testing.T) {
+	s := newService(t)
+	srv := graph.NewServer(s, false)
+	ec := s.EC
 	ctx := context.Background()
 
 	type response struct {
@@ -310,13 +160,26 @@ func (s *schoolTestSuite) TestAddSchool() {
 		} `json:"errors,omitempty"`
 	}
 
-	s.T().Run("missing image", func(t *testing.T) {
+	u := createSuperAdmin(ctx, s, "whatev22223")
+	data, err := auth.GenerateTokens(*u, s.Config.AuthConfig)
+	require.NoError(t, err)
+
+	t.Run("missing image", func(t *testing.T) {
 		var resp response
-		err := gc.Post("mutation { addSchool(input: {name: \"a school without an image\"}) { id name image active createdAt updatedAt }}", &resp.Data)
-		require.Error(t, err)
+
+		w := httptest.NewRecorder()
+		r := createRequest(t, "mutation { addSchool(input: {name: \"a school without an image\"}) { id name image active createdAt updatedAt }}", "{}")
+		r.Header.Set("authorization", fmt.Sprintf("Bearer %s", data.AccessToken))
+
+		srv.ServeHTTP(w, r)
+
+		err = json.NewDecoder(w.Body).Decode(&resp)
+		require.NoError(t, err)
+
+		require.NotEmpty(t, resp.Errors)
 	})
 
-	s.T().Run("with image", func(t *testing.T) {
+	t.Run("super admin", func(t *testing.T) {
 		defer ec.School.Delete().ExecX(ctx)
 
 		w := httptest.NewRecorder()
@@ -325,7 +188,7 @@ func (s *schoolTestSuite) TestAddSchool() {
 		require.NoError(t, err)
 
 		operations := `{
-			"query": "mutation ($image: Upload!) { addSchool(input: {name: \"a school with an image\", image: $image}) { id name image active createdAt updatedAt }}", 
+			"query": "mutation ($image: Upload!) { addSchool(input: {name: \"a school with an image\", image: $image}) { id name image active createdAt updatedAt }}",
 			"variables": {"image": null}
 		}`
 
@@ -336,7 +199,9 @@ func (s *schoolTestSuite) TestAddSchool() {
 			File:   imgFile,
 		})
 
-		server.ServeHTTP(w, r)
+		r.Header.Set("authorization", fmt.Sprintf("Bearer %s", data.AccessToken))
+
+		srv.ServeHTTP(w, r)
 
 		var resp response
 		require.NoError(t, json.NewDecoder(w.Body).Decode(&resp))
@@ -345,11 +210,53 @@ func (s *schoolTestSuite) TestAddSchool() {
 		require.NotEmpty(t, resp.Data.AddSchool.ID)
 		require.Equal(t, "a school with an image", resp.Data.AddSchool.Name)
 	})
+
+	t.Run("student", func(t *testing.T) {
+		defer ec.School.Delete().ExecX(ctx)
+
+		w := httptest.NewRecorder()
+
+		imgFile, err := os.Open("../testfiles/stanford.png")
+		require.NoError(t, err)
+
+		operations := `{
+			"query": "mutation ($image: Upload!) { addSchool(input: {name: \"a school with an image\", image: $image}) { id name image active createdAt updatedAt }}",
+			"variables": {"image": null}
+		}`
+
+		mapData := `{"0": ["variables.image"]}`
+
+		r := createMultipartRequest(t, operations, mapData, file{
+			mapKey: "0",
+			File:   imgFile,
+		})
+
+		u.Role = user.RoleStudent
+		data, err = auth.GenerateTokens(*u, s.Config.AuthConfig)
+		require.NoError(t, err)
+
+		r.Header.Set("authorization", fmt.Sprintf("Bearer %s", data.AccessToken))
+
+		srv.ServeHTTP(w, r)
+
+		var resp response
+		require.NoError(t, json.NewDecoder(w.Body).Decode(&resp))
+		require.NotEmpty(t, resp.Errors)
+		require.Equal(t, auth.UnauthorizedErr.Error(), resp.Errors[0].Message)
+	})
 }
 
 type file struct {
 	mapKey string
 	*os.File
+}
+
+func createRequest(t *testing.T, query, variables string) *http.Request {
+	b := bytes.NewBuffer([]byte(fmt.Sprintf(`{"query": %q, "variables": %s}`, query, variables)))
+	r := httptest.NewRequest(http.MethodPost, "/graphql", b)
+	r.Header.Set("content-type", "application/json")
+
+	return r
 }
 
 func createMultipartRequest(t *testing.T, operations, mapData string, f file) *http.Request {
@@ -374,12 +281,10 @@ func createMultipartRequest(t *testing.T, operations, mapData string, f file) *h
 
 const testID = "2710c203-7842-4356-8d9f-12f9da4722a2"
 
-func (s *schoolTestSuite) TestUpdateSchool() {
-	srv := s.newService("sd3tesw2")
-	defer srv.EC.Close()
-	server := handler.NewDefaultServer(graph.NewSchema(srv))
-	gc := client.New(server)
-	ec := srv.EC
+func TestUpdateSchool(t *testing.T) {
+	s := newService(t)
+	defer s.EC.Close()
+	srv := graph.NewServer(s, false)
 	ctx := context.Background()
 
 	type response struct {
@@ -399,15 +304,19 @@ func (s *schoolTestSuite) TestUpdateSchool() {
 		} `json:"errors,omitempty"`
 	}
 
-	s.T().Run("invalid", func(t *testing.T) {
-		var resp response
-		err := gc.Post(fmt.Sprintf("mutation { updateSchool(id: %q, input: {name: \"a school without an image\"}) { id name image active createdAt updatedAt }}", testID), &resp.Data)
-		require.Error(t, err)
+	t.Run("unauthenticated", func(t *testing.T) {
+		r := createRequest(t, fmt.Sprintf("mutation { updateSchool(id: %q, input: {name: \"a school without an image\"}) { id name image active createdAt updatedAt }}", testID), "{}")
+
+		w := httptest.NewRecorder()
+
+		srv.ServeHTTP(w, r)
+
+		require.Equal(t, http.StatusUnauthorized, w.Code)
 	})
 
-	f := testutil.OpenFile(s.T(), "../testfiles/harvard.jpg")
+	f := testutil.OpenFile(t, "../testfiles/harvard.jpg")
 	defer f.Close()
-	sch, err := srv.AddSchool(ctx,
+	sch, err := s.AddSchool(ctx,
 		model.AddSchoolInput{
 			Name: "test schoo",
 			Image: graphql.Upload{
@@ -418,75 +327,190 @@ func (s *schoolTestSuite) TestUpdateSchool() {
 			Active: true,
 		},
 	)
-	require.NoError(s.T(), err)
+	require.NoError(t, err)
 
-	s.T().Run("valid", func(t *testing.T) {
-		defer ec.School.Delete().ExecX(ctx)
+	u := createSuperAdmin(ctx, s, "superuser224")
+	data, err := auth.GenerateTokens(*u, s.Config.AuthConfig)
+	require.NoError(t, err)
 
-		w := httptest.NewRecorder()
+	imgFile, err := os.Open("../testfiles/stanford.png")
+	defer imgFile.Close()
+	require.NoError(t, err)
 
-		imgFile, err := os.Open("../testfiles/stanford.png")
-		defer imgFile.Close()
-		require.NoError(t, err)
-
-		operations := fmt.Sprintf(`{
-"query": "mutation ($image: Upload!) { updateSchool(id: \"%s\", input: {name: \"a school with an image\", image: $image}) { id name image active createdAt updatedAt }}", 
+	operations := fmt.Sprintf(`{
+"query": "mutation ($image: Upload!) { updateSchool(id: \"%s\", input: {name: \"a school with an image\", image: $image}) { id name image active createdAt updatedAt }}",
 			"variables": {"image": null}
 		}`, sch.ID)
 
-		mapData := `{"0": ["variables.image"]}`
+	mapData := `{"0": ["variables.image"]}`
+
+	t.Run("super admin", func(t *testing.T) {
+		w := httptest.NewRecorder()
 
 		r := createMultipartRequest(t, operations, mapData, file{
 			mapKey: "0",
 			File:   imgFile,
 		})
 
-		server.ServeHTTP(w, r)
+		r.Header.Set("authorization", "Bearer "+data.AccessToken)
+
+		srv.ServeHTTP(w, r)
 
 		var resp response
 		require.NoError(t, json.NewDecoder(w.Body).Decode(&resp))
-		require.Nil(t, resp.Errors)
-		require.NotNil(t, resp.Data, "data is nil")
-		require.NotNil(t, resp.Data.UpdateSchool, "data.updateSchool is nil")
+		require.Empty(t, resp.Errors)
+		require.NotNil(t, resp.Data, "data must not be nil")
+		require.NotNil(t, resp.Data.UpdateSchool, "data.updateSchool must not be nil")
 		require.NotEmpty(t, resp.Data.UpdateSchool.ID)
 		require.Equal(t, "a school with an image", resp.Data.UpdateSchool.Name)
 	})
+
+	t.Run("school admin", func(t *testing.T) {
+		w := httptest.NewRecorder()
+
+		imgFile.Seek(0, 0)
+
+		r := createMultipartRequest(t, operations, mapData, file{
+			mapKey: "0",
+			File:   imgFile,
+		})
+
+		u.Role = user.RoleSchoolAdmin
+
+		data, err = auth.GenerateTokens(*u, s.Config.AuthConfig)
+		require.NoError(t, err)
+
+		r.Header.Set("authorization", "Bearer "+data.AccessToken)
+
+		srv.ServeHTTP(w, r)
+
+		var resp response
+		require.NoError(t, json.NewDecoder(w.Body).Decode(&resp))
+		require.NotEmpty(t, resp.Errors)
+		require.Equal(t, auth.UnauthorizedErr.Error(), resp.Errors[0].Message)
+	})
 }
 
-func (s *schoolTestSuite) TestDeleteSchoolPermanently() {
-	srv := s.newService("rsdj2")
-	ec := srv.EC
-	server := handler.NewDefaultServer(graph.NewSchema(srv))
-	gc := client.New(server)
+func TestDeleteSchoolPermanently(t *testing.T) {
+	s := newService(t)
+	ec := s.EC
+	srv := graph.NewServer(s, false)
 	ctx := context.Background()
 
 	type response struct {
-		DeleteSchoolPermanently bool
+		Data struct {
+			DeleteSchoolPermanently bool `json:"deleteSchoolPermanently"`
+		} `json:"data"`
+
+		Errors []struct {
+			Message string   `json:"message"`
+			Path    []string `json:"path"`
+		} `json:"errors,omitempty"`
 	}
 
-	s.T().Run("exists", func(t *testing.T) {
+	u := createSuperAdmin(ctx, s, "superuser224")
+	data, err := auth.GenerateTokens(*u, s.Config.AuthConfig)
+	require.NoError(t, err)
+
+	t.Run("super admin", func(t *testing.T) {
+		var resp response
+		sch := ec.School.Create().SetName("test school").SetDirectory("test_dir").SetImage("test/image").SaveX(ctx)
+
+		r := createRequest(t, fmt.Sprintf(`mutation { deleteSchoolPermanently(id:"%s") }`, sch.ID.String()), "{}")
+		r.Header.Set("authorization", "Bearer "+data.AccessToken)
+
+		w := httptest.NewRecorder()
+
+		srv.ServeHTTP(w, r)
+
+		require.NoError(t, json.NewDecoder(w.Body).Decode(&resp))
+
+		require.True(t, resp.Data.DeleteSchoolPermanently)
+	})
+
+	t.Run("school admin", func(t *testing.T) {
 		defer ec.School.Delete().ExecX(ctx)
 
 		sch := ec.School.Create().SetName("test school").SetDirectory("test_dir").SetImage("test/image").SaveX(ctx)
 
-		var resp response
-		gc.MustPost(fmt.Sprintf(`mutation { deleteSchoolPermanently(id:"%s") }`, sch.ID.String()), &resp)
-		require.True(t, resp.DeleteSchoolPermanently)
+		r := createRequest(t, fmt.Sprintf(`mutation { deleteSchoolPermanently(id:"%s") }`, sch.ID.String()), "{}")
 
-		schools := ec.School.Query().AllX(ctx)
-		require.Empty(t, schools)
+		u.Role = user.RoleSchoolAdmin
+		data, err := auth.GenerateTokens(*u, s.Config.AuthConfig)
+		require.NoError(t, err)
+
+		r.Header.Set("authorization", "Bearer "+data.AccessToken)
+
+		w := httptest.NewRecorder()
+
+		srv.ServeHTTP(w, r)
+
+		var resp response
+		require.NoError(t, json.NewDecoder(w.Body).Decode(&resp))
+
+		require.NotEmpty(t, resp.Errors)
+		require.Equal(t, auth.UnauthorizedErr.Error(), resp.Errors[0].Message)
+	})
+}
+
+func TestDeleteSchool(t *testing.T) {
+	s := newService(t)
+	ec := s.EC
+	srv := graph.NewServer(s, false)
+	ctx := context.Background()
+
+	type response struct {
+		Data struct {
+			DeleteSchool bool `json:"deleteSchool"`
+		} `json:"data"`
+
+		Errors []struct {
+			Message string   `json:"message"`
+			Path    []string `json:"path"`
+		} `json:"errors,omitempty"`
+	}
+
+	u := createSuperAdmin(ctx, s, "superuser224")
+	data, err := auth.GenerateTokens(*u, s.Config.AuthConfig)
+	require.NoError(t, err)
+
+	t.Run("super admin authorized", func(t *testing.T) {
+		var resp response
+		sch := ec.School.Create().SetName("test school").SetDirectory("test_dir").SetImage("test/image").SaveX(ctx)
+
+		r := createRequest(t, fmt.Sprintf(`mutation { deleteSchool(id:"%s") }`, sch.ID.String()), "{}")
+		r.Header.Set("authorization", "Bearer "+data.AccessToken)
+
+		w := httptest.NewRecorder()
+
+		srv.ServeHTTP(w, r)
+
+		require.NoError(t, json.NewDecoder(w.Body).Decode(&resp))
+
+		require.True(t, resp.Data.DeleteSchool)
 	})
 
-	s.T().Run("does not exist", func(t *testing.T) {
+	t.Run("school admin not authorized", func(t *testing.T) {
 		defer ec.School.Delete().ExecX(ctx)
 
-		ec.School.Create().SetName("test school").SetDirectory("test_dir").SetImage("test/image").SaveX(ctx)
+		sch := ec.School.Create().SetName("test school").SetDirectory("test_dir").SetImage("test/image").SaveX(ctx)
+
+		r := createRequest(t, fmt.Sprintf(`mutation { deleteSchool(id:"%s") }`, sch.ID.String()), "{}")
+
+		u.Role = user.RoleSchoolAdmin
+		data, err := auth.GenerateTokens(*u, s.Config.AuthConfig)
+		require.NoError(t, err)
+
+		r.Header.Set("authorization", "Bearer "+data.AccessToken)
+
+		w := httptest.NewRecorder()
+
+		srv.ServeHTTP(w, r)
 
 		var resp response
-		err := gc.Post(`mutation { deleteSchoolPermanently(id:"2710c203-7842-4356-8d9f-12f9da4722a2") } `, &resp)
-		require.Error(t, err)
+		require.NoError(t, json.NewDecoder(w.Body).Decode(&resp))
 
-		schools := ec.School.Query().AllX(ctx)
-		require.NotEmpty(t, schools)
+		require.NotEmpty(t, resp.Errors)
+		require.Equal(t, auth.UnauthorizedErr.Error(), resp.Errors[0].Message)
 	})
 }

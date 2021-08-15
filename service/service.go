@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/minio/minio-go/v7"
+	"github.com/msal4/hassah_school_server/auth"
 	"github.com/msal4/hassah_school_server/ent"
 )
 
@@ -49,25 +50,8 @@ type Config struct {
 	// If not provided defaultHQImageSize is used.
 	HQImageSize imageSize
 
-	// AccessSecretKey is the key used to sign the access token.
-	//
-	// Default: defaultAccessKey
-	AccessSecretKey []byte
-
-	// RefreshSecretKey is the key used to sign the refresh token.
-	//
-	// Default: defaultRefreshKey
-	RefreshSecretKey []byte
-
-	// AccessTokenLifetime is the duration used to determine the expiration date for the access token.
-	//
-	// Default: defaultAccessTokenLifetime
-	AccessTokenLifetime time.Duration
-
-	// RefreshTokenLifetime is the duration used to determine the expiration date for the refresh token.
-	//
-	// Default: defaultRefreshTokenLifetime
-	RefreshTokenLifetime time.Duration
+	// AuthConfig is used to configure the token generation.
+	auth.AuthConfig
 }
 
 type Service struct {
