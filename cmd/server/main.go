@@ -14,13 +14,11 @@ import (
 	"github.com/msal4/hassah_school_server/service"
 )
 
-var debg bool
+var debg *bool
 
 func init() {
-	d := flag.Bool("debug", false, "Run server in debug mode")
+	debg = flag.Bool("debug", false, "Run server in debug mode")
 	flag.Parse()
-
-	debg = d != nil && *d
 }
 
 // minio credentials
@@ -47,7 +45,7 @@ func main() {
 		log.Fatalf("initializing service: %v", err)
 	}
 
-	srv := graph.NewServer(s, debg)
+	srv := graph.NewServer(s, *debg)
 
 	log.Println("listening on :3000")
 	log.Fatal(http.ListenAndServe(":3000", srv))

@@ -25,7 +25,7 @@ func main() {
 	}
 	defer client.Close()
 
-	if debug != nil && *debug {
+	if *debug {
 		err = client.Debug().Schema.Create(context.Background(), migrate.WithDropIndex(true), migrate.WithDropColumn(true))
 	} else {
 		err = client.Schema.Create(context.Background())
