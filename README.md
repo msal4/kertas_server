@@ -7,5 +7,6 @@
 - [x] Setup tests
 - [x] Refactor
 - [x] Setup authorization
+- [ ] Stages and the file/document system
 - [ ] Implement chat
 - [ ] Fulltext search
