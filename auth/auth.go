@@ -84,8 +84,14 @@ func IsStudent(ctx context.Context) bool {
 
 func Middleware(h http.Handler, accessKey []byte) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		authHeader := r.Header.Get("authorization")
+		authHeader := strings.TrimSpace(r.Header.Get("authorization"))
 		tokenStr := strings.TrimPrefix(authHeader, "Bearer ")
+
+		if tokenStr == "" {
+			h.ServeHTTP(w, r)
+			return
+		}
+
 		getSecret := func(token *jwt.Token) (interface{}, error) {
 			return accessKey, nil
 		}

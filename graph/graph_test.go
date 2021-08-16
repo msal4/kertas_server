@@ -21,6 +21,7 @@ import (
 	"github.com/msal4/hassah_school_server/auth"
 	"github.com/msal4/hassah_school_server/ent"
 	"github.com/msal4/hassah_school_server/ent/enttest"
+	"github.com/msal4/hassah_school_server/ent/user"
 	"github.com/msal4/hassah_school_server/graph/model"
 	"github.com/msal4/hassah_school_server/service"
 	"github.com/msal4/hassah_school_server/util"
@@ -101,4 +102,28 @@ func genTokens(t testing.TB, u *ent.User, s *service.Service) *model.AuthData {
 	require.NoError(t, err)
 
 	return data
+}
+
+func createSuperAdmin(ctx context.Context, s *service.Service, username string) *ent.User {
+	return s.EC.User.Create().SetName("test userd" + username).SetUsername(username).
+		SetPhone("077059333812").SetDirectory("diresss22" + username).SetRole(user.RoleSuperAdmin).SetImage("sss").SetPassword("mipassword22@@@@5").SaveX(ctx)
+}
+
+func createSchoolAdmin(ctx context.Context, s *service.Service, username string) *ent.User {
+	sch := s.EC.School.Create().SetName("schooltest").SetDirectory("fsss").SetImage("fss").SaveX(ctx)
+	return s.EC.User.Create().SetName("testu4serd" + username).SetUsername(username).
+		SetPhone("077059333812").SetDirectory("diresss22" + username).SetPassword("mipassword22@@@@5").SetSchool(sch).SetRole(user.RoleSchoolAdmin).SaveX(ctx)
+}
+
+func createTeacher(ctx context.Context, s *service.Service, username string) *ent.User {
+	sch := s.EC.School.Create().SetName("schooltest").SetDirectory("fsss").SetImage("fss").SaveX(ctx)
+	return s.EC.User.Create().SetName("testu4serd" + username).SetUsername(username).
+		SetPhone("077059333812").SetDirectory("diresss22" + username).SetPassword("mipassword22@@@@5").SetSchool(sch).SetRole(user.RoleTeacher).SaveX(ctx)
+}
+
+func createStudent(ctx context.Context, s *service.Service, username string) *ent.User {
+	sch := s.EC.School.Create().SetName("schooltest").SetDirectory("fsss").SetImage("fss").SaveX(ctx)
+	stage := s.EC.Stage.Create().SetName("2nd").SetTuitionAmount(122).SetSchool(sch).SaveX(ctx)
+	return s.EC.User.Create().SetName("test userd" + username).SetUsername(username).
+		SetPhone("077059333812").SetDirectory("diresss22" + username).SetPassword("mipassword22@@@@5").SetSchool(sch).SetStage(stage).SaveX(ctx)
 }

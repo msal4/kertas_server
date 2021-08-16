@@ -10,6 +10,7 @@ import (
 	"github.com/msal4/hassah_school_server/ent"
 	"github.com/msal4/hassah_school_server/ent/user"
 	"github.com/msal4/hassah_school_server/graph"
+	"github.com/msal4/hassah_school_server/service"
 	"github.com/msal4/hassah_school_server/testutil"
 	"github.com/msal4/hassah_school_server/util/ptr"
 	"github.com/stretchr/testify/require"
@@ -299,6 +300,128 @@ func TestDeleteUserPermanently(t *testing.T) {
 
 			if c.want == nil {
 				require.Nil(t, resp.Errors)
+				return
+			}
+
+			require.NotEmpty(t, resp.Errors)
+			require.Equal(t, *c.want, resp.Errors[0].Message)
+		})
+	}
+}
+
+func TestLoginAdmin(t *testing.T) {
+	type response struct {
+		Data *struct {
+			LoginAdmin *struct {
+				AccessToken  string `json:"accessToken"`
+				RefreshToken string `json:"refreshToken"`
+			} `json:"loginAdmin"`
+		} `json:"data"`
+		Errors []struct {
+			Message string   `json:"message"`
+			Path    []string `json:"path"`
+		} `json:"errors,omitempty"`
+	}
+	s := newService(t)
+	defer s.EC.Close()
+
+	srv := graph.NewServer(s, false)
+	ctx := context.Background()
+
+	suAdmin := createSuperAdmin(ctx, s, "hello23super")
+	schAdmin := createSchoolAdmin(ctx, s, "hello23sup24")
+	teacher := createTeacher(ctx, s, "hellostuteachert22")
+	student := createStudent(ctx, s, "heldesnt22")
+
+	operations := `mutation { loginAdmin(input: { username: %q, password: %q }) {accessToken refreshToken} }`
+
+	cases := []struct {
+		desc string
+		user *ent.User
+		want *string
+	}{
+		{"super admin is allowed", suAdmin, nil},
+		{"school admin is allowed", schAdmin, nil},
+		{"teacher is not allowed", teacher, ptr.Str(service.NotAllowedErr.Error())},
+		{"student is not allowed", student, ptr.Str(service.NotAllowedErr.Error())},
+	}
+
+	for _, c := range cases {
+		t.Run(c.desc, func(t *testing.T) {
+			var resp response
+
+			r := createRequest(t, fmt.Sprintf(operations, c.user.Username, c.user.Password), "{}")
+			w := httptest.NewRecorder()
+
+			srv.ServeHTTP(w, r)
+
+			parseBody(t, w, &resp)
+
+			if c.want == nil {
+				require.Nil(t, resp.Errors)
+				require.NotNil(t, resp.Data)
+				require.NotNil(t, resp.Data.LoginAdmin)
+				return
+			}
+
+			require.NotEmpty(t, resp.Errors)
+			require.Equal(t, *c.want, resp.Errors[0].Message)
+		})
+	}
+}
+
+func TestLoginUser(t *testing.T) {
+	type response struct {
+		Data *struct {
+			LoginUser *struct {
+				AccessToken  string `json:"accessToken"`
+				RefreshToken string `json:"refreshToken"`
+			} `json:"loginUser"`
+		} `json:"data"`
+		Errors []struct {
+			Message string   `json:"message"`
+			Path    []string `json:"path"`
+		} `json:"errors,omitempty"`
+	}
+	s := newService(t)
+	defer s.EC.Close()
+
+	srv := graph.NewServer(s, false)
+	ctx := context.Background()
+
+	suAdmin := createSuperAdmin(ctx, s, "hello23super")
+	schAdmin := createSchoolAdmin(ctx, s, "hello23sup24")
+	teacher := createTeacher(ctx, s, "hellostuteachert22")
+	student := createStudent(ctx, s, "heldesnt22")
+
+	operations := `mutation { loginUser(input: { username: %q, password: %q }) {accessToken refreshToken} }`
+
+	cases := []struct {
+		desc string
+		user *ent.User
+		want *string
+	}{
+		{"teacher is allowed", teacher, nil},
+		{"student is allowed", student, nil},
+		{"super admin is not allowed", suAdmin, ptr.Str(service.NotAllowedErr.Error())},
+		{"school admin is not allowed", schAdmin, ptr.Str(service.NotAllowedErr.Error())},
+	}
+
+	for _, c := range cases {
+		t.Run(c.desc, func(t *testing.T) {
+			var resp response
+
+			r := createRequest(t, fmt.Sprintf(operations, c.user.Username, c.user.Password), "{}")
+			w := httptest.NewRecorder()
+
+			srv.ServeHTTP(w, r)
+
+			parseBody(t, w, &resp)
+
+			if c.want == nil {
+				require.Nil(t, resp.Errors)
+				require.NotNil(t, resp.Data)
+				require.NotNil(t, resp.Data.LoginUser)
 				return
 			}
 

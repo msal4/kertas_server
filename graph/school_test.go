@@ -13,11 +13,9 @@ import (
 	"github.com/99designs/gqlgen/graphql"
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/msal4/hassah_school_server/auth"
-	"github.com/msal4/hassah_school_server/ent"
 	"github.com/msal4/hassah_school_server/ent/user"
 	"github.com/msal4/hassah_school_server/graph"
 	"github.com/msal4/hassah_school_server/graph/model"
-	"github.com/msal4/hassah_school_server/service"
 	"github.com/msal4/hassah_school_server/testutil"
 	"github.com/stretchr/testify/require"
 )
@@ -63,13 +61,15 @@ func TestSchools(t *testing.T) {
 		"query": "{ schools { totalCount pageInfo { hasNextPage hasPreviousPage startCursor endCursor } edges { node { id name image active createdAt updatedAt } cursor } } }"
 		}`)
 
-	t.Run("unauthorized", func(t *testing.T) {
+	t.Run("unauthenticated", func(t *testing.T) {
 		r := httptest.NewRequest(http.MethodPost, "/graphql", bytes.NewBuffer(operations))
 		w := httptest.NewRecorder()
 
 		srv.ServeHTTP(w, r)
 
-		require.Equal(t, http.StatusUnauthorized, w.Result().StatusCode)
+		var resp response
+		parseBody(t, w, &resp)
+		require.NotEmpty(t, resp.Errors)
 	})
 
 	t.Run("super admin", func(t *testing.T) {
@@ -121,18 +121,6 @@ func TestSchools(t *testing.T) {
 		require.NotEmpty(t, resp.Errors)
 		require.Equal(t, auth.UnauthorizedErr.Error(), resp.Errors[0].Message)
 	})
-}
-
-func createSuperAdmin(ctx context.Context, s *service.Service, username string) *ent.User {
-	return s.EC.User.Create().SetName("test userd" + username).SetUsername(username).
-		SetPhone("077059333812").SetDirectory("diresss22").SetRole(user.RoleSuperAdmin).SetImage("sss").SetPassword("mipassword22@@@@5").SaveX(ctx)
-}
-
-func createStudent(ctx context.Context, s *service.Service, username string) *ent.User {
-	sch := s.EC.School.Create().SetName("schooltest").SetDirectory("fsss").SetImage("fss").SaveX(ctx)
-	stage := s.EC.Stage.Create().SetName("2nd").SetTuitionAmount(122).SetSchool(sch).SaveX(ctx)
-	return s.EC.User.Create().SetName("test userd" + username).SetUsername(username).
-		SetPhone("077059333812").SetDirectory("diresss22").SetPassword("mipassword22@@@@5").SetSchool(sch).SetStage(stage).SaveX(ctx)
 }
 
 func TestAddSchool(t *testing.T) {
@@ -277,7 +265,9 @@ func TestUpdateSchool(t *testing.T) {
 
 		srv.ServeHTTP(w, r)
 
-		require.Equal(t, http.StatusUnauthorized, w.Code)
+		var resp response
+		parseBody(t, w, &resp)
+		require.NotEmpty(t, resp.Errors)
 	})
 
 	f := testutil.OpenFile(t, "../testfiles/harvard.jpg")
