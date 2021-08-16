@@ -82,7 +82,7 @@ func IsStudent(ctx context.Context) bool {
 	return IsAuthorized(ctx, user.RoleStudent)
 }
 
-func Middleware(h http.Handler, accessKey []byte) http.Handler {
+func Middleware(h http.Handler, accessKey string) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		authHeader := strings.TrimSpace(r.Header.Get("authorization"))
 		tokenStr := strings.TrimPrefix(authHeader, "Bearer ")
@@ -93,7 +93,7 @@ func Middleware(h http.Handler, accessKey []byte) http.Handler {
 		}
 
 		getSecret := func(token *jwt.Token) (interface{}, error) {
-			return accessKey, nil
+			return []byte(accessKey), nil
 		}
 		var claims AccessClaims
 		t, err := jwt.ParseWithClaims(tokenStr, &claims, getSecret)
@@ -115,16 +115,16 @@ func Middleware(h http.Handler, accessKey []byte) http.Handler {
 
 type AuthConfig struct {
 	// AccessSecretKey is the key used to sign the access token.
-	AccessSecretKey []byte
+	AccessSecretKey string `yaml:"access_secret_key" env:"ACCESS_SECRET_KEY"`
 
 	// RefreshSecretKey is the key used to sign the refresh token.
-	RefreshSecretKey []byte
+	RefreshSecretKey string `yaml:"refresh_secret_key" env:"REFRESH_SECRET_KEY"`
 
 	// AccessTokenLifetime is the duration used to determine the expiration date for the access token.
-	AccessTokenLifetime time.Duration
+	AccessTokenLifetime time.Duration `yaml:"access_token_lifetime" env:"ACCESS_TOKEN_LIFETIME"`
 
 	// RefreshTokenLifetime is the duration used to determine the expiration date for the refresh token.
-	RefreshTokenLifetime time.Duration
+	RefreshTokenLifetime time.Duration `yaml:"refresh_token_lifetime" env:"REFRESH_TOKEN_LIFETIME"`
 }
 
 func GenerateTokens(u ent.User, cfg AuthConfig) (*model.AuthData, error) {
@@ -135,7 +135,7 @@ func GenerateTokens(u ent.User, cfg AuthConfig) (*model.AuthData, error) {
 		UserID: u.ID,
 		Role:   u.Role,
 	})
-	access, err := token.SignedString(cfg.AccessSecretKey)
+	access, err := token.SignedString([]byte(cfg.AccessSecretKey))
 	if err != nil {
 		return nil, err
 	}
@@ -147,7 +147,8 @@ func GenerateTokens(u ent.User, cfg AuthConfig) (*model.AuthData, error) {
 		UserID:       u.ID,
 		TokenVersion: u.TokenVersion,
 	})
-	refresh, err := token.SignedString(cfg.RefreshSecretKey)
+
+	refresh, err := token.SignedString([]byte(cfg.RefreshSecretKey))
 	if err != nil {
 		return nil, err
 	}

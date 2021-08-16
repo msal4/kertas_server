@@ -495,7 +495,7 @@ func TestLoginAdmin(t *testing.T) {
 
 		var accessClaims auth.AccessClaims
 		token, err := jwt.ParseWithClaims(resp.AccessToken, &accessClaims, func(t *jwt.Token) (interface{}, error) {
-			return s.Config.AccessSecretKey, nil
+			return []byte(s.Config.AccessSecretKey), nil
 		})
 		require.NoError(t, err)
 		require.NotNil(t, token)
@@ -505,7 +505,7 @@ func TestLoginAdmin(t *testing.T) {
 
 		var refreshClaims auth.RefreshClaims
 		token, err = jwt.ParseWithClaims(resp.RefreshToken, &refreshClaims, func(t *jwt.Token) (interface{}, error) {
-			return s.Config.RefreshSecretKey, nil
+			return []byte(s.Config.RefreshSecretKey), nil
 		})
 		require.NoError(t, err)
 		require.NotNil(t, token)
@@ -542,7 +542,7 @@ func TestLoginAdmin(t *testing.T) {
 
 		var accessClaims auth.AccessClaims
 		token, err := jwt.ParseWithClaims(resp.AccessToken, &accessClaims, func(t *jwt.Token) (interface{}, error) {
-			return s.Config.AccessSecretKey, nil
+			return []byte(s.Config.AccessSecretKey), nil
 		})
 		require.NoError(t, err)
 		require.NotNil(t, token)
@@ -552,7 +552,7 @@ func TestLoginAdmin(t *testing.T) {
 
 		var refreshClaims auth.RefreshClaims
 		token, err = jwt.ParseWithClaims(resp.RefreshToken, &refreshClaims, func(t *jwt.Token) (interface{}, error) {
-			return s.Config.RefreshSecretKey, nil
+			return []byte(s.Config.RefreshSecretKey), nil
 		})
 		require.NoError(t, err)
 		require.NotNil(t, token)
@@ -738,7 +738,7 @@ func TestLoginUser(t *testing.T) {
 
 		var accessClaims auth.AccessClaims
 		token, err := jwt.ParseWithClaims(resp.AccessToken, &accessClaims, func(t *jwt.Token) (interface{}, error) {
-			return s.Config.AccessSecretKey, nil
+			return []byte(s.Config.AccessSecretKey), nil
 		})
 		require.NoError(t, err)
 		require.NotNil(t, token)
@@ -748,7 +748,7 @@ func TestLoginUser(t *testing.T) {
 
 		var refreshClaims auth.RefreshClaims
 		token, err = jwt.ParseWithClaims(resp.RefreshToken, &refreshClaims, func(t *jwt.Token) (interface{}, error) {
-			return s.Config.RefreshSecretKey, nil
+			return []byte(s.Config.RefreshSecretKey), nil
 		})
 		require.NoError(t, err)
 		require.NotNil(t, token)
@@ -783,7 +783,7 @@ func TestLoginUser(t *testing.T) {
 
 		var accessClaims auth.AccessClaims
 		token, err := jwt.ParseWithClaims(resp.AccessToken, &accessClaims, func(t *jwt.Token) (interface{}, error) {
-			return s.Config.AccessSecretKey, nil
+			return []byte(s.Config.AccessSecretKey), nil
 		})
 		require.NoError(t, err)
 		require.NotNil(t, token)
@@ -793,7 +793,7 @@ func TestLoginUser(t *testing.T) {
 
 		var refreshClaims auth.RefreshClaims
 		token, err = jwt.ParseWithClaims(resp.RefreshToken, &refreshClaims, func(t *jwt.Token) (interface{}, error) {
-			return s.Config.RefreshSecretKey, nil
+			return []byte(s.Config.RefreshSecretKey), nil
 		})
 		require.NoError(t, err)
 		require.NotNil(t, token)
@@ -941,7 +941,7 @@ func TestRefreshTokens(t *testing.T) {
 
 		var accessClaims auth.AccessClaims
 		token, err := jwt.ParseWithClaims(data.AccessToken, &accessClaims, func(t *jwt.Token) (interface{}, error) {
-			return s.Config.AccessSecretKey, nil
+			return []byte(s.Config.AccessSecretKey), nil
 		})
 		require.NoError(t, err)
 		require.NotNil(t, token)
@@ -951,7 +951,7 @@ func TestRefreshTokens(t *testing.T) {
 
 		var refreshClaims auth.RefreshClaims
 		token, err = jwt.ParseWithClaims(resp.RefreshToken, &refreshClaims, func(t *jwt.Token) (interface{}, error) {
-			return s.Config.RefreshSecretKey, nil
+			return []byte(s.Config.RefreshSecretKey), nil
 		})
 		require.NoError(t, err)
 		require.NotNil(t, token)

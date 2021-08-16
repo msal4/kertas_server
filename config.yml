@@ -1,0 +1,27 @@
+# Environment variables have presedence over the yaml config.
+# The environment variable name is the same as the config property name prefixed with the name of the parent property if it has any seperated by an underscore but in uppercase.
+# For example:
+# minio:
+#   endpoint: whatever
+# the env var name for endpoint is MINIO_ENDPOINT.
+port: 3000
+minio:
+  endpoint: localhost:9000
+  access_key: myaccesskey
+  token: mytoken
+service:
+  root_bucket: root
+  max_filename_len: 6
+  rand_string_len: 6
+  filename_time_format: 02-01-06_15-04
+  thumbnail_image_size:
+    width: 200
+    height: 200
+  hq_image_size:
+    width: 1000
+    height: 1000
+  auth:
+    access_secret_key: myaccesssecretkey
+    refresh_secret_key: myrefreshsecretkey
+    access_token_lifetime: 300_000_000_000 # 5 minutes in nanoseconds (5 * 60 * 1000 * 1000 * 1000)
+    refresh_token_lifetime: 3_600_000_000_000 # 1 hour in nanoseconds (60 * 60 * 1000 * 1000 * 1000)

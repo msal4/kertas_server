@@ -15,12 +15,17 @@ import (
 )
 
 func TestGenerateToken(t *testing.T) {
-	cfg := auth.AuthConfig{}
+	cfg := auth.AuthConfig{
+		AccessSecretKey:      "secret",
+		RefreshSecretKey:     "secret",
+		AccessTokenLifetime:  time.Hour,
+		RefreshTokenLifetime: time.Hour,
+	}
 
 	u := ent.User{
 		ID:           uuid.New(),
 		Role:         user.RoleSuperAdmin,
-		TokenVersion: 20,
+		TokenVersion: 19,
 	}
 
 	data, err := auth.GenerateTokens(u, cfg)
@@ -30,7 +35,7 @@ func TestGenerateToken(t *testing.T) {
 
 	var accessClaims auth.AccessClaims
 	_, err = jwt.ParseWithClaims(data.AccessToken, &accessClaims, func(t *jwt.Token) (interface{}, error) {
-		return cfg.AccessSecretKey, nil
+		return []byte(cfg.AccessSecretKey), nil
 	})
 	require.NoError(t, err)
 
@@ -39,7 +44,7 @@ func TestGenerateToken(t *testing.T) {
 
 	var refreshClaims auth.RefreshClaims
 	_, err = jwt.ParseWithClaims(data.AccessToken, &refreshClaims, func(t *jwt.Token) (interface{}, error) {
-		return cfg.RefreshSecretKey, nil
+		return []byte(cfg.RefreshSecretKey), nil
 	})
 	require.NoError(t, err)
 
@@ -50,8 +55,8 @@ func TestGenerateToken(t *testing.T) {
 func TestMiddleware(t *testing.T) {
 	t.Run("expired token", func(t *testing.T) {
 		cfg := auth.AuthConfig{
-			AccessSecretKey:      []byte("secret"),
-			RefreshSecretKey:     []byte("secret"),
+			AccessSecretKey:      "secret",
+			RefreshSecretKey:     "secret",
 			AccessTokenLifetime:  -time.Hour,
 			RefreshTokenLifetime: time.Hour,
 		}
@@ -82,7 +87,7 @@ func TestMiddleware(t *testing.T) {
 		w := httptest.NewRecorder()
 		r := httptest.NewRequest(http.MethodPost, "/whatever", nil)
 
-		srv := auth.Middleware(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {}), []byte(""))
+		srv := auth.Middleware(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {}), "")
 
 		srv.ServeHTTP(w, r)
 
@@ -91,8 +96,8 @@ func TestMiddleware(t *testing.T) {
 
 	t.Run("authenticated", func(t *testing.T) {
 		cfg := auth.AuthConfig{
-			AccessSecretKey:      []byte("secret"),
-			RefreshSecretKey:     []byte("secret"),
+			AccessSecretKey:      "secret",
+			RefreshSecretKey:     "secret",
 			AccessTokenLifetime:  time.Hour,
 			RefreshTokenLifetime: time.Hour,
 		}

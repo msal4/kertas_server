@@ -12,8 +12,6 @@ import (
 	"github.com/msal4/hassah_school_server/ent"
 )
 
-type imageSize struct{ Width, Height uint }
-
 type Config struct {
 	// RS is the random source used to generate unique filenames.
 	//
@@ -23,35 +21,41 @@ type Config struct {
 	// RootBucket is the bucket used to store all the schools binary data.
 	//
 	// If not provided defaultRootBucket is used.
-	RootBucket string
+	RootBucket string `yaml:"root_bucket" env:"ROOT_BUCKET"`
 
 	// MaxFilenameLen is used to clip the original filename.
 	//
 	// If not provided defaultMaxFilenameLen is used.
-	MaxFilenameLen int
+	MaxFilenameLen int `yaml:"max_filename_len" env:"MAX_FILENAME_LEN"`
 
 	// RandStringLen is the length of the generated random string that is appended to the filename to make it unique.
 	//
 	// If not provided defaultRandStringLen is used.
-	RandStringLen int
+	RandStringLen int `yaml:"rand_string_len" env:"RAND_STRING_LEN"`
 
 	// FilenameTimeFormat is the format used for the time prefix in filename to increase the probability of it being unique.
 	//
 	// If not provided defaultFilenameTimeFormat is used.
-	FilenameTimeFormat string
+	FilenameTimeFormat string `yaml:"filename_time_format" env:"FILENAME_TIME_FORMAT"`
 
 	// ThumbnailSize is the size of the image thumbnail.
 	//
 	// If not provided defaultThumbnailSize is used.
-	ThumbnailSize imageSize
+	ThumbnailSize struct {
+		Width  uint `yaml:"width" env:"THUMBNAIL_IMAGE_WIDTH"`
+		Height uint `yaml:"height" env:"THUMBNAIL_IMAGE_HEIGHT"`
+	} `yaml:"thumbnail_image_size"`
 
 	// HQImageSize is the size of the high quality version of the image.
 	//
 	// If not provided defaultHQImageSize is used.
-	HQImageSize imageSize
+	HQImageSize struct {
+		Width  uint `yaml:"width" env:"HQ_IMAGE_WIDTH"`
+		Height uint `yaml:"height" env:"HQ_IMAGE_HEIGHT"`
+	} `yaml:"hq_image_size"`
 
 	// AuthConfig is used to configure the token generation.
-	auth.AuthConfig
+	auth.AuthConfig `yaml:"auth"`
 }
 
 type Service struct {
@@ -142,11 +146,11 @@ func getConfig(cfg *Config) *Config {
 	}
 
 	if len(cfg.AccessSecretKey) == 0 {
-		cfg.AccessSecretKey = []byte(defaultAccessKey)
+		cfg.AccessSecretKey = defaultAccessKey
 	}
 
 	if len(cfg.RefreshSecretKey) == 0 {
-		cfg.RefreshSecretKey = []byte(defaultRefreshKey)
+		cfg.RefreshSecretKey = defaultRefreshKey
 	}
 
 	if cfg.AccessTokenLifetime == 0 {

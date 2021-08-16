@@ -248,7 +248,7 @@ func (s *Service) LoginUser(ctx context.Context, input model.LoginInput) (*model
 func (s *Service) RefreshTokens(ctx context.Context, refreshToken string) (*model.AuthData, error) {
 	var claims auth.RefreshClaims
 	token, err := jwt.ParseWithClaims(refreshToken, &claims, func(t *jwt.Token) (interface{}, error) {
-		return s.Config.RefreshSecretKey, nil
+		return []byte(s.Config.RefreshSecretKey), nil
 	})
 	if err != nil {
 		return nil, err
