@@ -1,7 +1,6 @@
 package auth_test
 
 import (
-	"context"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -27,39 +26,79 @@ func TestGenerateToken(t *testing.T) {
 }
 
 func TestMiddleware(t *testing.T) {
-	cfg := auth.AuthConfig{
-		AccessSecretKey:      []byte("secret"),
-		RefreshSecretKey:     []byte("secret"),
-		AccessTokenLifetime:  time.Hour,
-		RefreshTokenLifetime: time.Hour,
-	}
+	t.Run("expired token", func(t *testing.T) {
+		cfg := auth.AuthConfig{
+			AccessSecretKey:      []byte("secret"),
+			RefreshSecretKey:     []byte("secret"),
+			AccessTokenLifetime:  -time.Hour,
+			RefreshTokenLifetime: time.Hour,
+		}
 
-	u := ent.User{
-		ID:   uuid.New(),
-		Role: user.RoleSuperAdmin,
-	}
+		u := ent.User{
+			ID:   uuid.New(),
+			Role: user.RoleSuperAdmin,
+		}
 
-	data, err := auth.GenerateTokens(u, cfg)
-	require.NoError(t, err)
-	require.NotEmpty(t, data.AccessToken)
-	require.NotEmpty(t, data.RefreshToken)
+		data, err := auth.GenerateTokens(u, cfg)
+		require.NoError(t, err)
+		require.NotEmpty(t, data.AccessToken)
+		require.NotEmpty(t, data.RefreshToken)
 
-	srv := auth.Middleware(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		got, ok := auth.UserForContext(r.Context())
+		w := httptest.NewRecorder()
+		r := httptest.NewRequest(http.MethodPost, "/whatever", nil)
 
-		require.True(t, ok)
+		r.Header.Set("authorization", "Bearer "+data.AccessToken)
 
-		require.Equal(t, u.ID, got.ID)
-		require.Equal(t, u.Role, got.Role)
-	}), cfg.AccessSecretKey)
+		srv := auth.Middleware(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {}), cfg.AccessSecretKey)
 
-	w := httptest.NewRecorder()
-	r := httptest.NewRequest(http.MethodPost, "/whatever", nil)
+		srv.ServeHTTP(w, r)
 
-	ctx := context.Background()
-	r = r.WithContext(ctx)
+		require.Equal(t, http.StatusUnauthorized, w.Code)
+	})
 
-	r.Header.Set("authorization", "Bearer "+data.AccessToken)
+	t.Run("no token", func(t *testing.T) {
+		w := httptest.NewRecorder()
+		r := httptest.NewRequest(http.MethodPost, "/whatever", nil)
 
-	srv.ServeHTTP(w, r)
+		srv := auth.Middleware(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {}), []byte(""))
+
+		srv.ServeHTTP(w, r)
+
+		require.Equal(t, http.StatusOK, w.Code)
+	})
+
+	t.Run("authenticated", func(t *testing.T) {
+		cfg := auth.AuthConfig{
+			AccessSecretKey:      []byte("secret"),
+			RefreshSecretKey:     []byte("secret"),
+			AccessTokenLifetime:  time.Hour,
+			RefreshTokenLifetime: time.Hour,
+		}
+
+		u := ent.User{
+			ID:   uuid.New(),
+			Role: user.RoleSuperAdmin,
+		}
+
+		data, err := auth.GenerateTokens(u, cfg)
+		require.NoError(t, err)
+		require.NotEmpty(t, data.AccessToken)
+		require.NotEmpty(t, data.RefreshToken)
+
+		w := httptest.NewRecorder()
+		r := httptest.NewRequest(http.MethodPost, "/whatever", nil)
+
+		r.Header.Set("authorization", "Bearer "+data.AccessToken)
+
+		srv := auth.Middleware(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			got, ok := auth.UserForContext(r.Context())
+
+			require.True(t, ok)
+
+			require.Equal(t, u.ID, got.ID)
+			require.Equal(t, u.Role, got.Role)
+		}), cfg.AccessSecretKey)
+
+		srv.ServeHTTP(w, r)
+	})
 }
