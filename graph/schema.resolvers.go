@@ -50,10 +50,15 @@ func (r *mutationResolver) AddUser(ctx context.Context, input model.AddUserInput
 	if !auth.IsAdmin(ctx) {
 		return nil, auth.UnauthorizedErr
 	}
+
 	return r.s.AddUser(ctx, input)
 }
 
-func (r *mutationResolver) UdpateUser(ctx context.Context, id uuid.UUID, input model.UpdateUserInput) (*ent.User, error) {
+func (r *mutationResolver) UpdateUser(ctx context.Context, id uuid.UUID, input model.UpdateUserInput) (*ent.User, error) {
+	if !auth.IsAdmin(ctx) {
+		return nil, auth.UnauthorizedErr
+	}
+
 	return r.s.UpdateUser(ctx, id, input)
 }
 

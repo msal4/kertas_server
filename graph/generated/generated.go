@@ -66,8 +66,8 @@ type ComplexityRoot struct {
 		LoginAdmin              func(childComplexity int, input model.LoginInput) int
 		LoginUser               func(childComplexity int, input model.LoginInput) int
 		RefreshTokens           func(childComplexity int, token string) int
-		UdpateUser              func(childComplexity int, id uuid.UUID, input model.UpdateUserInput) int
 		UpdateSchool            func(childComplexity int, id uuid.UUID, input model.UpdateSchoolInput) int
+		UpdateUser              func(childComplexity int, id uuid.UUID, input model.UpdateUserInput) int
 	}
 
 	PageInfo struct {
@@ -146,7 +146,7 @@ type MutationResolver interface {
 	DeleteSchool(ctx context.Context, id uuid.UUID) (bool, error)
 	DeleteSchoolPermanently(ctx context.Context, id uuid.UUID) (bool, error)
 	AddUser(ctx context.Context, input model.AddUserInput) (*ent.User, error)
-	UdpateUser(ctx context.Context, id uuid.UUID, input model.UpdateUserInput) (*ent.User, error)
+	UpdateUser(ctx context.Context, id uuid.UUID, input model.UpdateUserInput) (*ent.User, error)
 	DeleteUser(ctx context.Context, id uuid.UUID) (bool, error)
 	DeleteUserPermanently(ctx context.Context, id uuid.UUID) (bool, error)
 	LoginAdmin(ctx context.Context, input model.LoginInput) (*model.AuthData, error)
@@ -297,18 +297,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.RefreshTokens(childComplexity, args["token"].(string)), true
 
-	case "Mutation.udpateUser":
-		if e.complexity.Mutation.UdpateUser == nil {
-			break
-		}
-
-		args, err := ec.field_Mutation_udpateUser_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Mutation.UdpateUser(childComplexity, args["id"].(uuid.UUID), args["input"].(model.UpdateUserInput)), true
-
 	case "Mutation.updateSchool":
 		if e.complexity.Mutation.UpdateSchool == nil {
 			break
@@ -320,6 +308,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.UpdateSchool(childComplexity, args["id"].(uuid.UUID), args["input"].(model.UpdateSchoolInput)), true
+
+	case "Mutation.updateUser":
+		if e.complexity.Mutation.UpdateUser == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_updateUser_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UpdateUser(childComplexity, args["id"].(uuid.UUID), args["input"].(model.UpdateUserInput)), true
 
 	case "PageInfo.endCursor":
 		if e.complexity.PageInfo.EndCursor == nil {
@@ -877,7 +877,7 @@ type Mutation {
   deleteSchoolPermanently(id: ID!): Boolean!
 
   addUser(input: AddUserInput!): User
-  udpateUser(id: ID!, input: UpdateUserInput!): User
+  updateUser(id: ID!, input: UpdateUserInput!): User
   deleteUser(id: ID!): Boolean!
   deleteUserPermanently(id: ID!): Boolean!
 
@@ -2122,30 +2122,6 @@ func (ec *executionContext) field_Mutation_refreshTokens_args(ctx context.Contex
 	return args, nil
 }
 
-func (ec *executionContext) field_Mutation_udpateUser_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 uuid.UUID
-	if tmp, ok := rawArgs["id"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
-		arg0, err = ec.unmarshalNID2githubᚗcomᚋgoogleᚋuuidᚐUUID(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["id"] = arg0
-	var arg1 model.UpdateUserInput
-	if tmp, ok := rawArgs["input"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg1, err = ec.unmarshalNUpdateUserInput2githubᚗcomᚋmsal4ᚋhassah_school_serverᚋgraphᚋmodelᚐUpdateUserInput(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["input"] = arg1
-	return args, nil
-}
-
 func (ec *executionContext) field_Mutation_updateSchool_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -2162,6 +2138,30 @@ func (ec *executionContext) field_Mutation_updateSchool_args(ctx context.Context
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
 		arg1, err = ec.unmarshalNUpdateSchoolInput2githubᚗcomᚋmsal4ᚋhassah_school_serverᚋgraphᚋmodelᚐUpdateSchoolInput(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg1
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_updateUser_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 uuid.UUID
+	if tmp, ok := rawArgs["id"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+		arg0, err = ec.unmarshalNID2githubᚗcomᚋgoogleᚋuuidᚐUUID(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["id"] = arg0
+	var arg1 model.UpdateUserInput
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg1, err = ec.unmarshalNUpdateUserInput2githubᚗcomᚋmsal4ᚋhassah_school_serverᚋgraphᚋmodelᚐUpdateUserInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -2644,7 +2644,7 @@ func (ec *executionContext) _Mutation_addUser(ctx context.Context, field graphql
 	return ec.marshalOUser2ᚖgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚐUser(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Mutation_udpateUser(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+func (ec *executionContext) _Mutation_updateUser(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -2661,7 +2661,7 @@ func (ec *executionContext) _Mutation_udpateUser(ctx context.Context, field grap
 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	rawArgs := field.ArgumentMap(ec.Variables)
-	args, err := ec.field_Mutation_udpateUser_args(ctx, rawArgs)
+	args, err := ec.field_Mutation_updateUser_args(ctx, rawArgs)
 	if err != nil {
 		ec.Error(ctx, err)
 		return graphql.Null
@@ -2669,7 +2669,7 @@ func (ec *executionContext) _Mutation_udpateUser(ctx context.Context, field grap
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().UdpateUser(rctx, args["id"].(uuid.UUID), args["input"].(model.UpdateUserInput))
+		return ec.resolvers.Mutation().UpdateUser(rctx, args["id"].(uuid.UUID), args["input"].(model.UpdateUserInput))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -12331,8 +12331,8 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			}
 		case "addUser":
 			out.Values[i] = ec._Mutation_addUser(ctx, field)
-		case "udpateUser":
-			out.Values[i] = ec._Mutation_udpateUser(ctx, field)
+		case "updateUser":
+			out.Values[i] = ec._Mutation_updateUser(ctx, field)
 		case "deleteUser":
 			out.Values[i] = ec._Mutation_deleteUser(ctx, field)
 			if out.Values[i] == graphql.Null {

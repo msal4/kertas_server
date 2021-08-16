@@ -137,3 +137,58 @@ func TestAddUser(t *testing.T) {
 		})
 	}
 }
+
+func TestUpdateUser(t *testing.T) {
+	s := newService(t)
+	defer s.EC.Close()
+	srv := graph.NewServer(s, false)
+	ctx := context.Background()
+
+	suAdmin := createSuperAdmin(ctx, s, "hello23super")
+	schAdmin := *suAdmin
+	schAdmin.Role = user.RoleSchoolAdmin
+	teacher := schAdmin
+	teacher.Role = user.RoleTeacher
+	student := schAdmin
+	student.Role = user.RoleStudent
+
+	u := createStudent(ctx, s, "random234user")
+
+	operations := `mutation { updateUser(id: %q, input: {name: "a test user"}) { id name updatedAt }}`
+
+	cases := []struct {
+		desc string
+		user ent.User
+		want *string
+	}{
+		{"super admin is authorized", *suAdmin, nil},
+		{"school admin is not authorized", schAdmin, nil},
+		{"teacher is not authorized", teacher, ptr.Str(auth.UnauthorizedErr.Error())},
+		{"student is not authorized", student, ptr.Str(auth.UnauthorizedErr.Error())},
+	}
+
+	for _, c := range cases {
+		t.Run(c.desc, func(t *testing.T) {
+			var resp errsResponse
+
+			r := createRequest(t, fmt.Sprintf(operations, u.ID.String()), "{}")
+			w := httptest.NewRecorder()
+
+			data := genTokens(t, &c.user, s)
+
+			setAuth(r, data.AccessToken)
+
+			srv.ServeHTTP(w, r)
+
+			parseBody(t, w, &resp)
+
+			if c.want == nil {
+				require.Nil(t, resp.Errors)
+				return
+			}
+
+			require.NotEmpty(t, resp.Errors)
+			require.Equal(t, *c.want, resp.Errors[0].Message)
+		})
+	}
+}
