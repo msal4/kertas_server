@@ -47,6 +47,9 @@ func (r *mutationResolver) DeleteSchoolPermanently(ctx context.Context, id uuid.
 }
 
 func (r *mutationResolver) AddUser(ctx context.Context, input model.AddUserInput) (*ent.User, error) {
+	if !auth.IsAdmin(ctx) {
+		return nil, auth.UnauthorizedErr
+	}
 	return r.s.AddUser(ctx, input)
 }
 

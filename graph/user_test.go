@@ -2,7 +2,7 @@ package graph_test
 
 import (
 	"context"
-	"net/http"
+	"fmt"
 	"net/http/httptest"
 	"testing"
 
@@ -10,8 +10,8 @@ import (
 	"github.com/msal4/hassah_school_server/ent"
 	"github.com/msal4/hassah_school_server/ent/user"
 	"github.com/msal4/hassah_school_server/graph"
-	"github.com/msal4/hassah_school_server/graph/model"
-	"github.com/msal4/hassah_school_server/service"
+	"github.com/msal4/hassah_school_server/testutil"
+	"github.com/msal4/hassah_school_server/util/ptr"
 	"github.com/stretchr/testify/require"
 )
 
@@ -24,74 +24,116 @@ type errsResponse struct {
 
 func TestUsers(t *testing.T) {
 	s := newService(t)
+	defer s.EC.Close()
 	srv := graph.NewServer(s, false)
 	ctx := context.Background()
 
-	u := createSuperAdmin(ctx, s, "hello23super")
-	data, err := auth.GenerateTokens(*u, s.Config.AuthConfig)
-	require.NoError(t, err)
+	suAdmin := createSuperAdmin(ctx, s, "hello23super")
+	schAdmin := *suAdmin
+	schAdmin.Role = user.RoleSchoolAdmin
+	teacher := schAdmin
+	teacher.Role = user.RoleTeacher
+	student := schAdmin
+	student.Role = user.RoleStudent
 
 	operations := `{ users { totalCount pageInfo { hasNextPage hasPreviousPage startCursor endCursor } edges { node { id } cursor } } }`
 
-	t.Run("school admin authorized", func(t *testing.T) {
-		var resp errsResponse
+	cases := []struct {
+		desc string
+		user ent.User
+		want *string
+	}{
+		{"super admin is authorized", *suAdmin, nil},
+		{"school admin is not authorized", schAdmin, ptr.Str(auth.UnauthorizedErr.Error())},
+		{"teacher is not authorized", teacher, ptr.Str(auth.UnauthorizedErr.Error())},
+		{"student is not authorized", student, ptr.Str(auth.UnauthorizedErr.Error())},
+	}
 
-		r := createRequest(t, operations, "{}")
-		w := httptest.NewRecorder()
+	for _, c := range cases {
+		t.Run(c.desc, func(t *testing.T) {
+			var resp errsResponse
 
-		setAuth(r, data.AccessToken)
+			r := createRequest(t, operations, "{}")
+			w := httptest.NewRecorder()
 
-		srv.ServeHTTP(w, r)
+			data := genTokens(t, &c.user, s)
 
-		parseBody(t, w, &resp)
+			setAuth(r, data.AccessToken)
 
-		require.Nil(t, resp.Errors)
-	})
+			srv.ServeHTTP(w, r)
 
-	t.Run("other roles unauthorized", func(t *testing.T) {
-		var resp errsResponse
+			parseBody(t, w, &resp)
 
-		r := createRequest(t, operations, "{}")
-		w := httptest.NewRecorder()
+			if c.want == nil {
+				require.Nil(t, resp.Errors)
+				return
+			}
 
-		u.Role = user.RoleSchoolAdmin
-
-		data = genTokens(t, u, s)
-
-		setAuth(r, data.AccessToken)
-
-		srv.ServeHTTP(w, r)
-
-		parseBody(t, w, &resp)
-
-		require.NotEmpty(t, resp.Errors)
-		require.Equal(t, auth.UnauthorizedErr.Error(), resp.Errors[0].Message)
-
-		r = createRequest(t, operations, "{}")
-		w = httptest.NewRecorder()
-
-		u.Role = user.RoleStudent
-
-		data = genTokens(t, u, s)
-
-		setAuth(r, data.AccessToken)
-
-		srv.ServeHTTP(w, r)
-
-		parseBody(t, w, &resp)
-
-		require.NotEmpty(t, resp.Errors)
-		require.Equal(t, auth.UnauthorizedErr.Error(), resp.Errors[0].Message)
-	})
+			require.NotEmpty(t, resp.Errors)
+			require.Equal(t, *c.want, resp.Errors[0].Message)
+		})
+	}
 }
 
-func setAuth(r *http.Request, ac string) {
-	r.Header.Set("authorization", "Bearer "+ac)
-}
+func TestAddUser(t *testing.T) {
+	s := newService(t)
+	defer s.EC.Close()
+	srv := graph.NewServer(s, false)
+	ctx := context.Background()
 
-func genTokens(t testing.TB, u *ent.User, s *service.Service) *model.AuthData {
-	data, err := auth.GenerateTokens(*u, s.Config.AuthConfig)
-	require.NoError(t, err)
+	suAdmin := createSuperAdmin(ctx, s, "hello23super")
+	schAdmin := *suAdmin
+	schAdmin.Role = user.RoleSchoolAdmin
+	teacher := schAdmin
+	teacher.Role = user.RoleTeacher
+	student := schAdmin
+	student.Role = user.RoleStudent
 
-	return data
+	sch := s.EC.School.Create().SetName("test school").SetDirectory("test_dir").SetImage("test/image").SaveX(ctx)
+	stage := s.EC.Stage.Create().SetName("2nd").SetTuitionAmount(122).SetSchool(sch).SaveX(ctx)
+
+	operations := `{
+"query": "mutation ($image: Upload!) { addUser(input: {stage_id: \"%s\", name: \"a test user\", phone: \"077059333812\", username: \"minamo123%d\", password: \"helo234444488@@@@8\" image: $image}) { id name updatedAt }}",
+			"variables": {"image": null}
+		}`
+
+	cases := []struct {
+		desc string
+		user ent.User
+		want *string
+	}{
+		{"super admin is authorized", *suAdmin, nil},
+		{"school admin is not authorized", schAdmin, nil},
+		{"teacher is not authorized", teacher, ptr.Str(auth.UnauthorizedErr.Error())},
+		{"student is not authorized", student, ptr.Str(auth.UnauthorizedErr.Error())},
+	}
+
+	f := testutil.OpenFile(t, "../testfiles/harvard.jpg")
+
+	for i, c := range cases {
+		t.Run(c.desc, func(t *testing.T) {
+			var resp errsResponse
+
+			f.Seek(0, 0)
+
+			r := createMultipartRequest(t, fmt.Sprintf(operations, stage.ID.String(), i), `{"0": ["variables.image"]}`, file{File: f.File, mapKey: "0"})
+			w := httptest.NewRecorder()
+
+			data := genTokens(t, &c.user, s)
+
+			setAuth(r, data.AccessToken)
+
+			srv.ServeHTTP(w, r)
+
+			parseBody(t, w, &resp)
+
+			if c.want == nil {
+				require.Nil(t, resp.Errors)
+				return
+			}
+
+			require.NotEmpty(t, resp.Errors)
+			require.Equal(t, *c.want, resp.Errors[0].Message)
+		})
+	}
 }

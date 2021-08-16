@@ -18,8 +18,10 @@ import (
 	"entgo.io/ent/dialect"
 	"github.com/minio/minio-go/v7"
 	"github.com/minio/minio-go/v7/pkg/credentials"
+	"github.com/msal4/hassah_school_server/auth"
 	"github.com/msal4/hassah_school_server/ent"
 	"github.com/msal4/hassah_school_server/ent/enttest"
+	"github.com/msal4/hassah_school_server/graph/model"
 	"github.com/msal4/hassah_school_server/service"
 	"github.com/msal4/hassah_school_server/util"
 	"github.com/stretchr/testify/require"
@@ -88,4 +90,15 @@ func createMultipartRequest(t *testing.T, operations, mapData string, f file) *h
 
 func parseBody(t testing.TB, w *httptest.ResponseRecorder, v interface{}) {
 	require.NoError(t, json.NewDecoder(w.Body).Decode(v))
+}
+
+func setAuth(r *http.Request, ac string) {
+	r.Header.Set("authorization", "Bearer "+ac)
+}
+
+func genTokens(t testing.TB, u *ent.User, s *service.Service) *model.AuthData {
+	data, err := auth.GenerateTokens(*u, s.Config.AuthConfig)
+	require.NoError(t, err)
+
+	return data
 }
