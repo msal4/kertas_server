@@ -63,10 +63,18 @@ func (r *mutationResolver) UpdateUser(ctx context.Context, id uuid.UUID, input m
 }
 
 func (r *mutationResolver) DeleteUser(ctx context.Context, id uuid.UUID) (bool, error) {
+	if !auth.IsAdmin(ctx) {
+		return false, auth.UnauthorizedErr
+	}
+
 	return true, r.s.DeleteUser(ctx, id)
 }
 
 func (r *mutationResolver) DeleteUserPermanently(ctx context.Context, id uuid.UUID) (bool, error) {
+	if !auth.IsAdmin(ctx) {
+		return false, auth.UnauthorizedErr
+	}
+
 	return true, r.s.DeleteUserPermanently(ctx, id)
 }
 
