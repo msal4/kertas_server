@@ -6,11 +6,11 @@ require (
 	entgo.io/contrib v0.0.0-20210726113942-478c3f3c33cb
 	entgo.io/ent v0.9.0
 	github.com/99designs/gqlgen v0.13.0
-	github.com/Netflix/go-env v0.0.0-20210215222557-e437a7e7f9fb // indirect
+	github.com/Netflix/go-env v0.0.0-20210215222557-e437a7e7f9fb
 	github.com/golang-jwt/jwt v3.2.2+incompatible
 	github.com/google/uuid v1.3.0
 	github.com/hashicorp/go-multierror v1.1.1
-	github.com/joho/godotenv v1.3.0 // indirect
+	github.com/joho/godotenv v1.3.0
 	github.com/lib/pq v1.10.2
 	github.com/mattn/go-sqlite3 v1.14.8
 	github.com/minio/minio-go/v7 v7.0.12
