@@ -1,4 +1,4 @@
-package graph_test
+package server_test
 
 import (
 	"context"
@@ -9,7 +9,7 @@ import (
 	"github.com/msal4/hassah_school_server/auth"
 	"github.com/msal4/hassah_school_server/ent"
 	"github.com/msal4/hassah_school_server/ent/user"
-	"github.com/msal4/hassah_school_server/graph"
+	"github.com/msal4/hassah_school_server/server"
 	"github.com/msal4/hassah_school_server/service"
 	"github.com/msal4/hassah_school_server/testutil"
 	"github.com/msal4/hassah_school_server/util/ptr"
@@ -27,7 +27,7 @@ func TestUsers(t *testing.T) {
 	s := newService(t)
 	defer s.EC.Close()
 
-	srv := graph.NewServer(s, false)
+	srv := server.NewServer(s, false)
 	ctx := context.Background()
 
 	suAdmin := createSuperAdmin(ctx, s, "hello23super")
@@ -81,7 +81,7 @@ func TestAddUser(t *testing.T) {
 	s := newService(t)
 	defer s.EC.Close()
 
-	srv := graph.NewServer(s, false)
+	srv := server.NewServer(s, false)
 	ctx := context.Background()
 
 	suAdmin := createSuperAdmin(ctx, s, "hello23super")
@@ -145,7 +145,7 @@ func TestUpdateUser(t *testing.T) {
 	s := newService(t)
 	defer s.EC.Close()
 
-	srv := graph.NewServer(s, false)
+	srv := server.NewServer(s, false)
 	ctx := context.Background()
 
 	suAdmin := createSuperAdmin(ctx, s, "hello23super")
@@ -201,7 +201,7 @@ func TestDeleteUser(t *testing.T) {
 	s := newService(t)
 	defer s.EC.Close()
 
-	srv := graph.NewServer(s, false)
+	srv := server.NewServer(s, false)
 	ctx := context.Background()
 
 	suAdmin := createSuperAdmin(ctx, s, "hello23super")
@@ -257,7 +257,7 @@ func TestDeleteUserPermanently(t *testing.T) {
 	s := newService(t)
 	defer s.EC.Close()
 
-	srv := graph.NewServer(s, false)
+	srv := server.NewServer(s, false)
 	ctx := context.Background()
 
 	suAdmin := createSuperAdmin(ctx, s, "hello23super")
@@ -325,7 +325,7 @@ func TestLoginAdmin(t *testing.T) {
 	s := newService(t)
 	defer s.EC.Close()
 
-	srv := graph.NewServer(s, false)
+	srv := server.NewServer(s, false)
 	ctx := context.Background()
 
 	suAdmin := createSuperAdmin(ctx, s, "hello23super")
@@ -386,7 +386,7 @@ func TestLoginUser(t *testing.T) {
 	s := newService(t)
 	defer s.EC.Close()
 
-	srv := graph.NewServer(s, false)
+	srv := server.NewServer(s, false)
 	ctx := context.Background()
 
 	suAdmin := createSuperAdmin(ctx, s, "hello23super")

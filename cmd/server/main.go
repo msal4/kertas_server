@@ -14,7 +14,7 @@ import (
 	"github.com/minio/minio-go/v7"
 	"github.com/minio/minio-go/v7/pkg/credentials"
 	"github.com/msal4/hassah_school_server/ent"
-	"github.com/msal4/hassah_school_server/graph"
+	"github.com/msal4/hassah_school_server/server"
 	"github.com/msal4/hassah_school_server/service"
 	"gopkg.in/yaml.v2"
 )
@@ -74,7 +74,7 @@ func main() {
 		log.Fatalf("initializing service: %v", err)
 	}
 
-	srv := graph.NewServer(s, *debg)
+	srv := server.NewServer(s, *debg)
 
 	log.Printf("listening on :%d", cfg.Port)
 	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%d", cfg.Port), srv))

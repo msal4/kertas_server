@@ -1,4 +1,4 @@
-package graph
+package server
 
 // This file will be automatically regenerated based on the schema, any resolver implementations
 // will be copied through when generating and any unknown code will be moved to the end.
@@ -9,8 +9,8 @@ import (
 	"github.com/google/uuid"
 	"github.com/msal4/hassah_school_server/auth"
 	"github.com/msal4/hassah_school_server/ent"
-	"github.com/msal4/hassah_school_server/graph/generated"
-	"github.com/msal4/hassah_school_server/graph/model"
+	"github.com/msal4/hassah_school_server/server/generated"
+	"github.com/msal4/hassah_school_server/server/model"
 	"github.com/msal4/hassah_school_server/service"
 )
 

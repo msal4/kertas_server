@@ -20,7 +20,7 @@ import (
 	"github.com/msal4/hassah_school_server/ent/group"
 	"github.com/msal4/hassah_school_server/ent/schema/uuidgql"
 	"github.com/msal4/hassah_school_server/ent/user"
-	"github.com/msal4/hassah_school_server/graph/model"
+	"github.com/msal4/hassah_school_server/server/model"
 	gqlparser "github.com/vektah/gqlparser/v2"
 	"github.com/vektah/gqlparser/v2/ast"
 )
@@ -1993,7 +1993,7 @@ func (ec *executionContext) field_Mutation_addSchool_args(ctx context.Context, r
 	var arg0 model.AddSchoolInput
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalNAddSchoolInput2githubᚗcomᚋmsal4ᚋhassah_school_serverᚋgraphᚋmodelᚐAddSchoolInput(ctx, tmp)
+		arg0, err = ec.unmarshalNAddSchoolInput2githubᚗcomᚋmsal4ᚋhassah_school_serverᚋserverᚋmodelᚐAddSchoolInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -2008,7 +2008,7 @@ func (ec *executionContext) field_Mutation_addUser_args(ctx context.Context, raw
 	var arg0 model.AddUserInput
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalNAddUserInput2githubᚗcomᚋmsal4ᚋhassah_school_serverᚋgraphᚋmodelᚐAddUserInput(ctx, tmp)
+		arg0, err = ec.unmarshalNAddUserInput2githubᚗcomᚋmsal4ᚋhassah_school_serverᚋserverᚋmodelᚐAddUserInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -2083,7 +2083,7 @@ func (ec *executionContext) field_Mutation_loginAdmin_args(ctx context.Context, 
 	var arg0 model.LoginInput
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalNLoginInput2githubᚗcomᚋmsal4ᚋhassah_school_serverᚋgraphᚋmodelᚐLoginInput(ctx, tmp)
+		arg0, err = ec.unmarshalNLoginInput2githubᚗcomᚋmsal4ᚋhassah_school_serverᚋserverᚋmodelᚐLoginInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -2098,7 +2098,7 @@ func (ec *executionContext) field_Mutation_loginUser_args(ctx context.Context, r
 	var arg0 model.LoginInput
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalNLoginInput2githubᚗcomᚋmsal4ᚋhassah_school_serverᚋgraphᚋmodelᚐLoginInput(ctx, tmp)
+		arg0, err = ec.unmarshalNLoginInput2githubᚗcomᚋmsal4ᚋhassah_school_serverᚋserverᚋmodelᚐLoginInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -2137,7 +2137,7 @@ func (ec *executionContext) field_Mutation_updateSchool_args(ctx context.Context
 	var arg1 model.UpdateSchoolInput
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg1, err = ec.unmarshalNUpdateSchoolInput2githubᚗcomᚋmsal4ᚋhassah_school_serverᚋgraphᚋmodelᚐUpdateSchoolInput(ctx, tmp)
+		arg1, err = ec.unmarshalNUpdateSchoolInput2githubᚗcomᚋmsal4ᚋhassah_school_serverᚋserverᚋmodelᚐUpdateSchoolInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -2161,7 +2161,7 @@ func (ec *executionContext) field_Mutation_updateUser_args(ctx context.Context, 
 	var arg1 model.UpdateUserInput
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg1, err = ec.unmarshalNUpdateUserInput2githubᚗcomᚋmsal4ᚋhassah_school_serverᚋgraphᚋmodelᚐUpdateUserInput(ctx, tmp)
+		arg1, err = ec.unmarshalNUpdateUserInput2githubᚗcomᚋmsal4ᚋhassah_school_serverᚋserverᚋmodelᚐUpdateUserInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -2803,7 +2803,7 @@ func (ec *executionContext) _Mutation_loginAdmin(ctx context.Context, field grap
 	}
 	res := resTmp.(*model.AuthData)
 	fc.Result = res
-	return ec.marshalOAuthData2ᚖgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋgraphᚋmodelᚐAuthData(ctx, field.Selections, res)
+	return ec.marshalOAuthData2ᚖgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋserverᚋmodelᚐAuthData(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_loginUser(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -2842,7 +2842,7 @@ func (ec *executionContext) _Mutation_loginUser(ctx context.Context, field graph
 	}
 	res := resTmp.(*model.AuthData)
 	fc.Result = res
-	return ec.marshalOAuthData2ᚖgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋgraphᚋmodelᚐAuthData(ctx, field.Selections, res)
+	return ec.marshalOAuthData2ᚖgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋserverᚋmodelᚐAuthData(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_refreshTokens(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -2881,7 +2881,7 @@ func (ec *executionContext) _Mutation_refreshTokens(ctx context.Context, field g
 	}
 	res := resTmp.(*model.AuthData)
 	fc.Result = res
-	return ec.marshalOAuthData2ᚖgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋgraphᚋmodelᚐAuthData(ctx, field.Selections, res)
+	return ec.marshalOAuthData2ᚖgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋserverᚋmodelᚐAuthData(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _PageInfo_hasNextPage(ctx context.Context, field graphql.CollectedField, obj *ent.PageInfo) (ret graphql.Marshaler) {
@@ -13045,12 +13045,12 @@ func (ec *executionContext) ___Type(ctx context.Context, sel ast.SelectionSet, o
 
 // region    ***************************** type.gotpl *****************************
 
-func (ec *executionContext) unmarshalNAddSchoolInput2githubᚗcomᚋmsal4ᚋhassah_school_serverᚋgraphᚋmodelᚐAddSchoolInput(ctx context.Context, v interface{}) (model.AddSchoolInput, error) {
+func (ec *executionContext) unmarshalNAddSchoolInput2githubᚗcomᚋmsal4ᚋhassah_school_serverᚋserverᚋmodelᚐAddSchoolInput(ctx context.Context, v interface{}) (model.AddSchoolInput, error) {
 	res, err := ec.unmarshalInputAddSchoolInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) unmarshalNAddUserInput2githubᚗcomᚋmsal4ᚋhassah_school_serverᚋgraphᚋmodelᚐAddUserInput(ctx context.Context, v interface{}) (model.AddUserInput, error) {
+func (ec *executionContext) unmarshalNAddUserInput2githubᚗcomᚋmsal4ᚋhassah_school_serverᚋserverᚋmodelᚐAddUserInput(ctx context.Context, v interface{}) (model.AddUserInput, error) {
 	res, err := ec.unmarshalInputAddUserInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
@@ -13150,7 +13150,7 @@ func (ec *executionContext) marshalNInt2int(ctx context.Context, sel ast.Selecti
 	return res
 }
 
-func (ec *executionContext) unmarshalNLoginInput2githubᚗcomᚋmsal4ᚋhassah_school_serverᚋgraphᚋmodelᚐLoginInput(ctx context.Context, v interface{}) (model.LoginInput, error) {
+func (ec *executionContext) unmarshalNLoginInput2githubᚗcomᚋmsal4ᚋhassah_school_serverᚋserverᚋmodelᚐLoginInput(ctx context.Context, v interface{}) (model.LoginInput, error) {
 	res, err := ec.unmarshalInputLoginInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
@@ -13254,12 +13254,12 @@ func (ec *executionContext) unmarshalNTuitionPaymentWhereInput2ᚖgithubᚗcom�
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) unmarshalNUpdateSchoolInput2githubᚗcomᚋmsal4ᚋhassah_school_serverᚋgraphᚋmodelᚐUpdateSchoolInput(ctx context.Context, v interface{}) (model.UpdateSchoolInput, error) {
+func (ec *executionContext) unmarshalNUpdateSchoolInput2githubᚗcomᚋmsal4ᚋhassah_school_serverᚋserverᚋmodelᚐUpdateSchoolInput(ctx context.Context, v interface{}) (model.UpdateSchoolInput, error) {
 	res, err := ec.unmarshalInputUpdateSchoolInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) unmarshalNUpdateUserInput2githubᚗcomᚋmsal4ᚋhassah_school_serverᚋgraphᚋmodelᚐUpdateUserInput(ctx context.Context, v interface{}) (model.UpdateUserInput, error) {
+func (ec *executionContext) unmarshalNUpdateUserInput2githubᚗcomᚋmsal4ᚋhassah_school_serverᚋserverᚋmodelᚐUpdateUserInput(ctx context.Context, v interface{}) (model.UpdateUserInput, error) {
 	res, err := ec.unmarshalInputUpdateUserInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
@@ -13609,7 +13609,7 @@ func (ec *executionContext) unmarshalOAttendanceWhereInput2ᚖgithubᚗcomᚋmsa
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalOAuthData2ᚖgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋgraphᚋmodelᚐAuthData(ctx context.Context, sel ast.SelectionSet, v *model.AuthData) graphql.Marshaler {
+func (ec *executionContext) marshalOAuthData2ᚖgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋserverᚋmodelᚐAuthData(ctx context.Context, sel ast.SelectionSet, v *model.AuthData) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}

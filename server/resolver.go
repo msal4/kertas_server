@@ -1,4 +1,4 @@
-package graph
+package server
 
 import (
 	_ "image/png"

@@ -12,7 +12,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/msal4/hassah_school_server/ent"
 	"github.com/msal4/hassah_school_server/ent/user"
-	"github.com/msal4/hassah_school_server/graph/model"
+	"github.com/msal4/hassah_school_server/server/model"
 )
 
 var UnauthorizedErr = errors.New("unauthorized")

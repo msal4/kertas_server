@@ -9,7 +9,7 @@ import (
 	"github.com/minio/minio-go/v7"
 	"github.com/msal4/hassah_school_server/ent"
 	"github.com/msal4/hassah_school_server/ent/school"
-	"github.com/msal4/hassah_school_server/graph/model"
+	"github.com/msal4/hassah_school_server/server/model"
 	"github.com/msal4/hassah_school_server/service"
 	"github.com/msal4/hassah_school_server/testutil"
 	"github.com/msal4/hassah_school_server/util/ptr"

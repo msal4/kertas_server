@@ -1,4 +1,4 @@
-package graph_test
+package server_test
 
 import (
 	"bytes"
@@ -14,8 +14,8 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/msal4/hassah_school_server/auth"
 	"github.com/msal4/hassah_school_server/ent/user"
-	"github.com/msal4/hassah_school_server/graph"
-	"github.com/msal4/hassah_school_server/graph/model"
+	"github.com/msal4/hassah_school_server/server"
+	"github.com/msal4/hassah_school_server/server/model"
 	"github.com/msal4/hassah_school_server/testutil"
 	"github.com/stretchr/testify/require"
 )
@@ -24,7 +24,7 @@ func TestSchools(t *testing.T) {
 	s := newService(t)
 	defer s.EC.Close()
 
-	srv := graph.NewServer(s, false)
+	srv := server.NewServer(s, false)
 	ctx := context.Background()
 
 	type response struct {
@@ -125,7 +125,7 @@ func TestSchools(t *testing.T) {
 
 func TestAddSchool(t *testing.T) {
 	s := newService(t)
-	srv := graph.NewServer(s, false)
+	srv := server.NewServer(s, false)
 	ec := s.EC
 	ctx := context.Background()
 
@@ -238,7 +238,7 @@ func TestUpdateSchool(t *testing.T) {
 	s := newService(t)
 	defer s.EC.Close()
 
-	srv := graph.NewServer(s, false)
+	srv := server.NewServer(s, false)
 	ctx := context.Background()
 
 	type response struct {
@@ -352,7 +352,7 @@ func TestDeleteSchoolPermanently(t *testing.T) {
 	defer s.EC.Close()
 
 	ec := s.EC
-	srv := graph.NewServer(s, false)
+	srv := server.NewServer(s, false)
 	ctx := context.Background()
 
 	type response struct {
@@ -416,7 +416,7 @@ func TestDeleteSchool(t *testing.T) {
 	defer s.EC.Close()
 
 	ec := s.EC
-	srv := graph.NewServer(s, false)
+	srv := server.NewServer(s, false)
 	ctx := context.Background()
 
 	type response struct {

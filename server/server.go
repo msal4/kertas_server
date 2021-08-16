@@ -1,4 +1,4 @@
-package graph
+package server
 
 import (
 	"net/http"
@@ -9,7 +9,7 @@ import (
 	"github.com/99designs/gqlgen/graphql/playground"
 	_ "github.com/lib/pq"
 	"github.com/msal4/hassah_school_server/auth"
-	"github.com/msal4/hassah_school_server/graph/generated"
+	"github.com/msal4/hassah_school_server/server/generated"
 	"github.com/msal4/hassah_school_server/service"
 )
 

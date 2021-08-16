@@ -1,4 +1,4 @@
-package graph_test
+package server_test
 
 import (
 	"bytes"
@@ -22,7 +22,7 @@ import (
 	"github.com/msal4/hassah_school_server/ent"
 	"github.com/msal4/hassah_school_server/ent/enttest"
 	"github.com/msal4/hassah_school_server/ent/user"
-	"github.com/msal4/hassah_school_server/graph/model"
+	"github.com/msal4/hassah_school_server/server/model"
 	"github.com/msal4/hassah_school_server/service"
 	"github.com/msal4/hassah_school_server/util"
 	"github.com/stretchr/testify/require"
