@@ -43,7 +43,7 @@ func TestGenerateToken(t *testing.T) {
 	require.Equal(t, u.Role, accessClaims.Role)
 
 	var refreshClaims auth.RefreshClaims
-	_, err = jwt.ParseWithClaims(data.AccessToken, &refreshClaims, func(t *jwt.Token) (interface{}, error) {
+	_, err = jwt.ParseWithClaims(data.RefreshToken, &refreshClaims, func(t *jwt.Token) (interface{}, error) {
 		return []byte(cfg.RefreshSecretKey), nil
 	})
 	require.NoError(t, err)
