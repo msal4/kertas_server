@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"entgo.io/ent/dialect"
+	"github.com/joho/godotenv"
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/minio/minio-go/v7"
 	"github.com/minio/minio-go/v7/pkg/credentials"
@@ -23,9 +24,11 @@ import (
 var mc *minio.Client
 
 func TestMain(m *testing.M) {
+	godotenv.Load("../.env")
+
 	var err error
-	mc, err = minio.New("localhost:9000", &minio.Options{
-		Creds: credentials.NewStaticV4("minioadmin", "minioadmin", ""),
+	mc, err = minio.New(os.Getenv("MINIO_ENDPOINT"), &minio.Options{
+		Creds: credentials.NewStaticV4(os.Getenv("MINIO_ACCESS_KEY"), os.Getenv("MINIO_TOKEN"), ""),
 	})
 	if err != nil {
 		log.Fatalf("initializing minio client: %v", err)
