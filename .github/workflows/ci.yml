@@ -14,8 +14,9 @@ jobs:
     services:
       minio:
         image: lazybit/minio
+        # does not apply since the image does not recognize these vars.
         env:
-          MINIO_ROOT_USER: minio
+          MINIO_ROOT_USER: minio 
           MINIO_ROOT_PASSWORD: minio
         ports:
         - 9000:9000
