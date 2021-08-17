@@ -5,6 +5,8 @@
 #   endpoint: whatever
 # the env var name for endpoint is MINIO_ENDPOINT.
 port: 3000
+debug: false
+database_dialect: postgres
 minio:
   endpoint: localhost:9000
   access_key: myaccesskey

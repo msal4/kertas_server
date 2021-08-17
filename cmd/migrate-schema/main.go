@@ -4,11 +4,16 @@ import (
 	"context"
 	"flag"
 	"log"
+	"os"
+	"strings"
 
-	"entgo.io/ent/dialect"
+	"github.com/Netflix/go-env"
+	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
 	"github.com/msal4/hassah_school_server/ent"
 	"github.com/msal4/hassah_school_server/ent/migrate"
+	"github.com/msal4/hassah_school_server/server"
+	"gopkg.in/yaml.v2"
 )
 
 var debug *bool
@@ -19,7 +24,34 @@ func init() {
 }
 
 func main() {
-	client, err := ent.Open(dialect.Postgres, "postgres://postgres@localhost:5432/school?sslmode=disable")
+	f, err := os.Open("./config.yml")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	var cfg server.Config
+	err = yaml.NewDecoder(f).Decode(&cfg)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	godotenv.Load()
+
+	env.UnmarshalFromEnviron(&cfg)
+
+	if cfg.Port == 0 {
+		cfg.Port = 3000
+	}
+
+	if *debug {
+		cfg.Debug = true
+	}
+
+	if cfg.DatabaseDialect == "" {
+		cfg.DatabaseDialect = cfg.DatabaseURL[:strings.Index(cfg.DatabaseURL, ":")]
+	}
+
+	client, err := ent.Open(cfg.DatabaseDialect, cfg.DatabaseURL)
 	if err != nil {
 		log.Fatalf("failed establishing connection: %v", err)
 	}
