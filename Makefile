@@ -6,4 +6,5 @@ gen:
 	@go generate ./ent
 	@go generate .
 test:
+	@sleep 10
 	@go test -v ./...
