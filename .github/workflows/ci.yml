@@ -34,5 +34,5 @@ jobs:
       run: make test
     env:
       MINIO_ENDPOINT: 127.0.0.1:9000
-      MINIO_ACCESS_KEY: minio
-      MINIO_TOKEN: minio
+      MINIO_ACCESS_KEY: minioadmin
+      MINIO_TOKEN: minioadmin
