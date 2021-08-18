@@ -33,9 +33,13 @@ func loadConfig() server.Config {
 		log.Fatal(err)
 	}
 
-	godotenv.Load()
+	if err := godotenv.Load(); err != nil {
+		log.Println(err)
+	}
 
-	env.UnmarshalFromEnviron(&cfg)
+	if _, err := env.UnmarshalFromEnviron(&cfg); err != nil {
+		log.Fatal(err)
+	}
 
 	if cfg.Port == 0 {
 		cfg.Port = 3000
