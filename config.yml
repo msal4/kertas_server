@@ -7,6 +7,8 @@
 port: 3000
 debug: false
 database_dialect: postgres
+super_admin_username: admin
+super_admin_password: superadmin
 minio:
   endpoint: localhost:9000
   access_key: myaccesskey

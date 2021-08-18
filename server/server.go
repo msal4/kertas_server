@@ -23,10 +23,12 @@ import (
 )
 
 type Config struct {
-	DatabaseURL     string `yaml:"database_url" env:"DATABASE_URL"`
-	DatabaseDialect string `yam:"database_dialect" env:"DATABASE_DIALECT,default=postgres"`
-	Port            int    `yaml:"port" env:"PORT"`
-	Debug           bool   `yaml:"debug" env:"DEBUG"`
+	DatabaseURL        string `yaml:"database_url" env:"DATABASE_URL"`
+	DatabaseDialect    string `yam:"database_dialect" env:"DATABASE_DIALECT,default=postgres"`
+	Port               int    `yaml:"port" env:"PORT"`
+	Debug              bool   `yaml:"debug" env:"DEBUG"`
+	SuperAdminUsername string `yaml:"super_admin_username" env:"SUPER_ADMIN_USERNAME"`
+	SuperAdminPassword string `yaml:"super_admin_password" env:"SUPER_ADMIN_PASSWORD"`
 
 	Minio struct {
 		Endpoint  string `yaml:"endpoint" env:"MINIO_ENDPOINT"`
@@ -59,14 +61,14 @@ func NewDefaultServer(cfg Config) (*http.ServeMux, error) {
 		return nil, fmt.Errorf("initializing service: %v", err)
 	}
 
-	if err := createDefaultAdminIfNotExists(context.Background(), s); err != nil {
+	if err := createDefaultAdminIfNotExists(context.Background(), s, cfg); err != nil {
 		return nil, fmt.Errorf("creating super admin: %v", err)
 	}
 
 	return NewServer(s, cfg.Debug), nil
 }
 
-func createDefaultAdminIfNotExists(ctx context.Context, s *service.Service) error {
+func createDefaultAdminIfNotExists(ctx context.Context, s *service.Service, cfg Config) error {
 	if s.EC.User.Query().Where(user.RoleEQ(user.RoleSuperAdmin)).CountX(context.Background()) > 0 {
 		return nil
 	}
@@ -74,8 +76,8 @@ func createDefaultAdminIfNotExists(ctx context.Context, s *service.Service) erro
 	log.Println("No super admins found, creating the default admin...")
 	u, err := s.AddUser(ctx, model.AddUserInput{
 		Name:     "Admin",
-		Username: "admin",
-		Password: "superadmin",
+		Username: cfg.SuperAdminUsername,
+		Password: cfg.SuperAdminPassword,
 		Phone:    "07712345678",
 		Role:     user.RoleSuperAdmin,
 		Active:   true,
