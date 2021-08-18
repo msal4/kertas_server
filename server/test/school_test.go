@@ -170,7 +170,7 @@ func TestAddSchool(t *testing.T) {
 
 		w := httptest.NewRecorder()
 
-		imgFile, err := os.Open("../testfiles/stanford.png")
+		imgFile, err := os.Open("../../testfiles/stanford.png")
 		require.NoError(t, err)
 
 		operations := `{
@@ -202,7 +202,7 @@ func TestAddSchool(t *testing.T) {
 
 		w := httptest.NewRecorder()
 
-		imgFile, err := os.Open("../testfiles/stanford.png")
+		imgFile, err := os.Open("../../testfiles/stanford.png")
 		require.NoError(t, err)
 
 		operations := `{
@@ -270,7 +270,7 @@ func TestUpdateSchool(t *testing.T) {
 		require.NotEmpty(t, resp.Errors)
 	})
 
-	f := testutil.OpenFile(t, "../testfiles/harvard.jpg")
+	f := testutil.OpenFile(t, "../../testfiles/harvard.jpg")
 	defer f.Close()
 	sch, err := s.AddSchool(ctx,
 		model.AddSchoolInput{
@@ -289,7 +289,7 @@ func TestUpdateSchool(t *testing.T) {
 	data, err := auth.GenerateTokens(*u, s.Config.AuthConfig)
 	require.NoError(t, err)
 
-	imgFile, err := os.Open("../testfiles/stanford.png")
+	imgFile, err := os.Open("../../testfiles/stanford.png")
 	defer imgFile.Close()
 	require.NoError(t, err)
 
