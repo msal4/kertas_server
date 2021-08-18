@@ -8,6 +8,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/minio/minio-go/v7"
 	"github.com/msal4/hassah_school_server/ent"
+	"github.com/msal4/hassah_school_server/ent/stage"
 	"github.com/msal4/hassah_school_server/server/model"
 )
 
@@ -60,16 +61,14 @@ func (s *Service) DeleteStage(ctx context.Context, id uuid.UUID) error {
 }
 
 func (s *Service) DeleteStagePermanently(ctx context.Context, id uuid.UUID) error {
-	// TODO: delete stage directory
-	//st, err := s.EC.Stage.Get(ctx, id)
-	//if err != nil {
-	//	return err
-	//}
+	st, err := s.EC.Stage.Query().Select(stage.FieldDirectory).Only(ctx)
+	if err != nil {
+		return err
+	}
 
-	//err = s.MC.RemoveObject(ctx, s.Config.RootBucket, st.Directory, minio.RemoveObjectOptions{})
-	//if err != nil {
-	//	return fmt.Errorf("removing stage directory: %v", err)
-	//}
+	if err := s.RemoveDir(ctx, st.Directory); err != nil {
+		return err
+	}
 
 	return s.EC.Stage.DeleteOneID(id).Exec(ctx)
 }

@@ -1,10 +1,12 @@
 package service_test
 
 import (
+	"bufio"
 	"context"
 	"testing"
 
 	"github.com/google/uuid"
+	"github.com/minio/minio-go/v7"
 	"github.com/msal4/hassah_school_server/ent"
 	"github.com/msal4/hassah_school_server/ent/stage"
 	"github.com/msal4/hassah_school_server/server/model"
@@ -256,12 +258,40 @@ func TestDeleteStagePermanently(t *testing.T) {
 		require.NoError(t, err)
 	})
 
-	t.Run("existing stage", func(t *testing.T) {
+	t.Run("stage with empty directory", func(t *testing.T) {
 		err := s.DeleteStagePermanently(ctx, st.ID)
 		require.NoError(t, err)
 		_, err = s.EC.Stage.Get(ctx, st.ID)
 		require.Error(t, err)
 		require.True(t, ent.IsNotFound(err))
+	})
+
+	t.Run("stage with directory", func(t *testing.T) {
+		st := createStage(ctx, s, "testfs", 12)
+		filename1 := st.Directory + "/testfile1.txt"
+		_, err := s.MC.PutObject(ctx, s.Config.RootBucket, filename1, bufio.NewReader(nil), 0, minio.PutObjectOptions{})
+		require.NoError(t, err)
+
+		filename2 := st.Directory + "/testfile2.txt"
+		_, err = s.MC.PutObject(ctx, s.Config.RootBucket, filename2, bufio.NewReader(nil), 0, minio.PutObjectOptions{})
+		require.NoError(t, err)
+
+		filename3 := st.Directory + "/hello/testfile3.txt"
+		_, err = s.MC.PutObject(ctx, s.Config.RootBucket, filename2, bufio.NewReader(nil), 0, minio.PutObjectOptions{})
+		require.NoError(t, err)
+
+		err = s.DeleteStagePermanently(ctx, st.ID)
+		require.NoError(t, err)
+		_, err = s.EC.Stage.Get(ctx, st.ID)
+		require.Error(t, err)
+		require.True(t, ent.IsNotFound(err))
+
+		_, err = s.MC.StatObject(ctx, s.Config.RootBucket, filename1, minio.StatObjectOptions{})
+		require.Error(t, err)
+		_, err = s.MC.StatObject(ctx, s.Config.RootBucket, filename2, minio.StatObjectOptions{})
+		require.Error(t, err)
+		_, err = s.MC.StatObject(ctx, s.Config.RootBucket, filename3, minio.StatObjectOptions{})
+		require.Error(t, err)
 	})
 }
 
