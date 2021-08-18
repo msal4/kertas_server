@@ -115,7 +115,7 @@ func (r *queryResolver) Schools(ctx context.Context, after *ent.Cursor, first *i
 		return nil, auth.UnauthorizedErr
 	}
 
-	return r.s.Schools(ctx, service.SchoolListOptions{
+	return r.s.Schools(ctx, service.SchoolsOptions{
 		After: after, First: first, Before: before, Last: last, OrderBy: orderBy, Where: where})
 }
 

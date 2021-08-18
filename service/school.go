@@ -6,12 +6,12 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/minio/minio-go/v7"
 	"github.com/msal4/hassah_school_server/ent"
+	"github.com/msal4/hassah_school_server/ent/school"
 	"github.com/msal4/hassah_school_server/server/model"
 )
 
-type SchoolListOptions struct {
+type SchoolsOptions struct {
 	After   *ent.Cursor
 	First   *int
 	Before  *ent.Cursor
@@ -20,7 +20,7 @@ type SchoolListOptions struct {
 	Where   *ent.SchoolWhereInput
 }
 
-func (s *Service) Schools(ctx context.Context, opts SchoolListOptions) (*ent.SchoolConnection, error) {
+func (s *Service) Schools(ctx context.Context, opts SchoolsOptions) (*ent.SchoolConnection, error) {
 	return s.EC.School.Query().Paginate(ctx, opts.After, opts.First, opts.Before, opts.Last, ent.WithSchoolOrder(opts.OrderBy),
 		ent.WithSchoolFilter(opts.Where.Filter))
 }
@@ -34,24 +34,6 @@ func (s *Service) AddSchool(ctx context.Context, input model.AddSchoolInput) (*e
 	}
 
 	return s.EC.School.Create().SetName(input.Name).SetActive(input.Active).SetImage(info.Key).SetDirectory(dir).Save(ctx)
-}
-
-func (s *Service) DeleteSchool(ctx context.Context, id uuid.UUID) error {
-	return s.EC.School.UpdateOneID(id).SetDeletedAt(time.Now()).Exec(ctx)
-}
-
-func (s *Service) DeleteSchoolPermanently(ctx context.Context, id uuid.UUID) error {
-	sch, err := s.EC.School.Get(ctx, id)
-	if err != nil {
-		return err
-	}
-
-	err = s.MC.RemoveObject(ctx, s.Config.RootBucket, sch.Image, minio.RemoveObjectOptions{})
-	if err != nil {
-		return err
-	}
-
-	return s.EC.School.DeleteOneID(id).Exec(ctx)
 }
 
 func (s *Service) UpdateSchool(ctx context.Context, id uuid.UUID, input model.UpdateSchoolInput) (*ent.School, error) {
@@ -75,4 +57,21 @@ func (s *Service) UpdateSchool(ctx context.Context, id uuid.UUID, input model.Up
 	}
 
 	return b.Save(ctx)
+}
+
+func (s *Service) DeleteSchool(ctx context.Context, id uuid.UUID) error {
+	return s.EC.School.UpdateOneID(id).SetDeletedAt(time.Now()).Exec(ctx)
+}
+
+func (s *Service) DeleteSchoolPermanently(ctx context.Context, id uuid.UUID) error {
+	sch, err := s.EC.School.Query().Select(school.FieldDirectory).Where(school.ID(id)).Only(ctx)
+	if err != nil {
+		return err
+	}
+
+	if err := s.RemoveDir(ctx, sch.Directory); err != nil {
+		return err
+	}
+
+	return s.EC.School.DeleteOneID(id).Exec(ctx)
 }

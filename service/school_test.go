@@ -24,7 +24,7 @@ func TestListSchool(t *testing.T) {
 	t.Run("empty", func(t *testing.T) {
 		defer s.EC.School.Delete().ExecX(ctx)
 
-		conn, err := s.Schools(ctx, service.SchoolListOptions{})
+		conn, err := s.Schools(ctx, service.SchoolsOptions{})
 		require.NoError(t, err)
 		require.NotNil(t, conn)
 		require.Zero(t, conn.TotalCount)
@@ -36,7 +36,7 @@ func TestListSchool(t *testing.T) {
 
 		want := s.EC.School.Create().SetName("school 1").SetImage("s/image").SetDirectory("test_dir").SaveX(ctx)
 
-		conn, err := s.Schools(ctx, service.SchoolListOptions{})
+		conn, err := s.Schools(ctx, service.SchoolsOptions{})
 		require.NoError(t, err)
 		require.NotNil(t, conn)
 		require.Equal(t, 1, conn.TotalCount)
@@ -60,7 +60,7 @@ func TestListSchool(t *testing.T) {
 		b := s.EC.School.Query().Order(ent.Asc(school.FieldCreatedAt))
 		want := b.AllX(ctx)
 
-		conn, err := s.Schools(ctx, service.SchoolListOptions{
+		conn, err := s.Schools(ctx, service.SchoolsOptions{
 			OrderBy: &ent.SchoolOrder{Field: ent.SchoolOrderFieldCreatedAt, Direction: ent.OrderDirectionAsc},
 		})
 		require.NoError(t, err)
@@ -80,7 +80,7 @@ func TestListSchool(t *testing.T) {
 
 		want = b.Where(school.Active(false)).AllX(ctx)
 
-		conn, err = s.Schools(ctx, service.SchoolListOptions{
+		conn, err = s.Schools(ctx, service.SchoolsOptions{
 			Where:   &ent.SchoolWhereInput{Active: ptr.Bool(false)},
 			OrderBy: &ent.SchoolOrder{Field: ent.SchoolOrderFieldCreatedAt, Direction: ent.OrderDirectionAsc},
 		})
@@ -197,6 +197,14 @@ func TestDeleteSchoolPermanently(t *testing.T) {
 	require.NoError(t, err)
 	require.NotNil(t, sch)
 
+	f.Seek(0, 0)
+	sch2, err := s.AddSchool(ctx, model.AddSchoolInput{
+		Name:  "test school 2",
+		Image: graphql.Upload{File: f, Filename: f.File.Name(), ContentType: f.ContentType, Size: f.Size()},
+	})
+	require.NoError(t, err)
+	require.NotNil(t, sch)
+
 	t.Run("non-existing school", func(t *testing.T) {
 		err := s.DeleteSchoolPermanently(ctx, uuid.MustParse("2710c203-7842-4356-8d9f-12f9da4722a2"))
 		require.Error(t, err)
@@ -211,6 +219,8 @@ func TestDeleteSchoolPermanently(t *testing.T) {
 		require.NoError(t, err)
 		_, err = s.EC.School.Query().Where(school.ID(sch.ID)).Only(ctx)
 		require.Error(t, err)
+
+		require.NotNil(t, s.EC.School.GetX(ctx, sch2.ID))
 
 		_, err = s.MC.StatObject(ctx, s.Config.RootBucket, sch.Image, minio.StatObjectOptions{})
 		require.Error(t, err)

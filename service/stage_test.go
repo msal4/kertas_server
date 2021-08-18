@@ -268,6 +268,8 @@ func TestDeleteStagePermanently(t *testing.T) {
 
 	t.Run("stage with directory", func(t *testing.T) {
 		st := createStage(ctx, s, "testfs", 12)
+		st2 := createStage(ctx, s, "testfs23", 22312)
+
 		filename1 := st.Directory + "/testfile1.txt"
 		_, err := s.MC.PutObject(ctx, s.Config.RootBucket, filename1, bufio.NewReader(nil), 0, minio.PutObjectOptions{})
 		require.NoError(t, err)
@@ -282,9 +284,13 @@ func TestDeleteStagePermanently(t *testing.T) {
 
 		err = s.DeleteStagePermanently(ctx, st.ID)
 		require.NoError(t, err)
+
 		_, err = s.EC.Stage.Get(ctx, st.ID)
 		require.Error(t, err)
 		require.True(t, ent.IsNotFound(err))
+
+		_, err = s.EC.Stage.Get(ctx, st2.ID)
+		require.NoError(t, err)
 
 		_, err = s.MC.StatObject(ctx, s.Config.RootBucket, filename1, minio.StatObjectOptions{})
 		require.Error(t, err)

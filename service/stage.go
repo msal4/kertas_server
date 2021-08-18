@@ -61,7 +61,7 @@ func (s *Service) DeleteStage(ctx context.Context, id uuid.UUID) error {
 }
 
 func (s *Service) DeleteStagePermanently(ctx context.Context, id uuid.UUID) error {
-	st, err := s.EC.Stage.Query().Select(stage.FieldDirectory).Only(ctx)
+	st, err := s.EC.Stage.Query().Select(stage.FieldDirectory).Where(stage.ID(id)).Only(ctx)
 	if err != nil {
 		return err
 	}
