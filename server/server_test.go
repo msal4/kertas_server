@@ -130,3 +130,12 @@ func createStudent(ctx context.Context, s *service.Service, username string) *en
 	return s.EC.User.Create().SetName("test userd" + username).SetUsername(username).
 		SetPhone("077059333812").SetDirectory("diresss22" + username).SetPassword("mipassword22@@@@5").SetSchool(sch).SetStage(stage).SaveX(ctx)
 }
+
+func createSchool(ctx context.Context, s *service.Service, name, image string) *ent.School {
+	return s.EC.School.Create().SetName(name).SetImage(image).SetDirectory("test_dir").SaveX(ctx)
+}
+
+func createStage(ctx context.Context, s *service.Service, name string, tuition int) *ent.Stage {
+	sch := createSchool(ctx, s, "school for"+name, "image/"+name)
+	return s.EC.Stage.Create().SetName(name).SetDirectory("testdir" + name).SetTuitionAmount(tuition).SetSchool(sch).SaveX(ctx)
+}

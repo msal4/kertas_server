@@ -79,18 +79,34 @@ func (r *mutationResolver) DeleteUserPermanently(ctx context.Context, id uuid.UU
 }
 
 func (r *mutationResolver) AddStage(ctx context.Context, input model.AddStageInput) (*ent.Stage, error) {
+	if !auth.IsAdmin(ctx) {
+		return nil, auth.UnauthorizedErr
+	}
+
 	return r.s.AddStage(ctx, input)
 }
 
 func (r *mutationResolver) UpdateStage(ctx context.Context, id uuid.UUID, input model.UpdateStageInput) (*ent.Stage, error) {
+	if !auth.IsAdmin(ctx) {
+		return nil, auth.UnauthorizedErr
+	}
+
 	return r.s.UpdateStage(ctx, id, input)
 }
 
 func (r *mutationResolver) DeleteStage(ctx context.Context, id uuid.UUID) (bool, error) {
+	if !auth.IsAdmin(ctx) {
+		return false, auth.UnauthorizedErr
+	}
+
 	return true, r.s.DeleteStage(ctx, id)
 }
 
 func (r *mutationResolver) DeleteStagePermanently(ctx context.Context, id uuid.UUID) (bool, error) {
+	if !auth.IsAdmin(ctx) {
+		return false, auth.UnauthorizedErr
+	}
+
 	return true, r.s.DeleteStagePermanently(ctx, id)
 }
 
