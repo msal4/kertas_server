@@ -378,6 +378,7 @@ var (
 		{Name: "updated_at", Type: field.TypeTime},
 		{Name: "name", Type: field.TypeString},
 		{Name: "tuition_amount", Type: field.TypeInt},
+		{Name: "directory", Type: field.TypeString},
 		{Name: "active", Type: field.TypeBool, Default: true},
 		{Name: "deleted_at", Type: field.TypeTime, Nullable: true},
 		{Name: "school_stages", Type: field.TypeUUID, Nullable: true},
@@ -390,7 +391,7 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "stages_schools_stages",
-				Columns:    []*schema.Column{StagesColumns[7]},
+				Columns:    []*schema.Column{StagesColumns[8]},
 				RefColumns: []*schema.Column{SchoolsColumns[0]},
 				OnDelete:   schema.Cascade,
 			},
@@ -399,17 +400,17 @@ var (
 			{
 				Name:    "stage_school_stages",
 				Unique:  false,
-				Columns: []*schema.Column{StagesColumns[7]},
+				Columns: []*schema.Column{StagesColumns[8]},
 			},
 			{
 				Name:    "stage_active",
 				Unique:  false,
-				Columns: []*schema.Column{StagesColumns[5]},
+				Columns: []*schema.Column{StagesColumns[6]},
 			},
 			{
 				Name:    "stage_deleted_at",
 				Unique:  false,
-				Columns: []*schema.Column{StagesColumns[6]},
+				Columns: []*schema.Column{StagesColumns[7]},
 			},
 		},
 	}

@@ -58,15 +58,19 @@ type ComplexityRoot struct {
 
 	Mutation struct {
 		AddSchool               func(childComplexity int, input model.AddSchoolInput) int
+		AddStage                func(childComplexity int, input model.AddStageInput) int
 		AddUser                 func(childComplexity int, input model.AddUserInput) int
 		DeleteSchool            func(childComplexity int, id uuid.UUID) int
 		DeleteSchoolPermanently func(childComplexity int, id uuid.UUID) int
+		DeleteStage             func(childComplexity int, id uuid.UUID) int
+		DeleteStagePermanently  func(childComplexity int, id uuid.UUID) int
 		DeleteUser              func(childComplexity int, id uuid.UUID) int
 		DeleteUserPermanently   func(childComplexity int, id uuid.UUID) int
 		LoginAdmin              func(childComplexity int, input model.LoginInput) int
 		LoginUser               func(childComplexity int, input model.LoginInput) int
 		RefreshTokens           func(childComplexity int, token string) int
 		UpdateSchool            func(childComplexity int, id uuid.UUID, input model.UpdateSchoolInput) int
+		UpdateStage             func(childComplexity int, id uuid.UUID, input model.UpdateStageInput) int
 		UpdateUser              func(childComplexity int, id uuid.UUID, input model.UpdateUserInput) int
 	}
 
@@ -80,6 +84,8 @@ type ComplexityRoot struct {
 	Query struct {
 		School  func(childComplexity int, id uuid.UUID) int
 		Schools func(childComplexity int, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.SchoolOrder, where *ent.SchoolWhereInput) int
+		Stage   func(childComplexity int, id uuid.UUID) int
+		Stages  func(childComplexity int, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.StageOrder, where *ent.StageWhereInput) int
 		User    func(childComplexity int, id uuid.UUID) int
 		Users   func(childComplexity int, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.UserOrder, where *ent.UserWhereInput) int
 	}
@@ -112,6 +118,17 @@ type ComplexityRoot struct {
 		School        func(childComplexity int) int
 		TuitionAmount func(childComplexity int) int
 		UpdatedAt     func(childComplexity int) int
+	}
+
+	StageConnection struct {
+		Edges      func(childComplexity int) int
+		PageInfo   func(childComplexity int) int
+		TotalCount func(childComplexity int) int
+	}
+
+	StageEdge struct {
+		Cursor func(childComplexity int) int
+		Node   func(childComplexity int) int
 	}
 
 	User struct {
@@ -149,6 +166,10 @@ type MutationResolver interface {
 	UpdateUser(ctx context.Context, id uuid.UUID, input model.UpdateUserInput) (*ent.User, error)
 	DeleteUser(ctx context.Context, id uuid.UUID) (bool, error)
 	DeleteUserPermanently(ctx context.Context, id uuid.UUID) (bool, error)
+	AddStage(ctx context.Context, input model.AddStageInput) (*ent.Stage, error)
+	UpdateStage(ctx context.Context, id uuid.UUID, input model.UpdateStageInput) (*ent.Stage, error)
+	DeleteStage(ctx context.Context, id uuid.UUID) (bool, error)
+	DeleteStagePermanently(ctx context.Context, id uuid.UUID) (bool, error)
 	LoginAdmin(ctx context.Context, input model.LoginInput) (*model.AuthData, error)
 	LoginUser(ctx context.Context, input model.LoginInput) (*model.AuthData, error)
 	RefreshTokens(ctx context.Context, token string) (*model.AuthData, error)
@@ -158,6 +179,8 @@ type QueryResolver interface {
 	Schools(ctx context.Context, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.SchoolOrder, where *ent.SchoolWhereInput) (*ent.SchoolConnection, error)
 	User(ctx context.Context, id uuid.UUID) (*ent.User, error)
 	Users(ctx context.Context, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.UserOrder, where *ent.UserWhereInput) (*ent.UserConnection, error)
+	Stage(ctx context.Context, id uuid.UUID) (*ent.Stage, error)
+	Stages(ctx context.Context, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.StageOrder, where *ent.StageWhereInput) (*ent.StageConnection, error)
 }
 
 type executableSchema struct {
@@ -201,6 +224,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.AddSchool(childComplexity, args["input"].(model.AddSchoolInput)), true
 
+	case "Mutation.addStage":
+		if e.complexity.Mutation.AddStage == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_addStage_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.AddStage(childComplexity, args["input"].(model.AddStageInput)), true
+
 	case "Mutation.addUser":
 		if e.complexity.Mutation.AddUser == nil {
 			break
@@ -236,6 +271,30 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.DeleteSchoolPermanently(childComplexity, args["id"].(uuid.UUID)), true
+
+	case "Mutation.deleteStage":
+		if e.complexity.Mutation.DeleteStage == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_deleteStage_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.DeleteStage(childComplexity, args["id"].(uuid.UUID)), true
+
+	case "Mutation.deleteStagePermanently":
+		if e.complexity.Mutation.DeleteStagePermanently == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_deleteStagePermanently_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.DeleteStagePermanently(childComplexity, args["id"].(uuid.UUID)), true
 
 	case "Mutation.deleteUser":
 		if e.complexity.Mutation.DeleteUser == nil {
@@ -309,6 +368,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.UpdateSchool(childComplexity, args["id"].(uuid.UUID), args["input"].(model.UpdateSchoolInput)), true
 
+	case "Mutation.updateStage":
+		if e.complexity.Mutation.UpdateStage == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_updateStage_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UpdateStage(childComplexity, args["id"].(uuid.UUID), args["input"].(model.UpdateStageInput)), true
+
 	case "Mutation.updateUser":
 		if e.complexity.Mutation.UpdateUser == nil {
 			break
@@ -372,6 +443,30 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Query.Schools(childComplexity, args["after"].(*ent.Cursor), args["first"].(*int), args["before"].(*ent.Cursor), args["last"].(*int), args["orderBy"].(*ent.SchoolOrder), args["where"].(*ent.SchoolWhereInput)), true
+
+	case "Query.stage":
+		if e.complexity.Query.Stage == nil {
+			break
+		}
+
+		args, err := ec.field_Query_stage_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.Stage(childComplexity, args["id"].(uuid.UUID)), true
+
+	case "Query.stages":
+		if e.complexity.Query.Stages == nil {
+			break
+		}
+
+		args, err := ec.field_Query_stages_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.Stages(childComplexity, args["after"].(*ent.Cursor), args["first"].(*int), args["before"].(*ent.Cursor), args["last"].(*int), args["orderBy"].(*ent.StageOrder), args["where"].(*ent.StageWhereInput)), true
 
 	case "Query.user":
 		if e.complexity.Query.User == nil {
@@ -522,6 +617,41 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Stage.UpdatedAt(childComplexity), true
+
+	case "StageConnection.edges":
+		if e.complexity.StageConnection.Edges == nil {
+			break
+		}
+
+		return e.complexity.StageConnection.Edges(childComplexity), true
+
+	case "StageConnection.pageInfo":
+		if e.complexity.StageConnection.PageInfo == nil {
+			break
+		}
+
+		return e.complexity.StageConnection.PageInfo(childComplexity), true
+
+	case "StageConnection.totalCount":
+		if e.complexity.StageConnection.TotalCount == nil {
+			break
+		}
+
+		return e.complexity.StageConnection.TotalCount(childComplexity), true
+
+	case "StageEdge.cursor":
+		if e.complexity.StageEdge.Cursor == nil {
+			break
+		}
+
+		return e.complexity.StageEdge.Cursor(childComplexity), true
+
+	case "StageEdge.node":
+		if e.complexity.StageEdge.Node == nil {
+			break
+		}
+
+		return e.complexity.StageEdge.Node(childComplexity), true
 
 	case "User.active":
 		if e.complexity.User.Active == nil {
@@ -781,16 +911,6 @@ input UpdateSchoolInput {
   active: Boolean
 }
 
-type Stage implements Node {
-  id: ID!
-  name: String!
-  tuition_amount: Int!
-  active: Boolean!
-  school: School!
-  createdAt: Time!
-  updatedAt: Time!
-}
-
 enum UserOrderField {
     NAME
     USERNAME
@@ -852,6 +972,52 @@ input UpdateUserInput {
   stage_id: ID
 }
 
+type Stage implements Node {
+  id: ID!
+  name: String!
+  tuition_amount: Int!
+  active: Boolean!
+  school: School!
+  createdAt: Time!
+  updatedAt: Time!
+}
+
+
+enum StageOrderField {
+    NAME
+    CREATED_AT
+    UPDATED_AT
+}
+
+input StageOrder {
+    field: StageOrderField
+    direction: OrderDirection!
+}
+
+type StageEdge {
+  node: Stage
+  cursor: Cursor!
+}
+
+type StageConnection {
+  totalCount: Int!
+  pageInfo: PageInfo!
+  edges: [StageEdge]
+}
+
+input AddStageInput {
+  name: String!
+  active: Boolean! = true
+  tuition_amount: Int!
+  school_id: ID!
+}
+
+input UpdateStageInput {
+  name: String
+  active: Boolean
+  tuition_amount: Int
+}
+
 input LoginInput {
   username: String!
   password: String!
@@ -868,6 +1034,9 @@ type Query {
 
   user(id: ID!): User
   users(after: Cursor, first: Int, before: Cursor, last: Int, orderBy: UserOrder, where: UserWhereInput): UserConnection
+
+  stage(id: ID!): Stage
+  stages(after: Cursor, first: Int, before: Cursor, last: Int, orderBy: StageOrder, where: StageWhereInput): StageConnection
 }
 
 type Mutation {
@@ -880,6 +1049,11 @@ type Mutation {
   updateUser(id: ID!, input: UpdateUserInput!): User
   deleteUser(id: ID!): Boolean!
   deleteUserPermanently(id: ID!): Boolean!
+
+  addStage(input: AddStageInput!): Stage
+  updateStage(id: ID!, input: UpdateStageInput!): Stage
+  deleteStage(id: ID!): Boolean!
+  deleteStagePermanently(id: ID!): Boolean!
 
   loginAdmin(input: LoginInput!): AuthData
   loginUser(input: LoginInput!): AuthData
@@ -1879,6 +2053,21 @@ input StageWhereInput {
   tuitionAmountLT: Int
   tuitionAmountLTE: Int
   
+  """directory field predicates"""
+  directory: String
+  directoryNEQ: String
+  directoryIn: [String!]
+  directoryNotIn: [String!]
+  directoryGT: String
+  directoryGTE: String
+  directoryLT: String
+  directoryLTE: String
+  directoryContains: String
+  directoryHasPrefix: String
+  directoryHasSuffix: String
+  directoryEqualFold: String
+  directoryContainsFold: String
+  
   """active field predicates"""
   active: Boolean
   activeNEQ: Boolean
@@ -2002,6 +2191,21 @@ func (ec *executionContext) field_Mutation_addSchool_args(ctx context.Context, r
 	return args, nil
 }
 
+func (ec *executionContext) field_Mutation_addStage_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 model.AddStageInput
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg0, err = ec.unmarshalNAddStageInput2githubᚗcomᚋmsal4ᚋhassah_school_serverᚋserverᚋmodelᚐAddStageInput(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
 func (ec *executionContext) field_Mutation_addUser_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -2033,6 +2237,36 @@ func (ec *executionContext) field_Mutation_deleteSchoolPermanently_args(ctx cont
 }
 
 func (ec *executionContext) field_Mutation_deleteSchool_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 uuid.UUID
+	if tmp, ok := rawArgs["id"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+		arg0, err = ec.unmarshalNID2githubᚗcomᚋgoogleᚋuuidᚐUUID(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["id"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_deleteStagePermanently_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 uuid.UUID
+	if tmp, ok := rawArgs["id"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+		arg0, err = ec.unmarshalNID2githubᚗcomᚋgoogleᚋuuidᚐUUID(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["id"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_deleteStage_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
 	var arg0 uuid.UUID
@@ -2138,6 +2372,30 @@ func (ec *executionContext) field_Mutation_updateSchool_args(ctx context.Context
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
 		arg1, err = ec.unmarshalNUpdateSchoolInput2githubᚗcomᚋmsal4ᚋhassah_school_serverᚋserverᚋmodelᚐUpdateSchoolInput(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg1
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_updateStage_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 uuid.UUID
+	if tmp, ok := rawArgs["id"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+		arg0, err = ec.unmarshalNID2githubᚗcomᚋgoogleᚋuuidᚐUUID(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["id"] = arg0
+	var arg1 model.UpdateStageInput
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg1, err = ec.unmarshalNUpdateStageInput2githubᚗcomᚋmsal4ᚋhassah_school_serverᚋserverᚋmodelᚐUpdateStageInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -2252,6 +2510,81 @@ func (ec *executionContext) field_Query_schools_args(ctx context.Context, rawArg
 	if tmp, ok := rawArgs["where"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("where"))
 		arg5, err = ec.unmarshalOSchoolWhereInput2ᚖgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚐSchoolWhereInput(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["where"] = arg5
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_stage_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 uuid.UUID
+	if tmp, ok := rawArgs["id"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+		arg0, err = ec.unmarshalNID2githubᚗcomᚋgoogleᚋuuidᚐUUID(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["id"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_stages_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *ent.Cursor
+	if tmp, ok := rawArgs["after"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("after"))
+		arg0, err = ec.unmarshalOCursor2ᚖgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚐCursor(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["after"] = arg0
+	var arg1 *int
+	if tmp, ok := rawArgs["first"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("first"))
+		arg1, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["first"] = arg1
+	var arg2 *ent.Cursor
+	if tmp, ok := rawArgs["before"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("before"))
+		arg2, err = ec.unmarshalOCursor2ᚖgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚐCursor(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["before"] = arg2
+	var arg3 *int
+	if tmp, ok := rawArgs["last"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("last"))
+		arg3, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["last"] = arg3
+	var arg4 *ent.StageOrder
+	if tmp, ok := rawArgs["orderBy"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("orderBy"))
+		arg4, err = ec.unmarshalOStageOrder2ᚖgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚐStageOrder(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["orderBy"] = arg4
+	var arg5 *ent.StageWhereInput
+	if tmp, ok := rawArgs["where"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("where"))
+		arg5, err = ec.unmarshalOStageWhereInput2ᚖgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚐStageWhereInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -2767,6 +3100,168 @@ func (ec *executionContext) _Mutation_deleteUserPermanently(ctx context.Context,
 	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _Mutation_addStage(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_addStage_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().AddStage(rctx, args["input"].(model.AddStageInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*ent.Stage)
+	fc.Result = res
+	return ec.marshalOStage2ᚖgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚐStage(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_updateStage(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_updateStage_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().UpdateStage(rctx, args["id"].(uuid.UUID), args["input"].(model.UpdateStageInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*ent.Stage)
+	fc.Result = res
+	return ec.marshalOStage2ᚖgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚐStage(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_deleteStage(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_deleteStage_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().DeleteStage(rctx, args["id"].(uuid.UUID))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_deleteStagePermanently(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_deleteStagePermanently_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().DeleteStagePermanently(rctx, args["id"].(uuid.UUID))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _Mutation_loginAdmin(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -3172,6 +3667,84 @@ func (ec *executionContext) _Query_users(ctx context.Context, field graphql.Coll
 	res := resTmp.(*ent.UserConnection)
 	fc.Result = res
 	return ec.marshalOUserConnection2ᚖgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚐUserConnection(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Query_stage(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Query_stage_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().Stage(rctx, args["id"].(uuid.UUID))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*ent.Stage)
+	fc.Result = res
+	return ec.marshalOStage2ᚖgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚐStage(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Query_stages(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Query_stages_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().Stages(rctx, args["after"].(*ent.Cursor), args["first"].(*int), args["before"].(*ent.Cursor), args["last"].(*int), args["orderBy"].(*ent.StageOrder), args["where"].(*ent.StageWhereInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*ent.StageConnection)
+	fc.Result = res
+	return ec.marshalOStageConnection2ᚖgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚐStageConnection(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query___type(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -3864,6 +4437,175 @@ func (ec *executionContext) _Stage_updatedAt(ctx context.Context, field graphql.
 	res := resTmp.(time.Time)
 	fc.Result = res
 	return ec.marshalNTime2timeᚐTime(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _StageConnection_totalCount(ctx context.Context, field graphql.CollectedField, obj *ent.StageConnection) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "StageConnection",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.TotalCount, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _StageConnection_pageInfo(ctx context.Context, field graphql.CollectedField, obj *ent.StageConnection) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "StageConnection",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.PageInfo, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(ent.PageInfo)
+	fc.Result = res
+	return ec.marshalNPageInfo2githubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚐPageInfo(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _StageConnection_edges(ctx context.Context, field graphql.CollectedField, obj *ent.StageConnection) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "StageConnection",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Edges, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*ent.StageEdge)
+	fc.Result = res
+	return ec.marshalOStageEdge2ᚕᚖgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚐStageEdge(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _StageEdge_node(ctx context.Context, field graphql.CollectedField, obj *ent.StageEdge) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "StageEdge",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Node, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*ent.Stage)
+	fc.Result = res
+	return ec.marshalOStage2ᚖgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚐStage(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _StageEdge_cursor(ctx context.Context, field graphql.CollectedField, obj *ent.StageEdge) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "StageEdge",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Cursor, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(ent.Cursor)
+	fc.Result = res
+	return ec.marshalNCursor2githubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚐCursor(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _User_id(ctx context.Context, field graphql.CollectedField, obj *ent.User) (ret graphql.Marshaler) {
@@ -5532,6 +6274,54 @@ func (ec *executionContext) unmarshalInputAddSchoolInput(ctx context.Context, ob
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("active"))
 			it.Active, err = ec.unmarshalNBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputAddStageInput(ctx context.Context, obj interface{}) (model.AddStageInput, error) {
+	var it model.AddStageInput
+	var asMap = obj.(map[string]interface{})
+
+	if _, present := asMap["active"]; !present {
+		asMap["active"] = true
+	}
+
+	for k, v := range asMap {
+		switch k {
+		case "name":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
+			it.Name, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "active":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("active"))
+			it.Active, err = ec.unmarshalNBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "tuition_amount":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tuition_amount"))
+			it.TuitionAmount, err = ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "school_id":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("school_id"))
+			it.SchoolID, err = ec.unmarshalNID2githubᚗcomᚋgoogleᚋuuidᚐUUID(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -10036,6 +10826,34 @@ func (ec *executionContext) unmarshalInputSchoolWhereInput(ctx context.Context, 
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputStageOrder(ctx context.Context, obj interface{}) (ent.StageOrder, error) {
+	var it ent.StageOrder
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "field":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("field"))
+			it.Field, err = ec.unmarshalOStageOrderField2ᚖgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚐStageOrderField(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "direction":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("direction"))
+			it.Direction, err = ec.unmarshalNOrderDirection2githubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚐOrderDirection(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputStageWhereInput(ctx context.Context, obj interface{}) (ent.StageWhereInput, error) {
 	var it ent.StageWhereInput
 	var asMap = obj.(map[string]interface{})
@@ -10359,6 +11177,110 @@ func (ec *executionContext) unmarshalInputStageWhereInput(ctx context.Context, o
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tuitionAmountLTE"))
 			it.TuitionAmountLTE, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "directory":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("directory"))
+			it.Directory, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "directoryNEQ":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("directoryNEQ"))
+			it.DirectoryNEQ, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "directoryIn":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("directoryIn"))
+			it.DirectoryIn, err = ec.unmarshalOString2ᚕstringᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "directoryNotIn":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("directoryNotIn"))
+			it.DirectoryNotIn, err = ec.unmarshalOString2ᚕstringᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "directoryGT":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("directoryGT"))
+			it.DirectoryGT, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "directoryGTE":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("directoryGTE"))
+			it.DirectoryGTE, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "directoryLT":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("directoryLT"))
+			it.DirectoryLT, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "directoryLTE":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("directoryLTE"))
+			it.DirectoryLTE, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "directoryContains":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("directoryContains"))
+			it.DirectoryContains, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "directoryHasPrefix":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("directoryHasPrefix"))
+			it.DirectoryHasPrefix, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "directoryHasSuffix":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("directoryHasSuffix"))
+			it.DirectoryHasSuffix, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "directoryEqualFold":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("directoryEqualFold"))
+			it.DirectoryEqualFold, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "directoryContainsFold":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("directoryContainsFold"))
+			it.DirectoryContainsFold, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -10943,6 +11865,42 @@ func (ec *executionContext) unmarshalInputUpdateSchoolInput(ctx context.Context,
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("active"))
 			it.Active, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputUpdateStageInput(ctx context.Context, obj interface{}) (model.UpdateStageInput, error) {
+	var it model.UpdateStageInput
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "name":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
+			it.Name, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "active":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("active"))
+			it.Active, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "tuition_amount":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tuition_amount"))
+			it.TuitionAmount, err = ec.unmarshalOInt2ᚖint(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -12249,16 +13207,16 @@ func (ec *executionContext) _Node(ctx context.Context, sel ast.SelectionSet, obj
 			return graphql.Null
 		}
 		return ec._School(ctx, sel, obj)
-	case *ent.Stage:
-		if obj == nil {
-			return graphql.Null
-		}
-		return ec._Stage(ctx, sel, obj)
 	case *ent.User:
 		if obj == nil {
 			return graphql.Null
 		}
 		return ec._User(ctx, sel, obj)
+	case *ent.Stage:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._Stage(ctx, sel, obj)
 	default:
 		panic(fmt.Errorf("unexpected type %T", obj))
 	}
@@ -12340,6 +13298,20 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			}
 		case "deleteUserPermanently":
 			out.Values[i] = ec._Mutation_deleteUserPermanently(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "addStage":
+			out.Values[i] = ec._Mutation_addStage(ctx, field)
+		case "updateStage":
+			out.Values[i] = ec._Mutation_updateStage(ctx, field)
+		case "deleteStage":
+			out.Values[i] = ec._Mutation_deleteStage(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "deleteStagePermanently":
+			out.Values[i] = ec._Mutation_deleteStagePermanently(ctx, field)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -12453,6 +13425,28 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_users(ctx, field)
+				return res
+			})
+		case "stage":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_stage(ctx, field)
+				return res
+			})
+		case "stages":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_stages(ctx, field)
 				return res
 			})
 		case "__type":
@@ -12636,6 +13630,69 @@ func (ec *executionContext) _Stage(ctx context.Context, sel ast.SelectionSet, ob
 			out.Values[i] = ec._Stage_updatedAt(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var stageConnectionImplementors = []string{"StageConnection"}
+
+func (ec *executionContext) _StageConnection(ctx context.Context, sel ast.SelectionSet, obj *ent.StageConnection) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, stageConnectionImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("StageConnection")
+		case "totalCount":
+			out.Values[i] = ec._StageConnection_totalCount(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "pageInfo":
+			out.Values[i] = ec._StageConnection_pageInfo(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "edges":
+			out.Values[i] = ec._StageConnection_edges(ctx, field, obj)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var stageEdgeImplementors = []string{"StageEdge"}
+
+func (ec *executionContext) _StageEdge(ctx context.Context, sel ast.SelectionSet, obj *ent.StageEdge) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, stageEdgeImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("StageEdge")
+		case "node":
+			out.Values[i] = ec._StageEdge_node(ctx, field, obj)
+		case "cursor":
+			out.Values[i] = ec._StageEdge_cursor(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
 			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
@@ -13050,6 +14107,11 @@ func (ec *executionContext) unmarshalNAddSchoolInput2githubᚗcomᚋmsal4ᚋhass
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
+func (ec *executionContext) unmarshalNAddStageInput2githubᚗcomᚋmsal4ᚋhassah_school_serverᚋserverᚋmodelᚐAddStageInput(ctx context.Context, v interface{}) (model.AddStageInput, error) {
+	res, err := ec.unmarshalInputAddStageInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
 func (ec *executionContext) unmarshalNAddUserInput2githubᚗcomᚋmsal4ᚋhassah_school_serverᚋserverᚋmodelᚐAddUserInput(ctx context.Context, v interface{}) (model.AddUserInput, error) {
 	res, err := ec.unmarshalInputAddUserInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -13256,6 +14318,11 @@ func (ec *executionContext) unmarshalNTuitionPaymentWhereInput2ᚖgithubᚗcom�
 
 func (ec *executionContext) unmarshalNUpdateSchoolInput2githubᚗcomᚋmsal4ᚋhassah_school_serverᚋserverᚋmodelᚐUpdateSchoolInput(ctx context.Context, v interface{}) (model.UpdateSchoolInput, error) {
 	res, err := ec.unmarshalInputUpdateSchoolInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNUpdateStageInput2githubᚗcomᚋmsal4ᚋhassah_school_serverᚋserverᚋmodelᚐUpdateStageInput(ctx context.Context, v interface{}) (model.UpdateStageInput, error) {
+	res, err := ec.unmarshalInputUpdateStageInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
@@ -14200,6 +15267,84 @@ func (ec *executionContext) marshalOStage2ᚖgithubᚗcomᚋmsal4ᚋhassah_schoo
 		return graphql.Null
 	}
 	return ec._Stage(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalOStageConnection2ᚖgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚐStageConnection(ctx context.Context, sel ast.SelectionSet, v *ent.StageConnection) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._StageConnection(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalOStageEdge2ᚕᚖgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚐStageEdge(ctx context.Context, sel ast.SelectionSet, v []*ent.StageEdge) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalOStageEdge2ᚖgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚐStageEdge(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+	return ret
+}
+
+func (ec *executionContext) marshalOStageEdge2ᚖgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚐStageEdge(ctx context.Context, sel ast.SelectionSet, v *ent.StageEdge) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._StageEdge(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalOStageOrder2ᚖgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚐStageOrder(ctx context.Context, v interface{}) (*ent.StageOrder, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputStageOrder(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalOStageOrderField2ᚖgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚐStageOrderField(ctx context.Context, v interface{}) (*ent.StageOrderField, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var res = new(ent.StageOrderField)
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOStageOrderField2ᚖgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚐStageOrderField(ctx context.Context, sel ast.SelectionSet, v *ent.StageOrderField) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return v
 }
 
 func (ec *executionContext) unmarshalOStageWhereInput2ᚕᚖgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚐStageWhereInputᚄ(ctx context.Context, v interface{}) ([]*ent.StageWhereInput, error) {

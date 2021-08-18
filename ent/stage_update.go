@@ -52,6 +52,12 @@ func (su *StageUpdate) AddTuitionAmount(i int) *StageUpdate {
 	return su
 }
 
+// SetDirectory sets the "directory" field.
+func (su *StageUpdate) SetDirectory(s string) *StageUpdate {
+	su.mutation.SetDirectory(s)
+	return su
+}
+
 // SetActive sets the "active" field.
 func (su *StageUpdate) SetActive(b bool) *StageUpdate {
 	su.mutation.SetActive(b)
@@ -292,6 +298,11 @@ func (su *StageUpdate) check() error {
 			return &ValidationError{Name: "name", err: fmt.Errorf("ent: validator failed for field \"name\": %w", err)}
 		}
 	}
+	if v, ok := su.mutation.TuitionAmount(); ok {
+		if err := stage.TuitionAmountValidator(v); err != nil {
+			return &ValidationError{Name: "tuition_amount", err: fmt.Errorf("ent: validator failed for field \"tuition_amount\": %w", err)}
+		}
+	}
 	if _, ok := su.mutation.SchoolID(); su.mutation.SchoolCleared() && !ok {
 		return errors.New("ent: clearing a required unique edge \"school\"")
 	}
@@ -342,6 +353,13 @@ func (su *StageUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Type:   field.TypeInt,
 			Value:  value,
 			Column: stage.FieldTuitionAmount,
+		})
+	}
+	if value, ok := su.mutation.Directory(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: stage.FieldDirectory,
 		})
 	}
 	if value, ok := su.mutation.Active(); ok {
@@ -599,6 +617,12 @@ func (suo *StageUpdateOne) AddTuitionAmount(i int) *StageUpdateOne {
 	return suo
 }
 
+// SetDirectory sets the "directory" field.
+func (suo *StageUpdateOne) SetDirectory(s string) *StageUpdateOne {
+	suo.mutation.SetDirectory(s)
+	return suo
+}
+
 // SetActive sets the "active" field.
 func (suo *StageUpdateOne) SetActive(b bool) *StageUpdateOne {
 	suo.mutation.SetActive(b)
@@ -846,6 +870,11 @@ func (suo *StageUpdateOne) check() error {
 			return &ValidationError{Name: "name", err: fmt.Errorf("ent: validator failed for field \"name\": %w", err)}
 		}
 	}
+	if v, ok := suo.mutation.TuitionAmount(); ok {
+		if err := stage.TuitionAmountValidator(v); err != nil {
+			return &ValidationError{Name: "tuition_amount", err: fmt.Errorf("ent: validator failed for field \"tuition_amount\": %w", err)}
+		}
+	}
 	if _, ok := suo.mutation.SchoolID(); suo.mutation.SchoolCleared() && !ok {
 		return errors.New("ent: clearing a required unique edge \"school\"")
 	}
@@ -913,6 +942,13 @@ func (suo *StageUpdateOne) sqlSave(ctx context.Context) (_node *Stage, err error
 			Type:   field.TypeInt,
 			Value:  value,
 			Column: stage.FieldTuitionAmount,
+		})
+	}
+	if value, ok := suo.mutation.Directory(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: stage.FieldDirectory,
 		})
 	}
 	if value, ok := suo.mutation.Active(); ok {

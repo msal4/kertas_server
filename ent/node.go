@@ -735,7 +735,7 @@ func (s *Stage) Node(ctx context.Context) (node *Node, err error) {
 	node = &Node{
 		ID:     s.ID,
 		Type:   "Stage",
-		Fields: make([]*Field, 6),
+		Fields: make([]*Field, 7),
 		Edges:  make([]*Edge, 4),
 	}
 	var buf []byte
@@ -771,10 +771,18 @@ func (s *Stage) Node(ctx context.Context) (node *Node, err error) {
 		Name:  "tuition_amount",
 		Value: string(buf),
 	}
-	if buf, err = json.Marshal(s.Active); err != nil {
+	if buf, err = json.Marshal(s.Directory); err != nil {
 		return nil, err
 	}
 	node.Fields[4] = &Field{
+		Type:  "string",
+		Name:  "directory",
+		Value: string(buf),
+	}
+	if buf, err = json.Marshal(s.Active); err != nil {
+		return nil, err
+	}
+	node.Fields[5] = &Field{
 		Type:  "bool",
 		Name:  "active",
 		Value: string(buf),
@@ -782,7 +790,7 @@ func (s *Stage) Node(ctx context.Context) (node *Node, err error) {
 	if buf, err = json.Marshal(s.DeletedAt); err != nil {
 		return nil, err
 	}
-	node.Fields[5] = &Field{
+	node.Fields[6] = &Field{
 		Type:  "time.Time",
 		Name:  "deleted_at",
 		Value: string(buf),

@@ -21,6 +21,8 @@ const (
 	FieldName = "name"
 	// FieldTuitionAmount holds the string denoting the tuition_amount field in the database.
 	FieldTuitionAmount = "tuition_amount"
+	// FieldDirectory holds the string denoting the directory field in the database.
+	FieldDirectory = "directory"
 	// FieldActive holds the string denoting the active field in the database.
 	FieldActive = "active"
 	// FieldDeletedAt holds the string denoting the deleted_at field in the database.
@@ -72,6 +74,7 @@ var Columns = []string{
 	FieldUpdatedAt,
 	FieldName,
 	FieldTuitionAmount,
+	FieldDirectory,
 	FieldActive,
 	FieldDeletedAt,
 }
@@ -106,6 +109,8 @@ var (
 	UpdateDefaultUpdatedAt func() time.Time
 	// NameValidator is a validator for the "name" field. It is called by the builders before save.
 	NameValidator func(string) error
+	// TuitionAmountValidator is a validator for the "tuition_amount" field. It is called by the builders before save.
+	TuitionAmountValidator func(int) error
 	// DefaultActive holds the default value on creation for the "active" field.
 	DefaultActive bool
 	// DefaultID holds the default value on creation for the "id" field.

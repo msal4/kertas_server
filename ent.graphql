@@ -991,6 +991,21 @@ input StageWhereInput {
   tuitionAmountLT: Int
   tuitionAmountLTE: Int
   
+  """directory field predicates"""
+  directory: String
+  directoryNEQ: String
+  directoryIn: [String!]
+  directoryNotIn: [String!]
+  directoryGT: String
+  directoryGTE: String
+  directoryLT: String
+  directoryLTE: String
+  directoryContains: String
+  directoryHasPrefix: String
+  directoryHasSuffix: String
+  directoryEqualFold: String
+  directoryContainsFold: String
+  
   """active field predicates"""
   active: Boolean
   activeNEQ: Boolean

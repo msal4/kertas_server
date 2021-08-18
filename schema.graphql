@@ -80,16 +80,6 @@ input UpdateSchoolInput {
   active: Boolean
 }
 
-type Stage implements Node {
-  id: ID!
-  name: String!
-  tuition_amount: Int!
-  active: Boolean!
-  school: School!
-  createdAt: Time!
-  updatedAt: Time!
-}
-
 enum UserOrderField {
     NAME
     USERNAME
@@ -151,6 +141,52 @@ input UpdateUserInput {
   stage_id: ID
 }
 
+type Stage implements Node {
+  id: ID!
+  name: String!
+  tuition_amount: Int!
+  active: Boolean!
+  school: School!
+  createdAt: Time!
+  updatedAt: Time!
+}
+
+
+enum StageOrderField {
+    NAME
+    CREATED_AT
+    UPDATED_AT
+}
+
+input StageOrder {
+    field: StageOrderField
+    direction: OrderDirection!
+}
+
+type StageEdge {
+  node: Stage
+  cursor: Cursor!
+}
+
+type StageConnection {
+  totalCount: Int!
+  pageInfo: PageInfo!
+  edges: [StageEdge]
+}
+
+input AddStageInput {
+  name: String!
+  active: Boolean! = true
+  tuition_amount: Int!
+  school_id: ID!
+}
+
+input UpdateStageInput {
+  name: String
+  active: Boolean
+  tuition_amount: Int
+}
+
 input LoginInput {
   username: String!
   password: String!
@@ -167,6 +203,9 @@ type Query {
 
   user(id: ID!): User
   users(after: Cursor, first: Int, before: Cursor, last: Int, orderBy: UserOrder, where: UserWhereInput): UserConnection
+
+  stage(id: ID!): Stage
+  stages(after: Cursor, first: Int, before: Cursor, last: Int, orderBy: StageOrder, where: StageWhereInput): StageConnection
 }
 
 type Mutation {
@@ -179,6 +218,11 @@ type Mutation {
   updateUser(id: ID!, input: UpdateUserInput!): User
   deleteUser(id: ID!): Boolean!
   deleteUserPermanently(id: ID!): Boolean!
+
+  addStage(input: AddStageInput!): Stage
+  updateStage(id: ID!, input: UpdateStageInput!): Stage
+  deleteStage(id: ID!): Boolean!
+  deleteStagePermanently(id: ID!): Boolean!
 
   loginAdmin(input: LoginInput!): AuthData
   loginUser(input: LoginInput!): AuthData

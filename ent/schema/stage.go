@@ -20,7 +20,8 @@ func (Stage) Fields() []ent.Field {
 	return []ent.Field{
 		field.UUID("id", uuid.UUID{}).Default(uuid.New),
 		field.String("name").NotEmpty().Annotations(entgql.OrderField("NAME")),
-		field.Int("tuition_amount").Annotations(entgql.OrderField("TUITION_AMOUNT")),
+		field.Int("tuition_amount").Positive().Annotations(entgql.OrderField("TUITION_AMOUNT")),
+		field.String("directory"),
 		field.Bool("active").Default(true),
 		field.Time("deleted_at").Nillable().Optional(),
 	}

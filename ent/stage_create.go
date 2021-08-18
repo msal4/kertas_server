@@ -65,6 +65,12 @@ func (sc *StageCreate) SetTuitionAmount(i int) *StageCreate {
 	return sc
 }
 
+// SetDirectory sets the "directory" field.
+func (sc *StageCreate) SetDirectory(s string) *StageCreate {
+	sc.mutation.SetDirectory(s)
+	return sc
+}
+
 // SetActive sets the "active" field.
 func (sc *StageCreate) SetActive(b bool) *StageCreate {
 	sc.mutation.SetActive(b)
@@ -263,6 +269,14 @@ func (sc *StageCreate) check() error {
 	if _, ok := sc.mutation.TuitionAmount(); !ok {
 		return &ValidationError{Name: "tuition_amount", err: errors.New(`ent: missing required field "tuition_amount"`)}
 	}
+	if v, ok := sc.mutation.TuitionAmount(); ok {
+		if err := stage.TuitionAmountValidator(v); err != nil {
+			return &ValidationError{Name: "tuition_amount", err: fmt.Errorf(`ent: validator failed for field "tuition_amount": %w`, err)}
+		}
+	}
+	if _, ok := sc.mutation.Directory(); !ok {
+		return &ValidationError{Name: "directory", err: errors.New(`ent: missing required field "directory"`)}
+	}
 	if _, ok := sc.mutation.Active(); !ok {
 		return &ValidationError{Name: "active", err: errors.New(`ent: missing required field "active"`)}
 	}
@@ -329,6 +343,14 @@ func (sc *StageCreate) createSpec() (*Stage, *sqlgraph.CreateSpec) {
 			Column: stage.FieldTuitionAmount,
 		})
 		_node.TuitionAmount = value
+	}
+	if value, ok := sc.mutation.Directory(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: stage.FieldDirectory,
+		})
+		_node.Directory = value
 	}
 	if value, ok := sc.mutation.Active(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{

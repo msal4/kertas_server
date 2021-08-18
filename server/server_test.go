@@ -126,7 +126,7 @@ func createTeacher(ctx context.Context, s *service.Service, username string) *en
 
 func createStudent(ctx context.Context, s *service.Service, username string) *ent.User {
 	sch := s.EC.School.Create().SetName("schooltest").SetDirectory("fsss").SetImage("fss").SaveX(ctx)
-	stage := s.EC.Stage.Create().SetName("2nd").SetTuitionAmount(122).SetSchool(sch).SaveX(ctx)
+	stage := s.EC.Stage.Create().SetName("2nd").SetDirectory("hello").SetTuitionAmount(122).SetSchool(sch).SaveX(ctx)
 	return s.EC.User.Create().SetName("test userd" + username).SetUsername(username).
 		SetPhone("077059333812").SetDirectory("diresss22" + username).SetPassword("mipassword22@@@@5").SetSchool(sch).SetStage(stage).SaveX(ctx)
 }

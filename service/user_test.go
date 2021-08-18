@@ -206,7 +206,7 @@ func TestAddUser(t *testing.T) {
 		defer s.EC.User.Delete().ExecX(ctx)
 
 		sch := s.EC.School.Create().SetName("hello").SetImage("hi").SetDirectory("testdir").SetActive(true).SaveX(ctx)
-		stage := s.EC.Stage.Create().SetName("first stage").SetSchool(sch).SetTuitionAmount(299).SaveX(ctx)
+		stage := s.EC.Stage.Create().SetName("first stage").SetSchool(sch).SetTuitionAmount(299).SetDirectory("testdir").SaveX(ctx)
 
 		got, err := s.AddUser(ctx, model.AddUserInput{
 			Name:     "test user",
@@ -622,7 +622,7 @@ func TestLoginAdmin(t *testing.T) {
 		require.Nil(t, resp)
 		require.ErrorIs(t, err, service.NotAllowedErr)
 
-		stage := s.EC.Stage.Create().SetName("1st").SetTuitionAmount(1000).SetActive(true).SetSchool(sch).SaveX(ctx)
+		stage := s.EC.Stage.Create().SetName("1st").SetTuitionAmount(1000).SetActive(true).SetSchool(sch).SetDirectory("ifidsfksd").SaveX(ctx)
 		u.Update().SetStage(stage).SaveX(ctx)
 
 		resp, err = s.LoginAdmin(ctx, model.LoginInput{
@@ -641,7 +641,7 @@ func TestLoginUser(t *testing.T) {
 	ctx := context.Background()
 
 	sch := s.EC.School.Create().SetName("test school").SetActive(true).SetImage("hello").SetDirectory("whatev").SaveX(ctx)
-	stage := s.EC.Stage.Create().SetName("1st").SetTuitionAmount(1000).SetActive(true).SetSchool(sch).SaveX(ctx)
+	stage := s.EC.Stage.Create().SetName("1st").SetTuitionAmount(1000).SetActive(true).SetSchool(sch).SetDirectory("iifidfjs").SaveX(ctx)
 
 	input := model.AddUserInput{
 		Name:     "test name",
@@ -839,7 +839,7 @@ func TestLoginUser(t *testing.T) {
 	})
 
 	t.Run("disabled stage", func(t *testing.T) {
-		stage := s.EC.Stage.Create().SetName("test naem").SetActive(false).SetSchool(sch).SetTuitionAmount(100).SaveX(ctx)
+		stage := s.EC.Stage.Create().SetName("test naem").SetActive(false).SetSchool(sch).SetTuitionAmount(100).SetDirectory("k").SaveX(ctx)
 		input := model.AddUserInput{
 			Name:     "test name",
 			Username: "s3stestusernam3242",

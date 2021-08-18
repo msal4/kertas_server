@@ -26,6 +26,8 @@ type Stage struct {
 	Name string `json:"name,omitempty"`
 	// TuitionAmount holds the value of the "tuition_amount" field.
 	TuitionAmount int `json:"tuition_amount,omitempty"`
+	// Directory holds the value of the "directory" field.
+	Directory string `json:"directory,omitempty"`
 	// Active holds the value of the "active" field.
 	Active bool `json:"active,omitempty"`
 	// DeletedAt holds the value of the "deleted_at" field.
@@ -101,7 +103,7 @@ func (*Stage) scanValues(columns []string) ([]interface{}, error) {
 			values[i] = new(sql.NullBool)
 		case stage.FieldTuitionAmount:
 			values[i] = new(sql.NullInt64)
-		case stage.FieldName:
+		case stage.FieldName, stage.FieldDirectory:
 			values[i] = new(sql.NullString)
 		case stage.FieldCreatedAt, stage.FieldUpdatedAt, stage.FieldDeletedAt:
 			values[i] = new(sql.NullTime)
@@ -153,6 +155,12 @@ func (s *Stage) assignValues(columns []string, values []interface{}) error {
 				return fmt.Errorf("unexpected type %T for field tuition_amount", values[i])
 			} else if value.Valid {
 				s.TuitionAmount = int(value.Int64)
+			}
+		case stage.FieldDirectory:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field directory", values[i])
+			} else if value.Valid {
+				s.Directory = value.String
 			}
 		case stage.FieldActive:
 			if value, ok := values[i].(*sql.NullBool); !ok {
@@ -230,6 +238,8 @@ func (s *Stage) String() string {
 	builder.WriteString(s.Name)
 	builder.WriteString(", tuition_amount=")
 	builder.WriteString(fmt.Sprintf("%v", s.TuitionAmount))
+	builder.WriteString(", directory=")
+	builder.WriteString(s.Directory)
 	builder.WriteString(", active=")
 	builder.WriteString(fmt.Sprintf("%v", s.Active))
 	if v := s.DeletedAt; v != nil {

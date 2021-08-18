@@ -14,6 +14,13 @@ type AddSchoolInput struct {
 	Active bool           `json:"active"`
 }
 
+type AddStageInput struct {
+	Name          string    `json:"name"`
+	Active        bool      `json:"active"`
+	TuitionAmount int       `json:"tuition_amount"`
+	SchoolID      uuid.UUID `json:"school_id"`
+}
+
 type AddUserInput struct {
 	Name     string          `json:"name"`
 	Username string          `json:"username"`
@@ -40,6 +47,12 @@ type UpdateSchoolInput struct {
 	Name   *string         `json:"name"`
 	Image  *graphql.Upload `json:"image"`
 	Active *bool           `json:"active"`
+}
+
+type UpdateStageInput struct {
+	Name          *string `json:"name"`
+	Active        *bool   `json:"active"`
+	TuitionAmount *int    `json:"tuition_amount"`
 }
 
 type UpdateUserInput struct {

@@ -1,7 +1,9 @@
 package server
 
 import (
+	"context"
 	"fmt"
+	"log"
 	"net/http"
 
 	"entgo.io/contrib/entgql"
@@ -14,7 +16,9 @@ import (
 	"github.com/minio/minio-go/v7/pkg/credentials"
 	"github.com/msal4/hassah_school_server/auth"
 	"github.com/msal4/hassah_school_server/ent"
+	"github.com/msal4/hassah_school_server/ent/user"
 	"github.com/msal4/hassah_school_server/server/generated"
+	"github.com/msal4/hassah_school_server/server/model"
 	"github.com/msal4/hassah_school_server/service"
 )
 
@@ -55,7 +59,33 @@ func NewDefaultServer(cfg Config) (*http.ServeMux, error) {
 		return nil, fmt.Errorf("initializing service: %v", err)
 	}
 
+	if err := createDefaultAdminIfNotExists(context.Background(), s); err != nil {
+		return nil, fmt.Errorf("creating super admin: %v", err)
+	}
+
 	return NewServer(s, cfg.Debug), nil
+}
+
+func createDefaultAdminIfNotExists(ctx context.Context, s *service.Service) error {
+	if s.EC.User.Query().Where(user.RoleEQ(user.RoleSuperAdmin)).CountX(context.Background()) > 0 {
+		return nil
+	}
+
+	log.Println("No super admins found, creating the default admin...")
+	u, err := s.AddUser(ctx, model.AddUserInput{
+		Name:     "Admin",
+		Username: "admin",
+		Password: "superadmin",
+		Phone:    "07712345678",
+		Role:     user.RoleSuperAdmin,
+		Active:   true,
+	})
+	if err != nil {
+		return err
+	}
+	log.Printf("Default super admin created with username: %q and password: %q.\n", u.Username, u.Password)
+
+	return nil
 }
 
 func NewServer(s *service.Service, debg bool) *http.ServeMux {

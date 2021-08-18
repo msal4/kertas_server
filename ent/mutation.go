@@ -6635,6 +6635,7 @@ type StageMutation struct {
 	name              *string
 	tuition_amount    *int
 	addtuition_amount *int
+	directory         *string
 	active            *bool
 	deleted_at        *time.Time
 	clearedFields     map[string]struct{}
@@ -6901,6 +6902,42 @@ func (m *StageMutation) AddedTuitionAmount() (r int, exists bool) {
 func (m *StageMutation) ResetTuitionAmount() {
 	m.tuition_amount = nil
 	m.addtuition_amount = nil
+}
+
+// SetDirectory sets the "directory" field.
+func (m *StageMutation) SetDirectory(s string) {
+	m.directory = &s
+}
+
+// Directory returns the value of the "directory" field in the mutation.
+func (m *StageMutation) Directory() (r string, exists bool) {
+	v := m.directory
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDirectory returns the old "directory" field's value of the Stage entity.
+// If the Stage object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *StageMutation) OldDirectory(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldDirectory is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldDirectory requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDirectory: %w", err)
+	}
+	return oldValue.Directory, nil
+}
+
+// ResetDirectory resets all changes to the "directory" field.
+func (m *StageMutation) ResetDirectory() {
+	m.directory = nil
 }
 
 // SetActive sets the "active" field.
@@ -7208,7 +7245,7 @@ func (m *StageMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *StageMutation) Fields() []string {
-	fields := make([]string, 0, 6)
+	fields := make([]string, 0, 7)
 	if m.created_at != nil {
 		fields = append(fields, stage.FieldCreatedAt)
 	}
@@ -7220,6 +7257,9 @@ func (m *StageMutation) Fields() []string {
 	}
 	if m.tuition_amount != nil {
 		fields = append(fields, stage.FieldTuitionAmount)
+	}
+	if m.directory != nil {
+		fields = append(fields, stage.FieldDirectory)
 	}
 	if m.active != nil {
 		fields = append(fields, stage.FieldActive)
@@ -7243,6 +7283,8 @@ func (m *StageMutation) Field(name string) (ent.Value, bool) {
 		return m.Name()
 	case stage.FieldTuitionAmount:
 		return m.TuitionAmount()
+	case stage.FieldDirectory:
+		return m.Directory()
 	case stage.FieldActive:
 		return m.Active()
 	case stage.FieldDeletedAt:
@@ -7264,6 +7306,8 @@ func (m *StageMutation) OldField(ctx context.Context, name string) (ent.Value, e
 		return m.OldName(ctx)
 	case stage.FieldTuitionAmount:
 		return m.OldTuitionAmount(ctx)
+	case stage.FieldDirectory:
+		return m.OldDirectory(ctx)
 	case stage.FieldActive:
 		return m.OldActive(ctx)
 	case stage.FieldDeletedAt:
@@ -7304,6 +7348,13 @@ func (m *StageMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetTuitionAmount(v)
+		return nil
+	case stage.FieldDirectory:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDirectory(v)
 		return nil
 	case stage.FieldActive:
 		v, ok := value.(bool)
@@ -7403,6 +7454,9 @@ func (m *StageMutation) ResetField(name string) error {
 		return nil
 	case stage.FieldTuitionAmount:
 		m.ResetTuitionAmount()
+		return nil
+	case stage.FieldDirectory:
+		m.ResetDirectory()
 		return nil
 	case stage.FieldActive:
 		m.ResetActive()

@@ -3202,6 +3202,21 @@ type StageWhereInput struct {
 	TuitionAmountLT    *int  `json:"tuitionAmountLT,omitempty"`
 	TuitionAmountLTE   *int  `json:"tuitionAmountLTE,omitempty"`
 
+	// "directory" field predicates.
+	Directory             *string  `json:"directory,omitempty"`
+	DirectoryNEQ          *string  `json:"directoryNEQ,omitempty"`
+	DirectoryIn           []string `json:"directoryIn,omitempty"`
+	DirectoryNotIn        []string `json:"directoryNotIn,omitempty"`
+	DirectoryGT           *string  `json:"directoryGT,omitempty"`
+	DirectoryGTE          *string  `json:"directoryGTE,omitempty"`
+	DirectoryLT           *string  `json:"directoryLT,omitempty"`
+	DirectoryLTE          *string  `json:"directoryLTE,omitempty"`
+	DirectoryContains     *string  `json:"directoryContains,omitempty"`
+	DirectoryHasPrefix    *string  `json:"directoryHasPrefix,omitempty"`
+	DirectoryHasSuffix    *string  `json:"directoryHasSuffix,omitempty"`
+	DirectoryEqualFold    *string  `json:"directoryEqualFold,omitempty"`
+	DirectoryContainsFold *string  `json:"directoryContainsFold,omitempty"`
+
 	// "active" field predicates.
 	Active    *bool `json:"active,omitempty"`
 	ActiveNEQ *bool `json:"activeNEQ,omitempty"`
@@ -3428,6 +3443,45 @@ func (i *StageWhereInput) P() (predicate.Stage, error) {
 	}
 	if i.TuitionAmountLTE != nil {
 		predicates = append(predicates, stage.TuitionAmountLTE(*i.TuitionAmountLTE))
+	}
+	if i.Directory != nil {
+		predicates = append(predicates, stage.DirectoryEQ(*i.Directory))
+	}
+	if i.DirectoryNEQ != nil {
+		predicates = append(predicates, stage.DirectoryNEQ(*i.DirectoryNEQ))
+	}
+	if len(i.DirectoryIn) > 0 {
+		predicates = append(predicates, stage.DirectoryIn(i.DirectoryIn...))
+	}
+	if len(i.DirectoryNotIn) > 0 {
+		predicates = append(predicates, stage.DirectoryNotIn(i.DirectoryNotIn...))
+	}
+	if i.DirectoryGT != nil {
+		predicates = append(predicates, stage.DirectoryGT(*i.DirectoryGT))
+	}
+	if i.DirectoryGTE != nil {
+		predicates = append(predicates, stage.DirectoryGTE(*i.DirectoryGTE))
+	}
+	if i.DirectoryLT != nil {
+		predicates = append(predicates, stage.DirectoryLT(*i.DirectoryLT))
+	}
+	if i.DirectoryLTE != nil {
+		predicates = append(predicates, stage.DirectoryLTE(*i.DirectoryLTE))
+	}
+	if i.DirectoryContains != nil {
+		predicates = append(predicates, stage.DirectoryContains(*i.DirectoryContains))
+	}
+	if i.DirectoryHasPrefix != nil {
+		predicates = append(predicates, stage.DirectoryHasPrefix(*i.DirectoryHasPrefix))
+	}
+	if i.DirectoryHasSuffix != nil {
+		predicates = append(predicates, stage.DirectoryHasSuffix(*i.DirectoryHasSuffix))
+	}
+	if i.DirectoryEqualFold != nil {
+		predicates = append(predicates, stage.DirectoryEqualFold(*i.DirectoryEqualFold))
+	}
+	if i.DirectoryContainsFold != nil {
+		predicates = append(predicates, stage.DirectoryContainsFold(*i.DirectoryContainsFold))
 	}
 	if i.Active != nil {
 		predicates = append(predicates, stage.ActiveEQ(*i.Active))

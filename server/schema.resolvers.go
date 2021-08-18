@@ -78,6 +78,22 @@ func (r *mutationResolver) DeleteUserPermanently(ctx context.Context, id uuid.UU
 	return true, r.s.DeleteUserPermanently(ctx, id)
 }
 
+func (r *mutationResolver) AddStage(ctx context.Context, input model.AddStageInput) (*ent.Stage, error) {
+	return r.s.AddStage(ctx, input)
+}
+
+func (r *mutationResolver) UpdateStage(ctx context.Context, id uuid.UUID, input model.UpdateStageInput) (*ent.Stage, error) {
+	return r.s.UpdateStage(ctx, id, input)
+}
+
+func (r *mutationResolver) DeleteStage(ctx context.Context, id uuid.UUID) (bool, error) {
+	return true, r.s.DeleteStage(ctx, id)
+}
+
+func (r *mutationResolver) DeleteStagePermanently(ctx context.Context, id uuid.UUID) (bool, error) {
+	return true, r.s.DeleteStagePermanently(ctx, id)
+}
+
 func (r *mutationResolver) LoginAdmin(ctx context.Context, input model.LoginInput) (*model.AuthData, error) {
 	return r.s.LoginAdmin(ctx, input)
 }
@@ -120,6 +136,14 @@ func (r *queryResolver) Users(ctx context.Context, after *ent.Cursor, first *int
 		OrderBy: orderBy,
 		Where:   where,
 	})
+}
+
+func (r *queryResolver) Stage(ctx context.Context, id uuid.UUID) (*ent.Stage, error) {
+	return r.s.EC.Stage.Get(ctx, id)
+}
+
+func (r *queryResolver) Stages(ctx context.Context, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.StageOrder, where *ent.StageWhereInput) (*ent.StageConnection, error) {
+	return r.s.Stages(ctx, service.StagesOptions{After: after, First: first, Before: before, Last: last, OrderBy: orderBy, Where: where})
 }
 
 // Mutation returns generated.MutationResolver implementation.

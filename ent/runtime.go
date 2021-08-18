@@ -264,8 +264,12 @@ func init() {
 	stageDescName := stageFields[1].Descriptor()
 	// stage.NameValidator is a validator for the "name" field. It is called by the builders before save.
 	stage.NameValidator = stageDescName.Validators[0].(func(string) error)
+	// stageDescTuitionAmount is the schema descriptor for tuition_amount field.
+	stageDescTuitionAmount := stageFields[2].Descriptor()
+	// stage.TuitionAmountValidator is a validator for the "tuition_amount" field. It is called by the builders before save.
+	stage.TuitionAmountValidator = stageDescTuitionAmount.Validators[0].(func(int) error)
 	// stageDescActive is the schema descriptor for active field.
-	stageDescActive := stageFields[3].Descriptor()
+	stageDescActive := stageFields[4].Descriptor()
 	// stage.DefaultActive holds the default value on creation for the active field.
 	stage.DefaultActive = stageDescActive.Default.(bool)
 	// stageDescID is the schema descriptor for id field.
