@@ -37,8 +37,8 @@ func TestSchools(t *testing.T) {
 						Name      string `json:"name"`
 						Image     string `json:"image"`
 						Active    bool   `json:"active"`
-						CreatedAt string `json:"created_at"`
-						UpdatedAt string `json:"udpated_at"`
+						CreatedAt string `json:"createdAt"`
+						UpdatedAt string `json:"updatedAt"`
 					} `json:"edges"`
 					Cursor *string
 				} `json:"edges"`
@@ -136,8 +136,8 @@ func TestAddSchool(t *testing.T) {
 				Name      string `json:"name"`
 				Image     string `json:"image"`
 				Active    bool   `json:"active"`
-				CreatedAt string `json:"created_at"`
-				UpdatedAt string `json:"updated_at"`
+				CreatedAt string `json:"createdAt"`
+				UpdatedAt string `json:"updatedAt"`
 			} `json:"addSchool"`
 		} `json:"data"`
 		Errors []struct {
@@ -248,8 +248,8 @@ func TestUpdateSchool(t *testing.T) {
 				Name      string `json:"name"`
 				Image     string `json:"image"`
 				Active    bool   `json:"active"`
-				CreatedAt string `json:"created_at"`
-				UpdatedAt string `json:"updated_at"`
+				CreatedAt string `json:"createdAt"`
+				UpdatedAt string `json:"updatedAt"`
 			} `json:"updateSchool"`
 		} `json:"data"`
 		Errors []struct {

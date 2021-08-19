@@ -604,7 +604,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Stage.School(childComplexity), true
 
-	case "Stage.tuition_amount":
+	case "Stage.tuitionAmount":
 		if e.complexity.Stage.TuitionAmount == nil {
 			break
 		}
@@ -958,8 +958,8 @@ input AddUserInput {
   image: Upload
   role: Role! = STUDENT
   active: Boolean! = true
-  school_id: ID
-  stage_id: ID
+  schoolID: ID
+  stageID: ID
 }
 
 input UpdateUserInput {
@@ -969,13 +969,13 @@ input UpdateUserInput {
   phone: String
   image: Upload
   active: Boolean
-  stage_id: ID
+  stageID: ID
 }
 
 type Stage implements Node {
   id: ID!
   name: String!
-  tuition_amount: Int!
+  tuitionAmount: Int!
   active: Boolean!
   school: School!
   createdAt: Time!
@@ -1008,14 +1008,14 @@ type StageConnection {
 input AddStageInput {
   name: String!
   active: Boolean! = true
-  tuition_amount: Int!
-  school_id: ID!
+  tuitionAmount: Int!
+  schoolID: ID!
 }
 
 input UpdateStageInput {
   name: String
   active: Boolean
-  tuition_amount: Int
+  tuitionAmount: Int
 }
 
 input LoginInput {
@@ -4264,7 +4264,7 @@ func (ec *executionContext) _Stage_name(ctx context.Context, field graphql.Colle
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Stage_tuition_amount(ctx context.Context, field graphql.CollectedField, obj *ent.Stage) (ret graphql.Marshaler) {
+func (ec *executionContext) _Stage_tuitionAmount(ctx context.Context, field graphql.CollectedField, obj *ent.Stage) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -6309,18 +6309,18 @@ func (ec *executionContext) unmarshalInputAddStageInput(ctx context.Context, obj
 			if err != nil {
 				return it, err
 			}
-		case "tuition_amount":
+		case "tuitionAmount":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tuition_amount"))
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tuitionAmount"))
 			it.TuitionAmount, err = ec.unmarshalNInt2int(ctx, v)
 			if err != nil {
 				return it, err
 			}
-		case "school_id":
+		case "schoolID":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("school_id"))
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("schoolID"))
 			it.SchoolID, err = ec.unmarshalNID2githubᚗcomᚋgoogleᚋuuidᚐUUID(ctx, v)
 			if err != nil {
 				return it, err
@@ -6400,18 +6400,18 @@ func (ec *executionContext) unmarshalInputAddUserInput(ctx context.Context, obj 
 			if err != nil {
 				return it, err
 			}
-		case "school_id":
+		case "schoolID":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("school_id"))
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("schoolID"))
 			it.SchoolID, err = ec.unmarshalOID2ᚖgithubᚗcomᚋgoogleᚋuuidᚐUUID(ctx, v)
 			if err != nil {
 				return it, err
 			}
-		case "stage_id":
+		case "stageID":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("stage_id"))
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("stageID"))
 			it.StageID, err = ec.unmarshalOID2ᚖgithubᚗcomᚋgoogleᚋuuidᚐUUID(ctx, v)
 			if err != nil {
 				return it, err
@@ -11896,10 +11896,10 @@ func (ec *executionContext) unmarshalInputUpdateStageInput(ctx context.Context, 
 			if err != nil {
 				return it, err
 			}
-		case "tuition_amount":
+		case "tuitionAmount":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tuition_amount"))
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tuitionAmount"))
 			it.TuitionAmount, err = ec.unmarshalOInt2ᚖint(ctx, v)
 			if err != nil {
 				return it, err
@@ -11964,10 +11964,10 @@ func (ec *executionContext) unmarshalInputUpdateUserInput(ctx context.Context, o
 			if err != nil {
 				return it, err
 			}
-		case "stage_id":
+		case "stageID":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("stage_id"))
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("stageID"))
 			it.StageID, err = ec.unmarshalOID2ᚖgithubᚗcomᚋgoogleᚋuuidᚐUUID(ctx, v)
 			if err != nil {
 				return it, err
@@ -13597,8 +13597,8 @@ func (ec *executionContext) _Stage(ctx context.Context, sel ast.SelectionSet, ob
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
-		case "tuition_amount":
-			out.Values[i] = ec._Stage_tuition_amount(ctx, field, obj)
+		case "tuitionAmount":
+			out.Values[i] = ec._Stage_tuitionAmount(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
