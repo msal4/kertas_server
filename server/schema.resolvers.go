@@ -122,6 +122,20 @@ func (r *mutationResolver) RefreshTokens(ctx context.Context, token string) (*mo
 	return r.s.RefreshTokens(ctx, token)
 }
 
+func (r *mutationResolver) PostMessage(ctx context.Context, content string) (*ent.Message, error) {
+	u, ok := auth.UserForContext(ctx)
+	if !ok {
+		return nil, auth.UnauthorizedErr
+	}
+
+	sender, err := r.s.EC.User.Get(ctx, u.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	return r.s.PostMessage(ctx, sender, content)
+}
+
 func (r *queryResolver) School(ctx context.Context, id uuid.UUID) (*ent.School, error) {
 	return r.s.EC.School.Get(ctx, id)
 }
@@ -162,11 +176,38 @@ func (r *queryResolver) Stages(ctx context.Context, after *ent.Cursor, first *in
 	return r.s.Stages(ctx, service.StagesOptions{After: after, First: first, Before: before, Last: last, OrderBy: orderBy, Where: where})
 }
 
+func (r *subscriptionResolver) MessagePosted(ctx context.Context) (<-chan *ent.Message, error) {
+	u, ok := auth.UserForContext(ctx)
+	if !ok {
+		return nil, auth.UnauthorizedErr
+	}
+
+	messages := make(chan *ent.Message, 1)
+
+	r.s.Lock()
+	r.s.MessageChannels[u.ID.String()] = messages
+	r.s.Unlock()
+
+	go func() {
+		<-ctx.Done()
+		r.s.Lock()
+		delete(r.s.MessageChannels, u.ID.String())
+		close(messages)
+		r.s.Unlock()
+	}()
+
+	return messages, nil
+}
+
 // Mutation returns generated.MutationResolver implementation.
 func (r *Resolver) Mutation() generated.MutationResolver { return &mutationResolver{r} }
 
 // Query returns generated.QueryResolver implementation.
 func (r *Resolver) Query() generated.QueryResolver { return &queryResolver{r} }
 
+// Subscription returns generated.SubscriptionResolver implementation.
+func (r *Resolver) Subscription() generated.SubscriptionResolver { return &subscriptionResolver{r} }
+
 type mutationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
+type subscriptionResolver struct{ *Resolver }

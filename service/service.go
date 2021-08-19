@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"math/rand"
+	"sync"
 	"time"
 
 	"github.com/minio/minio-go/v7"
@@ -67,6 +68,10 @@ type Service struct {
 
 	// Config is all of the server configuration.
 	Config *Config
+
+	MessageChannels map[string]chan *ent.Message
+
+	sync.Mutex
 }
 
 // New creates a new initialized and configured service.
@@ -87,7 +92,7 @@ func New(ec *ent.Client, mc *minio.Client, cfg *Config) (*Service, error) {
 		log.Printf("created bucket %q.\n", cfg.RootBucket)
 	}
 
-	return &Service{EC: ec, MC: mc, Config: cfg}, nil
+	return &Service{EC: ec, MC: mc, Config: cfg, MessageChannels: make(map[string]chan *ent.Message)}, nil
 }
 
 // Config defaults.
@@ -100,7 +105,7 @@ const (
 	defaultHQImageSize          = 1000
 	defaultAccessKey            = "dontusethedefaultaccesskey"
 	defaultRefreshKey           = "dontusethedefaultrefreshkey"
-	defaultAccessTokenLifetime  = 2 * time.Minute
+	defaultAccessTokenLifetime  = 5 * time.Hour
 	defaultRefreshTokenLifetime = 1 * time.Hour
 )
 

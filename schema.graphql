@@ -197,6 +197,23 @@ type AuthData {
   refreshToken: String!
 }
 
+type Group {
+  id: ID!
+  name: String!
+  groupType: GroupType!
+  active: Boolean!
+  createdAt: Time!
+  updatedAt: Time!
+}
+
+type Message {
+  id: ID!
+  content: String!
+  attachment: String!
+  createdAt: Time!
+  updatedAt: Time!
+}
+
 type Query {
   school(id: ID!): School
   schools(after: Cursor, first: Int, before: Cursor, last: Int, orderBy: SchoolOrder, where: SchoolWhereInput): SchoolConnection
@@ -227,4 +244,10 @@ type Mutation {
   loginAdmin(input: LoginInput!): AuthData
   loginUser(input: LoginInput!): AuthData
   refreshTokens(token: String!): AuthData
+
+  postMessage(content: String!): Message
+}
+
+type Subscription {
+  messagePosted: Message!
 }
