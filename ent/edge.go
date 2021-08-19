@@ -132,6 +132,14 @@ func (gr *Group) Class(ctx context.Context) (*Class, error) {
 	return result, MaskNotFound(err)
 }
 
+func (gr *Group) Users(ctx context.Context) ([]*User, error) {
+	result, err := gr.Edges.UsersOrErr()
+	if IsNotLoaded(err) {
+		result, err = gr.QueryUsers().All(ctx)
+	}
+	return result, err
+}
+
 func (gr *Group) Messages(ctx context.Context) ([]*Message, error) {
 	result, err := gr.Edges.MessagesOrErr()
 	if IsNotLoaded(err) {
@@ -288,6 +296,14 @@ func (u *User) Grades(ctx context.Context) ([]*Grade, error) {
 	result, err := u.Edges.GradesOrErr()
 	if IsNotLoaded(err) {
 		result, err = u.QueryGrades().All(ctx)
+	}
+	return result, err
+}
+
+func (u *User) Groups(ctx context.Context) ([]*Group, error) {
+	result, err := u.Edges.GroupsOrErr()
+	if IsNotLoaded(err) {
+		result, err = u.QueryGroups().All(ctx)
 	}
 	return result, err
 }

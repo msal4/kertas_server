@@ -122,7 +122,7 @@ func (r *mutationResolver) RefreshTokens(ctx context.Context, token string) (*mo
 	return r.s.RefreshTokens(ctx, token)
 }
 
-func (r *mutationResolver) PostMessage(ctx context.Context, content string) (*ent.Message, error) {
+func (r *mutationResolver) PostMessage(ctx context.Context, input model.PostMessageInput) (*ent.Message, error) {
 	u, ok := auth.UserForContext(ctx)
 	if !ok {
 		return nil, auth.UnauthorizedErr
@@ -133,7 +133,7 @@ func (r *mutationResolver) PostMessage(ctx context.Context, content string) (*en
 		return nil, err
 	}
 
-	return r.s.PostMessage(ctx, sender, content)
+	return r.s.PostMessage(ctx, sender, input)
 }
 
 func (r *queryResolver) School(ctx context.Context, id uuid.UUID) (*ent.School, error) {
@@ -176,7 +176,7 @@ func (r *queryResolver) Stages(ctx context.Context, after *ent.Cursor, first *in
 	return r.s.Stages(ctx, service.StagesOptions{After: after, First: first, Before: before, Last: last, OrderBy: orderBy, Where: where})
 }
 
-func (r *subscriptionResolver) MessagePosted(ctx context.Context) (<-chan *ent.Message, error) {
+func (r *subscriptionResolver) MessagePosted(ctx context.Context, groupID uuid.UUID) (<-chan *ent.Message, error) {
 	u, ok := auth.UserForContext(ctx)
 	if !ok {
 		return nil, auth.UnauthorizedErr

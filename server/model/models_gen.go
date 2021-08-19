@@ -43,6 +43,12 @@ type LoginInput struct {
 	Password string `json:"password"`
 }
 
+type PostMessageInput struct {
+	GroupID    uuid.UUID `json:"groupID"`
+	Content    string    `json:"content"`
+	Attachment *string   `json:"attachment"`
+}
+
 type UpdateSchoolInput struct {
 	Name   *string         `json:"name"`
 	Image  *graphql.Upload `json:"image"`

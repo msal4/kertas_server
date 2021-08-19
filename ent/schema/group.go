@@ -36,6 +36,7 @@ func (Group) Mixin() []ent.Mixin {
 func (Group) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.From("class", Class.Type).Ref("group").Unique(),
+		edge.From("users", User.Type).Ref("groups"),
 		edge.To("messages", Message.Type).Annotations(entsql.Annotation{OnDelete: entsql.Cascade}),
 	}
 }

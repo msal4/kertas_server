@@ -40,11 +40,13 @@ type Group struct {
 type GroupEdges struct {
 	// Class holds the value of the class edge.
 	Class *Class `json:"class,omitempty"`
+	// Users holds the value of the users edge.
+	Users []*User `json:"users,omitempty"`
 	// Messages holds the value of the messages edge.
 	Messages []*Message `json:"messages,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [2]bool
+	loadedTypes [3]bool
 }
 
 // ClassOrErr returns the Class value or an error if the edge
@@ -61,10 +63,19 @@ func (e GroupEdges) ClassOrErr() (*Class, error) {
 	return nil, &NotLoadedError{edge: "class"}
 }
 
+// UsersOrErr returns the Users value or an error if the edge
+// was not loaded in eager-loading.
+func (e GroupEdges) UsersOrErr() ([]*User, error) {
+	if e.loadedTypes[1] {
+		return e.Users, nil
+	}
+	return nil, &NotLoadedError{edge: "users"}
+}
+
 // MessagesOrErr returns the Messages value or an error if the edge
 // was not loaded in eager-loading.
 func (e GroupEdges) MessagesOrErr() ([]*Message, error) {
-	if e.loadedTypes[1] {
+	if e.loadedTypes[2] {
 		return e.Messages, nil
 	}
 	return nil, &NotLoadedError{edge: "messages"}
@@ -158,6 +169,11 @@ func (gr *Group) assignValues(columns []string, values []interface{}) error {
 // QueryClass queries the "class" edge of the Group entity.
 func (gr *Group) QueryClass() *ClassQuery {
 	return (&GroupClient{config: gr.config}).QueryClass(gr)
+}
+
+// QueryUsers queries the "users" edge of the Group entity.
+func (gr *Group) QueryUsers() *UserQuery {
+	return (&GroupClient{config: gr.config}).QueryUsers(gr)
 }
 
 // QueryMessages queries the "messages" edge of the Group entity.

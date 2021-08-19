@@ -87,7 +87,7 @@ type ComplexityRoot struct {
 		DeleteUserPermanently   func(childComplexity int, id uuid.UUID) int
 		LoginAdmin              func(childComplexity int, input model.LoginInput) int
 		LoginUser               func(childComplexity int, input model.LoginInput) int
-		PostMessage             func(childComplexity int, content string) int
+		PostMessage             func(childComplexity int, input model.PostMessageInput) int
 		RefreshTokens           func(childComplexity int, token string) int
 		UpdateSchool            func(childComplexity int, id uuid.UUID, input model.UpdateSchoolInput) int
 		UpdateStage             func(childComplexity int, id uuid.UUID, input model.UpdateStageInput) int
@@ -152,7 +152,7 @@ type ComplexityRoot struct {
 	}
 
 	Subscription struct {
-		MessagePosted func(childComplexity int) int
+		MessagePosted func(childComplexity int, groupID uuid.UUID) int
 	}
 
 	User struct {
@@ -197,7 +197,7 @@ type MutationResolver interface {
 	LoginAdmin(ctx context.Context, input model.LoginInput) (*model.AuthData, error)
 	LoginUser(ctx context.Context, input model.LoginInput) (*model.AuthData, error)
 	RefreshTokens(ctx context.Context, token string) (*model.AuthData, error)
-	PostMessage(ctx context.Context, content string) (*ent.Message, error)
+	PostMessage(ctx context.Context, input model.PostMessageInput) (*ent.Message, error)
 }
 type QueryResolver interface {
 	School(ctx context.Context, id uuid.UUID) (*ent.School, error)
@@ -208,7 +208,7 @@ type QueryResolver interface {
 	Stages(ctx context.Context, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.StageOrder, where *ent.StageWhereInput) (*ent.StageConnection, error)
 }
 type SubscriptionResolver interface {
-	MessagePosted(ctx context.Context) (<-chan *ent.Message, error)
+	MessagePosted(ctx context.Context, groupID uuid.UUID) (<-chan *ent.Message, error)
 }
 
 type executableSchema struct {
@@ -459,7 +459,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.PostMessage(childComplexity, args["content"].(string)), true
+		return e.complexity.Mutation.PostMessage(childComplexity, args["input"].(model.PostMessageInput)), true
 
 	case "Mutation.refreshTokens":
 		if e.complexity.Mutation.RefreshTokens == nil {
@@ -775,7 +775,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		return e.complexity.Subscription.MessagePosted(childComplexity), true
+		args, err := ec.field_Subscription_messagePosted_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Subscription.MessagePosted(childComplexity, args["groupID"].(uuid.UUID)), true
 
 	case "User.active":
 		if e.complexity.User.Active == nil {
@@ -1186,6 +1191,12 @@ type Message {
   updatedAt: Time!
 }
 
+input PostMessageInput {
+  groupID: ID!
+  content: String!
+  attachment: String
+}
+
 type Query {
   school(id: ID!): School
   schools(after: Cursor, first: Int, before: Cursor, last: Int, orderBy: SchoolOrder, where: SchoolWhereInput): SchoolConnection
@@ -1217,11 +1228,11 @@ type Mutation {
   loginUser(input: LoginInput!): AuthData
   refreshTokens(token: String!): AuthData
 
-  postMessage(content: String!): Message
+  postMessage(input: PostMessageInput!): Message
 }
 
 type Subscription {
-  messagePosted: Message!
+  messagePosted(groupID: ID!): Message!
 }
 `, BuiltIn: false},
 	{Name: "ent.graphql", Input: `"""
@@ -2508,15 +2519,15 @@ func (ec *executionContext) field_Mutation_loginUser_args(ctx context.Context, r
 func (ec *executionContext) field_Mutation_postMessage_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 string
-	if tmp, ok := rawArgs["content"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("content"))
-		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+	var arg0 model.PostMessageInput
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg0, err = ec.unmarshalNPostMessageInput2githubᚗcomᚋmsal4ᚋhassah_school_serverᚋserverᚋmodelᚐPostMessageInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["content"] = arg0
+	args["input"] = arg0
 	return args, nil
 }
 
@@ -2844,6 +2855,21 @@ func (ec *executionContext) field_Query_users_args(ctx context.Context, rawArgs 
 		}
 	}
 	args["where"] = arg5
+	return args, nil
+}
+
+func (ec *executionContext) field_Subscription_messagePosted_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 uuid.UUID
+	if tmp, ok := rawArgs["groupID"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("groupID"))
+		arg0, err = ec.unmarshalNID2githubᚗcomᚋgoogleᚋuuidᚐUUID(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["groupID"] = arg0
 	return args, nil
 }
 
@@ -3968,7 +3994,7 @@ func (ec *executionContext) _Mutation_postMessage(ctx context.Context, field gra
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().PostMessage(rctx, args["content"].(string))
+		return ec.resolvers.Mutation().PostMessage(rctx, args["input"].(model.PostMessageInput))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -5227,9 +5253,16 @@ func (ec *executionContext) _Subscription_messagePosted(ctx context.Context, fie
 	}
 
 	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Subscription_messagePosted_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return nil
+	}
+	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Subscription().MessagePosted(rctx)
+		return ec.resolvers.Subscription().MessagePosted(rctx, args["groupID"].(uuid.UUID))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -10470,6 +10503,42 @@ func (ec *executionContext) unmarshalInputMessageWhereInput(ctx context.Context,
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputPostMessageInput(ctx context.Context, obj interface{}) (model.PostMessageInput, error) {
+	var it model.PostMessageInput
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "groupID":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("groupID"))
+			it.GroupID, err = ec.unmarshalNID2githubᚗcomᚋgoogleᚋuuidᚐUUID(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "content":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("content"))
+			it.Content, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "attachment":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("attachment"))
+			it.Attachment, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputScheduleWhereInput(ctx context.Context, obj interface{}) (ent.ScheduleWhereInput, error) {
 	var it ent.ScheduleWhereInput
 	var asMap = obj.(map[string]interface{})
@@ -15017,6 +15086,11 @@ func (ec *executionContext) marshalNOrderDirection2githubᚗcomᚋmsal4ᚋhassah
 
 func (ec *executionContext) marshalNPageInfo2githubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚐPageInfo(ctx context.Context, sel ast.SelectionSet, v ent.PageInfo) graphql.Marshaler {
 	return ec._PageInfo(ctx, sel, &v)
+}
+
+func (ec *executionContext) unmarshalNPostMessageInput2githubᚗcomᚋmsal4ᚋhassah_school_serverᚋserverᚋmodelᚐPostMessageInput(ctx context.Context, v interface{}) (model.PostMessageInput, error) {
+	res, err := ec.unmarshalInputPostMessageInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) unmarshalNRole2githubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚋuserᚐRole(ctx context.Context, v interface{}) (user.Role, error) {

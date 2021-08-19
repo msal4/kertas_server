@@ -214,6 +214,12 @@ type Message {
   updatedAt: Time!
 }
 
+input PostMessageInput {
+  groupID: ID!
+  content: String!
+  attachment: String
+}
+
 type Query {
   school(id: ID!): School
   schools(after: Cursor, first: Int, before: Cursor, last: Int, orderBy: SchoolOrder, where: SchoolWhereInput): SchoolConnection
@@ -245,9 +251,9 @@ type Mutation {
   loginUser(input: LoginInput!): AuthData
   refreshTokens(token: String!): AuthData
 
-  postMessage(content: String!): Message
+  postMessage(input: PostMessageInput!): Message
 }
 
 type Subscription {
-  messagePosted: Message!
+  messagePosted(groupID: ID!): Message!
 }
