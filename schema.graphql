@@ -127,8 +127,8 @@ input AddUserInput {
   image: Upload
   role: Role! = STUDENT
   active: Boolean! = true
-  school_id: ID
-  stage_id: ID
+  schoolID: ID
+  stageID: ID
 }
 
 input UpdateUserInput {
@@ -138,13 +138,13 @@ input UpdateUserInput {
   phone: String
   image: Upload
   active: Boolean
-  stage_id: ID
+  stageID: ID
 }
 
 type Stage implements Node {
   id: ID!
   name: String!
-  tuition_amount: Int!
+  tuitionAmount: Int!
   active: Boolean!
   school: School!
   createdAt: Time!
@@ -177,14 +177,14 @@ type StageConnection {
 input AddStageInput {
   name: String!
   active: Boolean! = true
-  tuition_amount: Int!
-  school_id: ID!
+  tuitionAmount: Int!
+  schoolID: ID!
 }
 
 input UpdateStageInput {
   name: String
   active: Boolean
-  tuition_amount: Int
+  tuitionAmount: Int
 }
 
 input LoginInput {

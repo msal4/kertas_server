@@ -17,8 +17,8 @@ type AddSchoolInput struct {
 type AddStageInput struct {
 	Name          string    `json:"name"`
 	Active        bool      `json:"active"`
-	TuitionAmount int       `json:"tuition_amount"`
-	SchoolID      uuid.UUID `json:"school_id"`
+	TuitionAmount int       `json:"tuitionAmount"`
+	SchoolID      uuid.UUID `json:"schoolID"`
 }
 
 type AddUserInput struct {
@@ -29,8 +29,8 @@ type AddUserInput struct {
 	Image    *graphql.Upload `json:"image"`
 	Role     user.Role       `json:"role"`
 	Active   bool            `json:"active"`
-	SchoolID *uuid.UUID      `json:"school_id"`
-	StageID  *uuid.UUID      `json:"stage_id"`
+	SchoolID *uuid.UUID      `json:"schoolID"`
+	StageID  *uuid.UUID      `json:"stageID"`
 }
 
 type AuthData struct {
@@ -52,7 +52,7 @@ type UpdateSchoolInput struct {
 type UpdateStageInput struct {
 	Name          *string `json:"name"`
 	Active        *bool   `json:"active"`
-	TuitionAmount *int    `json:"tuition_amount"`
+	TuitionAmount *int    `json:"tuitionAmount"`
 }
 
 type UpdateUserInput struct {
@@ -62,5 +62,5 @@ type UpdateUserInput struct {
 	Phone    *string         `json:"phone"`
 	Image    *graphql.Upload `json:"image"`
 	Active   *bool           `json:"active"`
-	StageID  *uuid.UUID      `json:"stage_id"`
+	StageID  *uuid.UUID      `json:"stageID"`
 }

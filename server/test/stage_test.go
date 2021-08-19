@@ -99,7 +99,7 @@ func TestAddStage(t *testing.T) {
 
 	sch := createSchool(ctx, s, "test school", "ch/image.pgg")
 
-	query := `mutation { addStage(input: {name: "a stage", tuition_amount: 20, school_id: %q}) { id }}`
+	query := `mutation { addStage(input: {name: "a stage", tuitionAmount: 20, schoolID: %q}) { id }}`
 
 	cases := []struct {
 		desc string
@@ -155,7 +155,7 @@ func TestUpdateStage(t *testing.T) {
 
 	st := createStage(ctx, s, "stage", 3523)
 
-	query := fmt.Sprintf(`mutation { updateStage(id: %q, input: {name: "a stage with a new name", tuition_amount: 20}) { id }}`, st.ID)
+	query := fmt.Sprintf(`mutation { updateStage(id: %q, input: {name: "a stage with a new name", tuitionAmount: 20}) { id }}`, st.ID)
 
 	cases := []struct {
 		desc string

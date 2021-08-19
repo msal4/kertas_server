@@ -96,7 +96,7 @@ func TestAddUser(t *testing.T) {
 	stage := s.EC.Stage.Create().SetName("2nd").SetTuitionAmount(122).SetSchool(sch).SetDirectory("fsdjfld").SaveX(ctx)
 
 	operations := `{
-"query": "mutation ($image: Upload!) { addUser(input: {stage_id: \"%s\", name: \"a test user\", phone: \"077059333812\", username: \"minamo123%d\", password: \"helo234444488@@@@8\" image: $image}) { id name updatedAt }}",
+"query": "mutation ($image: Upload!) { addUser(input: {stageID: \"%s\", name: \"a test user\", phone: \"077059333812\", username: \"minamo123%d\", password: \"helo234444488@@@@8\" image: $image}) { id name updatedAt }}",
 			"variables": {"image": null}
 		}`
 
