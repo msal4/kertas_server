@@ -56,7 +56,7 @@ func NewDefaultServer(cfg Config) (*http.ServeMux, error) {
 		return nil, fmt.Errorf("instantiating minio client: %v", err)
 	}
 
-	s, err := service.New(ec, mc, nil)
+	s, err := service.New(ec, mc, &cfg.Config)
 	if err != nil {
 		return nil, fmt.Errorf("initializing service: %v", err)
 	}
