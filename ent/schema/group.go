@@ -20,7 +20,10 @@ func (Group) Fields() []ent.Field {
 	return []ent.Field{
 		field.UUID("id", uuid.UUID{}).Default(uuid.New),
 		field.String("name").Optional().Annotations(entgql.OrderField("NAME")),
-		field.Enum("group_type").Values("PRIVATE", "SHARED").Default("SHARED").Annotations(entgql.OrderField("GROUP_TYPE")),
+		field.Enum("group_type").NamedValues(
+			"Private", "PRIVATE",
+			"Shared", "SHARED",
+		).Default("SHARED").Annotations(entgql.OrderField("GROUP_TYPE")),
 		field.Bool("active").Default(true),
 		field.Time("deleted_at").Nillable().Optional(),
 	}

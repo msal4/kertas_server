@@ -1194,7 +1194,7 @@ type Message {
 input PostMessageInput {
   groupID: ID!
   content: String!
-  attachment: String
+  attachment: Upload
 }
 
 type Query {
@@ -1561,6 +1561,10 @@ input GroupWhereInput {
   hasClass: Boolean
   hasClassWith: [ClassWhereInput!]
   
+  """users edge predicates"""
+  hasUsers: Boolean
+  hasUsersWith: [UserWhereInput!]
+  
   """messages edge predicates"""
   hasMessages: Boolean
   hasMessagesWith: [MessageWhereInput!]
@@ -1760,6 +1764,10 @@ input UserWhereInput {
   """grades edge predicates"""
   hasGrades: Boolean
   hasGradesWith: [GradeWhereInput!]
+  
+  """groups edge predicates"""
+  hasGroups: Boolean
+  hasGroupsWith: [GroupWhereInput!]
 }
 
 """
@@ -9873,6 +9881,22 @@ func (ec *executionContext) unmarshalInputGroupWhereInput(ctx context.Context, o
 			if err != nil {
 				return it, err
 			}
+		case "hasUsers":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasUsers"))
+			it.HasUsers, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "hasUsersWith":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasUsersWith"))
+			it.HasUsersWith, err = ec.unmarshalOUserWhereInput2ᚕᚖgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚐUserWhereInputᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "hasMessages":
 			var err error
 
@@ -10529,7 +10553,7 @@ func (ec *executionContext) unmarshalInputPostMessageInput(ctx context.Context, 
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("attachment"))
-			it.Attachment, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			it.Attachment, err = ec.unmarshalOUpload2ᚖgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚐUpload(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -13902,6 +13926,22 @@ func (ec *executionContext) unmarshalInputUserWhereInput(ctx context.Context, ob
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasGradesWith"))
 			it.HasGradesWith, err = ec.unmarshalOGradeWhereInput2ᚕᚖgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚐGradeWhereInputᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "hasGroups":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasGroups"))
+			it.HasGroups, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "hasGroupsWith":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasGroupsWith"))
+			it.HasGroupsWith, err = ec.unmarshalOGroupWhereInput2ᚕᚖgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚐGroupWhereInputᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}

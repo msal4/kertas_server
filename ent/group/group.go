@@ -111,13 +111,13 @@ var (
 // GroupType defines the type for the "group_type" enum field.
 type GroupType string
 
-// GroupTypeSHARED is the default value of the GroupType enum.
-const DefaultGroupType = GroupTypeSHARED
+// GroupTypeShared is the default value of the GroupType enum.
+const DefaultGroupType = GroupTypeShared
 
 // GroupType values.
 const (
-	GroupTypePRIVATE GroupType = "PRIVATE"
-	GroupTypeSHARED  GroupType = "SHARED"
+	GroupTypePrivate GroupType = "PRIVATE"
+	GroupTypeShared  GroupType = "SHARED"
 )
 
 func (gt GroupType) String() string {
@@ -127,7 +127,7 @@ func (gt GroupType) String() string {
 // GroupTypeValidator is a validator for the "group_type" field enum values. It is called by the builders before save.
 func GroupTypeValidator(gt GroupType) error {
 	switch gt {
-	case GroupTypePRIVATE, GroupTypeSHARED:
+	case GroupTypePrivate, GroupTypeShared:
 		return nil
 	default:
 		return fmt.Errorf("group: invalid enum value for group_type field: %q", gt)

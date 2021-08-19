@@ -4,8 +4,10 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"path"
 
 	"github.com/google/uuid"
+	"github.com/minio/minio-go/v7"
 	"github.com/msal4/hassah_school_server/ent"
 	"github.com/msal4/hassah_school_server/server/model"
 )
@@ -20,7 +22,25 @@ func (s *Service) PostMessage(ctx context.Context, sender *ent.User, input model
 		return nil, err
 	}
 
-	msg, err := s.EC.Message.Create().SetContent(input.Content).SetOwner(sender).SetGroup(grp).Save(ctx)
+	b := s.EC.Message.Create().SetContent(input.Content).SetOwner(sender).SetGroup(grp)
+
+	if input.Attachment != nil {
+		info, err := s.MC.PutObject(
+			ctx,
+			s.Config.RootBucket,
+			path.Join(sender.Directory, s.FormatFilename(input.Attachment.Filename, "")),
+			input.Attachment.File,
+			input.Attachment.Size,
+			minio.PutObjectOptions{},
+		)
+		if err != nil {
+			return nil, fmt.Errorf("uploading attachment: %v", err)
+		}
+
+		b.SetAttachment(info.Key)
+	}
+
+	msg, err := b.Save(ctx)
 	if err != nil {
 		return nil, err
 	}

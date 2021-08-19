@@ -217,7 +217,7 @@ type Message {
 input PostMessageInput {
   groupID: ID!
   content: String!
-  attachment: String
+  attachment: Upload
 }
 
 type Query {
