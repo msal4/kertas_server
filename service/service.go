@@ -105,7 +105,7 @@ const (
 	defaultHQImageSize          = 1000
 	defaultAccessKey            = "dontusethedefaultaccesskey"
 	defaultRefreshKey           = "dontusethedefaultrefreshkey"
-	defaultAccessTokenLifetime  = 5 * time.Hour
+	defaultAccessTokenLifetime  = 2 * time.Minute
 	defaultRefreshTokenLifetime = 1 * time.Hour
 )
 
