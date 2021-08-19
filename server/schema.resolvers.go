@@ -182,21 +182,7 @@ func (r *subscriptionResolver) MessagePosted(ctx context.Context, groupID uuid.U
 		return nil, auth.UnauthorizedErr
 	}
 
-	messages := make(chan *ent.Message, 1)
-
-	r.s.Lock()
-	r.s.MessageChannels[u.ID.String()] = messages
-	r.s.Unlock()
-
-	go func() {
-		<-ctx.Done()
-		r.s.Lock()
-		delete(r.s.MessageChannels, u.ID.String())
-		close(messages)
-		r.s.Unlock()
-	}()
-
-	return messages, nil
+	return r.s.RegisterGroupListener(ctx, groupID, u.ID)
 }
 
 // Mutation returns generated.MutationResolver implementation.

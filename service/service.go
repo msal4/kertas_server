@@ -69,9 +69,8 @@ type Service struct {
 	// Config is all of the server configuration.
 	Config *Config
 
-	MessageChannels map[string]chan *ent.Message
-
-	sync.Mutex
+	msgChannels map[string]chan *ent.Message
+	mu          sync.Mutex
 }
 
 // New creates a new initialized and configured service.
@@ -92,7 +91,7 @@ func New(ec *ent.Client, mc *minio.Client, cfg *Config) (*Service, error) {
 		log.Printf("created bucket %q.\n", cfg.RootBucket)
 	}
 
-	return &Service{EC: ec, MC: mc, Config: cfg, MessageChannels: make(map[string]chan *ent.Message)}, nil
+	return &Service{EC: ec, MC: mc, Config: cfg, msgChannels: make(map[string]chan *ent.Message)}, nil
 }
 
 // Config defaults.

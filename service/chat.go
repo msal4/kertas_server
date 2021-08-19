@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/google/uuid"
 	"github.com/msal4/hassah_school_server/ent"
 	"github.com/msal4/hassah_school_server/server/model"
 )
@@ -29,13 +30,31 @@ func (s *Service) PostMessage(ctx context.Context, sender *ent.User, input model
 		return nil, fmt.Errorf("retrieving group participants: %v", err)
 	}
 
-	s.Lock()
+	s.mu.Lock()
 	for _, u := range users {
-		if ch, ok := s.MessageChannels[u.ID.String()]; ok {
+		if ch, ok := s.msgChannels[u.ID.String()]; ok {
 			ch <- msg
 		}
 	}
-	s.Unlock()
+	s.mu.Unlock()
 
 	return msg, nil
+}
+
+func (s *Service) RegisterGroupListener(ctx context.Context, groupID uuid.UUID, userID uuid.UUID) (<-chan *ent.Message, error) {
+	messages := make(chan *ent.Message, 1)
+
+	s.mu.Lock()
+	s.msgChannels[userID.String()] = messages
+	s.mu.Unlock()
+
+	go func() {
+		<-ctx.Done()
+		s.mu.Lock()
+		delete(s.msgChannels, userID.String())
+		close(messages)
+		s.mu.Unlock()
+	}()
+
+	return messages, nil
 }
