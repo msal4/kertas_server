@@ -8,9 +8,11 @@ import (
 	"sync"
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/minio/minio-go/v7"
 	"github.com/msal4/hassah_school_server/auth"
 	"github.com/msal4/hassah_school_server/ent"
+	"github.com/segmentio/ksuid"
 )
 
 type Config struct {
@@ -69,7 +71,7 @@ type Service struct {
 	// Config is all of the server configuration.
 	Config *Config
 
-	msgChannels map[string]chan *ent.Message
+	msgChannels map[uuid.UUID]map[ksuid.KSUID]chan *ent.Message
 	mu          sync.Mutex
 }
 
@@ -91,7 +93,7 @@ func New(ec *ent.Client, mc *minio.Client, cfg *Config) (*Service, error) {
 		log.Printf("created bucket %q.\n", cfg.RootBucket)
 	}
 
-	return &Service{EC: ec, MC: mc, Config: cfg, msgChannels: make(map[string]chan *ent.Message)}, nil
+	return &Service{EC: ec, MC: mc, Config: cfg, msgChannels: make(map[uuid.UUID]map[ksuid.KSUID]chan *ent.Message)}, nil
 }
 
 // Config defaults.

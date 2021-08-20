@@ -20,8 +20,8 @@ func TestPostMessage(t *testing.T) {
 	ctx := context.Background()
 
 	sch := createSchool(ctx, s, "myuniqueschoolname", "myimage")
-	stdt := createStudent(ctx, s, "myuniqueusername", sch)
-	tchr := createTeacher(ctx, s, "myuniqueteachernaem", sch)
+	stdt := createStudent(ctx, s, "skdfjdskmyuniqueusername", sch)
+	tchr := createTeacher(ctx, s, "myuniqkfjdkueteachernaem", sch)
 
 	outsiderStdt := createStudent(ctx, s, "sdsmyuniqueusername", sch)
 
@@ -98,12 +98,12 @@ func TestRegisterGroupListener(t *testing.T) {
 	ctx := context.Background()
 
 	sch := createSchool(ctx, s, "myuniqueschoolname", "myimage")
-	stdt := createStudent(ctx, s, "myuniqueusername", sch)
-	tchr := createTeacher(ctx, s, "myuniqueteachernaem", sch)
-
+	stdt := createStudent(ctx, s, "sjkdfjsdmyuniqueusername", sch)
+	tchr := createTeacher(ctx, s, "myuniqujjkfldseteachernaem", sch)
 	grp := s.EC.Group.Create().SetName("test group name").AddUsers(tchr, stdt).SetGroupType(group.GroupTypePrivate).SaveX(ctx)
 
 	t.Run("private", func(t *testing.T) {
+
 		require := require.New(t)
 		cancelableCtx, cancel := context.WithCancel(context.Background())
 
@@ -145,5 +145,99 @@ func TestRegisterGroupListener(t *testing.T) {
 		got = <-msgCh
 
 		require.Nil(got)
+	})
+
+	t.Run("shared", func(t *testing.T) {
+		require := require.New(t)
+		stg := s.EC.Stage.Create().SetName("stage 1").SetDirectory("testdir").SetTuitionAmount(23423).SetSchool(sch).SaveX(ctx)
+		grp := s.EC.Group.Create().SetName("test group name").AddUsers(tchr, stdt).SetGroupType(group.GroupTypeShared).SaveX(ctx)
+		s.EC.Class.Create().SetName("math").SetStage(stg).SetTeacher(tchr).SetGroup(grp).SaveX(ctx)
+
+		stdt := s.EC.User.Create().SetName("test userd").SetUsername("teststsdfksdjudent1").
+			SetPhone("077059333812").SetDirectory("diresss22").SetPassword("mipassword22@@@@5").SetSchool(sch).SetStage(stg).SaveX(ctx)
+		s.EC.User.Create().SetName("test userd 2").SetUsername("ksdjfklsdjteststudent2").
+			SetPhone("077059333812").SetDirectory("diresss22").SetPassword("mipassword22@@@@5").SetSchool(sch).SetStage(stg).SaveX(ctx)
+		s.EC.User.Create().SetName("test userd 3").SetUsername("teststudejfksdjfkldnt3").
+			SetPhone("077059333812").SetDirectory("diresss22").SetPassword("mipassword22@@@@5").SetSchool(sch).SetStage(stg).SaveX(ctx)
+
+		stg2 := s.EC.Stage.Create().SetName("stage 2").SetDirectory("testdir").SetTuitionAmount(23423).SetSchool(sch).SaveX(ctx)
+		differentStageStdt := s.EC.User.Create().SetName("test userd 4").SetUsername("tefjdskfjdklsststudent4").
+			SetPhone("077059333812").SetDirectory("diresss22").SetPassword("mipassword22@@@@5").SetSchool(sch).SetStage(stg2).SaveX(ctx)
+
+		// student
+		msgCh, err := s.RegisterGroupListener(ctx, grp.ID, stdt.ID)
+		require.NoError(err)
+		input := model.PostMessageInput{GroupID: grp.ID, Content: "message test content"}
+		msg, err := s.PostMessage(ctx, stdt, input)
+		require.NoError(err)
+		require.NotNil(msg)
+		got := <-msgCh
+		require.NotNil(got)
+		require.Equal(msg.Content, got.Content)
+		require.Equal(msg.ID, got.ID)
+		require.Equal(msg.Attachment, got.Attachment)
+
+		// teacher
+		msgCh, err = s.RegisterGroupListener(ctx, grp.ID, tchr.ID)
+		require.NoError(err)
+		input = model.PostMessageInput{GroupID: grp.ID, Content: "message test content"}
+		msg, err = s.PostMessage(ctx, stdt, input)
+		require.NoError(err)
+		require.NotNil(msg)
+		got = <-msgCh
+		require.NotNil(got)
+		require.Equal(msg.Content, got.Content)
+		require.Equal(msg.ID, got.ID)
+		require.Equal(msg.Attachment, got.Attachment)
+
+		// outside student
+		msgCh, err = s.RegisterGroupListener(ctx, grp.ID, differentStageStdt.ID)
+		require.Error(err)
+		require.Nil(msgCh)
+
+		anotherSch := createSchool(ctx, s, "tet", "kdfjs")
+		// outside teacher
+		outsideTchr := createTeacher(ctx, s, "skdmyuniqueteachernaem", anotherSch)
+		msgCh, err = s.RegisterGroupListener(ctx, grp.ID, outsideTchr.ID)
+		require.Error(err)
+		require.Nil(msgCh)
+	})
+
+	t.Run("multiple devices", func(t *testing.T) {
+		require := require.New(t)
+
+		// device 1
+		msgCh, err := s.RegisterGroupListener(ctx, grp.ID, stdt.ID)
+		require.NoError(err)
+		input := model.PostMessageInput{GroupID: grp.ID, Content: "message test content"}
+		msg, err := s.PostMessage(ctx, stdt, input)
+		require.NoError(err)
+		require.NotNil(msg)
+		got := <-msgCh
+
+		require.NotNil(got)
+		require.Equal(msg.Content, got.Content)
+		require.Equal(msg.ID, got.ID)
+		require.Equal(msg.Attachment, got.Attachment)
+
+		// device 2
+		msgCh2, err := s.RegisterGroupListener(ctx, grp.ID, stdt.ID)
+		require.NoError(err)
+		input = model.PostMessageInput{GroupID: grp.ID, Content: "message test content"}
+		msg, err = s.PostMessage(ctx, stdt, input)
+		require.NoError(err)
+		require.NotNil(msg)
+		got = <-msgCh2
+
+		require.NotNil(got)
+		require.Equal(msg.Content, got.Content)
+		require.Equal(msg.ID, got.ID)
+		require.Equal(msg.Attachment, got.Attachment)
+
+		got = <-msgCh
+		require.NotNil(got)
+		require.Equal(msg.Content, got.Content)
+		require.Equal(msg.ID, got.ID)
+		require.Equal(msg.Attachment, got.Attachment)
 	})
 }
