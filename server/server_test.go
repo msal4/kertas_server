@@ -32,7 +32,7 @@ import (
 var mc *minio.Client
 
 func TestMain(m *testing.M) {
-	godotenv.Load("../../.env")
+	godotenv.Load("../.env")
 
 	var err error
 	mc, err = minio.New(os.Getenv("MINIO_ENDPOINT"), &minio.Options{

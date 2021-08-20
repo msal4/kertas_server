@@ -111,7 +111,7 @@ func TestAddUser(t *testing.T) {
 		{"student is not authorized", student, ptr.Str(auth.UnauthorizedErr.Error())},
 	}
 
-	f := testutil.OpenFile(t, "../../testfiles/harvard.jpg")
+	f := testutil.OpenFile(t, "../testfiles/harvard.jpg")
 
 	for i, c := range cases {
 		t.Run(c.desc, func(t *testing.T) {
