@@ -23,6 +23,8 @@ func TestPostMessage(t *testing.T) {
 	stdt := createStudent(ctx, s, "myuniqueusername", sch)
 	tchr := createTeacher(ctx, s, "myuniqueteachernaem", sch)
 
+	outsiderStdt := createStudent(ctx, s, "sdsmyuniqueusername", sch)
+
 	grp := s.EC.Group.Create().SetName("test group name").AddUsers(tchr, stdt).SetGroupType(group.GroupTypePrivate).SaveX(ctx)
 
 	t.Run("without attachment", func(t *testing.T) {
@@ -70,5 +72,77 @@ func TestPostMessage(t *testing.T) {
 
 		require.True(strings.HasPrefix(got.Attachment, stdt.Directory))
 		require.True(strings.HasSuffix(got.Attachment, ".txt"))
+	})
+
+	t.Run("outsider", func(t *testing.T) {
+		require := require.New(t)
+
+		f := testutil.OpenFile(t, "../testfiles/file.txt")
+
+		input := model.PostMessageInput{GroupID: grp.ID, Content: "message test content", Attachment: &graphql.Upload{
+			File:        f,
+			Filename:    f.File.Name(),
+			Size:        f.Size(),
+			ContentType: f.ContentType,
+		}}
+
+		got, err := s.PostMessage(ctx, outsiderStdt, input)
+		require.Error(err)
+		require.Nil(got)
+	})
+}
+
+func TestRegisterGroupListener(t *testing.T) {
+	s := newService(t)
+	defer s.EC.Close()
+	ctx := context.Background()
+
+	sch := createSchool(ctx, s, "myuniqueschoolname", "myimage")
+	stdt := createStudent(ctx, s, "myuniqueusername", sch)
+	tchr := createTeacher(ctx, s, "myuniqueteachernaem", sch)
+
+	grp := s.EC.Group.Create().SetName("test group name").AddUsers(tchr, stdt).SetGroupType(group.GroupTypePrivate).SaveX(ctx)
+
+	t.Run("private", func(t *testing.T) {
+		require := require.New(t)
+		cancelableCtx, cancel := context.WithCancel(context.Background())
+
+		msgCh, err := s.RegisterGroupListener(cancelableCtx, grp.ID, stdt.ID)
+		require.NoError(err)
+
+		input := model.PostMessageInput{GroupID: grp.ID, Content: "message test content"}
+		msg, err := s.PostMessage(ctx, stdt, input)
+		require.NoError(err)
+		require.NotNil(msg)
+
+		got := <-msgCh
+
+		require.NotNil(got)
+		require.Equal(msg.Content, got.Content)
+		require.Equal(msg.ID, got.ID)
+		require.Equal(msg.Attachment, got.Attachment)
+
+		input = model.PostMessageInput{GroupID: grp.ID, Content: "message test content 2"}
+		msg, err = s.PostMessage(ctx, tchr, input)
+		require.NoError(err)
+		require.NotNil(msg)
+
+		got = <-msgCh
+
+		require.NotNil(got)
+		require.Equal(msg.Content, got.Content)
+		require.Equal(msg.ID, got.ID)
+		require.Equal(msg.Attachment, got.Attachment)
+
+		cancel()
+
+		input = model.PostMessageInput{GroupID: grp.ID, Content: "message test content 3"}
+		msg, err = s.PostMessage(ctx, tchr, input)
+		require.NoError(err)
+		require.NotNil(msg)
+
+		got = <-msgCh
+
+		require.Nil(got)
 	})
 }

@@ -22,6 +22,23 @@ func (s *Service) PostMessage(ctx context.Context, sender *ent.User, input model
 		return nil, err
 	}
 
+	users, err := grp.Users(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("retrieving group participants: %v", err)
+	}
+
+	var found bool
+	for _, u := range users {
+		if u.ID.String() == sender.ID.String() {
+			found = true
+			break
+		}
+	}
+
+	if !found {
+		return nil, NotFoundErr
+	}
+
 	b := s.EC.Message.Create().SetContent(input.Content).SetOwner(sender).SetGroup(grp)
 
 	if input.Attachment != nil {
@@ -43,11 +60,6 @@ func (s *Service) PostMessage(ctx context.Context, sender *ent.User, input model
 	msg, err := b.Save(ctx)
 	if err != nil {
 		return nil, err
-	}
-
-	users, err := grp.Users(ctx)
-	if err != nil {
-		return nil, fmt.Errorf("retrieving group participants: %v", err)
 	}
 
 	s.mu.Lock()
