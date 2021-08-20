@@ -32,7 +32,7 @@ jobs:
     - name: Build
       run: go build -v ./...
     - name: Test
-      run: make test
+      run: go test -v -race ./...
     env:
       MINIO_ENDPOINT: 127.0.0.1:9000
       MINIO_ACCESS_KEY: minioadmin
