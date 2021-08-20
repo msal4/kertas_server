@@ -123,7 +123,6 @@ func TestPostMessage(t *testing.T) {
 		require.NoError(err)
 		require.NotNil(got)
 		require.Equal(input.Content, got.Content)
-
 	})
 }
 
@@ -138,7 +137,6 @@ func TestRegisterGroupListener(t *testing.T) {
 	grp := s.EC.Group.Create().SetName("test group name").AddUsers(tchr, stdt).SetGroupType(group.GroupTypePrivate).SaveX(ctx)
 
 	t.Run("private", func(t *testing.T) {
-
 		require := require.New(t)
 		cancelableCtx, cancel := context.WithCancel(context.Background())
 
@@ -171,11 +169,6 @@ func TestRegisterGroupListener(t *testing.T) {
 
 		cancel()
 		<-cancelableCtx.Done()
-
-		input = model.PostMessageInput{GroupID: grp.ID, Content: "message test content 3"}
-		msg, err = s.PostMessage(ctx, tchr, input)
-		require.NoError(err)
-		require.NotNil(msg)
 
 		got, ok := <-msgCh
 
