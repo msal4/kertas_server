@@ -10,6 +10,7 @@ import (
 	"github.com/msal4/hassah_school_server/ent/group"
 	"github.com/msal4/hassah_school_server/server/model"
 	"github.com/msal4/hassah_school_server/testutil"
+	"github.com/segmentio/ksuid"
 	"github.com/stretchr/testify/require"
 )
 
@@ -27,7 +28,7 @@ func TestPostMessage(t *testing.T) {
 
 	grp := s.EC.Group.Create().SetName("test group name").AddUsers(tchr, stdt).SetGroupType(group.GroupTypePrivate).SaveX(ctx)
 
-	t.Run("without attachment", func(t *testing.T) {
+	t.Run("student message without attachment", func(t *testing.T) {
 		require := require.New(t)
 
 		input := model.PostMessageInput{GroupID: grp.ID, Content: "message test content"}
@@ -45,7 +46,7 @@ func TestPostMessage(t *testing.T) {
 		require.Equal(grp.ID, gotGrp.ID)
 	})
 
-	t.Run("with attachment", func(t *testing.T) {
+	t.Run("student message with attachment", func(t *testing.T) {
 		require := require.New(t)
 
 		f := testutil.OpenFile(t, "../testfiles/file.txt")
@@ -74,7 +75,7 @@ func TestPostMessage(t *testing.T) {
 		require.True(strings.HasSuffix(got.Attachment, ".txt"))
 	})
 
-	t.Run("outsider", func(t *testing.T) {
+	t.Run("outsider student", func(t *testing.T) {
 		require := require.New(t)
 
 		f := testutil.OpenFile(t, "../testfiles/file.txt")
@@ -89,6 +90,40 @@ func TestPostMessage(t *testing.T) {
 		got, err := s.PostMessage(ctx, outsiderStdt, input)
 		require.Error(err)
 		require.Nil(got)
+	})
+
+	t.Run("shared", func(t *testing.T) {
+		require := require.New(t)
+
+		stg := s.EC.Stage.Create().SetName("stage 1").SetDirectory("testdir").SetTuitionAmount(23423).SetSchool(sch).SaveX(ctx)
+		grp := s.EC.Group.Create().SetName("test group name").AddUsers(tchr, stdt).SetGroupType(group.GroupTypeShared).SaveX(ctx)
+		s.EC.Class.Create().SetName("math").SetStage(stg).SetTeacher(tchr).SetGroup(grp).SaveX(ctx)
+
+		stdt := s.EC.User.Create().SetName("test userd").SetUsername("teststsdfksdjudent1").
+			SetPhone("077059333812").SetDirectory("diresss22").SetPassword("mipassword22@@@@5").SetSchool(sch).SetStage(stg).SaveX(ctx)
+
+		// outsider teacher
+		sch := createSchool(ctx, s, "tesskd", "fkjds")
+		outsiderTchr := createTeacher(ctx, s, ksuid.New().String(), sch)
+		input := model.PostMessageInput{GroupID: grp.ID, Content: "message test content"}
+		got, err := s.PostMessage(ctx, outsiderTchr, input)
+		require.Error(err)
+		require.Nil(got)
+
+		// owner
+		input = model.PostMessageInput{GroupID: grp.ID, Content: "message test content"}
+		got, err = s.PostMessage(ctx, tchr, input)
+		require.NoError(err)
+		require.NotNil(got)
+		require.Equal(input.Content, got.Content)
+
+		// student
+		input = model.PostMessageInput{GroupID: grp.ID, Content: "message test content"}
+		got, err = s.PostMessage(ctx, stdt, input)
+		require.NoError(err)
+		require.NotNil(got)
+		require.Equal(input.Content, got.Content)
+
 	})
 }
 
@@ -142,9 +177,9 @@ func TestRegisterGroupListener(t *testing.T) {
 		require.NoError(err)
 		require.NotNil(msg)
 
-		got = <-msgCh
+		got, ok := <-msgCh
 
-		require.Nil(got)
+		require.False(ok)
 	})
 
 	t.Run("shared", func(t *testing.T) {

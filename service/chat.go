@@ -15,7 +15,7 @@ import (
 	"github.com/segmentio/ksuid"
 )
 
-// PostMessage posts a message to the group and notifies the group listeners.
+// PostMessage posts a message to a group and notifies the group listeners.
 func (s *Service) PostMessage(ctx context.Context, sender *ent.User, input model.PostMessageInput) (*ent.Message, error) {
 	if sender == nil {
 		return nil, errors.New("sender is required")
@@ -50,6 +50,14 @@ func (s *Service) PostMessage(ctx context.Context, sender *ent.User, input model
 		}
 
 		if senderStg, err := sender.Stage(ctx); err != nil || senderStg.ID != stg.ID {
+			return nil, fmt.Errorf("not allowed to post in this group")
+		}
+	} else if sender.Role == user.RoleTeacher {
+		tchr, err := grp.QueryClass().QueryTeacher().Only(ctx)
+		if err != nil {
+			return nil, fmt.Errorf("retrieving teacher: %v", err)
+		}
+		if tchr.ID != sender.ID {
 			return nil, fmt.Errorf("not allowed to post in this group")
 		}
 	}
