@@ -73,9 +73,11 @@ func (s *Service) PostMessage(ctx context.Context, sender *ent.User, input model
 	return msg, nil
 }
 
+// RegisterGroupListener registers a user to receive events for new messages on the specified group.
 func (s *Service) RegisterGroupListener(ctx context.Context, groupID uuid.UUID, userID uuid.UUID) (<-chan *ent.Message, error) {
 	messages := make(chan *ent.Message, 1)
 
+	// TODO: handle user registering on multiple devices.
 	s.mu.Lock()
 	s.msgChannels[userID.String()] = messages
 	s.mu.Unlock()

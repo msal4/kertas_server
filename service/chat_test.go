@@ -135,6 +135,7 @@ func TestRegisterGroupListener(t *testing.T) {
 		require.Equal(msg.Attachment, got.Attachment)
 
 		cancel()
+		<-cancelableCtx.Done()
 
 		input = model.PostMessageInput{GroupID: grp.ID, Content: "message test content 3"}
 		msg, err = s.PostMessage(ctx, tchr, input)
