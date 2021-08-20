@@ -214,6 +214,27 @@ type Message {
   updatedAt: Time!
 }
 
+enum MessageOrderField {
+    CREATED_AT
+    UPDATED_AT
+}
+
+input MessageOrder {
+    field: MessageOrderField
+    direction: OrderDirection!
+}
+
+type MessageEdge {
+  node: Message
+  cursor: Cursor!
+}
+
+type MessageConnection {
+  totalCount: Int!
+  pageInfo: PageInfo!
+  edges: [MessageEdge]
+}
+
 input PostMessageInput {
   groupID: ID!
   content: String!
@@ -229,6 +250,8 @@ type Query {
 
   stage(id: ID!): Stage
   stages(after: Cursor, first: Int, before: Cursor, last: Int, orderBy: StageOrder, where: StageWhereInput): StageConnection
+
+  messages(after: Cursor, first: Int, before: Cursor, last: Int, orderBy: MessageOrder, where: MessageWhereInput): MessageConnection
 }
 
 type Mutation {

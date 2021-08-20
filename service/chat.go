@@ -15,6 +15,20 @@ import (
 	"github.com/segmentio/ksuid"
 )
 
+type MessagesOptions struct {
+	After   *ent.Cursor
+	First   *int
+	Before  *ent.Cursor
+	Last    *int
+	OrderBy *ent.MessageOrder
+	Where   *ent.MessageWhereInput
+}
+
+func (s *Service) Messages(ctx context.Context, opts MessagesOptions) (*ent.MessageConnection, error) {
+	return s.EC.Message.Query().Paginate(ctx, opts.After, opts.First, opts.Before, opts.Last, ent.WithMessageOrder(opts.OrderBy),
+		ent.WithMessageFilter(opts.Where.Filter))
+}
+
 // PostMessage posts a message to a group and notifies the group listeners.
 func (s *Service) PostMessage(ctx context.Context, sender *ent.User, input model.PostMessageInput) (*ent.Message, error) {
 	if sender == nil {
