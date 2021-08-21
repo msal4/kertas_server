@@ -127,7 +127,6 @@ func (r *mutationResolver) PostMessage(ctx context.Context, input model.PostMess
 	if !ok {
 		return nil, auth.UnauthorizedErr
 	}
-
 	return r.s.PostMessage(ctx, u.ID, input)
 }
 
@@ -172,6 +171,15 @@ func (r *queryResolver) Stages(ctx context.Context, after *ent.Cursor, first *in
 }
 
 func (r *queryResolver) Messages(ctx context.Context, groupID uuid.UUID, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.MessageOrder, where *ent.MessageWhereInput) (*ent.MessageConnection, error) {
+	u, ok := auth.UserForContext(ctx)
+	if !ok {
+		return nil, auth.UnauthorizedErr
+	}
+
+	if err := r.s.CheckAllowedToParticipateInChat(ctx, groupID, u.ID); err != nil {
+		return nil, err
+	}
+
 	return r.s.Messages(ctx, groupID, service.MessagesOptions{After: after, First: first, Before: before, Last: last, OrderBy: orderBy, Where: where})
 }
 

@@ -35,7 +35,7 @@ func (s *Service) Messages(ctx context.Context, groupID uuid.UUID, opts Messages
 
 // PostMessage posts a message to a group and notifies the group listeners.
 func (s *Service) PostMessage(ctx context.Context, senderID uuid.UUID, input model.PostMessageInput) (*ent.Message, error) {
-	if err := s.checkAllowedToParticipateInChat(ctx, input.GroupID, senderID); err != nil {
+	if err := s.CheckAllowedToParticipateInChat(ctx, input.GroupID, senderID); err != nil {
 		return nil, err
 	}
 
@@ -80,14 +80,14 @@ func (s *Service) notifyObservers(groupID uuid.UUID, msg *ent.Message) {
 
 // RegisterGroupObserver registers a user to receive events for new messages on the specified group.
 func (s *Service) RegisterGroupObserver(ctx context.Context, groupID uuid.UUID, userID uuid.UUID) (<-chan *ent.Message, error) {
-	if err := s.checkAllowedToParticipateInChat(ctx, groupID, userID); err != nil {
+	if err := s.CheckAllowedToParticipateInChat(ctx, groupID, userID); err != nil {
 		return nil, err
 	}
 
 	return s.observeGroup(ctx, groupID), nil
 }
 
-func (s *Service) checkAllowedToParticipateInChat(ctx context.Context, groupID uuid.UUID, participatorID uuid.UUID) error {
+func (s *Service) CheckAllowedToParticipateInChat(ctx context.Context, groupID uuid.UUID, participatorID uuid.UUID) error {
 	grp, err := s.EC.Group.Get(ctx, groupID)
 	if err != nil {
 		return err
@@ -101,7 +101,7 @@ func (s *Service) checkAllowedToParticipateInChat(ctx context.Context, groupID u
 	if grp.GroupType == group.GroupTypePrivate {
 		_, err := grp.QueryUsers().Where(user.ID(prt.ID)).Only(ctx)
 		if err != nil {
-			return fmt.Errorf("checking user is a group participant: %v", err)
+			return NotAllowedErr
 		}
 	} else if prt.Role == user.RoleStudent {
 		stg, err := grp.QueryClass().QueryStage().Only(ctx)
@@ -110,7 +110,7 @@ func (s *Service) checkAllowedToParticipateInChat(ctx context.Context, groupID u
 		}
 
 		if pStg, err := prt.Stage(ctx); err != nil || pStg.ID.String() != stg.ID.String() {
-			return fmt.Errorf("not allowed to participate in this group")
+			return NotAllowedErr
 		}
 	} else if prt.Role == user.RoleTeacher {
 		sch, err := grp.QueryClass().QueryStage().QuerySchool().Only(ctx)
@@ -119,7 +119,7 @@ func (s *Service) checkAllowedToParticipateInChat(ctx context.Context, groupID u
 		}
 
 		if pSch, err := prt.School(ctx); err != nil || pSch.ID.String() != sch.ID.String() {
-			return fmt.Errorf("not allowed to participate in this group")
+			return NotAllowedErr
 		}
 	}
 
