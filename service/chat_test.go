@@ -6,13 +6,90 @@ import (
 	"testing"
 
 	"github.com/99designs/gqlgen/graphql"
+	"github.com/google/uuid"
 	"github.com/minio/minio-go/v7"
+	"github.com/msal4/hassah_school_server/ent"
 	"github.com/msal4/hassah_school_server/ent/group"
 	"github.com/msal4/hassah_school_server/server/model"
+	"github.com/msal4/hassah_school_server/service"
 	"github.com/msal4/hassah_school_server/testutil"
 	"github.com/segmentio/ksuid"
 	"github.com/stretchr/testify/require"
 )
+
+func TestMessages(t *testing.T) {
+	s := newService(t)
+	defer s.EC.Close()
+	ctx := context.Background()
+
+	sch := createSchool(ctx, s, "My School", "jfsdkfjsldbbbbbbbb")
+
+	t.Run("non-existing group", func(t *testing.T) {
+		require := require.New(t)
+
+		messages, err := s.Messages(ctx, uuid.New(), service.MessagesOptions{})
+		require.Error(err)
+		require.True(ent.IsNotFound(err))
+		require.Nil(messages)
+	})
+
+	t.Run("empty group", func(t *testing.T) {
+		require := require.New(t)
+
+		grp := createGroup(ctx, s)
+		messages, err := s.Messages(ctx, grp.ID, service.MessagesOptions{})
+		require.NoError(err)
+		require.NotNil(messages)
+		require.Zero(messages.TotalCount)
+	})
+
+	t.Run("private group messages", func(t *testing.T) {
+		require := require.New(t)
+
+		tchr := createTeacher(ctx, s, "jfsdklfjsdlkfjdl", sch)
+		stdt := createStudent(ctx, s, "fjsdklfjsd34523", sch)
+		grp := s.EC.Group.Create().SetName("test group name").AddUsers(tchr, stdt).SetGroupType(group.GroupTypePrivate).SaveX(ctx)
+
+		got, err := s.PostMessage(ctx, stdt.ID, model.PostMessageInput{GroupID: grp.ID, Content: "message test content"})
+		require.NoError(err)
+		require.NotNil(got)
+
+		messages, err := s.Messages(ctx, grp.ID, service.MessagesOptions{})
+		require.NoError(err)
+		require.NotNil(messages)
+		require.Equal(1, messages.TotalCount)
+		require.Equal(got.ID, messages.Edges[0].Node.ID)
+		require.Equal(got.ID, messages.Edges[0].Node.ID)
+		require.Equal(got.Content, messages.Edges[0].Node.Content)
+	})
+
+	t.Run("shared group messages", func(t *testing.T) {
+		require := require.New(t)
+
+		tchr := createTeacher(ctx, s, "jfsdklfjsdlkfjdlskdfjsdk", sch)
+		stg := s.EC.Stage.Create().SetName("2nd").SetDirectory("hello").SetTuitionAmount(122).SetSchool(sch).SaveX(ctx)
+		stdt := s.EC.User.Create().SetName("test userd").SetUsername("kskdjfklsd223432").
+			SetPhone("077059333812").SetDirectory("diresss22").SetPassword("mipassword22@@@@5").SetSchool(sch).SetStage(stg).SaveX(ctx)
+		grp := s.EC.Group.Create().SetName("test group name").SetGroupType(group.GroupTypeShared).SaveX(ctx)
+		s.EC.Class.Create().SetName("math").SetGroup(grp).SetTeacher(tchr).SetStage(stg).SaveX(ctx)
+
+		got, err := s.PostMessage(ctx, stdt.ID, model.PostMessageInput{GroupID: grp.ID, Content: "message test content"})
+		require.NoError(err)
+		require.NotNil(got)
+
+		messages, err := s.Messages(ctx, grp.ID, service.MessagesOptions{})
+		require.NoError(err)
+		require.NotNil(messages)
+		require.Equal(1, messages.TotalCount)
+		require.Equal(got.ID, messages.Edges[0].Node.ID)
+		require.Equal(got.ID, messages.Edges[0].Node.ID)
+		require.Equal(got.Content, messages.Edges[0].Node.Content)
+	})
+}
+
+func createGroup(ctx context.Context, s *service.Service) *ent.Group {
+	return s.EC.Group.Create().SetName("test group name").SetGroupType(group.GroupTypePrivate).SaveX(ctx)
+}
 
 func TestPostMessage(t *testing.T) {
 	s := newService(t)

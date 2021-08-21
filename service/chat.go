@@ -23,9 +23,14 @@ type MessagesOptions struct {
 	Where   *ent.MessageWhereInput
 }
 
-func (s *Service) Messages(ctx context.Context, opts MessagesOptions) (*ent.MessageConnection, error) {
-	return s.EC.Message.Query().Paginate(ctx, opts.After, opts.First, opts.Before, opts.Last, ent.WithMessageOrder(opts.OrderBy),
-		ent.WithMessageFilter(opts.Where.Filter))
+func (s *Service) Messages(ctx context.Context, groupID uuid.UUID, opts MessagesOptions) (*ent.MessageConnection, error) {
+	grp, err := s.EC.Group.Get(ctx, groupID)
+	if err != nil {
+		return nil, err
+	}
+
+	return grp.QueryMessages().
+		Paginate(ctx, opts.After, opts.First, opts.Before, opts.Last, ent.WithMessageOrder(opts.OrderBy), ent.WithMessageFilter(opts.Where.Filter))
 }
 
 // PostMessage posts a message to a group and notifies the group listeners.
