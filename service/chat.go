@@ -2,7 +2,6 @@ package service
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"path"
 
@@ -30,59 +29,19 @@ func (s *Service) Messages(ctx context.Context, opts MessagesOptions) (*ent.Mess
 }
 
 // PostMessage posts a message to a group and notifies the group listeners.
-func (s *Service) PostMessage(ctx context.Context, sender *ent.User, input model.PostMessageInput) (*ent.Message, error) {
-	if sender == nil {
-		return nil, errors.New("sender is required")
-	}
-
-	grp, err := s.EC.Group.Get(ctx, input.GroupID)
-	if err != nil {
+func (s *Service) PostMessage(ctx context.Context, senderID uuid.UUID, input model.PostMessageInput) (*ent.Message, error) {
+	if err := s.checkAllowedToParticipateInChat(ctx, input.GroupID, senderID); err != nil {
 		return nil, err
 	}
 
-	if grp.GroupType == group.GroupTypePrivate {
-		users, err := grp.Users(ctx)
-		if err != nil {
-			return nil, fmt.Errorf("retrieving group participants: %v", err)
-		}
-
-		var found bool
-		for _, u := range users {
-			if u.ID.String() == sender.ID.String() {
-				found = true
-				break
-			}
-		}
-
-		if !found {
-			return nil, NotFoundErr
-		}
-	} else if sender.Role == user.RoleStudent {
-		stg, err := grp.QueryClass().QueryStage().Only(ctx)
-		if err != nil {
-			return nil, fmt.Errorf("retrieving stage: %v", err)
-		}
-
-		if senderStg, err := sender.Stage(ctx); err != nil || senderStg.ID != stg.ID {
-			return nil, fmt.Errorf("not allowed to post in this group")
-		}
-	} else if sender.Role == user.RoleTeacher {
-		tchr, err := grp.QueryClass().QueryTeacher().Only(ctx)
-		if err != nil {
-			return nil, fmt.Errorf("retrieving teacher: %v", err)
-		}
-		if tchr.ID != sender.ID {
-			return nil, fmt.Errorf("not allowed to post in this group")
-		}
-	}
-
-	b := s.EC.Message.Create().SetContent(input.Content).SetOwner(sender).SetGroup(grp)
+	b := s.EC.Message.Create().SetContent(input.Content).SetOwnerID(senderID).SetGroupID(input.GroupID)
 
 	if input.Attachment != nil {
+		u := s.EC.User.GetX(ctx, senderID)
 		info, err := s.MC.PutObject(
 			ctx,
 			s.Config.RootBucket,
-			path.Join(sender.Directory, s.FormatFilename(input.Attachment.Filename, "")),
+			path.Join(u.Directory, s.FormatFilename(input.Attachment.Filename, "")),
 			input.Attachment.File,
 			input.Attachment.Size,
 			minio.PutObjectOptions{},
@@ -99,75 +58,90 @@ func (s *Service) PostMessage(ctx context.Context, sender *ent.User, input model
 		return nil, err
 	}
 
-	s.mu.Lock()
-	if channels, ok := s.msgChannels[input.GroupID]; ok {
-		for _, ch := range channels {
-			ch <- msg
-		}
-	}
-	s.mu.Unlock()
+	s.notifyObservers(input.GroupID, msg)
 
 	return msg, nil
 }
 
-// RegisterGroupListener registers a user to receive events for new messages on the specified group.
-func (s *Service) RegisterGroupListener(ctx context.Context, groupID uuid.UUID, userID uuid.UUID) (<-chan *ent.Message, error) {
-	grp, err := s.EC.Group.Get(ctx, groupID)
-	if err != nil {
+func (s *Service) notifyObservers(groupID uuid.UUID, msg *ent.Message) {
+	s.Lock()
+	if observers, ok := s.observers[groupID]; ok {
+		for _, observer := range observers {
+			observer <- msg
+		}
+	}
+	s.Unlock()
+}
+
+// RegisterGroupObserver registers a user to receive events for new messages on the specified group.
+func (s *Service) RegisterGroupObserver(ctx context.Context, groupID uuid.UUID, userID uuid.UUID) (<-chan *ent.Message, error) {
+	if err := s.checkAllowedToParticipateInChat(ctx, groupID, userID); err != nil {
 		return nil, err
 	}
 
-	u, err := s.EC.User.Get(ctx, userID)
+	return s.observeGroup(ctx, groupID), nil
+}
+
+func (s *Service) checkAllowedToParticipateInChat(ctx context.Context, groupID uuid.UUID, participatorID uuid.UUID) error {
+	grp, err := s.EC.Group.Get(ctx, groupID)
 	if err != nil {
-		return nil, err
+		return err
+	}
+
+	prt, err := s.EC.User.Get(ctx, participatorID)
+	if err != nil {
+		return err
 	}
 
 	if grp.GroupType == group.GroupTypePrivate {
-		_, err := grp.QueryUsers().Where(user.ID(userID)).Only(ctx)
+		_, err := grp.QueryUsers().Where(user.ID(prt.ID)).Only(ctx)
 		if err != nil {
-			return nil, fmt.Errorf("checking user is a group participant: %v", err)
+			return fmt.Errorf("checking user is a group participant: %v", err)
 		}
-	} else if u.Role == user.RoleStudent {
+	} else if prt.Role == user.RoleStudent {
 		stg, err := grp.QueryClass().QueryStage().Only(ctx)
 		if err != nil {
-			return nil, fmt.Errorf("retrieving stage: %v", err)
+			return fmt.Errorf("retrieving stage: %v", err)
 		}
 
-		if uStage, err := u.Stage(ctx); err != nil || uStage.ID.String() != stg.ID.String() {
-			return nil, fmt.Errorf("not allowed to listen in this group")
+		if pStg, err := prt.Stage(ctx); err != nil || pStg.ID.String() != stg.ID.String() {
+			return fmt.Errorf("not allowed to participate in this group")
 		}
-	} else if u.Role == user.RoleTeacher {
+	} else if prt.Role == user.RoleTeacher {
 		sch, err := grp.QueryClass().QueryStage().QuerySchool().Only(ctx)
 		if err != nil {
-			return nil, fmt.Errorf("retrieving school: %v", err)
+			return fmt.Errorf("retrieving school: %v", err)
 		}
 
-		if uSchool, err := u.School(ctx); err != nil || uSchool.ID.String() != sch.ID.String() {
-			return nil, fmt.Errorf("not allowed to listen in this group")
+		if pSch, err := prt.School(ctx); err != nil || pSch.ID.String() != sch.ID.String() {
+			return fmt.Errorf("not allowed to participate in this group")
 		}
 	}
 
+	return nil
+}
+
+func (s *Service) observeGroup(ctx context.Context, groupID uuid.UUID) <-chan *ent.Message {
 	ch := make(chan *ent.Message, 1)
 
-	s.mu.Lock()
-	if _, ok := s.msgChannels[groupID]; !ok {
-		s.msgChannels[groupID] = make(map[ksuid.KSUID]chan *ent.Message)
+	s.Lock()
+	if _, ok := s.observers[groupID]; !ok {
+		s.observers[groupID] = make(map[ksuid.KSUID]chan *ent.Message)
 	}
-
 	id := ksuid.New()
-	s.msgChannels[groupID][id] = ch
-	s.mu.Unlock()
+	s.observers[groupID][id] = ch
+	s.Unlock()
 
 	go func() {
 		<-ctx.Done()
-		s.mu.Lock()
-		delete(s.msgChannels[groupID], id)
-		if len(s.msgChannels[groupID]) == 0 {
-			delete(s.msgChannels, groupID)
+		s.Lock()
+		delete(s.observers[groupID], id)
+		if len(s.observers[groupID]) == 0 {
+			delete(s.observers, groupID)
 		}
 		close(ch)
-		s.mu.Unlock()
+		s.Unlock()
 	}()
 
-	return ch, nil
+	return ch
 }

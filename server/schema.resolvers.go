@@ -128,12 +128,7 @@ func (r *mutationResolver) PostMessage(ctx context.Context, input model.PostMess
 		return nil, auth.UnauthorizedErr
 	}
 
-	sender, err := r.s.EC.User.Get(ctx, u.ID)
-	if err != nil {
-		return nil, err
-	}
-
-	return r.s.PostMessage(ctx, sender, input)
+	return r.s.PostMessage(ctx, u.ID, input)
 }
 
 func (r *queryResolver) School(ctx context.Context, id uuid.UUID) (*ent.School, error) {
@@ -186,7 +181,7 @@ func (r *subscriptionResolver) MessagePosted(ctx context.Context, groupID uuid.U
 		return nil, auth.UnauthorizedErr
 	}
 
-	return r.s.RegisterGroupListener(ctx, groupID, u.ID)
+	return r.s.RegisterGroupObserver(ctx, groupID, u.ID)
 }
 
 // Mutation returns generated.MutationResolver implementation.

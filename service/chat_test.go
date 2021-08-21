@@ -32,7 +32,7 @@ func TestPostMessage(t *testing.T) {
 		require := require.New(t)
 
 		input := model.PostMessageInput{GroupID: grp.ID, Content: "message test content"}
-		got, err := s.PostMessage(ctx, stdt, input)
+		got, err := s.PostMessage(ctx, stdt.ID, input)
 		require.NoError(err)
 		require.NotNil(got)
 
@@ -58,7 +58,7 @@ func TestPostMessage(t *testing.T) {
 			ContentType: f.ContentType,
 		}}
 
-		got, err := s.PostMessage(ctx, stdt, input)
+		got, err := s.PostMessage(ctx, stdt.ID, input)
 		require.NoError(err)
 		require.NotNil(got)
 
@@ -87,7 +87,7 @@ func TestPostMessage(t *testing.T) {
 			ContentType: f.ContentType,
 		}}
 
-		got, err := s.PostMessage(ctx, outsiderStdt, input)
+		got, err := s.PostMessage(ctx, outsiderStdt.ID, input)
 		require.Error(err)
 		require.Nil(got)
 	})
@@ -106,27 +106,27 @@ func TestPostMessage(t *testing.T) {
 		sch := createSchool(ctx, s, "tesskd", "fkjds")
 		outsiderTchr := createTeacher(ctx, s, ksuid.New().String(), sch)
 		input := model.PostMessageInput{GroupID: grp.ID, Content: "message test content"}
-		got, err := s.PostMessage(ctx, outsiderTchr, input)
+		got, err := s.PostMessage(ctx, outsiderTchr.ID, input)
 		require.Error(err)
 		require.Nil(got)
 
 		// owner
 		input = model.PostMessageInput{GroupID: grp.ID, Content: "message test content"}
-		got, err = s.PostMessage(ctx, tchr, input)
+		got, err = s.PostMessage(ctx, tchr.ID, input)
 		require.NoError(err)
 		require.NotNil(got)
 		require.Equal(input.Content, got.Content)
 
 		// student
 		input = model.PostMessageInput{GroupID: grp.ID, Content: "message test content"}
-		got, err = s.PostMessage(ctx, stdt, input)
+		got, err = s.PostMessage(ctx, stdt.ID, input)
 		require.NoError(err)
 		require.NotNil(got)
 		require.Equal(input.Content, got.Content)
 	})
 }
 
-func TestRegisterGroupListener(t *testing.T) {
+func TestRegisterGroupObserver(t *testing.T) {
 	s := newService(t)
 	defer s.EC.Close()
 	ctx := context.Background()
@@ -140,11 +140,11 @@ func TestRegisterGroupListener(t *testing.T) {
 		require := require.New(t)
 		cancelableCtx, cancel := context.WithCancel(context.Background())
 
-		msgCh, err := s.RegisterGroupListener(cancelableCtx, grp.ID, stdt.ID)
+		msgCh, err := s.RegisterGroupObserver(cancelableCtx, grp.ID, stdt.ID)
 		require.NoError(err)
 
 		input := model.PostMessageInput{GroupID: grp.ID, Content: "message test content"}
-		msg, err := s.PostMessage(ctx, stdt, input)
+		msg, err := s.PostMessage(ctx, stdt.ID, input)
 		require.NoError(err)
 		require.NotNil(msg)
 
@@ -156,7 +156,7 @@ func TestRegisterGroupListener(t *testing.T) {
 		require.Equal(msg.Attachment, got.Attachment)
 
 		input = model.PostMessageInput{GroupID: grp.ID, Content: "message test content 2"}
-		msg, err = s.PostMessage(ctx, tchr, input)
+		msg, err = s.PostMessage(ctx, tchr.ID, input)
 		require.NoError(err)
 		require.NotNil(msg)
 
@@ -193,10 +193,10 @@ func TestRegisterGroupListener(t *testing.T) {
 			SetPhone("077059333812").SetDirectory("diresss22").SetPassword("mipassword22@@@@5").SetSchool(sch).SetStage(stg2).SaveX(ctx)
 
 		// student
-		msgCh, err := s.RegisterGroupListener(ctx, grp.ID, stdt.ID)
+		msgCh, err := s.RegisterGroupObserver(ctx, grp.ID, stdt.ID)
 		require.NoError(err)
 		input := model.PostMessageInput{GroupID: grp.ID, Content: "message test content"}
-		msg, err := s.PostMessage(ctx, stdt, input)
+		msg, err := s.PostMessage(ctx, stdt.ID, input)
 		require.NoError(err)
 		require.NotNil(msg)
 		got := <-msgCh
@@ -206,10 +206,10 @@ func TestRegisterGroupListener(t *testing.T) {
 		require.Equal(msg.Attachment, got.Attachment)
 
 		// teacher
-		msgCh, err = s.RegisterGroupListener(ctx, grp.ID, tchr.ID)
+		msgCh, err = s.RegisterGroupObserver(ctx, grp.ID, tchr.ID)
 		require.NoError(err)
 		input = model.PostMessageInput{GroupID: grp.ID, Content: "message test content"}
-		msg, err = s.PostMessage(ctx, stdt, input)
+		msg, err = s.PostMessage(ctx, stdt.ID, input)
 		require.NoError(err)
 		require.NotNil(msg)
 		got = <-msgCh
@@ -219,14 +219,14 @@ func TestRegisterGroupListener(t *testing.T) {
 		require.Equal(msg.Attachment, got.Attachment)
 
 		// outside student
-		msgCh, err = s.RegisterGroupListener(ctx, grp.ID, differentStageStdt.ID)
+		msgCh, err = s.RegisterGroupObserver(ctx, grp.ID, differentStageStdt.ID)
 		require.Error(err)
 		require.Nil(msgCh)
 
 		anotherSch := createSchool(ctx, s, "tet", "kdfjs")
 		// outside teacher
 		outsideTchr := createTeacher(ctx, s, "skdmyuniqueteachernaem", anotherSch)
-		msgCh, err = s.RegisterGroupListener(ctx, grp.ID, outsideTchr.ID)
+		msgCh, err = s.RegisterGroupObserver(ctx, grp.ID, outsideTchr.ID)
 		require.Error(err)
 		require.Nil(msgCh)
 	})
@@ -235,10 +235,10 @@ func TestRegisterGroupListener(t *testing.T) {
 		require := require.New(t)
 
 		// device 1
-		msgCh, err := s.RegisterGroupListener(ctx, grp.ID, stdt.ID)
+		msgCh, err := s.RegisterGroupObserver(ctx, grp.ID, stdt.ID)
 		require.NoError(err)
 		input := model.PostMessageInput{GroupID: grp.ID, Content: "message test content"}
-		msg, err := s.PostMessage(ctx, stdt, input)
+		msg, err := s.PostMessage(ctx, stdt.ID, input)
 		require.NoError(err)
 		require.NotNil(msg)
 		got := <-msgCh
@@ -249,10 +249,10 @@ func TestRegisterGroupListener(t *testing.T) {
 		require.Equal(msg.Attachment, got.Attachment)
 
 		// device 2
-		msgCh2, err := s.RegisterGroupListener(ctx, grp.ID, stdt.ID)
+		msgCh2, err := s.RegisterGroupObserver(ctx, grp.ID, stdt.ID)
 		require.NoError(err)
 		input = model.PostMessageInput{GroupID: grp.ID, Content: "message test content"}
-		msg, err = s.PostMessage(ctx, stdt, input)
+		msg, err = s.PostMessage(ctx, stdt.ID, input)
 		require.NoError(err)
 		require.NotNil(msg)
 		got = <-msgCh2
