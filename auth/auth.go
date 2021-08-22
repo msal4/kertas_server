@@ -36,10 +36,12 @@ type userData struct {
 	Role user.Role
 }
 
-const authCtxKey = "user"
+type ctxKey string
+
+const userCtxKey ctxKey = "user"
 
 func UserForContext(ctx context.Context) (userData, bool) {
-	data, ok := ctx.Value(authCtxKey).(userData)
+	data, ok := ctx.Value(userCtxKey).(userData)
 	return data, ok
 }
 
@@ -107,7 +109,7 @@ func ParseAuth(ctx context.Context, authHeader, accessKey string) (context.Conte
 		return ctx, errors.New("invalid token")
 	}
 
-	return context.WithValue(ctx, authCtxKey, userData{ID: claims.UserID, Role: claims.Role}), nil
+	return context.WithValue(ctx, userCtxKey, userData{ID: claims.UserID, Role: claims.Role}), nil
 }
 
 func Middleware(h http.Handler, accessKey string) http.Handler {
