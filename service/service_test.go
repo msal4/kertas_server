@@ -16,6 +16,7 @@ import (
 	"github.com/minio/minio-go/v7/pkg/credentials"
 	"github.com/msal4/hassah_school_server/ent"
 	"github.com/msal4/hassah_school_server/ent/enttest"
+	"github.com/msal4/hassah_school_server/ent/user"
 	"github.com/msal4/hassah_school_server/service"
 	"github.com/msal4/hassah_school_server/util"
 	"github.com/stretchr/testify/require"
@@ -49,4 +50,15 @@ func newService(t *testing.T) *service.Service {
 	s, err := service.New(ec, mc, nil)
 	require.NoError(t, err)
 	return s
+}
+
+func createTeacher(ctx context.Context, s *service.Service, username string, sch *ent.School) *ent.User {
+	return s.EC.User.Create().SetName("testu4serd" + username).SetUsername(username).
+		SetPhone("077059333812").SetDirectory("diresss22" + username).SetPassword("mipassword22@@@@5").SetSchool(sch).SetRole(user.RoleTeacher).SaveX(ctx)
+}
+
+func createStudent(ctx context.Context, s *service.Service, username string, sch *ent.School) *ent.User {
+	stage := s.EC.Stage.Create().SetName("2nd").SetDirectory("hello").SetTuitionAmount(122).SetSchool(sch).SaveX(ctx)
+	return s.EC.User.Create().SetName("test userd" + username).SetUsername(username).
+		SetPhone("077059333812").SetDirectory("diresss22" + username).SetPassword("mipassword22@@@@5").SetSchool(sch).SetStage(stage).SaveX(ctx)
 }

@@ -197,6 +197,50 @@ type AuthData {
   refreshToken: String!
 }
 
+type Group {
+  id: ID!
+  name: String!
+  groupType: GroupType!
+  active: Boolean!
+  createdAt: Time!
+  updatedAt: Time!
+}
+
+type Message {
+  id: ID!
+  content: String!
+  attachment: String!
+  createdAt: Time!
+  updatedAt: Time!
+}
+
+enum MessageOrderField {
+    CREATED_AT
+    UPDATED_AT
+}
+
+input MessageOrder {
+    field: MessageOrderField
+    direction: OrderDirection!
+}
+
+type MessageEdge {
+  node: Message
+  cursor: Cursor!
+}
+
+type MessageConnection {
+  totalCount: Int!
+  pageInfo: PageInfo!
+  edges: [MessageEdge]
+}
+
+input PostMessageInput {
+  groupID: ID!
+  content: String!
+  attachment: Upload
+}
+
 type Query {
   school(id: ID!): School
   schools(after: Cursor, first: Int, before: Cursor, last: Int, orderBy: SchoolOrder, where: SchoolWhereInput): SchoolConnection
@@ -206,6 +250,8 @@ type Query {
 
   stage(id: ID!): Stage
   stages(after: Cursor, first: Int, before: Cursor, last: Int, orderBy: StageOrder, where: StageWhereInput): StageConnection
+
+  messages(groupID: ID!, after: Cursor, first: Int, before: Cursor, last: Int, orderBy: MessageOrder, where: MessageWhereInput): MessageConnection
 }
 
 type Mutation {
@@ -227,4 +273,10 @@ type Mutation {
   loginAdmin(input: LoginInput!): AuthData
   loginUser(input: LoginInput!): AuthData
   refreshTokens(token: String!): AuthData
+
+  postMessage(input: PostMessageInput!): Message
+}
+
+type Subscription {
+  messagePosted(groupID: ID!): Message!
 }

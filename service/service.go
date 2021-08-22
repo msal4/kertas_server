@@ -5,11 +5,14 @@ import (
 	"fmt"
 	"log"
 	"math/rand"
+	"sync"
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/minio/minio-go/v7"
 	"github.com/msal4/hassah_school_server/auth"
 	"github.com/msal4/hassah_school_server/ent"
+	"github.com/segmentio/ksuid"
 )
 
 type Config struct {
@@ -58,6 +61,11 @@ type Config struct {
 	auth.AuthConfig `yaml:"auth"`
 }
 
+type chatObservers struct {
+	observers map[uuid.UUID]map[ksuid.KSUID]chan *ent.Message
+	sync.Mutex
+}
+
 type Service struct {
 	// EC is the entity client used to interact with the database.
 	EC *ent.Client
@@ -67,6 +75,8 @@ type Service struct {
 
 	// Config is all of the server configuration.
 	Config *Config
+
+	chatObservers
 }
 
 // New creates a new initialized and configured service.
@@ -87,7 +97,12 @@ func New(ec *ent.Client, mc *minio.Client, cfg *Config) (*Service, error) {
 		log.Printf("created bucket %q.\n", cfg.RootBucket)
 	}
 
-	return &Service{EC: ec, MC: mc, Config: cfg}, nil
+	return &Service{
+		EC:            ec,
+		MC:            mc,
+		Config:        cfg,
+		chatObservers: chatObservers{observers: make(map[uuid.UUID]map[ksuid.KSUID]chan *ent.Message)},
+	}, nil
 }
 
 // Config defaults.

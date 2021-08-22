@@ -454,7 +454,7 @@ func (gr *Group) Node(ctx context.Context) (node *Node, err error) {
 		ID:     gr.ID,
 		Type:   "Group",
 		Fields: make([]*Field, 6),
-		Edges:  make([]*Edge, 2),
+		Edges:  make([]*Edge, 3),
 	}
 	var buf []byte
 	if buf, err = json.Marshal(gr.CreatedAt); err != nil {
@@ -516,12 +516,22 @@ func (gr *Group) Node(ctx context.Context) (node *Node, err error) {
 		return nil, err
 	}
 	node.Edges[1] = &Edge{
+		Type: "User",
+		Name: "users",
+	}
+	err = gr.QueryUsers().
+		Select(user.FieldID).
+		Scan(ctx, &node.Edges[1].IDs)
+	if err != nil {
+		return nil, err
+	}
+	node.Edges[2] = &Edge{
 		Type: "Message",
 		Name: "messages",
 	}
 	err = gr.QueryMessages().
 		Select(message.FieldID).
-		Scan(ctx, &node.Edges[1].IDs)
+		Scan(ctx, &node.Edges[2].IDs)
 	if err != nil {
 		return nil, err
 	}
@@ -898,7 +908,7 @@ func (u *User) Node(ctx context.Context) (node *Node, err error) {
 		ID:     u.ID,
 		Type:   "User",
 		Fields: make([]*Field, 12),
-		Edges:  make([]*Edge, 8),
+		Edges:  make([]*Edge, 9),
 	}
 	var buf []byte
 	if buf, err = json.Marshal(u.CreatedAt); err != nil {
@@ -1074,6 +1084,16 @@ func (u *User) Node(ctx context.Context) (node *Node, err error) {
 	err = u.QueryGrades().
 		Select(grade.FieldID).
 		Scan(ctx, &node.Edges[7].IDs)
+	if err != nil {
+		return nil, err
+	}
+	node.Edges[8] = &Edge{
+		Type: "Group",
+		Name: "groups",
+	}
+	err = u.QueryGroups().
+		Select(group.FieldID).
+		Scan(ctx, &node.Edges[8].IDs)
 	if err != nil {
 		return nil, err
 	}

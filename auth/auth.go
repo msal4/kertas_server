@@ -49,6 +49,10 @@ func IsAuthorized(ctx context.Context, allowedRoles ...user.Role) bool {
 		return false
 	}
 
+	if len(allowedRoles) == 0 {
+		return true
+	}
+
 	for _, r := range allowedRoles {
 		if r == u.Role {
 			return true
@@ -82,32 +86,36 @@ func IsStudent(ctx context.Context) bool {
 	return IsAuthorized(ctx, user.RoleStudent)
 }
 
+func ParseAuth(ctx context.Context, authHeader, accessKey string) (context.Context, error) {
+	authHeader = strings.TrimSpace(authHeader)
+	tokenStr := strings.TrimPrefix(authHeader, "Bearer ")
+	if tokenStr == "" {
+		return ctx, nil
+	}
+
+	getSecret := func(token *jwt.Token) (interface{}, error) {
+		return []byte(accessKey), nil
+	}
+
+	var claims AccessClaims
+	t, err := jwt.ParseWithClaims(tokenStr, &claims, getSecret)
+	if err != nil {
+		return ctx, fmt.Errorf("invalid token: %v", err)
+	}
+
+	if !t.Valid {
+		return ctx, errors.New("invalid token")
+	}
+
+	return context.WithValue(ctx, authCtxKey, userData{ID: claims.UserID, Role: claims.Role}), nil
+}
+
 func Middleware(h http.Handler, accessKey string) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		authHeader := strings.TrimSpace(r.Header.Get("authorization"))
-		tokenStr := strings.TrimPrefix(authHeader, "Bearer ")
-
-		if tokenStr == "" {
-			h.ServeHTTP(w, r)
-			return
-		}
-
-		getSecret := func(token *jwt.Token) (interface{}, error) {
-			return []byte(accessKey), nil
-		}
-		var claims AccessClaims
-		t, err := jwt.ParseWithClaims(tokenStr, &claims, getSecret)
+		ctx, err := ParseAuth(r.Context(), r.Header.Get("authorization"), accessKey)
 		if err != nil {
-			http.Error(w, fmt.Sprintf("invalid token: %v", err), http.StatusUnauthorized)
-			return
+			http.Error(w, err.Error(), http.StatusUnauthorized)
 		}
-
-		if !t.Valid {
-			http.Error(w, "invalid token", http.StatusUnauthorized)
-			return
-		}
-
-		ctx := context.WithValue(r.Context(), authCtxKey, userData{ID: claims.UserID, Role: claims.Role})
 
 		h.ServeHTTP(w, r.WithContext(ctx))
 	})

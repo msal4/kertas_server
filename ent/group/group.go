@@ -30,6 +30,8 @@ const (
 	FieldDeletedAt = "deleted_at"
 	// EdgeClass holds the string denoting the class edge name in mutations.
 	EdgeClass = "class"
+	// EdgeUsers holds the string denoting the users edge name in mutations.
+	EdgeUsers = "users"
 	// EdgeMessages holds the string denoting the messages edge name in mutations.
 	EdgeMessages = "messages"
 	// Table holds the table name of the group in the database.
@@ -41,6 +43,11 @@ const (
 	ClassInverseTable = "classes"
 	// ClassColumn is the table column denoting the class relation/edge.
 	ClassColumn = "class_group"
+	// UsersTable is the table that holds the users relation/edge. The primary key declared below.
+	UsersTable = "user_groups"
+	// UsersInverseTable is the table name for the User entity.
+	// It exists in this package in order to avoid circular dependency with the "user" package.
+	UsersInverseTable = "users"
 	// MessagesTable is the table that holds the messages relation/edge.
 	MessagesTable = "messages"
 	// MessagesInverseTable is the table name for the Message entity.
@@ -66,6 +73,12 @@ var Columns = []string{
 var ForeignKeys = []string{
 	"class_group",
 }
+
+var (
+	// UsersPrimaryKey and UsersColumn2 are the table columns denoting the
+	// primary key for the users relation (M2M).
+	UsersPrimaryKey = []string{"user_id", "group_id"}
+)
 
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {
@@ -98,13 +111,13 @@ var (
 // GroupType defines the type for the "group_type" enum field.
 type GroupType string
 
-// GroupTypeSHARED is the default value of the GroupType enum.
-const DefaultGroupType = GroupTypeSHARED
+// GroupTypeShared is the default value of the GroupType enum.
+const DefaultGroupType = GroupTypeShared
 
 // GroupType values.
 const (
-	GroupTypePRIVATE GroupType = "PRIVATE"
-	GroupTypeSHARED  GroupType = "SHARED"
+	GroupTypePrivate GroupType = "PRIVATE"
+	GroupTypeShared  GroupType = "SHARED"
 )
 
 func (gt GroupType) String() string {
@@ -114,7 +127,7 @@ func (gt GroupType) String() string {
 // GroupTypeValidator is a validator for the "group_type" field enum values. It is called by the builders before save.
 func GroupTypeValidator(gt GroupType) error {
 	switch gt {
-	case GroupTypePRIVATE, GroupTypeSHARED:
+	case GroupTypePrivate, GroupTypeShared:
 		return nil
 	default:
 		return fmt.Errorf("group: invalid enum value for group_type field: %q", gt)
