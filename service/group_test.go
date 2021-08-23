@@ -225,8 +225,6 @@ func TestUpdateGroup(t *testing.T) {
 	})
 }
 
-var ctx = context.Background()
-
 func TestDeleteGroup(t *testing.T) {
 	s := newService(t)
 	defer s.EC.Close()

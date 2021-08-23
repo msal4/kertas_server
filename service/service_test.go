@@ -23,6 +23,7 @@ import (
 )
 
 var mc *minio.Client
+var ctx = context.Background()
 
 func TestMain(m *testing.M) {
 	godotenv.Load("../.env")
