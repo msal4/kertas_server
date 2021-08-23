@@ -49,7 +49,12 @@ func NewDefaultServer(cfg Config) (*http.ServeMux, error) {
 		cfg.DatabaseDialect = dialect.Postgres
 	}
 
-	ec, err := ent.Open(cfg.DatabaseDialect, cfg.DatabaseURL)
+	entOpts := []ent.Option{}
+	if cfg.Debug {
+		entOpts = append(entOpts, ent.Debug())
+	}
+
+	ec, err := ent.Open(cfg.DatabaseDialect, cfg.DatabaseURL, entOpts...)
 	if err != nil {
 		return nil, fmt.Errorf("establishing db connection: %v", err)
 	}
