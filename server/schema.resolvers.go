@@ -5,11 +5,11 @@ package server
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/google/uuid"
 	"github.com/msal4/hassah_school_server/auth"
 	"github.com/msal4/hassah_school_server/ent"
+	"github.com/msal4/hassah_school_server/ent/user"
 	"github.com/msal4/hassah_school_server/server/generated"
 	"github.com/msal4/hassah_school_server/server/model"
 	"github.com/msal4/hassah_school_server/service"
@@ -132,19 +132,32 @@ func (r *mutationResolver) PostMessage(ctx context.Context, input model.PostMess
 }
 
 func (r *mutationResolver) AddGroup(ctx context.Context, input model.AddGroupInput) (*ent.Group, error) {
-	panic(fmt.Errorf("not implemented"))
+	u, ok := auth.UserForContext(ctx)
+	if !ok {
+		return nil, auth.UnauthorizedErr
+	}
+
+	return r.s.AddGroup(ctx, service.AddGroupInput{
+		Name:    input.Name,
+		Active:  input.Active,
+		UserIDs: []uuid.UUID{u.ID, input.UserID},
+	})
 }
 
 func (r *mutationResolver) UpdateGroup(ctx context.Context, id uuid.UUID, input model.UpdateGroupInput) (*ent.Group, error) {
-	panic(fmt.Errorf("not implemented"))
+	if !auth.IsAdmin(ctx) {
+		return nil, auth.UnauthorizedErr
+	}
+
+	return r.s.UpdateGroup(ctx, id, input)
 }
 
 func (r *mutationResolver) DeleteGroup(ctx context.Context, id uuid.UUID) (bool, error) {
-	panic(fmt.Errorf("not implemented"))
-}
+	if !auth.IsAdmin(ctx) {
+		return false, auth.UnauthorizedErr
+	}
 
-func (r *mutationResolver) DeleteGroupPermanently(ctx context.Context, id uuid.UUID) (bool, error) {
-	panic(fmt.Errorf("not implemented"))
+	return true, r.s.DeleteGroup(ctx, id)
 }
 
 func (r *queryResolver) School(ctx context.Context, id uuid.UUID) (*ent.School, error) {
@@ -201,7 +214,24 @@ func (r *queryResolver) Messages(ctx context.Context, groupID uuid.UUID, after *
 }
 
 func (r *queryResolver) Groups(ctx context.Context, userID *uuid.UUID, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.GroupOrder, where *ent.GroupWhereInput) (*ent.GroupConnection, error) {
-	panic(fmt.Errorf("not implemented"))
+	u, ok := auth.UserForContext(ctx)
+	if !ok {
+		return nil, auth.UnauthorizedErr
+	}
+
+	if u.Role == user.RoleStudent || u.Role == user.RoleTeacher || userID == nil {
+		userID = &u.ID
+	}
+
+	return r.s.Groups(ctx, service.GroupsOptions{
+		UserID:  userID,
+		After:   after,
+		First:   first,
+		Before:  before,
+		Last:    last,
+		OrderBy: orderBy,
+		Where:   where,
+	})
 }
 
 func (r *subscriptionResolver) MessagePosted(ctx context.Context, groupID uuid.UUID) (<-chan *ent.Message, error) {

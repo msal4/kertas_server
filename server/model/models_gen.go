@@ -9,10 +9,9 @@ import (
 )
 
 type AddGroupInput struct {
-	Name    string     `json:"name"`
-	Active  bool       `json:"active"`
-	ClassID *uuid.UUID `json:"classID"`
-	UserID  *uuid.UUID `json:"userID"`
+	Name   string    `json:"name"`
+	Active bool      `json:"active"`
+	UserID uuid.UUID `json:"userID"`
 }
 
 type AddSchoolInput struct {

@@ -231,8 +231,7 @@ type GroupConnection {
 input AddGroupInput {
   name: String!
   active: Boolean! = true
-  classID: ID
-  userID: ID
+  userID: ID!
 }
 
 input UpdateGroupInput {
@@ -315,7 +314,6 @@ type Mutation {
   addGroup(input: AddGroupInput!): Group
   updateGroup(id: ID!, input: UpdateGroupInput!): Group
   deleteGroup(id: ID!): Boolean!
-  deleteGroupPermanently(id: ID!): Boolean!
 }
 
 type Subscription {

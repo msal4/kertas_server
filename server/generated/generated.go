@@ -103,7 +103,6 @@ type ComplexityRoot struct {
 		AddStage                func(childComplexity int, input model.AddStageInput) int
 		AddUser                 func(childComplexity int, input model.AddUserInput) int
 		DeleteGroup             func(childComplexity int, id uuid.UUID) int
-		DeleteGroupPermanently  func(childComplexity int, id uuid.UUID) int
 		DeleteSchool            func(childComplexity int, id uuid.UUID) int
 		DeleteSchoolPermanently func(childComplexity int, id uuid.UUID) int
 		DeleteStage             func(childComplexity int, id uuid.UUID) int
@@ -229,7 +228,6 @@ type MutationResolver interface {
 	AddGroup(ctx context.Context, input model.AddGroupInput) (*ent.Group, error)
 	UpdateGroup(ctx context.Context, id uuid.UUID, input model.UpdateGroupInput) (*ent.Group, error)
 	DeleteGroup(ctx context.Context, id uuid.UUID) (bool, error)
-	DeleteGroupPermanently(ctx context.Context, id uuid.UUID) (bool, error)
 }
 type QueryResolver interface {
 	School(ctx context.Context, id uuid.UUID) (*ent.School, error)
@@ -480,18 +478,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.DeleteGroup(childComplexity, args["id"].(uuid.UUID)), true
-
-	case "Mutation.deleteGroupPermanently":
-		if e.complexity.Mutation.DeleteGroupPermanently == nil {
-			break
-		}
-
-		args, err := ec.field_Mutation_deleteGroupPermanently_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Mutation.DeleteGroupPermanently(childComplexity, args["id"].(uuid.UUID)), true
 
 	case "Mutation.deleteSchool":
 		if e.complexity.Mutation.DeleteSchool == nil {
@@ -1384,8 +1370,7 @@ type GroupConnection {
 input AddGroupInput {
   name: String!
   active: Boolean! = true
-  classID: ID
-  userID: ID
+  userID: ID!
 }
 
 input UpdateGroupInput {
@@ -1468,7 +1453,6 @@ type Mutation {
   addGroup(input: AddGroupInput!): Group
   updateGroup(id: ID!, input: UpdateGroupInput!): Group
   deleteGroup(id: ID!): Boolean!
-  deleteGroupPermanently(id: ID!): Boolean!
 }
 
 type Subscription {
@@ -2656,21 +2640,6 @@ func (ec *executionContext) field_Mutation_addUser_args(ctx context.Context, raw
 		}
 	}
 	args["input"] = arg0
-	return args, nil
-}
-
-func (ec *executionContext) field_Mutation_deleteGroupPermanently_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 uuid.UUID
-	if tmp, ok := rawArgs["id"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
-		arg0, err = ec.unmarshalNID2githubᚗcomᚋgoogleᚋuuidᚐUUID(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["id"] = arg0
 	return args, nil
 }
 
@@ -4905,48 +4874,6 @@ func (ec *executionContext) _Mutation_deleteGroup(ctx context.Context, field gra
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.Mutation().DeleteGroup(rctx, args["id"].(uuid.UUID))
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(bool)
-	fc.Result = res
-	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _Mutation_deleteGroupPermanently(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "Mutation",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   true,
-		IsResolver: true,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	rawArgs := field.ArgumentMap(ec.Variables)
-	args, err := ec.field_Mutation_deleteGroupPermanently_args(ctx, rawArgs)
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	fc.Args = args
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().DeleteGroupPermanently(rctx, args["id"].(uuid.UUID))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -7983,19 +7910,11 @@ func (ec *executionContext) unmarshalInputAddGroupInput(ctx context.Context, obj
 			if err != nil {
 				return it, err
 			}
-		case "classID":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("classID"))
-			it.ClassID, err = ec.unmarshalOID2ᚖgithubᚗcomᚋgoogleᚋuuidᚐUUID(ctx, v)
-			if err != nil {
-				return it, err
-			}
 		case "userID":
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("userID"))
-			it.UserID, err = ec.unmarshalOID2ᚖgithubᚗcomᚋgoogleᚋuuidᚐUUID(ctx, v)
+			it.UserID, err = ec.unmarshalNID2githubᚗcomᚋgoogleᚋuuidᚐUUID(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -15468,11 +15387,6 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			out.Values[i] = ec._Mutation_updateGroup(ctx, field)
 		case "deleteGroup":
 			out.Values[i] = ec._Mutation_deleteGroup(ctx, field)
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
-		case "deleteGroupPermanently":
-			out.Values[i] = ec._Mutation_deleteGroupPermanently(ctx, field)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
