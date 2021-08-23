@@ -151,7 +151,6 @@ type Stage implements Node {
   updatedAt: Time!
 }
 
-
 enum StageOrderField {
     NAME
     CREATED_AT
@@ -206,6 +205,41 @@ type Group {
   updatedAt: Time!
 }
 
+enum GroupOrderField {
+    NAME
+    CREATED_AT
+    UPDATED_AT
+}
+
+input GroupOrder {
+    field: GroupOrderField
+    direction: OrderDirection!
+}
+
+type GroupEdge {
+  node: Group
+  cursor: Cursor!
+}
+
+type GroupConnection {
+  totalCount: Int!
+  pageInfo: PageInfo!
+  edges: [GroupEdge]
+}
+
+
+input AddGroupInput {
+  name: String!
+  active: Boolean! = true
+  classID: ID
+  userID: ID
+}
+
+input UpdateGroupInput {
+  name: String
+  active: Boolean
+}
+
 type Message {
   id: ID!
   content: String!
@@ -252,6 +286,8 @@ type Query {
   stages(after: Cursor, first: Int, before: Cursor, last: Int, orderBy: StageOrder, where: StageWhereInput): StageConnection
 
   messages(groupID: ID!, after: Cursor, first: Int, before: Cursor, last: Int, orderBy: MessageOrder, where: MessageWhereInput): MessageConnection
+
+  groups(userID: ID, after: Cursor, first: Int, before: Cursor, last: Int, orderBy: GroupOrder, where: GroupWhereInput): GroupConnection
 }
 
 type Mutation {
@@ -275,6 +311,11 @@ type Mutation {
   refreshTokens(token: String!): AuthData
 
   postMessage(input: PostMessageInput!): Message
+
+  addGroup(input: AddGroupInput!): Group
+  updateGroup(id: ID!, input: UpdateGroupInput!): Group
+  deleteGroup(id: ID!): Boolean!
+  deleteGroupPermanently(id: ID!): Boolean!
 }
 
 type Subscription {

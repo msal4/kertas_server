@@ -8,6 +8,13 @@ import (
 	"github.com/msal4/hassah_school_server/ent/user"
 )
 
+type AddGroupInput struct {
+	Name    string     `json:"name"`
+	Active  bool       `json:"active"`
+	ClassID *uuid.UUID `json:"classID"`
+	UserID  *uuid.UUID `json:"userID"`
+}
+
 type AddSchoolInput struct {
 	Name   string         `json:"name"`
 	Image  graphql.Upload `json:"image"`
@@ -47,6 +54,11 @@ type PostMessageInput struct {
 	GroupID    uuid.UUID       `json:"groupID"`
 	Content    string          `json:"content"`
 	Attachment *graphql.Upload `json:"attachment"`
+}
+
+type UpdateGroupInput struct {
+	Name   *string `json:"name"`
+	Active *bool   `json:"active"`
 }
 
 type UpdateSchoolInput struct {

@@ -5,6 +5,7 @@ package server
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/google/uuid"
 	"github.com/msal4/hassah_school_server/auth"
@@ -130,6 +131,22 @@ func (r *mutationResolver) PostMessage(ctx context.Context, input model.PostMess
 	return r.s.PostMessage(ctx, u.ID, input)
 }
 
+func (r *mutationResolver) AddGroup(ctx context.Context, input model.AddGroupInput) (*ent.Group, error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
+func (r *mutationResolver) UpdateGroup(ctx context.Context, id uuid.UUID, input model.UpdateGroupInput) (*ent.Group, error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
+func (r *mutationResolver) DeleteGroup(ctx context.Context, id uuid.UUID) (bool, error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
+func (r *mutationResolver) DeleteGroupPermanently(ctx context.Context, id uuid.UUID) (bool, error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
 func (r *queryResolver) School(ctx context.Context, id uuid.UUID) (*ent.School, error) {
 	return r.s.EC.School.Get(ctx, id)
 }
@@ -181,6 +198,10 @@ func (r *queryResolver) Messages(ctx context.Context, groupID uuid.UUID, after *
 	}
 
 	return r.s.Messages(ctx, groupID, service.MessagesOptions{After: after, First: first, Before: before, Last: last, OrderBy: orderBy, Where: where})
+}
+
+func (r *queryResolver) Groups(ctx context.Context, userID *uuid.UUID, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.GroupOrder, where *ent.GroupWhereInput) (*ent.GroupConnection, error) {
+	panic(fmt.Errorf("not implemented"))
 }
 
 func (r *subscriptionResolver) MessagePosted(ctx context.Context, groupID uuid.UUID) (<-chan *ent.Message, error) {

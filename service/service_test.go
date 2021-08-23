@@ -46,7 +46,7 @@ var randomSource = rand.NewSource(time.Now().Unix())
 func newService(t *testing.T) *service.Service {
 	db := util.RandomString(randomSource, 6) + time.Now().Format("04-05")
 
-	ec := enttest.Open(t, dialect.SQLite, fmt.Sprintf("file:%s?mode=memory&cache=shared&_fk=1", db), enttest.WithOptions(ent.Log(t.Log), ent.Debug()))
+	ec := enttest.Open(t, dialect.SQLite, fmt.Sprintf("file:%s?mode=memory&cache=shared&_fk=1", db), enttest.WithOptions(ent.Log(t.Log)))
 	s, err := service.New(ec, mc, nil)
 	require.NoError(t, err)
 	return s
