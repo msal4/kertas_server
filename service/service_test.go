@@ -52,13 +52,37 @@ func newService(t *testing.T) *service.Service {
 	return s
 }
 
+func createSuperAdmin(ctx context.Context, s *service.Service, username string) *ent.User {
+	return s.EC.User.Create().SetName("testu4serd" + username).SetUsername(username).
+		SetPhone("077059333812").SetDirectory("diresss22" + username).SetPassword("mipassword22@@@@5").
+		SetRole(user.RoleSuperAdmin).SaveX(ctx)
+}
+
+func createSchoolAdmin(ctx context.Context, s *service.Service, username string, sch *ent.School) *ent.User {
+	return s.EC.User.Create().SetName("testu4serd" + username).SetUsername(username).
+		SetPhone("077059333812").SetDirectory("diresss22" + username).SetPassword("mipassword22@@@@5").SetSchool(sch).SetRole(user.RoleSchoolAdmin).SaveX(ctx)
+}
+
 func createTeacher(ctx context.Context, s *service.Service, username string, sch *ent.School) *ent.User {
 	return s.EC.User.Create().SetName("testu4serd" + username).SetUsername(username).
 		SetPhone("077059333812").SetDirectory("diresss22" + username).SetPassword("mipassword22@@@@5").SetSchool(sch).SetRole(user.RoleTeacher).SaveX(ctx)
 }
 
-func createStudent(ctx context.Context, s *service.Service, username string, sch *ent.School) *ent.User {
-	stage := s.EC.Stage.Create().SetName("2nd").SetDirectory("hello").SetTuitionAmount(122).SetSchool(sch).SaveX(ctx)
+func createStudent(ctx context.Context, s *service.Service, username string, sch *ent.School, stg ...*ent.Stage) *ent.User {
+	if len(stg) == 0 {
+		stg = append(stg, s.EC.Stage.Create().SetName("2nd").SetDirectory("hello").
+			SetTuitionAmount(122).SetSchool(sch).SaveX(ctx))
+	}
 	return s.EC.User.Create().SetName("test userd" + username).SetUsername(username).
-		SetPhone("077059333812").SetDirectory("diresss22" + username).SetPassword("mipassword22@@@@5").SetSchool(sch).SetStage(stage).SaveX(ctx)
+		SetPhone("077059333812").SetDirectory("diresss22" + username).SetPassword("mipassword22@@@@5").SetSchool(sch).SetStage(stg[0]).SaveX(ctx)
+}
+
+func createSchool(ctx context.Context, s *service.Service, name, image string) *ent.School {
+	return s.EC.School.Create().SetName(name).SetImage(image).SetDirectory("test_dir").SaveX(ctx)
+}
+
+func createStage(ctx context.Context, s *service.Service, name string, tuition int) *ent.Stage {
+	sch := createSchool(ctx, s, "school for"+name, "image/"+name)
+	return s.EC.Stage.Create().SetName(name).SetDirectory("testdir" + name).SetTuitionAmount(tuition).
+		SetSchool(sch).SaveX(ctx)
 }

@@ -300,12 +300,3 @@ func TestDeleteStagePermanently(t *testing.T) {
 		require.Error(t, err)
 	})
 }
-
-func createSchool(ctx context.Context, s *service.Service, name, image string) *ent.School {
-	return s.EC.School.Create().SetName(name).SetImage(image).SetDirectory("test_dir").SaveX(ctx)
-}
-
-func createStage(ctx context.Context, s *service.Service, name string, tuition int) *ent.Stage {
-	sch := createSchool(ctx, s, "school for"+name, "image/"+name)
-	return s.EC.Stage.Create().SetName(name).SetDirectory("testdir" + name).SetTuitionAmount(tuition).SetSchool(sch).SaveX(ctx)
-}
