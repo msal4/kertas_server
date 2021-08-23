@@ -286,6 +286,7 @@ type Query {
 
   messages(groupID: ID!, after: Cursor, first: Int, before: Cursor, last: Int, orderBy: MessageOrder, where: MessageWhereInput): MessageConnection
 
+  group(id: ID!): Group
   groups(userID: ID, after: Cursor, first: Int, before: Cursor, last: Int, orderBy: GroupOrder, where: GroupWhereInput): GroupConnection
 }
 

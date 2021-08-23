@@ -213,6 +213,10 @@ func (r *queryResolver) Messages(ctx context.Context, groupID uuid.UUID, after *
 	return r.s.Messages(ctx, groupID, service.MessagesOptions{After: after, First: first, Before: before, Last: last, OrderBy: orderBy, Where: where})
 }
 
+func (r *queryResolver) Group(ctx context.Context, id uuid.UUID) (*ent.Group, error) {
+	return r.s.EC.Group.Get(ctx, id)
+}
+
 func (r *queryResolver) Groups(ctx context.Context, userID *uuid.UUID, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.GroupOrder, where *ent.GroupWhereInput) (*ent.GroupConnection, error) {
 	u, ok := auth.UserForContext(ctx)
 	if !ok {
