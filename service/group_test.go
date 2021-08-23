@@ -244,5 +244,5 @@ func TestDeleteGroup(t *testing.T) {
 	require.NotNil(grp.DeletedAt)
 
 	grp2 = s.EC.Group.GetX(ctx, grp2.ID)
-	require.Nil(grp.DeletedAt)
+	require.Nil(grp2.DeletedAt)
 }
