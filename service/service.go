@@ -178,3 +178,7 @@ func getConfig(cfg *Config) *Config {
 
 	return cfg
 }
+
+func (s *Service) Close() error {
+	return s.EC.Close()
+}
