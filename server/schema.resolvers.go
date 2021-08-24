@@ -160,6 +160,30 @@ func (r *mutationResolver) DeleteGroup(ctx context.Context, id uuid.UUID) (bool,
 	return true, r.s.DeleteGroup(ctx, id)
 }
 
+func (r *mutationResolver) AddClass(ctx context.Context, input model.AddClassInput) (*ent.Class, error) {
+	if !auth.IsAdmin(ctx) {
+		return nil, auth.UnauthorizedErr
+	}
+
+	return r.s.AddClass(ctx, input)
+}
+
+func (r *mutationResolver) UpdateClass(ctx context.Context, id uuid.UUID, input model.UpdateClassInput) (*ent.Class, error) {
+	if !auth.IsAdmin(ctx) {
+		return nil, auth.UnauthorizedErr
+	}
+
+	return r.s.UpdateClass(ctx, id, input)
+}
+
+func (r *mutationResolver) DeleteClass(ctx context.Context, id uuid.UUID) (bool, error) {
+	if !auth.IsAdmin(ctx) {
+		return false, auth.UnauthorizedErr
+	}
+
+	return true, r.s.DeleteClass(ctx, id)
+}
+
 func (r *queryResolver) School(ctx context.Context, id uuid.UUID) (*ent.School, error) {
 	return r.s.EC.School.Get(ctx, id)
 }
@@ -235,6 +259,43 @@ func (r *queryResolver) Groups(ctx context.Context, userID *uuid.UUID, after *en
 		Last:    last,
 		OrderBy: orderBy,
 		Where:   where,
+	})
+}
+
+func (r *queryResolver) Class(ctx context.Context, id uuid.UUID) (*ent.Class, error) {
+	return r.s.EC.Class.Get(ctx, id)
+}
+
+func (r *queryResolver) Classes(ctx context.Context, userID *uuid.UUID, stageID *uuid.UUID, schoolID *uuid.UUID, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.ClassOrder, where *ent.ClassWhereInput) (*ent.ClassConnection, error) {
+	u, ok := auth.UserForContext(ctx)
+	if !ok {
+		return nil, auth.UnauthorizedErr
+	}
+
+	// This step is just a precautionary measure and is probably unnecessary.
+	// Make sure that an admin/teacher is bounded by their school and cannot see classes from other schools.
+	if u.Role == user.RoleSchoolAdmin || u.Role == user.RoleTeacher {
+		schID, err := r.s.EC.User.Query().Where(user.ID(u.ID)).QuerySchool().OnlyID(ctx)
+		if err != nil {
+			return nil, err
+		}
+		schoolID = &schID
+	}
+
+	if userID == nil {
+		userID = &u.ID
+	}
+
+	return r.s.Classes(ctx, service.ClassesOptions{
+		UserID:   userID,
+		StageID:  stageID,
+		SchoolID: schoolID,
+		After:    after,
+		First:    first,
+		Before:   before,
+		Last:     last,
+		OrderBy:  orderBy,
+		Where:    where,
 	})
 }
 

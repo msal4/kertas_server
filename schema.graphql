@@ -239,6 +239,50 @@ input UpdateGroupInput {
   active: Boolean
 }
 
+type Class {
+  id: ID!
+  name: String!
+  active: Boolean!
+  createdAt: Time!
+  updatedAt: Time!
+}
+
+enum ClassOrderField {
+    NAME
+    CREATED_AT
+    UPDATED_AT
+}
+
+input ClassOrder {
+    field: ClassOrderField
+    direction: OrderDirection!
+}
+
+type ClassEdge {
+  node: Class
+  cursor: Cursor!
+}
+
+type ClassConnection {
+  totalCount: Int!
+  pageInfo: PageInfo!
+  edges: [ClassEdge]
+}
+
+
+input AddClassInput {
+  name: String!
+  active: Boolean! = true
+  teacherID: ID!
+  stageID: ID!
+}
+
+input UpdateClassInput {
+  name: String
+  active: Boolean
+  teacherID: ID
+}
+
 type Message {
   id: ID!
   content: String!
@@ -288,6 +332,9 @@ type Query {
 
   group(id: ID!): Group
   groups(userID: ID, after: Cursor, first: Int, before: Cursor, last: Int, orderBy: GroupOrder, where: GroupWhereInput): GroupConnection
+
+  class(id: ID!): Class
+  classes(userID: ID, stageID: ID, schoolID: ID, after: Cursor, first: Int, before: Cursor, last: Int, orderBy: ClassOrder, where: ClassWhereInput): ClassConnection
 }
 
 type Mutation {
@@ -315,6 +362,10 @@ type Mutation {
   addGroup(input: AddGroupInput!): Group
   updateGroup(id: ID!, input: UpdateGroupInput!): Group
   deleteGroup(id: ID!): Boolean!
+
+  addClass(input: AddClassInput!): Class
+  updateClass(id: ID!, input: UpdateClassInput!): Class
+  deleteClass(id: ID!): Boolean!
 }
 
 type Subscription {
