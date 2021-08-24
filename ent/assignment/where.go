@@ -122,6 +122,13 @@ func Description(v string) predicate.Assignment {
 	})
 }
 
+// File applies equality check predicate on the "file" field. It's identical to FileEQ.
+func File(v string) predicate.Assignment {
+	return predicate.Assignment(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldFile), v))
+	})
+}
+
 // IsExam applies equality check predicate on the "is_exam" field. It's identical to IsExamEQ.
 func IsExam(v bool) predicate.Assignment {
 	return predicate.Assignment(func(s *sql.Selector) {
@@ -535,6 +542,131 @@ func DescriptionEqualFold(v string) predicate.Assignment {
 func DescriptionContainsFold(v string) predicate.Assignment {
 	return predicate.Assignment(func(s *sql.Selector) {
 		s.Where(sql.ContainsFold(s.C(FieldDescription), v))
+	})
+}
+
+// FileEQ applies the EQ predicate on the "file" field.
+func FileEQ(v string) predicate.Assignment {
+	return predicate.Assignment(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldFile), v))
+	})
+}
+
+// FileNEQ applies the NEQ predicate on the "file" field.
+func FileNEQ(v string) predicate.Assignment {
+	return predicate.Assignment(func(s *sql.Selector) {
+		s.Where(sql.NEQ(s.C(FieldFile), v))
+	})
+}
+
+// FileIn applies the In predicate on the "file" field.
+func FileIn(vs ...string) predicate.Assignment {
+	v := make([]interface{}, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.Assignment(func(s *sql.Selector) {
+		// if not arguments were provided, append the FALSE constants,
+		// since we can't apply "IN ()". This will make this predicate falsy.
+		if len(v) == 0 {
+			s.Where(sql.False())
+			return
+		}
+		s.Where(sql.In(s.C(FieldFile), v...))
+	})
+}
+
+// FileNotIn applies the NotIn predicate on the "file" field.
+func FileNotIn(vs ...string) predicate.Assignment {
+	v := make([]interface{}, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.Assignment(func(s *sql.Selector) {
+		// if not arguments were provided, append the FALSE constants,
+		// since we can't apply "IN ()". This will make this predicate falsy.
+		if len(v) == 0 {
+			s.Where(sql.False())
+			return
+		}
+		s.Where(sql.NotIn(s.C(FieldFile), v...))
+	})
+}
+
+// FileGT applies the GT predicate on the "file" field.
+func FileGT(v string) predicate.Assignment {
+	return predicate.Assignment(func(s *sql.Selector) {
+		s.Where(sql.GT(s.C(FieldFile), v))
+	})
+}
+
+// FileGTE applies the GTE predicate on the "file" field.
+func FileGTE(v string) predicate.Assignment {
+	return predicate.Assignment(func(s *sql.Selector) {
+		s.Where(sql.GTE(s.C(FieldFile), v))
+	})
+}
+
+// FileLT applies the LT predicate on the "file" field.
+func FileLT(v string) predicate.Assignment {
+	return predicate.Assignment(func(s *sql.Selector) {
+		s.Where(sql.LT(s.C(FieldFile), v))
+	})
+}
+
+// FileLTE applies the LTE predicate on the "file" field.
+func FileLTE(v string) predicate.Assignment {
+	return predicate.Assignment(func(s *sql.Selector) {
+		s.Where(sql.LTE(s.C(FieldFile), v))
+	})
+}
+
+// FileContains applies the Contains predicate on the "file" field.
+func FileContains(v string) predicate.Assignment {
+	return predicate.Assignment(func(s *sql.Selector) {
+		s.Where(sql.Contains(s.C(FieldFile), v))
+	})
+}
+
+// FileHasPrefix applies the HasPrefix predicate on the "file" field.
+func FileHasPrefix(v string) predicate.Assignment {
+	return predicate.Assignment(func(s *sql.Selector) {
+		s.Where(sql.HasPrefix(s.C(FieldFile), v))
+	})
+}
+
+// FileHasSuffix applies the HasSuffix predicate on the "file" field.
+func FileHasSuffix(v string) predicate.Assignment {
+	return predicate.Assignment(func(s *sql.Selector) {
+		s.Where(sql.HasSuffix(s.C(FieldFile), v))
+	})
+}
+
+// FileIsNil applies the IsNil predicate on the "file" field.
+func FileIsNil() predicate.Assignment {
+	return predicate.Assignment(func(s *sql.Selector) {
+		s.Where(sql.IsNull(s.C(FieldFile)))
+	})
+}
+
+// FileNotNil applies the NotNil predicate on the "file" field.
+func FileNotNil() predicate.Assignment {
+	return predicate.Assignment(func(s *sql.Selector) {
+		s.Where(sql.NotNull(s.C(FieldFile)))
+	})
+}
+
+// FileEqualFold applies the EqualFold predicate on the "file" field.
+func FileEqualFold(v string) predicate.Assignment {
+	return predicate.Assignment(func(s *sql.Selector) {
+		s.Where(sql.EqualFold(s.C(FieldFile), v))
+	})
+}
+
+// FileContainsFold applies the ContainsFold predicate on the "file" field.
+func FileContainsFold(v string) predicate.Assignment {
+	return predicate.Assignment(func(s *sql.Selector) {
+		s.Where(sql.ContainsFold(s.C(FieldFile), v))
 	})
 }
 

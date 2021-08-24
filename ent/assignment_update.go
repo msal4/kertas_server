@@ -58,6 +58,26 @@ func (au *AssignmentUpdate) ClearDescription() *AssignmentUpdate {
 	return au
 }
 
+// SetFile sets the "file" field.
+func (au *AssignmentUpdate) SetFile(s string) *AssignmentUpdate {
+	au.mutation.SetFile(s)
+	return au
+}
+
+// SetNillableFile sets the "file" field if the given value is not nil.
+func (au *AssignmentUpdate) SetNillableFile(s *string) *AssignmentUpdate {
+	if s != nil {
+		au.SetFile(*s)
+	}
+	return au
+}
+
+// ClearFile clears the value of the "file" field.
+func (au *AssignmentUpdate) ClearFile() *AssignmentUpdate {
+	au.mutation.ClearFile()
+	return au
+}
+
 // SetIsExam sets the "is_exam" field.
 func (au *AssignmentUpdate) SetIsExam(b bool) *AssignmentUpdate {
 	au.mutation.SetIsExam(b)
@@ -346,6 +366,19 @@ func (au *AssignmentUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Column: assignment.FieldDescription,
 		})
 	}
+	if value, ok := au.mutation.File(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: assignment.FieldFile,
+		})
+	}
+	if au.mutation.FileCleared() {
+		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Column: assignment.FieldFile,
+		})
+	}
 	if value, ok := au.mutation.IsExam(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeBool,
@@ -578,6 +611,26 @@ func (auo *AssignmentUpdateOne) SetNillableDescription(s *string) *AssignmentUpd
 // ClearDescription clears the value of the "description" field.
 func (auo *AssignmentUpdateOne) ClearDescription() *AssignmentUpdateOne {
 	auo.mutation.ClearDescription()
+	return auo
+}
+
+// SetFile sets the "file" field.
+func (auo *AssignmentUpdateOne) SetFile(s string) *AssignmentUpdateOne {
+	auo.mutation.SetFile(s)
+	return auo
+}
+
+// SetNillableFile sets the "file" field if the given value is not nil.
+func (auo *AssignmentUpdateOne) SetNillableFile(s *string) *AssignmentUpdateOne {
+	if s != nil {
+		auo.SetFile(*s)
+	}
+	return auo
+}
+
+// ClearFile clears the value of the "file" field.
+func (auo *AssignmentUpdateOne) ClearFile() *AssignmentUpdateOne {
+	auo.mutation.ClearFile()
 	return auo
 }
 
@@ -891,6 +944,19 @@ func (auo *AssignmentUpdateOne) sqlSave(ctx context.Context) (_node *Assignment,
 		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
 			Type:   field.TypeString,
 			Column: assignment.FieldDescription,
+		})
+	}
+	if value, ok := auo.mutation.File(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: assignment.FieldFile,
+		})
+	}
+	if auo.mutation.FileCleared() {
+		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Column: assignment.FieldFile,
 		})
 	}
 	if value, ok := auo.mutation.IsExam(); ok {

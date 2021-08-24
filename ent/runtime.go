@@ -45,7 +45,7 @@ func init() {
 	// assignment.NameValidator is a validator for the "name" field. It is called by the builders before save.
 	assignment.NameValidator = assignmentDescName.Validators[0].(func(string) error)
 	// assignmentDescIsExam is the schema descriptor for is_exam field.
-	assignmentDescIsExam := assignmentFields[3].Descriptor()
+	assignmentDescIsExam := assignmentFields[4].Descriptor()
 	// assignment.DefaultIsExam holds the default value on creation for the is_exam field.
 	assignment.DefaultIsExam = assignmentDescIsExam.Default.(bool)
 	// assignmentDescID is the schema descriptor for id field.

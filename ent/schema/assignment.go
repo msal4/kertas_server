@@ -21,6 +21,7 @@ func (Assignment) Fields() []ent.Field {
 		field.UUID("id", uuid.UUID{}).Default(uuid.New),
 		field.String("name").NotEmpty().Annotations(entgql.OrderField("NAME")),
 		field.String("description").Optional().Annotations(entgql.OrderField("DESCRIPTION")),
+		field.String("file").Optional(),
 		field.Bool("is_exam").Default(false).Annotations(entgql.OrderField("IS_EXAM")),
 		field.Time("due_date").Annotations(entgql.OrderField("DUE_DATE")),
 		field.Int("duration").Optional().Annotations(entgql.OrderField("DURATION")),

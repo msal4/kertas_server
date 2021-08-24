@@ -26,6 +26,8 @@ type Assignment struct {
 	Name string `json:"name,omitempty"`
 	// Description holds the value of the "description" field.
 	Description string `json:"description,omitempty"`
+	// File holds the value of the "file" field.
+	File string `json:"file,omitempty"`
 	// IsExam holds the value of the "is_exam" field.
 	IsExam bool `json:"is_exam,omitempty"`
 	// DueDate holds the value of the "due_date" field.
@@ -94,7 +96,7 @@ func (*Assignment) scanValues(columns []string) ([]interface{}, error) {
 			values[i] = new(sql.NullBool)
 		case assignment.FieldDuration:
 			values[i] = new(sql.NullInt64)
-		case assignment.FieldName, assignment.FieldDescription:
+		case assignment.FieldName, assignment.FieldDescription, assignment.FieldFile:
 			values[i] = new(sql.NullString)
 		case assignment.FieldCreatedAt, assignment.FieldUpdatedAt, assignment.FieldDueDate, assignment.FieldDeletedAt:
 			values[i] = new(sql.NullTime)
@@ -146,6 +148,12 @@ func (a *Assignment) assignValues(columns []string, values []interface{}) error 
 				return fmt.Errorf("unexpected type %T for field description", values[i])
 			} else if value.Valid {
 				a.Description = value.String
+			}
+		case assignment.FieldFile:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field file", values[i])
+			} else if value.Valid {
+				a.File = value.String
 			}
 		case assignment.FieldIsExam:
 			if value, ok := values[i].(*sql.NullBool); !ok {
@@ -230,6 +238,8 @@ func (a *Assignment) String() string {
 	builder.WriteString(a.Name)
 	builder.WriteString(", description=")
 	builder.WriteString(a.Description)
+	builder.WriteString(", file=")
+	builder.WriteString(a.File)
 	builder.WriteString(", is_exam=")
 	builder.WriteString(fmt.Sprintf("%v", a.IsExam))
 	builder.WriteString(", due_date=")

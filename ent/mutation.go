@@ -59,6 +59,7 @@ type AssignmentMutation struct {
 	updated_at         *time.Time
 	name               *string
 	description        *string
+	file               *string
 	is_exam            *bool
 	due_date           *time.Time
 	duration           *int
@@ -318,6 +319,55 @@ func (m *AssignmentMutation) DescriptionCleared() bool {
 func (m *AssignmentMutation) ResetDescription() {
 	m.description = nil
 	delete(m.clearedFields, assignment.FieldDescription)
+}
+
+// SetFile sets the "file" field.
+func (m *AssignmentMutation) SetFile(s string) {
+	m.file = &s
+}
+
+// File returns the value of the "file" field in the mutation.
+func (m *AssignmentMutation) File() (r string, exists bool) {
+	v := m.file
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldFile returns the old "file" field's value of the Assignment entity.
+// If the Assignment object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *AssignmentMutation) OldFile(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldFile is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldFile requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldFile: %w", err)
+	}
+	return oldValue.File, nil
+}
+
+// ClearFile clears the value of the "file" field.
+func (m *AssignmentMutation) ClearFile() {
+	m.file = nil
+	m.clearedFields[assignment.FieldFile] = struct{}{}
+}
+
+// FileCleared returns if the "file" field was cleared in this mutation.
+func (m *AssignmentMutation) FileCleared() bool {
+	_, ok := m.clearedFields[assignment.FieldFile]
+	return ok
+}
+
+// ResetFile resets all changes to the "file" field.
+func (m *AssignmentMutation) ResetFile() {
+	m.file = nil
+	delete(m.clearedFields, assignment.FieldFile)
 }
 
 // SetIsExam sets the "is_exam" field.
@@ -677,7 +727,7 @@ func (m *AssignmentMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *AssignmentMutation) Fields() []string {
-	fields := make([]string, 0, 8)
+	fields := make([]string, 0, 9)
 	if m.created_at != nil {
 		fields = append(fields, assignment.FieldCreatedAt)
 	}
@@ -689,6 +739,9 @@ func (m *AssignmentMutation) Fields() []string {
 	}
 	if m.description != nil {
 		fields = append(fields, assignment.FieldDescription)
+	}
+	if m.file != nil {
+		fields = append(fields, assignment.FieldFile)
 	}
 	if m.is_exam != nil {
 		fields = append(fields, assignment.FieldIsExam)
@@ -718,6 +771,8 @@ func (m *AssignmentMutation) Field(name string) (ent.Value, bool) {
 		return m.Name()
 	case assignment.FieldDescription:
 		return m.Description()
+	case assignment.FieldFile:
+		return m.File()
 	case assignment.FieldIsExam:
 		return m.IsExam()
 	case assignment.FieldDueDate:
@@ -743,6 +798,8 @@ func (m *AssignmentMutation) OldField(ctx context.Context, name string) (ent.Val
 		return m.OldName(ctx)
 	case assignment.FieldDescription:
 		return m.OldDescription(ctx)
+	case assignment.FieldFile:
+		return m.OldFile(ctx)
 	case assignment.FieldIsExam:
 		return m.OldIsExam(ctx)
 	case assignment.FieldDueDate:
@@ -787,6 +844,13 @@ func (m *AssignmentMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetDescription(v)
+		return nil
+	case assignment.FieldFile:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetFile(v)
 		return nil
 	case assignment.FieldIsExam:
 		v, ok := value.(bool)
@@ -864,6 +928,9 @@ func (m *AssignmentMutation) ClearedFields() []string {
 	if m.FieldCleared(assignment.FieldDescription) {
 		fields = append(fields, assignment.FieldDescription)
 	}
+	if m.FieldCleared(assignment.FieldFile) {
+		fields = append(fields, assignment.FieldFile)
+	}
 	if m.FieldCleared(assignment.FieldDuration) {
 		fields = append(fields, assignment.FieldDuration)
 	}
@@ -886,6 +953,9 @@ func (m *AssignmentMutation) ClearField(name string) error {
 	switch name {
 	case assignment.FieldDescription:
 		m.ClearDescription()
+		return nil
+	case assignment.FieldFile:
+		m.ClearFile()
 		return nil
 	case assignment.FieldDuration:
 		m.ClearDuration()
@@ -912,6 +982,9 @@ func (m *AssignmentMutation) ResetField(name string) error {
 		return nil
 	case assignment.FieldDescription:
 		m.ResetDescription()
+		return nil
+	case assignment.FieldFile:
+		m.ResetFile()
 		return nil
 	case assignment.FieldIsExam:
 		m.ResetIsExam()

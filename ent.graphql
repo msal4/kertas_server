@@ -59,6 +59,23 @@ input AssignmentWhereInput {
   descriptionEqualFold: String
   descriptionContainsFold: String
   
+  """file field predicates"""
+  file: String
+  fileNEQ: String
+  fileIn: [String!]
+  fileNotIn: [String!]
+  fileGT: String
+  fileGTE: String
+  fileLT: String
+  fileLTE: String
+  fileContains: String
+  fileHasPrefix: String
+  fileHasSuffix: String
+  fileIsNil: Boolean
+  fileNotNil: Boolean
+  fileEqualFold: String
+  fileContainsFold: String
+  
   """is_exam field predicates"""
   isExam: Boolean
   isExamNEQ: Boolean

@@ -72,6 +72,20 @@ func (ac *AssignmentCreate) SetNillableDescription(s *string) *AssignmentCreate 
 	return ac
 }
 
+// SetFile sets the "file" field.
+func (ac *AssignmentCreate) SetFile(s string) *AssignmentCreate {
+	ac.mutation.SetFile(s)
+	return ac
+}
+
+// SetNillableFile sets the "file" field if the given value is not nil.
+func (ac *AssignmentCreate) SetNillableFile(s *string) *AssignmentCreate {
+	if s != nil {
+		ac.SetFile(*s)
+	}
+	return ac
+}
+
 // SetIsExam sets the "is_exam" field.
 func (ac *AssignmentCreate) SetIsExam(b bool) *AssignmentCreate {
 	ac.mutation.SetIsExam(b)
@@ -341,6 +355,14 @@ func (ac *AssignmentCreate) createSpec() (*Assignment, *sqlgraph.CreateSpec) {
 			Column: assignment.FieldDescription,
 		})
 		_node.Description = value
+	}
+	if value, ok := ac.mutation.File(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: assignment.FieldFile,
+		})
+		_node.File = value
 	}
 	if value, ok := ac.mutation.IsExam(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{

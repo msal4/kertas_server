@@ -15,6 +15,7 @@ var (
 		{Name: "updated_at", Type: field.TypeTime},
 		{Name: "name", Type: field.TypeString},
 		{Name: "description", Type: field.TypeString, Nullable: true},
+		{Name: "file", Type: field.TypeString, Nullable: true},
 		{Name: "is_exam", Type: field.TypeBool, Default: false},
 		{Name: "due_date", Type: field.TypeTime},
 		{Name: "duration", Type: field.TypeInt, Nullable: true},
@@ -29,7 +30,7 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "assignments_classes_assignments",
-				Columns:    []*schema.Column{AssignmentsColumns[9]},
+				Columns:    []*schema.Column{AssignmentsColumns[10]},
 				RefColumns: []*schema.Column{ClassesColumns[0]},
 				OnDelete:   schema.Cascade,
 			},

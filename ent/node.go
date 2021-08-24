@@ -56,7 +56,7 @@ func (a *Assignment) Node(ctx context.Context) (node *Node, err error) {
 	node = &Node{
 		ID:     a.ID,
 		Type:   "Assignment",
-		Fields: make([]*Field, 8),
+		Fields: make([]*Field, 9),
 		Edges:  make([]*Edge, 3),
 	}
 	var buf []byte
@@ -92,10 +92,18 @@ func (a *Assignment) Node(ctx context.Context) (node *Node, err error) {
 		Name:  "description",
 		Value: string(buf),
 	}
-	if buf, err = json.Marshal(a.IsExam); err != nil {
+	if buf, err = json.Marshal(a.File); err != nil {
 		return nil, err
 	}
 	node.Fields[4] = &Field{
+		Type:  "string",
+		Name:  "file",
+		Value: string(buf),
+	}
+	if buf, err = json.Marshal(a.IsExam); err != nil {
+		return nil, err
+	}
+	node.Fields[5] = &Field{
 		Type:  "bool",
 		Name:  "is_exam",
 		Value: string(buf),
@@ -103,7 +111,7 @@ func (a *Assignment) Node(ctx context.Context) (node *Node, err error) {
 	if buf, err = json.Marshal(a.DueDate); err != nil {
 		return nil, err
 	}
-	node.Fields[5] = &Field{
+	node.Fields[6] = &Field{
 		Type:  "time.Time",
 		Name:  "due_date",
 		Value: string(buf),
@@ -111,7 +119,7 @@ func (a *Assignment) Node(ctx context.Context) (node *Node, err error) {
 	if buf, err = json.Marshal(a.Duration); err != nil {
 		return nil, err
 	}
-	node.Fields[6] = &Field{
+	node.Fields[7] = &Field{
 		Type:  "int",
 		Name:  "duration",
 		Value: string(buf),
@@ -119,7 +127,7 @@ func (a *Assignment) Node(ctx context.Context) (node *Node, err error) {
 	if buf, err = json.Marshal(a.DeletedAt); err != nil {
 		return nil, err
 	}
-	node.Fields[7] = &Field{
+	node.Fields[8] = &Field{
 		Type:  "time.Time",
 		Name:  "deleted_at",
 		Value: string(buf),

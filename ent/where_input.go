@@ -90,6 +90,23 @@ type AssignmentWhereInput struct {
 	DescriptionEqualFold    *string  `json:"descriptionEqualFold,omitempty"`
 	DescriptionContainsFold *string  `json:"descriptionContainsFold,omitempty"`
 
+	// "file" field predicates.
+	File             *string  `json:"file,omitempty"`
+	FileNEQ          *string  `json:"fileNEQ,omitempty"`
+	FileIn           []string `json:"fileIn,omitempty"`
+	FileNotIn        []string `json:"fileNotIn,omitempty"`
+	FileGT           *string  `json:"fileGT,omitempty"`
+	FileGTE          *string  `json:"fileGTE,omitempty"`
+	FileLT           *string  `json:"fileLT,omitempty"`
+	FileLTE          *string  `json:"fileLTE,omitempty"`
+	FileContains     *string  `json:"fileContains,omitempty"`
+	FileHasPrefix    *string  `json:"fileHasPrefix,omitempty"`
+	FileHasSuffix    *string  `json:"fileHasSuffix,omitempty"`
+	FileIsNil        bool     `json:"fileIsNil,omitempty"`
+	FileNotNil       bool     `json:"fileNotNil,omitempty"`
+	FileEqualFold    *string  `json:"fileEqualFold,omitempty"`
+	FileContainsFold *string  `json:"fileContainsFold,omitempty"`
+
 	// "is_exam" field predicates.
 	IsExam    *bool `json:"isExam,omitempty"`
 	IsExamNEQ *bool `json:"isExamNEQ,omitempty"`
@@ -355,6 +372,51 @@ func (i *AssignmentWhereInput) P() (predicate.Assignment, error) {
 	}
 	if i.DescriptionContainsFold != nil {
 		predicates = append(predicates, assignment.DescriptionContainsFold(*i.DescriptionContainsFold))
+	}
+	if i.File != nil {
+		predicates = append(predicates, assignment.FileEQ(*i.File))
+	}
+	if i.FileNEQ != nil {
+		predicates = append(predicates, assignment.FileNEQ(*i.FileNEQ))
+	}
+	if len(i.FileIn) > 0 {
+		predicates = append(predicates, assignment.FileIn(i.FileIn...))
+	}
+	if len(i.FileNotIn) > 0 {
+		predicates = append(predicates, assignment.FileNotIn(i.FileNotIn...))
+	}
+	if i.FileGT != nil {
+		predicates = append(predicates, assignment.FileGT(*i.FileGT))
+	}
+	if i.FileGTE != nil {
+		predicates = append(predicates, assignment.FileGTE(*i.FileGTE))
+	}
+	if i.FileLT != nil {
+		predicates = append(predicates, assignment.FileLT(*i.FileLT))
+	}
+	if i.FileLTE != nil {
+		predicates = append(predicates, assignment.FileLTE(*i.FileLTE))
+	}
+	if i.FileContains != nil {
+		predicates = append(predicates, assignment.FileContains(*i.FileContains))
+	}
+	if i.FileHasPrefix != nil {
+		predicates = append(predicates, assignment.FileHasPrefix(*i.FileHasPrefix))
+	}
+	if i.FileHasSuffix != nil {
+		predicates = append(predicates, assignment.FileHasSuffix(*i.FileHasSuffix))
+	}
+	if i.FileIsNil {
+		predicates = append(predicates, assignment.FileIsNil())
+	}
+	if i.FileNotNil {
+		predicates = append(predicates, assignment.FileNotNil())
+	}
+	if i.FileEqualFold != nil {
+		predicates = append(predicates, assignment.FileEqualFold(*i.FileEqualFold))
+	}
+	if i.FileContainsFold != nil {
+		predicates = append(predicates, assignment.FileContainsFold(*i.FileContainsFold))
 	}
 	if i.IsExam != nil {
 		predicates = append(predicates, assignment.IsExamEQ(*i.IsExam))

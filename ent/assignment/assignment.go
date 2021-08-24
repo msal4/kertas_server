@@ -21,6 +21,8 @@ const (
 	FieldName = "name"
 	// FieldDescription holds the string denoting the description field in the database.
 	FieldDescription = "description"
+	// FieldFile holds the string denoting the file field in the database.
+	FieldFile = "file"
 	// FieldIsExam holds the string denoting the is_exam field in the database.
 	FieldIsExam = "is_exam"
 	// FieldDueDate holds the string denoting the due_date field in the database.
@@ -67,6 +69,7 @@ var Columns = []string{
 	FieldUpdatedAt,
 	FieldName,
 	FieldDescription,
+	FieldFile,
 	FieldIsExam,
 	FieldDueDate,
 	FieldDuration,
