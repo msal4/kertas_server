@@ -322,7 +322,11 @@ input PostMessageInput {
 type Assignment {
   id: ID!
   name: String!
-  active: Boolean!
+  description: String
+  dueDate: Time!
+  duration: Duration
+  isExam: Boolean!
+  file: String
   createdAt: Time!
   updatedAt: Time!
 }

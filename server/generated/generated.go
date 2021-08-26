@@ -45,7 +45,6 @@ type Config struct {
 }
 
 type ResolverRoot interface {
-	Assignment() AssignmentResolver
 	Mutation() MutationResolver
 	Query() QueryResolver
 	Subscription() SubscriptionResolver
@@ -56,11 +55,15 @@ type DirectiveRoot struct {
 
 type ComplexityRoot struct {
 	Assignment struct {
-		Active    func(childComplexity int) int
-		CreatedAt func(childComplexity int) int
-		ID        func(childComplexity int) int
-		Name      func(childComplexity int) int
-		UpdatedAt func(childComplexity int) int
+		CreatedAt   func(childComplexity int) int
+		Description func(childComplexity int) int
+		DueDate     func(childComplexity int) int
+		Duration    func(childComplexity int) int
+		File        func(childComplexity int) int
+		ID          func(childComplexity int) int
+		IsExam      func(childComplexity int) int
+		Name        func(childComplexity int) int
+		UpdatedAt   func(childComplexity int) int
 	}
 
 	AssignmentConnection struct {
@@ -259,9 +262,6 @@ type ComplexityRoot struct {
 	}
 }
 
-type AssignmentResolver interface {
-	Active(ctx context.Context, obj *ent.Assignment) (bool, error)
-}
 type MutationResolver interface {
 	AddSchool(ctx context.Context, input model.AddSchoolInput) (*ent.School, error)
 	UpdateSchool(ctx context.Context, id uuid.UUID, input model.UpdateSchoolInput) (*ent.School, error)
@@ -323,13 +323,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 	_ = ec
 	switch typeName + "." + field {
 
-	case "Assignment.active":
-		if e.complexity.Assignment.Active == nil {
-			break
-		}
-
-		return e.complexity.Assignment.Active(childComplexity), true
-
 	case "Assignment.createdAt":
 		if e.complexity.Assignment.CreatedAt == nil {
 			break
@@ -337,12 +330,47 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Assignment.CreatedAt(childComplexity), true
 
+	case "Assignment.description":
+		if e.complexity.Assignment.Description == nil {
+			break
+		}
+
+		return e.complexity.Assignment.Description(childComplexity), true
+
+	case "Assignment.dueDate":
+		if e.complexity.Assignment.DueDate == nil {
+			break
+		}
+
+		return e.complexity.Assignment.DueDate(childComplexity), true
+
+	case "Assignment.duration":
+		if e.complexity.Assignment.Duration == nil {
+			break
+		}
+
+		return e.complexity.Assignment.Duration(childComplexity), true
+
+	case "Assignment.file":
+		if e.complexity.Assignment.File == nil {
+			break
+		}
+
+		return e.complexity.Assignment.File(childComplexity), true
+
 	case "Assignment.id":
 		if e.complexity.Assignment.ID == nil {
 			break
 		}
 
 		return e.complexity.Assignment.ID(childComplexity), true
+
+	case "Assignment.isExam":
+		if e.complexity.Assignment.IsExam == nil {
+			break
+		}
+
+		return e.complexity.Assignment.IsExam(childComplexity), true
 
 	case "Assignment.name":
 		if e.complexity.Assignment.Name == nil {
@@ -1798,7 +1826,11 @@ input PostMessageInput {
 type Assignment {
   id: ID!
   name: String!
-  active: Boolean!
+  description: String
+  dueDate: Time!
+  duration: Duration
+  isExam: Boolean!
+  file: String
   createdAt: Time!
   updatedAt: Time!
 }
@@ -4198,7 +4230,7 @@ func (ec *executionContext) _Assignment_name(ctx context.Context, field graphql.
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Assignment_active(ctx context.Context, field graphql.CollectedField, obj *ent.Assignment) (ret graphql.Marshaler) {
+func (ec *executionContext) _Assignment_description(ctx context.Context, field graphql.CollectedField, obj *ent.Assignment) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -4209,14 +4241,113 @@ func (ec *executionContext) _Assignment_active(ctx context.Context, field graphq
 		Object:     "Assignment",
 		Field:      field,
 		Args:       nil,
-		IsMethod:   true,
-		IsResolver: true,
+		IsMethod:   false,
+		IsResolver: false,
 	}
 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Assignment().Active(rctx, obj)
+		return obj.Description, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalOString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Assignment_dueDate(ctx context.Context, field graphql.CollectedField, obj *ent.Assignment) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Assignment",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.DueDate, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(time.Time)
+	fc.Result = res
+	return ec.marshalNTime2timeᚐTime(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Assignment_duration(ctx context.Context, field graphql.CollectedField, obj *ent.Assignment) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Assignment",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Duration, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(time.Duration)
+	fc.Result = res
+	return ec.marshalODuration2timeᚐDuration(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Assignment_isExam(ctx context.Context, field graphql.CollectedField, obj *ent.Assignment) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Assignment",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.IsExam, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -4231,6 +4362,38 @@ func (ec *executionContext) _Assignment_active(ctx context.Context, field graphq
 	res := resTmp.(bool)
 	fc.Result = res
 	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Assignment_file(ctx context.Context, field graphql.CollectedField, obj *ent.Assignment) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Assignment",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.File, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalOString2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Assignment_createdAt(ctx context.Context, field graphql.CollectedField, obj *ent.Assignment) (ret graphql.Marshaler) {
@@ -17369,36 +17532,38 @@ func (ec *executionContext) _Assignment(ctx context.Context, sel ast.SelectionSe
 		case "id":
 			out.Values[i] = ec._Assignment_id(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
+				invalids++
 			}
 		case "name":
 			out.Values[i] = ec._Assignment_name(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
+				invalids++
 			}
-		case "active":
-			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._Assignment_active(ctx, field, obj)
-				if res == graphql.Null {
-					atomic.AddUint32(&invalids, 1)
-				}
-				return res
-			})
+		case "description":
+			out.Values[i] = ec._Assignment_description(ctx, field, obj)
+		case "dueDate":
+			out.Values[i] = ec._Assignment_dueDate(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "duration":
+			out.Values[i] = ec._Assignment_duration(ctx, field, obj)
+		case "isExam":
+			out.Values[i] = ec._Assignment_isExam(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "file":
+			out.Values[i] = ec._Assignment_file(ctx, field, obj)
 		case "createdAt":
 			out.Values[i] = ec._Assignment_createdAt(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
+				invalids++
 			}
 		case "updatedAt":
 			out.Values[i] = ec._Assignment_updatedAt(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
+				invalids++
 			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
@@ -19696,6 +19861,15 @@ func (ec *executionContext) marshalOCursor2ᚖgithubᚗcomᚋmsal4ᚋhassah_scho
 		return graphql.Null
 	}
 	return v
+}
+
+func (ec *executionContext) unmarshalODuration2timeᚐDuration(ctx context.Context, v interface{}) (time.Duration, error) {
+	res, err := durationgql.UnmarshalDuration(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalODuration2timeᚐDuration(ctx context.Context, sel ast.SelectionSet, v time.Duration) graphql.Marshaler {
+	return durationgql.MarshalDuration(v)
 }
 
 func (ec *executionContext) unmarshalODuration2ᚕtimeᚐDurationᚄ(ctx context.Context, v interface{}) ([]time.Duration, error) {
