@@ -120,7 +120,7 @@ func (a *Assignment) Node(ctx context.Context) (node *Node, err error) {
 		return nil, err
 	}
 	node.Fields[7] = &Field{
-		Type:  "int",
+		Type:  "time.Duration",
 		Name:  "duration",
 		Value: string(buf),
 	}
@@ -1178,7 +1178,6 @@ func (c *Client) noder(ctx context.Context, table string, id uuid.UUID) (Noder, 
 	case assignment.Table:
 		n, err := c.Assignment.Query().
 			Where(assignment.ID(id)).
-			CollectFields(ctx, "Assignment").
 			Only(ctx)
 		if err != nil {
 			return nil, err
@@ -1187,7 +1186,6 @@ func (c *Client) noder(ctx context.Context, table string, id uuid.UUID) (Noder, 
 	case assignmentsubmission.Table:
 		n, err := c.AssignmentSubmission.Query().
 			Where(assignmentsubmission.ID(id)).
-			CollectFields(ctx, "AssignmentSubmission").
 			Only(ctx)
 		if err != nil {
 			return nil, err
@@ -1196,7 +1194,6 @@ func (c *Client) noder(ctx context.Context, table string, id uuid.UUID) (Noder, 
 	case attendance.Table:
 		n, err := c.Attendance.Query().
 			Where(attendance.ID(id)).
-			CollectFields(ctx, "Attendance").
 			Only(ctx)
 		if err != nil {
 			return nil, err
@@ -1205,7 +1202,6 @@ func (c *Client) noder(ctx context.Context, table string, id uuid.UUID) (Noder, 
 	case class.Table:
 		n, err := c.Class.Query().
 			Where(class.ID(id)).
-			CollectFields(ctx, "Class").
 			Only(ctx)
 		if err != nil {
 			return nil, err
@@ -1214,7 +1210,6 @@ func (c *Client) noder(ctx context.Context, table string, id uuid.UUID) (Noder, 
 	case grade.Table:
 		n, err := c.Grade.Query().
 			Where(grade.ID(id)).
-			CollectFields(ctx, "Grade").
 			Only(ctx)
 		if err != nil {
 			return nil, err
@@ -1223,7 +1218,6 @@ func (c *Client) noder(ctx context.Context, table string, id uuid.UUID) (Noder, 
 	case group.Table:
 		n, err := c.Group.Query().
 			Where(group.ID(id)).
-			CollectFields(ctx, "Group").
 			Only(ctx)
 		if err != nil {
 			return nil, err
@@ -1232,7 +1226,6 @@ func (c *Client) noder(ctx context.Context, table string, id uuid.UUID) (Noder, 
 	case message.Table:
 		n, err := c.Message.Query().
 			Where(message.ID(id)).
-			CollectFields(ctx, "Message").
 			Only(ctx)
 		if err != nil {
 			return nil, err
@@ -1241,7 +1234,6 @@ func (c *Client) noder(ctx context.Context, table string, id uuid.UUID) (Noder, 
 	case schedule.Table:
 		n, err := c.Schedule.Query().
 			Where(schedule.ID(id)).
-			CollectFields(ctx, "Schedule").
 			Only(ctx)
 		if err != nil {
 			return nil, err
@@ -1250,7 +1242,6 @@ func (c *Client) noder(ctx context.Context, table string, id uuid.UUID) (Noder, 
 	case school.Table:
 		n, err := c.School.Query().
 			Where(school.ID(id)).
-			CollectFields(ctx, "School").
 			Only(ctx)
 		if err != nil {
 			return nil, err
@@ -1259,7 +1250,6 @@ func (c *Client) noder(ctx context.Context, table string, id uuid.UUID) (Noder, 
 	case stage.Table:
 		n, err := c.Stage.Query().
 			Where(stage.ID(id)).
-			CollectFields(ctx, "Stage").
 			Only(ctx)
 		if err != nil {
 			return nil, err
@@ -1268,7 +1258,6 @@ func (c *Client) noder(ctx context.Context, table string, id uuid.UUID) (Noder, 
 	case tuitionpayment.Table:
 		n, err := c.TuitionPayment.Query().
 			Where(tuitionpayment.ID(id)).
-			CollectFields(ctx, "TuitionPayment").
 			Only(ctx)
 		if err != nil {
 			return nil, err
@@ -1277,7 +1266,6 @@ func (c *Client) noder(ctx context.Context, table string, id uuid.UUID) (Noder, 
 	case user.Table:
 		n, err := c.User.Query().
 			Where(user.ID(id)).
-			CollectFields(ctx, "User").
 			Only(ctx)
 		if err != nil {
 			return nil, err
@@ -1359,7 +1347,6 @@ func (c *Client) noders(ctx context.Context, table string, ids []uuid.UUID) ([]N
 	case assignment.Table:
 		nodes, err := c.Assignment.Query().
 			Where(assignment.IDIn(ids...)).
-			CollectFields(ctx, "Assignment").
 			All(ctx)
 		if err != nil {
 			return nil, err
@@ -1372,7 +1359,6 @@ func (c *Client) noders(ctx context.Context, table string, ids []uuid.UUID) ([]N
 	case assignmentsubmission.Table:
 		nodes, err := c.AssignmentSubmission.Query().
 			Where(assignmentsubmission.IDIn(ids...)).
-			CollectFields(ctx, "AssignmentSubmission").
 			All(ctx)
 		if err != nil {
 			return nil, err
@@ -1385,7 +1371,6 @@ func (c *Client) noders(ctx context.Context, table string, ids []uuid.UUID) ([]N
 	case attendance.Table:
 		nodes, err := c.Attendance.Query().
 			Where(attendance.IDIn(ids...)).
-			CollectFields(ctx, "Attendance").
 			All(ctx)
 		if err != nil {
 			return nil, err
@@ -1398,7 +1383,6 @@ func (c *Client) noders(ctx context.Context, table string, ids []uuid.UUID) ([]N
 	case class.Table:
 		nodes, err := c.Class.Query().
 			Where(class.IDIn(ids...)).
-			CollectFields(ctx, "Class").
 			All(ctx)
 		if err != nil {
 			return nil, err
@@ -1411,7 +1395,6 @@ func (c *Client) noders(ctx context.Context, table string, ids []uuid.UUID) ([]N
 	case grade.Table:
 		nodes, err := c.Grade.Query().
 			Where(grade.IDIn(ids...)).
-			CollectFields(ctx, "Grade").
 			All(ctx)
 		if err != nil {
 			return nil, err
@@ -1424,7 +1407,6 @@ func (c *Client) noders(ctx context.Context, table string, ids []uuid.UUID) ([]N
 	case group.Table:
 		nodes, err := c.Group.Query().
 			Where(group.IDIn(ids...)).
-			CollectFields(ctx, "Group").
 			All(ctx)
 		if err != nil {
 			return nil, err
@@ -1437,7 +1419,6 @@ func (c *Client) noders(ctx context.Context, table string, ids []uuid.UUID) ([]N
 	case message.Table:
 		nodes, err := c.Message.Query().
 			Where(message.IDIn(ids...)).
-			CollectFields(ctx, "Message").
 			All(ctx)
 		if err != nil {
 			return nil, err
@@ -1450,7 +1431,6 @@ func (c *Client) noders(ctx context.Context, table string, ids []uuid.UUID) ([]N
 	case schedule.Table:
 		nodes, err := c.Schedule.Query().
 			Where(schedule.IDIn(ids...)).
-			CollectFields(ctx, "Schedule").
 			All(ctx)
 		if err != nil {
 			return nil, err
@@ -1463,7 +1443,6 @@ func (c *Client) noders(ctx context.Context, table string, ids []uuid.UUID) ([]N
 	case school.Table:
 		nodes, err := c.School.Query().
 			Where(school.IDIn(ids...)).
-			CollectFields(ctx, "School").
 			All(ctx)
 		if err != nil {
 			return nil, err
@@ -1476,7 +1455,6 @@ func (c *Client) noders(ctx context.Context, table string, ids []uuid.UUID) ([]N
 	case stage.Table:
 		nodes, err := c.Stage.Query().
 			Where(stage.IDIn(ids...)).
-			CollectFields(ctx, "Stage").
 			All(ctx)
 		if err != nil {
 			return nil, err
@@ -1489,7 +1467,6 @@ func (c *Client) noders(ctx context.Context, table string, ids []uuid.UUID) ([]N
 	case tuitionpayment.Table:
 		nodes, err := c.TuitionPayment.Query().
 			Where(tuitionpayment.IDIn(ids...)).
-			CollectFields(ctx, "TuitionPayment").
 			All(ctx)
 		if err != nil {
 			return nil, err
@@ -1502,7 +1479,6 @@ func (c *Client) noders(ctx context.Context, table string, ids []uuid.UUID) ([]N
 	case user.Table:
 		nodes, err := c.User.Query().
 			Where(user.IDIn(ids...)).
-			CollectFields(ctx, "User").
 			All(ctx)
 		if err != nil {
 			return nil, err

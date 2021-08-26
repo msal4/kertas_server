@@ -122,16 +122,16 @@ type AssignmentWhereInput struct {
 	DueDateLTE   *time.Time  `json:"dueDateLTE,omitempty"`
 
 	// "duration" field predicates.
-	Duration       *int  `json:"duration,omitempty"`
-	DurationNEQ    *int  `json:"durationNEQ,omitempty"`
-	DurationIn     []int `json:"durationIn,omitempty"`
-	DurationNotIn  []int `json:"durationNotIn,omitempty"`
-	DurationGT     *int  `json:"durationGT,omitempty"`
-	DurationGTE    *int  `json:"durationGTE,omitempty"`
-	DurationLT     *int  `json:"durationLT,omitempty"`
-	DurationLTE    *int  `json:"durationLTE,omitempty"`
-	DurationIsNil  bool  `json:"durationIsNil,omitempty"`
-	DurationNotNil bool  `json:"durationNotNil,omitempty"`
+	Duration       *time.Duration  `json:"duration,omitempty"`
+	DurationNEQ    *time.Duration  `json:"durationNEQ,omitempty"`
+	DurationIn     []time.Duration `json:"durationIn,omitempty"`
+	DurationNotIn  []time.Duration `json:"durationNotIn,omitempty"`
+	DurationGT     *time.Duration  `json:"durationGT,omitempty"`
+	DurationGTE    *time.Duration  `json:"durationGTE,omitempty"`
+	DurationLT     *time.Duration  `json:"durationLT,omitempty"`
+	DurationLTE    *time.Duration  `json:"durationLTE,omitempty"`
+	DurationIsNil  bool            `json:"durationIsNil,omitempty"`
+	DurationNotNil bool            `json:"durationNotNil,omitempty"`
 
 	// "deleted_at" field predicates.
 	DeletedAt       *time.Time  `json:"deletedAt,omitempty"`

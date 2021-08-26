@@ -478,16 +478,6 @@ var (
 			}
 		},
 	}
-	// AssignmentOrderFieldIsExam orders Assignment by is_exam.
-	AssignmentOrderFieldIsExam = &AssignmentOrderField{
-		field: assignment.FieldIsExam,
-		toCursor: func(a *Assignment) Cursor {
-			return Cursor{
-				ID:    a.ID,
-				Value: a.IsExam,
-			}
-		},
-	}
 	// AssignmentOrderFieldDueDate orders Assignment by due_date.
 	AssignmentOrderFieldDueDate = &AssignmentOrderField{
 		field: assignment.FieldDueDate,
@@ -522,8 +512,6 @@ func (f AssignmentOrderField) String() string {
 		str = "NAME"
 	case assignment.FieldDescription:
 		str = "DESCRIPTION"
-	case assignment.FieldIsExam:
-		str = "IS_EXAM"
 	case assignment.FieldDueDate:
 		str = "DUE_DATE"
 	case assignment.FieldDuration:
@@ -552,8 +540,6 @@ func (f *AssignmentOrderField) UnmarshalGQL(v interface{}) error {
 		*f = *AssignmentOrderFieldName
 	case "DESCRIPTION":
 		*f = *AssignmentOrderFieldDescription
-	case "IS_EXAM":
-		*f = *AssignmentOrderFieldIsExam
 	case "DUE_DATE":
 		*f = *AssignmentOrderFieldDueDate
 	case "DURATION":

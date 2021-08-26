@@ -3,10 +3,22 @@
 package model
 
 import (
+	"time"
+
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/google/uuid"
 	"github.com/msal4/hassah_school_server/ent/user"
 )
+
+type AddAssignmentInput struct {
+	Name        string          `json:"name"`
+	Description *string         `json:"description"`
+	File        *graphql.Upload `json:"file"`
+	ClassID     uuid.UUID       `json:"classID"`
+	DueDate     time.Time       `json:"dueDate"`
+	IsExam      bool            `json:"isExam"`
+	Duration    *time.Duration  `json:"duration"`
+}
 
 type AddClassInput struct {
 	Name      string    `json:"name"`
@@ -60,6 +72,14 @@ type PostMessageInput struct {
 	GroupID    uuid.UUID       `json:"groupID"`
 	Content    string          `json:"content"`
 	Attachment *graphql.Upload `json:"attachment"`
+}
+
+type UpdateAssignmentInput struct {
+	Name        *string         `json:"name"`
+	Description *string         `json:"description"`
+	File        *graphql.Upload `json:"file"`
+	DueDate     *time.Time      `json:"dueDate"`
+	Duration    *time.Duration  `json:"duration"`
 }
 
 type UpdateClassInput struct {

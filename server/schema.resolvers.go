@@ -5,6 +5,7 @@ package server
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/google/uuid"
 	"github.com/msal4/hassah_school_server/auth"
@@ -14,6 +15,10 @@ import (
 	"github.com/msal4/hassah_school_server/server/model"
 	"github.com/msal4/hassah_school_server/service"
 )
+
+func (r *assignmentResolver) Active(ctx context.Context, obj *ent.Assignment) (bool, error) {
+	panic(fmt.Errorf("not implemented"))
+}
 
 func (r *mutationResolver) AddSchool(ctx context.Context, input model.AddSchoolInput) (*ent.School, error) {
 	if !auth.IsSuperAdmin(ctx) {
@@ -184,6 +189,18 @@ func (r *mutationResolver) DeleteClass(ctx context.Context, id uuid.UUID) (bool,
 	return true, r.s.DeleteClass(ctx, id)
 }
 
+func (r *mutationResolver) AddAssignment(ctx context.Context, input model.AddAssignmentInput) (*ent.Assignment, error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
+func (r *mutationResolver) UpdateAssignment(ctx context.Context, id uuid.UUID, input model.UpdateAssignmentInput) (*ent.Assignment, error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
+func (r *mutationResolver) DeleteAssignment(ctx context.Context, id uuid.UUID) (bool, error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
 func (r *queryResolver) School(ctx context.Context, id uuid.UUID) (*ent.School, error) {
 	return r.s.EC.School.Get(ctx, id)
 }
@@ -299,6 +316,14 @@ func (r *queryResolver) Classes(ctx context.Context, userID *uuid.UUID, stageID 
 	})
 }
 
+func (r *queryResolver) Assignment(ctx context.Context, id uuid.UUID) (*ent.Assignment, error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
+func (r *queryResolver) Assignments(ctx context.Context, userID *uuid.UUID, stageID *uuid.UUID, schoolID *uuid.UUID, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.AssignmentOrder, where *ent.AssignmentWhereInput) (*ent.AssignmentConnection, error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
 func (r *subscriptionResolver) MessagePosted(ctx context.Context, groupID uuid.UUID) (<-chan *ent.Message, error) {
 	u, ok := auth.UserForContext(ctx)
 	if !ok {
@@ -307,6 +332,9 @@ func (r *subscriptionResolver) MessagePosted(ctx context.Context, groupID uuid.U
 
 	return r.s.RegisterGroupObserver(ctx, groupID, u.ID)
 }
+
+// Assignment returns generated.AssignmentResolver implementation.
+func (r *Resolver) Assignment() generated.AssignmentResolver { return &assignmentResolver{r} }
 
 // Mutation returns generated.MutationResolver implementation.
 func (r *Resolver) Mutation() generated.MutationResolver { return &mutationResolver{r} }
@@ -317,6 +345,7 @@ func (r *Resolver) Query() generated.QueryResolver { return &queryResolver{r} }
 // Subscription returns generated.SubscriptionResolver implementation.
 func (r *Resolver) Subscription() generated.SubscriptionResolver { return &subscriptionResolver{r} }
 
+type assignmentResolver struct{ *Resolver }
 type mutationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
 type subscriptionResolver struct{ *Resolver }

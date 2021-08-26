@@ -33,7 +33,7 @@ type Assignment struct {
 	// DueDate holds the value of the "due_date" field.
 	DueDate time.Time `json:"due_date,omitempty"`
 	// Duration holds the value of the "duration" field.
-	Duration int `json:"duration,omitempty"`
+	Duration time.Duration `json:"duration,omitempty"`
 	// DeletedAt holds the value of the "deleted_at" field.
 	DeletedAt *time.Time `json:"deleted_at,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
@@ -171,7 +171,7 @@ func (a *Assignment) assignValues(columns []string, values []interface{}) error 
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field duration", values[i])
 			} else if value.Valid {
-				a.Duration = int(value.Int64)
+				a.Duration = time.Duration(value.Int64)
 			}
 		case assignment.FieldDeletedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {

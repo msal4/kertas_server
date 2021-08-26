@@ -18,7 +18,7 @@ var (
 		{Name: "file", Type: field.TypeString, Nullable: true},
 		{Name: "is_exam", Type: field.TypeBool, Default: false},
 		{Name: "due_date", Type: field.TypeTime},
-		{Name: "duration", Type: field.TypeInt, Nullable: true},
+		{Name: "duration", Type: field.TypeInt64, Nullable: true},
 		{Name: "deleted_at", Type: field.TypeTime, Nullable: true},
 		{Name: "class_assignments", Type: field.TypeUUID, Nullable: true},
 	}

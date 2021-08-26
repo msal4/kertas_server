@@ -1,6 +1,7 @@
 scalar Cursor
 scalar Time
 scalar Upload
+scalar Duration
 
 interface Node {
   id: ID!
@@ -318,6 +319,58 @@ input PostMessageInput {
   attachment: Upload
 }
 
+type Assignment {
+  id: ID!
+  name: String!
+  active: Boolean!
+  createdAt: Time!
+  updatedAt: Time!
+}
+
+enum AssignmentOrderField {
+    NAME
+    DESCRIPTION
+    DUE_DATE
+    DURATION
+    CREATED_AT
+    UPDATED_AT
+}
+
+input AssignmentOrder {
+    field: AssignmentOrderField
+    direction: OrderDirection!
+}
+
+type AssignmentEdge {
+  node: Assignment
+  cursor: Cursor!
+}
+
+type AssignmentConnection {
+  totalCount: Int!
+  pageInfo: PageInfo!
+  edges: [AssignmentEdge]
+}
+
+
+input AddAssignmentInput {
+  name: String!
+  description: String
+  file: Upload
+  classID: ID!
+  dueDate: Time!
+  isExam: Boolean! = false
+  duration: Duration
+}
+
+input UpdateAssignmentInput {
+  name: String
+  description: String
+  file: Upload
+  dueDate: Time
+  duration: Duration
+}
+
 type Query {
   school(id: ID!): School
   schools(after: Cursor, first: Int, before: Cursor, last: Int, orderBy: SchoolOrder, where: SchoolWhereInput): SchoolConnection
@@ -335,6 +388,9 @@ type Query {
 
   class(id: ID!): Class
   classes(userID: ID, stageID: ID, schoolID: ID, after: Cursor, first: Int, before: Cursor, last: Int, orderBy: ClassOrder, where: ClassWhereInput): ClassConnection
+
+  assignment(id: ID!): Assignment
+  assignments(userID: ID, stageID: ID, schoolID: ID, after: Cursor, first: Int, before: Cursor, last: Int, orderBy: AssignmentOrder, where: AssignmentWhereInput): AssignmentConnection
 }
 
 type Mutation {
@@ -366,6 +422,10 @@ type Mutation {
   addClass(input: AddClassInput!): Class
   updateClass(id: ID!, input: UpdateClassInput!): Class
   deleteClass(id: ID!): Boolean!
+
+  addAssignment(input: AddAssignmentInput!): Assignment
+  updateAssignment(id: ID!, input: UpdateAssignmentInput!): Assignment
+  deleteAssignment(id: ID!): Boolean!
 }
 
 type Subscription {

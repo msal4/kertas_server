@@ -23,7 +23,9 @@ models:
   ID:
     model:
       - github.com/msal4/hassah_school_server/ent/schema/uuidgql.UUID 
-
+  Duration:
+    model:
+      - github.com/msal4/hassah_school_server/ent/schema/durationgql.Duration
   Node:
     model:
       - github.com/msal4/hassah_school_server/ent.Noder

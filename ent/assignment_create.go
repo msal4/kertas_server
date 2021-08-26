@@ -107,15 +107,15 @@ func (ac *AssignmentCreate) SetDueDate(t time.Time) *AssignmentCreate {
 }
 
 // SetDuration sets the "duration" field.
-func (ac *AssignmentCreate) SetDuration(i int) *AssignmentCreate {
-	ac.mutation.SetDuration(i)
+func (ac *AssignmentCreate) SetDuration(t time.Duration) *AssignmentCreate {
+	ac.mutation.SetDuration(t)
 	return ac
 }
 
 // SetNillableDuration sets the "duration" field if the given value is not nil.
-func (ac *AssignmentCreate) SetNillableDuration(i *int) *AssignmentCreate {
-	if i != nil {
-		ac.SetDuration(*i)
+func (ac *AssignmentCreate) SetNillableDuration(t *time.Duration) *AssignmentCreate {
+	if t != nil {
+		ac.SetDuration(*t)
 	}
 	return ac
 }
@@ -306,6 +306,9 @@ func (ac *AssignmentCreate) sqlSave(ctx context.Context) (*Assignment, error) {
 		}
 		return nil, err
 	}
+	if _spec.ID.Value != nil {
+		_node.ID = _spec.ID.Value.(uuid.UUID)
+	}
 	return _node, nil
 }
 
@@ -382,7 +385,7 @@ func (ac *AssignmentCreate) createSpec() (*Assignment, *sqlgraph.CreateSpec) {
 	}
 	if value, ok := ac.mutation.Duration(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeInt,
+			Type:   field.TypeInt64,
 			Value:  value,
 			Column: assignment.FieldDuration,
 		})

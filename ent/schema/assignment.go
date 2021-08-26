@@ -1,6 +1,8 @@
 package schema
 
 import (
+	"time"
+
 	"entgo.io/contrib/entgql"
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/entsql"
@@ -22,9 +24,10 @@ func (Assignment) Fields() []ent.Field {
 		field.String("name").NotEmpty().Annotations(entgql.OrderField("NAME")),
 		field.String("description").Optional().Annotations(entgql.OrderField("DESCRIPTION")),
 		field.String("file").Optional(),
-		field.Bool("is_exam").Default(false).Annotations(entgql.OrderField("IS_EXAM")),
+		field.Bool("is_exam").Default(false),
 		field.Time("due_date").Annotations(entgql.OrderField("DUE_DATE")),
-		field.Int("duration").Optional().Annotations(entgql.OrderField("DURATION")),
+		field.Int64("duration").GoType(time.Duration(0)).Optional().
+			Annotations(entgql.OrderField("DURATION"), entgql.Type("Duration")),
 		field.Time("deleted_at").Optional().Nillable(),
 	}
 }

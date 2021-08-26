@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"entgo.io/ent/dialect"
+	"github.com/99designs/gqlgen/graphql"
 	"github.com/joho/godotenv"
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/minio/minio-go/v7"
@@ -18,6 +19,7 @@ import (
 	"github.com/msal4/hassah_school_server/ent/enttest"
 	"github.com/msal4/hassah_school_server/ent/user"
 	"github.com/msal4/hassah_school_server/service"
+	"github.com/msal4/hassah_school_server/testutil"
 	"github.com/msal4/hassah_school_server/util"
 	"github.com/stretchr/testify/require"
 )
@@ -86,4 +88,16 @@ func createStage(ctx context.Context, s *service.Service, name string, tuition i
 	sch := createSchool(ctx, s, "school for"+name, "image/"+name)
 	return s.EC.Stage.Create().SetName(name).SetDirectory("testdir" + name).SetTuitionAmount(tuition).
 		SetSchool(sch).SaveX(ctx)
+}
+
+func uploadFromFile(f *testutil.File) *graphql.Upload {
+	return &graphql.Upload{File: f, Filename: f.File.Name(), Size: f.Size(), ContentType: f.ContentType}
+}
+
+func now(ds ...time.Duration) time.Time {
+	var d time.Duration
+	for _, t := range ds {
+		d += t
+	}
+	return time.Now().Add(d)
 }

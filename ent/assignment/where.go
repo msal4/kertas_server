@@ -144,9 +144,10 @@ func DueDate(v time.Time) predicate.Assignment {
 }
 
 // Duration applies equality check predicate on the "duration" field. It's identical to DurationEQ.
-func Duration(v int) predicate.Assignment {
+func Duration(v time.Duration) predicate.Assignment {
+	vc := int64(v)
 	return predicate.Assignment(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldDuration), v))
+		s.Where(sql.EQ(s.C(FieldDuration), vc))
 	})
 }
 
@@ -761,24 +762,26 @@ func DueDateLTE(v time.Time) predicate.Assignment {
 }
 
 // DurationEQ applies the EQ predicate on the "duration" field.
-func DurationEQ(v int) predicate.Assignment {
+func DurationEQ(v time.Duration) predicate.Assignment {
+	vc := int64(v)
 	return predicate.Assignment(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldDuration), v))
+		s.Where(sql.EQ(s.C(FieldDuration), vc))
 	})
 }
 
 // DurationNEQ applies the NEQ predicate on the "duration" field.
-func DurationNEQ(v int) predicate.Assignment {
+func DurationNEQ(v time.Duration) predicate.Assignment {
+	vc := int64(v)
 	return predicate.Assignment(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldDuration), v))
+		s.Where(sql.NEQ(s.C(FieldDuration), vc))
 	})
 }
 
 // DurationIn applies the In predicate on the "duration" field.
-func DurationIn(vs ...int) predicate.Assignment {
+func DurationIn(vs ...time.Duration) predicate.Assignment {
 	v := make([]interface{}, len(vs))
 	for i := range v {
-		v[i] = vs[i]
+		v[i] = int64(vs[i])
 	}
 	return predicate.Assignment(func(s *sql.Selector) {
 		// if not arguments were provided, append the FALSE constants,
@@ -792,10 +795,10 @@ func DurationIn(vs ...int) predicate.Assignment {
 }
 
 // DurationNotIn applies the NotIn predicate on the "duration" field.
-func DurationNotIn(vs ...int) predicate.Assignment {
+func DurationNotIn(vs ...time.Duration) predicate.Assignment {
 	v := make([]interface{}, len(vs))
 	for i := range v {
-		v[i] = vs[i]
+		v[i] = int64(vs[i])
 	}
 	return predicate.Assignment(func(s *sql.Selector) {
 		// if not arguments were provided, append the FALSE constants,
@@ -809,30 +812,34 @@ func DurationNotIn(vs ...int) predicate.Assignment {
 }
 
 // DurationGT applies the GT predicate on the "duration" field.
-func DurationGT(v int) predicate.Assignment {
+func DurationGT(v time.Duration) predicate.Assignment {
+	vc := int64(v)
 	return predicate.Assignment(func(s *sql.Selector) {
-		s.Where(sql.GT(s.C(FieldDuration), v))
+		s.Where(sql.GT(s.C(FieldDuration), vc))
 	})
 }
 
 // DurationGTE applies the GTE predicate on the "duration" field.
-func DurationGTE(v int) predicate.Assignment {
+func DurationGTE(v time.Duration) predicate.Assignment {
+	vc := int64(v)
 	return predicate.Assignment(func(s *sql.Selector) {
-		s.Where(sql.GTE(s.C(FieldDuration), v))
+		s.Where(sql.GTE(s.C(FieldDuration), vc))
 	})
 }
 
 // DurationLT applies the LT predicate on the "duration" field.
-func DurationLT(v int) predicate.Assignment {
+func DurationLT(v time.Duration) predicate.Assignment {
+	vc := int64(v)
 	return predicate.Assignment(func(s *sql.Selector) {
-		s.Where(sql.LT(s.C(FieldDuration), v))
+		s.Where(sql.LT(s.C(FieldDuration), vc))
 	})
 }
 
 // DurationLTE applies the LTE predicate on the "duration" field.
-func DurationLTE(v int) predicate.Assignment {
+func DurationLTE(v time.Duration) predicate.Assignment {
+	vc := int64(v)
 	return predicate.Assignment(func(s *sql.Selector) {
-		s.Where(sql.LTE(s.C(FieldDuration), v))
+		s.Where(sql.LTE(s.C(FieldDuration), vc))
 	})
 }
 

@@ -99,23 +99,23 @@ func (au *AssignmentUpdate) SetDueDate(t time.Time) *AssignmentUpdate {
 }
 
 // SetDuration sets the "duration" field.
-func (au *AssignmentUpdate) SetDuration(i int) *AssignmentUpdate {
+func (au *AssignmentUpdate) SetDuration(t time.Duration) *AssignmentUpdate {
 	au.mutation.ResetDuration()
-	au.mutation.SetDuration(i)
+	au.mutation.SetDuration(t)
 	return au
 }
 
 // SetNillableDuration sets the "duration" field if the given value is not nil.
-func (au *AssignmentUpdate) SetNillableDuration(i *int) *AssignmentUpdate {
-	if i != nil {
-		au.SetDuration(*i)
+func (au *AssignmentUpdate) SetNillableDuration(t *time.Duration) *AssignmentUpdate {
+	if t != nil {
+		au.SetDuration(*t)
 	}
 	return au
 }
 
-// AddDuration adds i to the "duration" field.
-func (au *AssignmentUpdate) AddDuration(i int) *AssignmentUpdate {
-	au.mutation.AddDuration(i)
+// AddDuration adds t to the "duration" field.
+func (au *AssignmentUpdate) AddDuration(t time.Duration) *AssignmentUpdate {
+	au.mutation.AddDuration(t)
 	return au
 }
 
@@ -395,21 +395,21 @@ func (au *AssignmentUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := au.mutation.Duration(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeInt,
+			Type:   field.TypeInt64,
 			Value:  value,
 			Column: assignment.FieldDuration,
 		})
 	}
 	if value, ok := au.mutation.AddedDuration(); ok {
 		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
-			Type:   field.TypeInt,
+			Type:   field.TypeInt64,
 			Value:  value,
 			Column: assignment.FieldDuration,
 		})
 	}
 	if au.mutation.DurationCleared() {
 		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
-			Type:   field.TypeInt,
+			Type:   field.TypeInt64,
 			Column: assignment.FieldDuration,
 		})
 	}
@@ -655,23 +655,23 @@ func (auo *AssignmentUpdateOne) SetDueDate(t time.Time) *AssignmentUpdateOne {
 }
 
 // SetDuration sets the "duration" field.
-func (auo *AssignmentUpdateOne) SetDuration(i int) *AssignmentUpdateOne {
+func (auo *AssignmentUpdateOne) SetDuration(t time.Duration) *AssignmentUpdateOne {
 	auo.mutation.ResetDuration()
-	auo.mutation.SetDuration(i)
+	auo.mutation.SetDuration(t)
 	return auo
 }
 
 // SetNillableDuration sets the "duration" field if the given value is not nil.
-func (auo *AssignmentUpdateOne) SetNillableDuration(i *int) *AssignmentUpdateOne {
-	if i != nil {
-		auo.SetDuration(*i)
+func (auo *AssignmentUpdateOne) SetNillableDuration(t *time.Duration) *AssignmentUpdateOne {
+	if t != nil {
+		auo.SetDuration(*t)
 	}
 	return auo
 }
 
-// AddDuration adds i to the "duration" field.
-func (auo *AssignmentUpdateOne) AddDuration(i int) *AssignmentUpdateOne {
-	auo.mutation.AddDuration(i)
+// AddDuration adds t to the "duration" field.
+func (auo *AssignmentUpdateOne) AddDuration(t time.Duration) *AssignmentUpdateOne {
+	auo.mutation.AddDuration(t)
 	return auo
 }
 
@@ -975,21 +975,21 @@ func (auo *AssignmentUpdateOne) sqlSave(ctx context.Context) (_node *Assignment,
 	}
 	if value, ok := auo.mutation.Duration(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeInt,
+			Type:   field.TypeInt64,
 			Value:  value,
 			Column: assignment.FieldDuration,
 		})
 	}
 	if value, ok := auo.mutation.AddedDuration(); ok {
 		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
-			Type:   field.TypeInt,
+			Type:   field.TypeInt64,
 			Value:  value,
 			Column: assignment.FieldDuration,
 		})
 	}
 	if auo.mutation.DurationCleared() {
 		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
-			Type:   field.TypeInt,
+			Type:   field.TypeInt64,
 			Column: assignment.FieldDuration,
 		})
 	}
