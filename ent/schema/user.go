@@ -25,7 +25,7 @@ func (User) Fields() []ent.Field {
 		field.UUID("id", uuid.UUID{}).Default(uuid.New),
 		field.String("name").NotEmpty().Annotations(entgql.OrderField("NAME")),
 		field.String("username").Unique().NotEmpty().Annotations(entgql.OrderField("USERNAME")),
-		field.String("password").MinLen(passwordMinLength),
+		field.String("password").MinLen(passwordMinLength).Annotations(entgql.Skip()),
 		field.String("phone").NotEmpty().Annotations(entgql.OrderField("PHONE")),
 		field.String("image").Optional(),
 		field.String("directory").NotEmpty(),

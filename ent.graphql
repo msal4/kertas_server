@@ -991,21 +991,6 @@ input UserWhereInput {
   usernameEqualFold: String
   usernameContainsFold: String
   
-  """password field predicates"""
-  password: String
-  passwordNEQ: String
-  passwordIn: [String!]
-  passwordNotIn: [String!]
-  passwordGT: String
-  passwordGTE: String
-  passwordLT: String
-  passwordLTE: String
-  passwordContains: String
-  passwordHasPrefix: String
-  passwordHasSuffix: String
-  passwordEqualFold: String
-  passwordContainsFold: String
-  
   """phone field predicates"""
   phone: String
   phoneNEQ: String

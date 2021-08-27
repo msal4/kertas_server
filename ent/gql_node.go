@@ -951,18 +951,10 @@ func (u *User) Node(ctx context.Context) (node *Node, err error) {
 		Name:  "username",
 		Value: string(buf),
 	}
-	if buf, err = json.Marshal(u.Password); err != nil {
-		return nil, err
-	}
-	node.Fields[4] = &Field{
-		Type:  "string",
-		Name:  "password",
-		Value: string(buf),
-	}
 	if buf, err = json.Marshal(u.Phone); err != nil {
 		return nil, err
 	}
-	node.Fields[5] = &Field{
+	node.Fields[4] = &Field{
 		Type:  "string",
 		Name:  "phone",
 		Value: string(buf),
@@ -970,7 +962,7 @@ func (u *User) Node(ctx context.Context) (node *Node, err error) {
 	if buf, err = json.Marshal(u.Image); err != nil {
 		return nil, err
 	}
-	node.Fields[6] = &Field{
+	node.Fields[5] = &Field{
 		Type:  "string",
 		Name:  "image",
 		Value: string(buf),
@@ -978,7 +970,7 @@ func (u *User) Node(ctx context.Context) (node *Node, err error) {
 	if buf, err = json.Marshal(u.Directory); err != nil {
 		return nil, err
 	}
-	node.Fields[7] = &Field{
+	node.Fields[6] = &Field{
 		Type:  "string",
 		Name:  "directory",
 		Value: string(buf),
@@ -986,7 +978,7 @@ func (u *User) Node(ctx context.Context) (node *Node, err error) {
 	if buf, err = json.Marshal(u.TokenVersion); err != nil {
 		return nil, err
 	}
-	node.Fields[8] = &Field{
+	node.Fields[7] = &Field{
 		Type:  "int",
 		Name:  "token_version",
 		Value: string(buf),
@@ -994,7 +986,7 @@ func (u *User) Node(ctx context.Context) (node *Node, err error) {
 	if buf, err = json.Marshal(u.Role); err != nil {
 		return nil, err
 	}
-	node.Fields[9] = &Field{
+	node.Fields[8] = &Field{
 		Type:  "user.Role",
 		Name:  "role",
 		Value: string(buf),
@@ -1002,7 +994,7 @@ func (u *User) Node(ctx context.Context) (node *Node, err error) {
 	if buf, err = json.Marshal(u.Active); err != nil {
 		return nil, err
 	}
-	node.Fields[10] = &Field{
+	node.Fields[9] = &Field{
 		Type:  "bool",
 		Name:  "active",
 		Value: string(buf),
@@ -1010,7 +1002,7 @@ func (u *User) Node(ctx context.Context) (node *Node, err error) {
 	if buf, err = json.Marshal(u.DeletedAt); err != nil {
 		return nil, err
 	}
-	node.Fields[11] = &Field{
+	node.Fields[10] = &Field{
 		Type:  "time.Time",
 		Name:  "deleted_at",
 		Value: string(buf),
