@@ -28,7 +28,7 @@ type User struct {
 	// Username holds the value of the "username" field.
 	Username string `json:"username,omitempty"`
 	// Password holds the value of the "password" field.
-	Password string `json:"password,omitempty"`
+	Password string `json:"-"`
 	// Phone holds the value of the "phone" field.
 	Phone string `json:"phone,omitempty"`
 	// Image holds the value of the "image" field.
@@ -374,8 +374,7 @@ func (u *User) String() string {
 	builder.WriteString(u.Name)
 	builder.WriteString(", username=")
 	builder.WriteString(u.Username)
-	builder.WriteString(", password=")
-	builder.WriteString(u.Password)
+	builder.WriteString(", password=<sensitive>")
 	builder.WriteString(", phone=")
 	builder.WriteString(u.Phone)
 	builder.WriteString(", image=")
