@@ -5,5 +5,7 @@ migrate:
 gen:
 	@go generate ./ent
 	@go generate .
+seed:
+	@go run cmd/seed/main.go
 test:
 	@go test -cover -v ./...
