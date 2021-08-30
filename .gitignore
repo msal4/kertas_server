@@ -2,6 +2,7 @@ vim-markdown-preview.html
 dbml-error.log
 .DS_Store
 
+build/
 .idea/
 .vscode/
 .env
