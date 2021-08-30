@@ -1,4 +1,4 @@
-# Hassah School Server
+# Kertas Server
 
 ## TODO
 - [x] Setup ent
