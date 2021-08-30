@@ -9,10 +9,11 @@ debug: false
 database_dialect: postgres
 super_admin_username: admin
 super_admin_password: superadmin
+database_url: postgres://postgres@localhost:5432/school?sslmode=disable
 minio:
   endpoint: localhost:9000
-  access_key: myaccesskey
-  token: mytoken
+  access_key: minioadmin
+  token: minioadmin
 service:
   root_bucket: root
   max_filename_len: 6

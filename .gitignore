@@ -3,6 +3,7 @@ dbml-error.log
 .DS_Store
 
 build/
+build.zip
 .idea/
 .vscode/
 .env
