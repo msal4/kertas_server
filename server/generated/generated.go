@@ -21,6 +21,7 @@ import (
 	"github.com/msal4/hassah_school_server/ent/group"
 	"github.com/msal4/hassah_school_server/ent/schema/durationgql"
 	"github.com/msal4/hassah_school_server/ent/schema/uuidgql"
+	"github.com/msal4/hassah_school_server/ent/schema/weekdaygql"
 	"github.com/msal4/hassah_school_server/ent/user"
 	"github.com/msal4/hassah_school_server/server/model"
 	gqlparser "github.com/vektah/gqlparser/v2"
@@ -144,12 +145,14 @@ type ComplexityRoot struct {
 		AddAssignment           func(childComplexity int, input model.AddAssignmentInput) int
 		AddClass                func(childComplexity int, input model.AddClassInput) int
 		AddGroup                func(childComplexity int, input model.AddGroupInput) int
+		AddSchedule             func(childComplexity int, input model.AddScheduleInput) int
 		AddSchool               func(childComplexity int, input model.AddSchoolInput) int
 		AddStage                func(childComplexity int, input model.AddStageInput) int
 		AddUser                 func(childComplexity int, input model.AddUserInput) int
 		DeleteAssignment        func(childComplexity int, id uuid.UUID) int
 		DeleteClass             func(childComplexity int, id uuid.UUID) int
 		DeleteGroup             func(childComplexity int, id uuid.UUID) int
+		DeleteSchedule          func(childComplexity int, id uuid.UUID) int
 		DeleteSchool            func(childComplexity int, id uuid.UUID) int
 		DeleteSchoolPermanently func(childComplexity int, id uuid.UUID) int
 		DeleteStage             func(childComplexity int, id uuid.UUID) int
@@ -163,6 +166,7 @@ type ComplexityRoot struct {
 		UpdateAssignment        func(childComplexity int, id uuid.UUID, input model.UpdateAssignmentInput) int
 		UpdateClass             func(childComplexity int, id uuid.UUID, input model.UpdateClassInput) int
 		UpdateGroup             func(childComplexity int, id uuid.UUID, input model.UpdateGroupInput) int
+		UpdateSchedule          func(childComplexity int, id uuid.UUID, input model.UpdateScheduleInput) int
 		UpdateSchool            func(childComplexity int, id uuid.UUID, input model.UpdateSchoolInput) int
 		UpdateStage             func(childComplexity int, id uuid.UUID, input model.UpdateStageInput) int
 		UpdateUser              func(childComplexity int, id uuid.UUID, input model.UpdateUserInput) int
@@ -183,12 +187,20 @@ type ComplexityRoot struct {
 		Group       func(childComplexity int, id uuid.UUID) int
 		Groups      func(childComplexity int, userID *uuid.UUID, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.GroupOrder, where *ent.GroupWhereInput) int
 		Messages    func(childComplexity int, groupID uuid.UUID, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.MessageOrder, where *ent.MessageWhereInput) int
+		Schedule    func(childComplexity int, stageID *uuid.UUID, weekday *time.Weekday) int
 		School      func(childComplexity int, id uuid.UUID) int
 		Schools     func(childComplexity int, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.SchoolOrder, where *ent.SchoolWhereInput) int
 		Stage       func(childComplexity int, id uuid.UUID) int
 		Stages      func(childComplexity int, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.StageOrder, where *ent.StageWhereInput) int
 		User        func(childComplexity int, id uuid.UUID) int
 		Users       func(childComplexity int, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.UserOrder, where *ent.UserWhereInput) int
+	}
+
+	Schedule struct {
+		Duration func(childComplexity int) int
+		ID       func(childComplexity int) int
+		StartsAt func(childComplexity int) int
+		Weekday  func(childComplexity int) int
 	}
 
 	School struct {
@@ -288,6 +300,9 @@ type MutationResolver interface {
 	AddAssignment(ctx context.Context, input model.AddAssignmentInput) (*ent.Assignment, error)
 	UpdateAssignment(ctx context.Context, id uuid.UUID, input model.UpdateAssignmentInput) (*ent.Assignment, error)
 	DeleteAssignment(ctx context.Context, id uuid.UUID) (bool, error)
+	AddSchedule(ctx context.Context, input model.AddScheduleInput) (*ent.Schedule, error)
+	UpdateSchedule(ctx context.Context, id uuid.UUID, input model.UpdateScheduleInput) (*ent.Schedule, error)
+	DeleteSchedule(ctx context.Context, id uuid.UUID) (bool, error)
 }
 type QueryResolver interface {
 	School(ctx context.Context, id uuid.UUID) (*ent.School, error)
@@ -303,6 +318,7 @@ type QueryResolver interface {
 	Classes(ctx context.Context, userID *uuid.UUID, stageID *uuid.UUID, schoolID *uuid.UUID, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.ClassOrder, where *ent.ClassWhereInput) (*ent.ClassConnection, error)
 	Assignment(ctx context.Context, id uuid.UUID) (*ent.Assignment, error)
 	Assignments(ctx context.Context, userID *uuid.UUID, stageID *uuid.UUID, schoolID *uuid.UUID, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.AssignmentOrder, where *ent.AssignmentWhereInput) (*ent.AssignmentConnection, error)
+	Schedule(ctx context.Context, stageID *uuid.UUID, weekday *time.Weekday) ([]*ent.Schedule, error)
 }
 type SubscriptionResolver interface {
 	MessagePosted(ctx context.Context, groupID uuid.UUID) (<-chan *ent.Message, error)
@@ -688,6 +704,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.AddGroup(childComplexity, args["input"].(model.AddGroupInput)), true
 
+	case "Mutation.addSchedule":
+		if e.complexity.Mutation.AddSchedule == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_addSchedule_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.AddSchedule(childComplexity, args["input"].(model.AddScheduleInput)), true
+
 	case "Mutation.addSchool":
 		if e.complexity.Mutation.AddSchool == nil {
 			break
@@ -759,6 +787,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.DeleteGroup(childComplexity, args["id"].(uuid.UUID)), true
+
+	case "Mutation.deleteSchedule":
+		if e.complexity.Mutation.DeleteSchedule == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_deleteSchedule_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.DeleteSchedule(childComplexity, args["id"].(uuid.UUID)), true
 
 	case "Mutation.deleteSchool":
 		if e.complexity.Mutation.DeleteSchool == nil {
@@ -916,6 +956,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.UpdateGroup(childComplexity, args["id"].(uuid.UUID), args["input"].(model.UpdateGroupInput)), true
 
+	case "Mutation.updateSchedule":
+		if e.complexity.Mutation.UpdateSchedule == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_updateSchedule_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UpdateSchedule(childComplexity, args["id"].(uuid.UUID), args["input"].(model.UpdateScheduleInput)), true
+
 	case "Mutation.updateSchool":
 		if e.complexity.Mutation.UpdateSchool == nil {
 			break
@@ -1064,6 +1116,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Query.Messages(childComplexity, args["groupID"].(uuid.UUID), args["after"].(*ent.Cursor), args["first"].(*int), args["before"].(*ent.Cursor), args["last"].(*int), args["orderBy"].(*ent.MessageOrder), args["where"].(*ent.MessageWhereInput)), true
 
+	case "Query.schedule":
+		if e.complexity.Query.Schedule == nil {
+			break
+		}
+
+		args, err := ec.field_Query_schedule_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.Schedule(childComplexity, args["stageID"].(*uuid.UUID), args["weekday"].(*time.Weekday)), true
+
 	case "Query.school":
 		if e.complexity.Query.School == nil {
 			break
@@ -1135,6 +1199,34 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Query.Users(childComplexity, args["after"].(*ent.Cursor), args["first"].(*int), args["before"].(*ent.Cursor), args["last"].(*int), args["orderBy"].(*ent.UserOrder), args["where"].(*ent.UserWhereInput)), true
+
+	case "Schedule.duration":
+		if e.complexity.Schedule.Duration == nil {
+			break
+		}
+
+		return e.complexity.Schedule.Duration(childComplexity), true
+
+	case "Schedule.id":
+		if e.complexity.Schedule.ID == nil {
+			break
+		}
+
+		return e.complexity.Schedule.ID(childComplexity), true
+
+	case "Schedule.startsAt":
+		if e.complexity.Schedule.StartsAt == nil {
+			break
+		}
+
+		return e.complexity.Schedule.StartsAt(childComplexity), true
+
+	case "Schedule.weekday":
+		if e.complexity.Schedule.Weekday == nil {
+			break
+		}
+
+		return e.complexity.Schedule.Weekday(childComplexity), true
 
 	case "School.active":
 		if e.complexity.School.Active == nil {
@@ -1506,6 +1598,7 @@ var sources = []*ast.Source{
 scalar Time
 scalar Upload
 scalar Duration
+scalar Weekday
 
 interface Node {
   id: ID!
@@ -1860,7 +1953,6 @@ type AssignmentConnection {
   edges: [AssignmentEdge]
 }
 
-
 input AddAssignmentInput {
   name: String!
   description: String
@@ -1877,6 +1969,26 @@ input UpdateAssignmentInput {
   file: Upload
   dueDate: Time
   duration: Duration
+}
+
+type Schedule {
+  id: ID!
+  weekday: Weekday!
+  duration: Duration!
+  startsAt: Time!
+}
+
+input AddScheduleInput {
+  weekday: Weekday!
+  duration: Duration!
+  startsAt: Time!
+  classID: ID!
+}
+
+input UpdateScheduleInput {
+  weekday: Weekday
+  duration: Duration
+  startsAt: Time
 }
 
 type Query {
@@ -1899,6 +2011,8 @@ type Query {
 
   assignment(id: ID!): Assignment
   assignments(userID: ID, stageID: ID, schoolID: ID, after: Cursor, first: Int, before: Cursor, last: Int, orderBy: AssignmentOrder, where: AssignmentWhereInput): AssignmentConnection
+
+  schedule(stageID: ID, weekday: Weekday): [Schedule]
 }
 
 type Mutation {
@@ -1934,6 +2048,10 @@ type Mutation {
   addAssignment(input: AddAssignmentInput!): Assignment
   updateAssignment(id: ID!, input: UpdateAssignmentInput!): Assignment
   deleteAssignment(id: ID!): Boolean!
+
+  addSchedule(input: AddScheduleInput!): Schedule
+  updateSchedule(id: ID!, input: UpdateScheduleInput!): Schedule
+  deleteSchedule(id: ID!): Boolean!
 }
 
 type Subscription {
@@ -1941,281 +2059,6 @@ type Subscription {
 }
 `, BuiltIn: false},
 	{Name: "ent.graphql", Input: `"""
-ScheduleWhereInput is used for filtering Schedule objects.
-Input was generated by ent.
-"""
-input ScheduleWhereInput {
-  not: ScheduleWhereInput
-  and: [ScheduleWhereInput!]
-  or: [ScheduleWhereInput!]
-  
-  """weekday field predicates"""
-  weekday: Int
-  weekdayNEQ: Int
-  weekdayIn: [Int!]
-  weekdayNotIn: [Int!]
-  weekdayGT: Int
-  weekdayGTE: Int
-  weekdayLT: Int
-  weekdayLTE: Int
-  
-  """starts_at field predicates"""
-  startsAt: Time
-  startsAtNEQ: Time
-  startsAtIn: [Time!]
-  startsAtNotIn: [Time!]
-  startsAtGT: Time
-  startsAtGTE: Time
-  startsAtLT: Time
-  startsAtLTE: Time
-  
-  """duration field predicates"""
-  duration: Int
-  durationNEQ: Int
-  durationIn: [Int!]
-  durationNotIn: [Int!]
-  durationGT: Int
-  durationGTE: Int
-  durationLT: Int
-  durationLTE: Int
-  
-  """id field predicates"""
-  id: ID
-  idNEQ: ID
-  idIn: [ID!]
-  idNotIn: [ID!]
-  idGT: ID
-  idGTE: ID
-  idLT: ID
-  idLTE: ID
-  
-  """class edge predicates"""
-  hasClass: Boolean
-  hasClassWith: [ClassWhereInput!]
-}
-
-"""
-SchoolWhereInput is used for filtering School objects.
-Input was generated by ent.
-"""
-input SchoolWhereInput {
-  not: SchoolWhereInput
-  and: [SchoolWhereInput!]
-  or: [SchoolWhereInput!]
-  
-  """created_at field predicates"""
-  createdAt: Time
-  createdAtNEQ: Time
-  createdAtIn: [Time!]
-  createdAtNotIn: [Time!]
-  createdAtGT: Time
-  createdAtGTE: Time
-  createdAtLT: Time
-  createdAtLTE: Time
-  
-  """updated_at field predicates"""
-  updatedAt: Time
-  updatedAtNEQ: Time
-  updatedAtIn: [Time!]
-  updatedAtNotIn: [Time!]
-  updatedAtGT: Time
-  updatedAtGTE: Time
-  updatedAtLT: Time
-  updatedAtLTE: Time
-  
-  """name field predicates"""
-  name: String
-  nameNEQ: String
-  nameIn: [String!]
-  nameNotIn: [String!]
-  nameGT: String
-  nameGTE: String
-  nameLT: String
-  nameLTE: String
-  nameContains: String
-  nameHasPrefix: String
-  nameHasSuffix: String
-  nameEqualFold: String
-  nameContainsFold: String
-  
-  """image field predicates"""
-  image: String
-  imageNEQ: String
-  imageIn: [String!]
-  imageNotIn: [String!]
-  imageGT: String
-  imageGTE: String
-  imageLT: String
-  imageLTE: String
-  imageContains: String
-  imageHasPrefix: String
-  imageHasSuffix: String
-  imageEqualFold: String
-  imageContainsFold: String
-  
-  """directory field predicates"""
-  directory: String
-  directoryNEQ: String
-  directoryIn: [String!]
-  directoryNotIn: [String!]
-  directoryGT: String
-  directoryGTE: String
-  directoryLT: String
-  directoryLTE: String
-  directoryContains: String
-  directoryHasPrefix: String
-  directoryHasSuffix: String
-  directoryEqualFold: String
-  directoryContainsFold: String
-  
-  """active field predicates"""
-  active: Boolean
-  activeNEQ: Boolean
-  
-  """deleted_at field predicates"""
-  deletedAt: Time
-  deletedAtNEQ: Time
-  deletedAtIn: [Time!]
-  deletedAtNotIn: [Time!]
-  deletedAtGT: Time
-  deletedAtGTE: Time
-  deletedAtLT: Time
-  deletedAtLTE: Time
-  deletedAtIsNil: Boolean
-  deletedAtNotNil: Boolean
-  
-  """id field predicates"""
-  id: ID
-  idNEQ: ID
-  idIn: [ID!]
-  idNotIn: [ID!]
-  idGT: ID
-  idGTE: ID
-  idLT: ID
-  idLTE: ID
-  
-  """users edge predicates"""
-  hasUsers: Boolean
-  hasUsersWith: [UserWhereInput!]
-  
-  """stages edge predicates"""
-  hasStages: Boolean
-  hasStagesWith: [StageWhereInput!]
-}
-
-"""
-StageWhereInput is used for filtering Stage objects.
-Input was generated by ent.
-"""
-input StageWhereInput {
-  not: StageWhereInput
-  and: [StageWhereInput!]
-  or: [StageWhereInput!]
-  
-  """created_at field predicates"""
-  createdAt: Time
-  createdAtNEQ: Time
-  createdAtIn: [Time!]
-  createdAtNotIn: [Time!]
-  createdAtGT: Time
-  createdAtGTE: Time
-  createdAtLT: Time
-  createdAtLTE: Time
-  
-  """updated_at field predicates"""
-  updatedAt: Time
-  updatedAtNEQ: Time
-  updatedAtIn: [Time!]
-  updatedAtNotIn: [Time!]
-  updatedAtGT: Time
-  updatedAtGTE: Time
-  updatedAtLT: Time
-  updatedAtLTE: Time
-  
-  """name field predicates"""
-  name: String
-  nameNEQ: String
-  nameIn: [String!]
-  nameNotIn: [String!]
-  nameGT: String
-  nameGTE: String
-  nameLT: String
-  nameLTE: String
-  nameContains: String
-  nameHasPrefix: String
-  nameHasSuffix: String
-  nameEqualFold: String
-  nameContainsFold: String
-  
-  """tuition_amount field predicates"""
-  tuitionAmount: Int
-  tuitionAmountNEQ: Int
-  tuitionAmountIn: [Int!]
-  tuitionAmountNotIn: [Int!]
-  tuitionAmountGT: Int
-  tuitionAmountGTE: Int
-  tuitionAmountLT: Int
-  tuitionAmountLTE: Int
-  
-  """directory field predicates"""
-  directory: String
-  directoryNEQ: String
-  directoryIn: [String!]
-  directoryNotIn: [String!]
-  directoryGT: String
-  directoryGTE: String
-  directoryLT: String
-  directoryLTE: String
-  directoryContains: String
-  directoryHasPrefix: String
-  directoryHasSuffix: String
-  directoryEqualFold: String
-  directoryContainsFold: String
-  
-  """active field predicates"""
-  active: Boolean
-  activeNEQ: Boolean
-  
-  """deleted_at field predicates"""
-  deletedAt: Time
-  deletedAtNEQ: Time
-  deletedAtIn: [Time!]
-  deletedAtNotIn: [Time!]
-  deletedAtGT: Time
-  deletedAtGTE: Time
-  deletedAtLT: Time
-  deletedAtLTE: Time
-  deletedAtIsNil: Boolean
-  deletedAtNotNil: Boolean
-  
-  """id field predicates"""
-  id: ID
-  idNEQ: ID
-  idIn: [ID!]
-  idNotIn: [ID!]
-  idGT: ID
-  idGTE: ID
-  idLT: ID
-  idLTE: ID
-  
-  """school edge predicates"""
-  hasSchool: Boolean
-  hasSchoolWith: [SchoolWhereInput!]
-  
-  """classes edge predicates"""
-  hasClasses: Boolean
-  hasClassesWith: [ClassWhereInput!]
-  
-  """payments edge predicates"""
-  hasPayments: Boolean
-  hasPaymentsWith: [TuitionPaymentWhereInput!]
-  
-  """students edge predicates"""
-  hasStudents: Boolean
-  hasStudentsWith: [UserWhereInput!]
-}
-
-"""
 AssignmentWhereInput is used for filtering Assignment objects.
 Input was generated by ent.
 """
@@ -2352,6 +2195,334 @@ input AssignmentWhereInput {
   """grades edge predicates"""
   hasGrades: Boolean
   hasGradesWith: [GradeWhereInput!]
+}
+
+"""
+AttendanceWhereInput is used for filtering Attendance objects.
+Input was generated by ent.
+"""
+input AttendanceWhereInput {
+  not: AttendanceWhereInput
+  and: [AttendanceWhereInput!]
+  or: [AttendanceWhereInput!]
+  
+  """created_at field predicates"""
+  createdAt: Time
+  createdAtNEQ: Time
+  createdAtIn: [Time!]
+  createdAtNotIn: [Time!]
+  createdAtGT: Time
+  createdAtGTE: Time
+  createdAtLT: Time
+  createdAtLTE: Time
+  
+  """updated_at field predicates"""
+  updatedAt: Time
+  updatedAtNEQ: Time
+  updatedAtIn: [Time!]
+  updatedAtNotIn: [Time!]
+  updatedAtGT: Time
+  updatedAtGTE: Time
+  updatedAtLT: Time
+  updatedAtLTE: Time
+  
+  """date field predicates"""
+  date: Time
+  dateNEQ: Time
+  dateIn: [Time!]
+  dateNotIn: [Time!]
+  dateGT: Time
+  dateGTE: Time
+  dateLT: Time
+  dateLTE: Time
+  
+  """state field predicates"""
+  state: State
+  stateNEQ: State
+  stateIn: [State!]
+  stateNotIn: [State!]
+  
+  """id field predicates"""
+  id: ID
+  idNEQ: ID
+  idIn: [ID!]
+  idNotIn: [ID!]
+  idGT: ID
+  idGTE: ID
+  idLT: ID
+  idLTE: ID
+  
+  """class edge predicates"""
+  hasClass: Boolean
+  hasClassWith: [ClassWhereInput!]
+  
+  """student edge predicates"""
+  hasStudent: Boolean
+  hasStudentWith: [UserWhereInput!]
+}
+
+"""
+MessageWhereInput is used for filtering Message objects.
+Input was generated by ent.
+"""
+input MessageWhereInput {
+  not: MessageWhereInput
+  and: [MessageWhereInput!]
+  or: [MessageWhereInput!]
+  
+  """created_at field predicates"""
+  createdAt: Time
+  createdAtNEQ: Time
+  createdAtIn: [Time!]
+  createdAtNotIn: [Time!]
+  createdAtGT: Time
+  createdAtGTE: Time
+  createdAtLT: Time
+  createdAtLTE: Time
+  
+  """updated_at field predicates"""
+  updatedAt: Time
+  updatedAtNEQ: Time
+  updatedAtIn: [Time!]
+  updatedAtNotIn: [Time!]
+  updatedAtGT: Time
+  updatedAtGTE: Time
+  updatedAtLT: Time
+  updatedAtLTE: Time
+  
+  """content field predicates"""
+  content: String
+  contentNEQ: String
+  contentIn: [String!]
+  contentNotIn: [String!]
+  contentGT: String
+  contentGTE: String
+  contentLT: String
+  contentLTE: String
+  contentContains: String
+  contentHasPrefix: String
+  contentHasSuffix: String
+  contentIsNil: Boolean
+  contentNotNil: Boolean
+  contentEqualFold: String
+  contentContainsFold: String
+  
+  """attachment field predicates"""
+  attachment: String
+  attachmentNEQ: String
+  attachmentIn: [String!]
+  attachmentNotIn: [String!]
+  attachmentGT: String
+  attachmentGTE: String
+  attachmentLT: String
+  attachmentLTE: String
+  attachmentContains: String
+  attachmentHasPrefix: String
+  attachmentHasSuffix: String
+  attachmentIsNil: Boolean
+  attachmentNotNil: Boolean
+  attachmentEqualFold: String
+  attachmentContainsFold: String
+  
+  """deleted_at field predicates"""
+  deletedAt: Time
+  deletedAtNEQ: Time
+  deletedAtIn: [Time!]
+  deletedAtNotIn: [Time!]
+  deletedAtGT: Time
+  deletedAtGTE: Time
+  deletedAtLT: Time
+  deletedAtLTE: Time
+  deletedAtIsNil: Boolean
+  deletedAtNotNil: Boolean
+  
+  """id field predicates"""
+  id: ID
+  idNEQ: ID
+  idIn: [ID!]
+  idNotIn: [ID!]
+  idGT: ID
+  idGTE: ID
+  idLT: ID
+  idLTE: ID
+  
+  """group edge predicates"""
+  hasGroup: Boolean
+  hasGroupWith: [GroupWhereInput!]
+  
+  """owner edge predicates"""
+  hasOwner: Boolean
+  hasOwnerWith: [UserWhereInput!]
+}
+
+"""
+StageWhereInput is used for filtering Stage objects.
+Input was generated by ent.
+"""
+input StageWhereInput {
+  not: StageWhereInput
+  and: [StageWhereInput!]
+  or: [StageWhereInput!]
+  
+  """created_at field predicates"""
+  createdAt: Time
+  createdAtNEQ: Time
+  createdAtIn: [Time!]
+  createdAtNotIn: [Time!]
+  createdAtGT: Time
+  createdAtGTE: Time
+  createdAtLT: Time
+  createdAtLTE: Time
+  
+  """updated_at field predicates"""
+  updatedAt: Time
+  updatedAtNEQ: Time
+  updatedAtIn: [Time!]
+  updatedAtNotIn: [Time!]
+  updatedAtGT: Time
+  updatedAtGTE: Time
+  updatedAtLT: Time
+  updatedAtLTE: Time
+  
+  """name field predicates"""
+  name: String
+  nameNEQ: String
+  nameIn: [String!]
+  nameNotIn: [String!]
+  nameGT: String
+  nameGTE: String
+  nameLT: String
+  nameLTE: String
+  nameContains: String
+  nameHasPrefix: String
+  nameHasSuffix: String
+  nameEqualFold: String
+  nameContainsFold: String
+  
+  """tuition_amount field predicates"""
+  tuitionAmount: Int
+  tuitionAmountNEQ: Int
+  tuitionAmountIn: [Int!]
+  tuitionAmountNotIn: [Int!]
+  tuitionAmountGT: Int
+  tuitionAmountGTE: Int
+  tuitionAmountLT: Int
+  tuitionAmountLTE: Int
+  
+  """directory field predicates"""
+  directory: String
+  directoryNEQ: String
+  directoryIn: [String!]
+  directoryNotIn: [String!]
+  directoryGT: String
+  directoryGTE: String
+  directoryLT: String
+  directoryLTE: String
+  directoryContains: String
+  directoryHasPrefix: String
+  directoryHasSuffix: String
+  directoryEqualFold: String
+  directoryContainsFold: String
+  
+  """active field predicates"""
+  active: Boolean
+  activeNEQ: Boolean
+  
+  """deleted_at field predicates"""
+  deletedAt: Time
+  deletedAtNEQ: Time
+  deletedAtIn: [Time!]
+  deletedAtNotIn: [Time!]
+  deletedAtGT: Time
+  deletedAtGTE: Time
+  deletedAtLT: Time
+  deletedAtLTE: Time
+  deletedAtIsNil: Boolean
+  deletedAtNotNil: Boolean
+  
+  """id field predicates"""
+  id: ID
+  idNEQ: ID
+  idIn: [ID!]
+  idNotIn: [ID!]
+  idGT: ID
+  idGTE: ID
+  idLT: ID
+  idLTE: ID
+  
+  """school edge predicates"""
+  hasSchool: Boolean
+  hasSchoolWith: [SchoolWhereInput!]
+  
+  """classes edge predicates"""
+  hasClasses: Boolean
+  hasClassesWith: [ClassWhereInput!]
+  
+  """payments edge predicates"""
+  hasPayments: Boolean
+  hasPaymentsWith: [TuitionPaymentWhereInput!]
+  
+  """students edge predicates"""
+  hasStudents: Boolean
+  hasStudentsWith: [UserWhereInput!]
+}
+
+"""
+TuitionPaymentWhereInput is used for filtering TuitionPayment objects.
+Input was generated by ent.
+"""
+input TuitionPaymentWhereInput {
+  not: TuitionPaymentWhereInput
+  and: [TuitionPaymentWhereInput!]
+  or: [TuitionPaymentWhereInput!]
+  
+  """created_at field predicates"""
+  createdAt: Time
+  createdAtNEQ: Time
+  createdAtIn: [Time!]
+  createdAtNotIn: [Time!]
+  createdAtGT: Time
+  createdAtGTE: Time
+  createdAtLT: Time
+  createdAtLTE: Time
+  
+  """updated_at field predicates"""
+  updatedAt: Time
+  updatedAtNEQ: Time
+  updatedAtIn: [Time!]
+  updatedAtNotIn: [Time!]
+  updatedAtGT: Time
+  updatedAtGTE: Time
+  updatedAtLT: Time
+  updatedAtLTE: Time
+  
+  """paid_amount field predicates"""
+  paidAmount: Int
+  paidAmountNEQ: Int
+  paidAmountIn: [Int!]
+  paidAmountNotIn: [Int!]
+  paidAmountGT: Int
+  paidAmountGTE: Int
+  paidAmountLT: Int
+  paidAmountLTE: Int
+  
+  """id field predicates"""
+  id: ID
+  idNEQ: ID
+  idIn: [ID!]
+  idNotIn: [ID!]
+  idGT: ID
+  idGTE: ID
+  idLT: ID
+  idLTE: ID
+  
+  """student edge predicates"""
+  hasStudent: Boolean
+  hasStudentWith: [UserWhereInput!]
+  
+  """stage edge predicates"""
+  hasStage: Boolean
+  hasStageWith: [StageWhereInput!]
 }
 
 """
@@ -2659,107 +2830,43 @@ input GroupWhereInput {
 }
 
 """
-TuitionPaymentWhereInput is used for filtering TuitionPayment objects.
+ScheduleWhereInput is used for filtering Schedule objects.
 Input was generated by ent.
 """
-input TuitionPaymentWhereInput {
-  not: TuitionPaymentWhereInput
-  and: [TuitionPaymentWhereInput!]
-  or: [TuitionPaymentWhereInput!]
+input ScheduleWhereInput {
+  not: ScheduleWhereInput
+  and: [ScheduleWhereInput!]
+  or: [ScheduleWhereInput!]
   
-  """created_at field predicates"""
-  createdAt: Time
-  createdAtNEQ: Time
-  createdAtIn: [Time!]
-  createdAtNotIn: [Time!]
-  createdAtGT: Time
-  createdAtGTE: Time
-  createdAtLT: Time
-  createdAtLTE: Time
+  """weekday field predicates"""
+  weekday: Weekday
+  weekdayNEQ: Weekday
+  weekdayIn: [Weekday!]
+  weekdayNotIn: [Weekday!]
+  weekdayGT: Weekday
+  weekdayGTE: Weekday
+  weekdayLT: Weekday
+  weekdayLTE: Weekday
   
-  """updated_at field predicates"""
-  updatedAt: Time
-  updatedAtNEQ: Time
-  updatedAtIn: [Time!]
-  updatedAtNotIn: [Time!]
-  updatedAtGT: Time
-  updatedAtGTE: Time
-  updatedAtLT: Time
-  updatedAtLTE: Time
+  """starts_at field predicates"""
+  startsAt: Time
+  startsAtNEQ: Time
+  startsAtIn: [Time!]
+  startsAtNotIn: [Time!]
+  startsAtGT: Time
+  startsAtGTE: Time
+  startsAtLT: Time
+  startsAtLTE: Time
   
-  """paid_amount field predicates"""
-  paidAmount: Int
-  paidAmountNEQ: Int
-  paidAmountIn: [Int!]
-  paidAmountNotIn: [Int!]
-  paidAmountGT: Int
-  paidAmountGTE: Int
-  paidAmountLT: Int
-  paidAmountLTE: Int
-  
-  """id field predicates"""
-  id: ID
-  idNEQ: ID
-  idIn: [ID!]
-  idNotIn: [ID!]
-  idGT: ID
-  idGTE: ID
-  idLT: ID
-  idLTE: ID
-  
-  """student edge predicates"""
-  hasStudent: Boolean
-  hasStudentWith: [UserWhereInput!]
-  
-  """stage edge predicates"""
-  hasStage: Boolean
-  hasStageWith: [StageWhereInput!]
-}
-
-"""
-AttendanceWhereInput is used for filtering Attendance objects.
-Input was generated by ent.
-"""
-input AttendanceWhereInput {
-  not: AttendanceWhereInput
-  and: [AttendanceWhereInput!]
-  or: [AttendanceWhereInput!]
-  
-  """created_at field predicates"""
-  createdAt: Time
-  createdAtNEQ: Time
-  createdAtIn: [Time!]
-  createdAtNotIn: [Time!]
-  createdAtGT: Time
-  createdAtGTE: Time
-  createdAtLT: Time
-  createdAtLTE: Time
-  
-  """updated_at field predicates"""
-  updatedAt: Time
-  updatedAtNEQ: Time
-  updatedAtIn: [Time!]
-  updatedAtNotIn: [Time!]
-  updatedAtGT: Time
-  updatedAtGTE: Time
-  updatedAtLT: Time
-  updatedAtLTE: Time
-  
-  """date field predicates"""
-  date: Time
-  dateNEQ: Time
-  dateIn: [Time!]
-  dateNotIn: [Time!]
-  dateGT: Time
-  dateGTE: Time
-  dateLT: Time
-  dateLTE: Time
-  
-  """state field predicates"""
-  state: State
-  stateNEQ: State
-  stateIn: [State!]
-  stateNotIn: [State!]
+  """duration field predicates"""
+  duration: Duration
+  durationNEQ: Duration
+  durationIn: [Duration!]
+  durationNotIn: [Duration!]
+  durationGT: Duration
+  durationGTE: Duration
+  durationLT: Duration
+  durationLTE: Duration
   
   """id field predicates"""
   id: ID
@@ -2774,20 +2881,16 @@ input AttendanceWhereInput {
   """class edge predicates"""
   hasClass: Boolean
   hasClassWith: [ClassWhereInput!]
-  
-  """student edge predicates"""
-  hasStudent: Boolean
-  hasStudentWith: [UserWhereInput!]
 }
 
 """
-MessageWhereInput is used for filtering Message objects.
+SchoolWhereInput is used for filtering School objects.
 Input was generated by ent.
 """
-input MessageWhereInput {
-  not: MessageWhereInput
-  and: [MessageWhereInput!]
-  or: [MessageWhereInput!]
+input SchoolWhereInput {
+  not: SchoolWhereInput
+  and: [SchoolWhereInput!]
+  or: [SchoolWhereInput!]
   
   """created_at field predicates"""
   createdAt: Time
@@ -2809,39 +2912,54 @@ input MessageWhereInput {
   updatedAtLT: Time
   updatedAtLTE: Time
   
-  """content field predicates"""
-  content: String
-  contentNEQ: String
-  contentIn: [String!]
-  contentNotIn: [String!]
-  contentGT: String
-  contentGTE: String
-  contentLT: String
-  contentLTE: String
-  contentContains: String
-  contentHasPrefix: String
-  contentHasSuffix: String
-  contentIsNil: Boolean
-  contentNotNil: Boolean
-  contentEqualFold: String
-  contentContainsFold: String
+  """name field predicates"""
+  name: String
+  nameNEQ: String
+  nameIn: [String!]
+  nameNotIn: [String!]
+  nameGT: String
+  nameGTE: String
+  nameLT: String
+  nameLTE: String
+  nameContains: String
+  nameHasPrefix: String
+  nameHasSuffix: String
+  nameEqualFold: String
+  nameContainsFold: String
   
-  """attachment field predicates"""
-  attachment: String
-  attachmentNEQ: String
-  attachmentIn: [String!]
-  attachmentNotIn: [String!]
-  attachmentGT: String
-  attachmentGTE: String
-  attachmentLT: String
-  attachmentLTE: String
-  attachmentContains: String
-  attachmentHasPrefix: String
-  attachmentHasSuffix: String
-  attachmentIsNil: Boolean
-  attachmentNotNil: Boolean
-  attachmentEqualFold: String
-  attachmentContainsFold: String
+  """image field predicates"""
+  image: String
+  imageNEQ: String
+  imageIn: [String!]
+  imageNotIn: [String!]
+  imageGT: String
+  imageGTE: String
+  imageLT: String
+  imageLTE: String
+  imageContains: String
+  imageHasPrefix: String
+  imageHasSuffix: String
+  imageEqualFold: String
+  imageContainsFold: String
+  
+  """directory field predicates"""
+  directory: String
+  directoryNEQ: String
+  directoryIn: [String!]
+  directoryNotIn: [String!]
+  directoryGT: String
+  directoryGTE: String
+  directoryLT: String
+  directoryLTE: String
+  directoryContains: String
+  directoryHasPrefix: String
+  directoryHasSuffix: String
+  directoryEqualFold: String
+  directoryContainsFold: String
+  
+  """active field predicates"""
+  active: Boolean
+  activeNEQ: Boolean
   
   """deleted_at field predicates"""
   deletedAt: Time
@@ -2865,13 +2983,13 @@ input MessageWhereInput {
   idLT: ID
   idLTE: ID
   
-  """group edge predicates"""
-  hasGroup: Boolean
-  hasGroupWith: [GroupWhereInput!]
+  """users edge predicates"""
+  hasUsers: Boolean
+  hasUsersWith: [UserWhereInput!]
   
-  """owner edge predicates"""
-  hasOwner: Boolean
-  hasOwnerWith: [UserWhereInput!]
+  """stages edge predicates"""
+  hasStages: Boolean
+  hasStagesWith: [StageWhereInput!]
 }
 
 """
@@ -3111,6 +3229,21 @@ func (ec *executionContext) field_Mutation_addGroup_args(ctx context.Context, ra
 	return args, nil
 }
 
+func (ec *executionContext) field_Mutation_addSchedule_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 model.AddScheduleInput
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg0, err = ec.unmarshalNAddScheduleInput2githubᚗcomᚋmsal4ᚋhassah_school_serverᚋserverᚋmodelᚐAddScheduleInput(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
 func (ec *executionContext) field_Mutation_addSchool_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -3187,6 +3320,21 @@ func (ec *executionContext) field_Mutation_deleteClass_args(ctx context.Context,
 }
 
 func (ec *executionContext) field_Mutation_deleteGroup_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 uuid.UUID
+	if tmp, ok := rawArgs["id"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+		arg0, err = ec.unmarshalNID2githubᚗcomᚋgoogleᚋuuidᚐUUID(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["id"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_deleteSchedule_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
 	var arg0 uuid.UUID
@@ -3415,6 +3563,30 @@ func (ec *executionContext) field_Mutation_updateGroup_args(ctx context.Context,
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
 		arg1, err = ec.unmarshalNUpdateGroupInput2githubᚗcomᚋmsal4ᚋhassah_school_serverᚋserverᚋmodelᚐUpdateGroupInput(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg1
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_updateSchedule_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 uuid.UUID
+	if tmp, ok := rawArgs["id"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+		arg0, err = ec.unmarshalNID2githubᚗcomᚋgoogleᚋuuidᚐUUID(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["id"] = arg0
+	var arg1 model.UpdateScheduleInput
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg1, err = ec.unmarshalNUpdateScheduleInput2githubᚗcomᚋmsal4ᚋhassah_school_serverᚋserverᚋmodelᚐUpdateScheduleInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -3864,6 +4036,30 @@ func (ec *executionContext) field_Query_messages_args(ctx context.Context, rawAr
 		}
 	}
 	args["where"] = arg6
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_schedule_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *uuid.UUID
+	if tmp, ok := rawArgs["stageID"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("stageID"))
+		arg0, err = ec.unmarshalOID2ᚖgithubᚗcomᚋgoogleᚋuuidᚐUUID(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["stageID"] = arg0
+	var arg1 *time.Weekday
+	if tmp, ok := rawArgs["weekday"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("weekday"))
+		arg1, err = ec.unmarshalOWeekday2ᚖtimeᚐWeekday(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["weekday"] = arg1
 	return args, nil
 }
 
@@ -6759,6 +6955,126 @@ func (ec *executionContext) _Mutation_deleteAssignment(ctx context.Context, fiel
 	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _Mutation_addSchedule(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_addSchedule_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().AddSchedule(rctx, args["input"].(model.AddScheduleInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*ent.Schedule)
+	fc.Result = res
+	return ec.marshalOSchedule2ᚖgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚐSchedule(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_updateSchedule(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_updateSchedule_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().UpdateSchedule(rctx, args["id"].(uuid.UUID), args["input"].(model.UpdateScheduleInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*ent.Schedule)
+	fc.Result = res
+	return ec.marshalOSchedule2ᚖgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚐSchedule(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_deleteSchedule(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_deleteSchedule_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().DeleteSchedule(rctx, args["id"].(uuid.UUID))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _PageInfo_hasNextPage(ctx context.Context, field graphql.CollectedField, obj *ent.PageInfo) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -7400,6 +7716,45 @@ func (ec *executionContext) _Query_assignments(ctx context.Context, field graphq
 	return ec.marshalOAssignmentConnection2ᚖgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚐAssignmentConnection(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _Query_schedule(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Query_schedule_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().Schedule(rctx, args["stageID"].(*uuid.UUID), args["weekday"].(*time.Weekday))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*ent.Schedule)
+	fc.Result = res
+	return ec.marshalOSchedule2ᚕᚖgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚐSchedule(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _Query___type(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -7469,6 +7824,146 @@ func (ec *executionContext) _Query___schema(ctx context.Context, field graphql.C
 	res := resTmp.(*introspection.Schema)
 	fc.Result = res
 	return ec.marshalO__Schema2ᚖgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐSchema(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Schedule_id(ctx context.Context, field graphql.CollectedField, obj *ent.Schedule) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Schedule",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(uuid.UUID)
+	fc.Result = res
+	return ec.marshalNID2githubᚗcomᚋgoogleᚋuuidᚐUUID(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Schedule_weekday(ctx context.Context, field graphql.CollectedField, obj *ent.Schedule) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Schedule",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Weekday, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(time.Weekday)
+	fc.Result = res
+	return ec.marshalNWeekday2timeᚐWeekday(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Schedule_duration(ctx context.Context, field graphql.CollectedField, obj *ent.Schedule) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Schedule",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Duration, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(time.Duration)
+	fc.Result = res
+	return ec.marshalNDuration2timeᚐDuration(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Schedule_startsAt(ctx context.Context, field graphql.CollectedField, obj *ent.Schedule) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Schedule",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.StartsAt, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(time.Time)
+	fc.Result = res
+	return ec.marshalNTime2timeᚐTime(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _School_id(ctx context.Context, field graphql.CollectedField, obj *ent.School) (ret graphql.Marshaler) {
@@ -10095,6 +10590,50 @@ func (ec *executionContext) unmarshalInputAddGroupInput(ctx context.Context, obj
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("userID"))
 			it.UserID, err = ec.unmarshalNID2githubᚗcomᚋgoogleᚋuuidᚐUUID(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputAddScheduleInput(ctx context.Context, obj interface{}) (model.AddScheduleInput, error) {
+	var it model.AddScheduleInput
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "weekday":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("weekday"))
+			it.Weekday, err = ec.unmarshalNWeekday2timeᚐWeekday(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "duration":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("duration"))
+			it.Duration, err = ec.unmarshalNDuration2timeᚐDuration(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "startsAt":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("startsAt"))
+			it.StartsAt, err = ec.unmarshalNTime2timeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "classID":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("classID"))
+			it.ClassID, err = ec.unmarshalNID2githubᚗcomᚋgoogleᚋuuidᚐUUID(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -14001,7 +14540,7 @@ func (ec *executionContext) unmarshalInputScheduleWhereInput(ctx context.Context
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("weekday"))
-			it.Weekday, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			it.Weekday, err = ec.unmarshalOWeekday2ᚖtimeᚐWeekday(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -14009,7 +14548,7 @@ func (ec *executionContext) unmarshalInputScheduleWhereInput(ctx context.Context
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("weekdayNEQ"))
-			it.WeekdayNEQ, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			it.WeekdayNEQ, err = ec.unmarshalOWeekday2ᚖtimeᚐWeekday(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -14017,7 +14556,7 @@ func (ec *executionContext) unmarshalInputScheduleWhereInput(ctx context.Context
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("weekdayIn"))
-			it.WeekdayIn, err = ec.unmarshalOInt2ᚕintᚄ(ctx, v)
+			it.WeekdayIn, err = ec.unmarshalOWeekday2ᚕtimeᚐWeekdayᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -14025,7 +14564,7 @@ func (ec *executionContext) unmarshalInputScheduleWhereInput(ctx context.Context
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("weekdayNotIn"))
-			it.WeekdayNotIn, err = ec.unmarshalOInt2ᚕintᚄ(ctx, v)
+			it.WeekdayNotIn, err = ec.unmarshalOWeekday2ᚕtimeᚐWeekdayᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -14033,7 +14572,7 @@ func (ec *executionContext) unmarshalInputScheduleWhereInput(ctx context.Context
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("weekdayGT"))
-			it.WeekdayGT, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			it.WeekdayGT, err = ec.unmarshalOWeekday2ᚖtimeᚐWeekday(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -14041,7 +14580,7 @@ func (ec *executionContext) unmarshalInputScheduleWhereInput(ctx context.Context
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("weekdayGTE"))
-			it.WeekdayGTE, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			it.WeekdayGTE, err = ec.unmarshalOWeekday2ᚖtimeᚐWeekday(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -14049,7 +14588,7 @@ func (ec *executionContext) unmarshalInputScheduleWhereInput(ctx context.Context
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("weekdayLT"))
-			it.WeekdayLT, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			it.WeekdayLT, err = ec.unmarshalOWeekday2ᚖtimeᚐWeekday(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -14057,7 +14596,7 @@ func (ec *executionContext) unmarshalInputScheduleWhereInput(ctx context.Context
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("weekdayLTE"))
-			it.WeekdayLTE, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			it.WeekdayLTE, err = ec.unmarshalOWeekday2ᚖtimeᚐWeekday(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -14129,7 +14668,7 @@ func (ec *executionContext) unmarshalInputScheduleWhereInput(ctx context.Context
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("duration"))
-			it.Duration, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			it.Duration, err = ec.unmarshalODuration2ᚖtimeᚐDuration(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -14137,7 +14676,7 @@ func (ec *executionContext) unmarshalInputScheduleWhereInput(ctx context.Context
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("durationNEQ"))
-			it.DurationNEQ, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			it.DurationNEQ, err = ec.unmarshalODuration2ᚖtimeᚐDuration(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -14145,7 +14684,7 @@ func (ec *executionContext) unmarshalInputScheduleWhereInput(ctx context.Context
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("durationIn"))
-			it.DurationIn, err = ec.unmarshalOInt2ᚕintᚄ(ctx, v)
+			it.DurationIn, err = ec.unmarshalODuration2ᚕtimeᚐDurationᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -14153,7 +14692,7 @@ func (ec *executionContext) unmarshalInputScheduleWhereInput(ctx context.Context
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("durationNotIn"))
-			it.DurationNotIn, err = ec.unmarshalOInt2ᚕintᚄ(ctx, v)
+			it.DurationNotIn, err = ec.unmarshalODuration2ᚕtimeᚐDurationᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -14161,7 +14700,7 @@ func (ec *executionContext) unmarshalInputScheduleWhereInput(ctx context.Context
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("durationGT"))
-			it.DurationGT, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			it.DurationGT, err = ec.unmarshalODuration2ᚖtimeᚐDuration(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -14169,7 +14708,7 @@ func (ec *executionContext) unmarshalInputScheduleWhereInput(ctx context.Context
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("durationGTE"))
-			it.DurationGTE, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			it.DurationGTE, err = ec.unmarshalODuration2ᚖtimeᚐDuration(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -14177,7 +14716,7 @@ func (ec *executionContext) unmarshalInputScheduleWhereInput(ctx context.Context
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("durationLT"))
-			it.DurationLT, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			it.DurationLT, err = ec.unmarshalODuration2ᚖtimeᚐDuration(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -14185,7 +14724,7 @@ func (ec *executionContext) unmarshalInputScheduleWhereInput(ctx context.Context
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("durationLTE"))
-			it.DurationLTE, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			it.DurationLTE, err = ec.unmarshalODuration2ᚖtimeᚐDuration(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -16099,6 +16638,42 @@ func (ec *executionContext) unmarshalInputUpdateGroupInput(ctx context.Context, 
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputUpdateScheduleInput(ctx context.Context, obj interface{}) (model.UpdateScheduleInput, error) {
+	var it model.UpdateScheduleInput
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "weekday":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("weekday"))
+			it.Weekday, err = ec.unmarshalOWeekday2ᚖtimeᚐWeekday(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "duration":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("duration"))
+			it.Duration, err = ec.unmarshalODuration2ᚖtimeᚐDuration(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "startsAt":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("startsAt"))
+			it.StartsAt, err = ec.unmarshalOTime2ᚖtimeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputUpdateSchoolInput(ctx context.Context, obj interface{}) (model.UpdateSchoolInput, error) {
 	var it model.UpdateSchoolInput
 	var asMap = obj.(map[string]interface{})
@@ -17979,6 +18554,15 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		case "addSchedule":
+			out.Values[i] = ec._Mutation_addSchedule(ctx, field)
+		case "updateSchedule":
+			out.Values[i] = ec._Mutation_updateSchedule(ctx, field)
+		case "deleteSchedule":
+			out.Values[i] = ec._Mutation_deleteSchedule(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -18184,10 +18768,63 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 				res = ec._Query_assignments(ctx, field)
 				return res
 			})
+		case "schedule":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_schedule(ctx, field)
+				return res
+			})
 		case "__type":
 			out.Values[i] = ec._Query___type(ctx, field)
 		case "__schema":
 			out.Values[i] = ec._Query___schema(ctx, field)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var scheduleImplementors = []string{"Schedule"}
+
+func (ec *executionContext) _Schedule(ctx context.Context, sel ast.SelectionSet, obj *ent.Schedule) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, scheduleImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("Schedule")
+		case "id":
+			out.Values[i] = ec._Schedule_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "weekday":
+			out.Values[i] = ec._Schedule_weekday(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "duration":
+			out.Values[i] = ec._Schedule_duration(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "startsAt":
+			out.Values[i] = ec._Schedule_startsAt(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -18872,6 +19509,11 @@ func (ec *executionContext) unmarshalNAddGroupInput2githubᚗcomᚋmsal4ᚋhassa
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
+func (ec *executionContext) unmarshalNAddScheduleInput2githubᚗcomᚋmsal4ᚋhassah_school_serverᚋserverᚋmodelᚐAddScheduleInput(ctx context.Context, v interface{}) (model.AddScheduleInput, error) {
+	res, err := ec.unmarshalInputAddScheduleInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
 func (ec *executionContext) unmarshalNAddSchoolInput2githubᚗcomᚋmsal4ᚋhassah_school_serverᚋserverᚋmodelᚐAddSchoolInput(ctx context.Context, v interface{}) (model.AddSchoolInput, error) {
 	res, err := ec.unmarshalInputAddSchoolInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -19135,6 +19777,11 @@ func (ec *executionContext) unmarshalNUpdateGroupInput2githubᚗcomᚋmsal4ᚋha
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
+func (ec *executionContext) unmarshalNUpdateScheduleInput2githubᚗcomᚋmsal4ᚋhassah_school_serverᚋserverᚋmodelᚐUpdateScheduleInput(ctx context.Context, v interface{}) (model.UpdateScheduleInput, error) {
+	res, err := ec.unmarshalInputUpdateScheduleInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
 func (ec *executionContext) unmarshalNUpdateSchoolInput2githubᚗcomᚋmsal4ᚋhassah_school_serverᚋserverᚋmodelᚐUpdateSchoolInput(ctx context.Context, v interface{}) (model.UpdateSchoolInput, error) {
 	res, err := ec.unmarshalInputUpdateSchoolInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -19168,6 +19815,21 @@ func (ec *executionContext) marshalNUpload2githubᚗcomᚋ99designsᚋgqlgenᚋg
 func (ec *executionContext) unmarshalNUserWhereInput2ᚖgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚐUserWhereInput(ctx context.Context, v interface{}) (*ent.UserWhereInput, error) {
 	res, err := ec.unmarshalInputUserWhereInput(ctx, v)
 	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNWeekday2timeᚐWeekday(ctx context.Context, v interface{}) (time.Weekday, error) {
+	res, err := weekdaygql.UnmarshalWeekday(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNWeekday2timeᚐWeekday(ctx context.Context, sel ast.SelectionSet, v time.Weekday) graphql.Marshaler {
+	res := weekdaygql.MarshalWeekday(v)
+	if res == graphql.Null {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+	}
+	return res
 }
 
 func (ec *executionContext) marshalN__Directive2githubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐDirective(ctx context.Context, sel ast.SelectionSet, v introspection.Directive) graphql.Marshaler {
@@ -20332,6 +20994,53 @@ func (ec *executionContext) marshalORole2ᚖgithubᚗcomᚋmsal4ᚋhassah_school
 	return v
 }
 
+func (ec *executionContext) marshalOSchedule2ᚕᚖgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚐSchedule(ctx context.Context, sel ast.SelectionSet, v []*ent.Schedule) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalOSchedule2ᚖgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚐSchedule(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+	return ret
+}
+
+func (ec *executionContext) marshalOSchedule2ᚖgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚐSchedule(ctx context.Context, sel ast.SelectionSet, v *ent.Schedule) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._Schedule(ctx, sel, v)
+}
+
 func (ec *executionContext) unmarshalOScheduleWhereInput2ᚕᚖgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚐScheduleWhereInputᚄ(ctx context.Context, v interface{}) ([]*ent.ScheduleWhereInput, error) {
 	if v == nil {
 		return nil, nil
@@ -20951,6 +21660,57 @@ func (ec *executionContext) unmarshalOUserWhereInput2ᚖgithubᚗcomᚋmsal4ᚋh
 	}
 	res, err := ec.unmarshalInputUserWhereInput(ctx, v)
 	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalOWeekday2ᚕtimeᚐWeekdayᚄ(ctx context.Context, v interface{}) ([]time.Weekday, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var vSlice []interface{}
+	if v != nil {
+		if tmp1, ok := v.([]interface{}); ok {
+			vSlice = tmp1
+		} else {
+			vSlice = []interface{}{v}
+		}
+	}
+	var err error
+	res := make([]time.Weekday, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalNWeekday2timeᚐWeekday(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) marshalOWeekday2ᚕtimeᚐWeekdayᚄ(ctx context.Context, sel ast.SelectionSet, v []time.Weekday) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	for i := range v {
+		ret[i] = ec.marshalNWeekday2timeᚐWeekday(ctx, sel, v[i])
+	}
+
+	return ret
+}
+
+func (ec *executionContext) unmarshalOWeekday2ᚖtimeᚐWeekday(ctx context.Context, v interface{}) (*time.Weekday, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := weekdaygql.UnmarshalWeekday(v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOWeekday2ᚖtimeᚐWeekday(ctx context.Context, sel ast.SelectionSet, v *time.Weekday) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return weekdaygql.MarshalWeekday(*v)
 }
 
 func (ec *executionContext) marshalO__EnumValue2ᚕgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐEnumValueᚄ(ctx context.Context, sel ast.SelectionSet, v []introspection.EnumValue) graphql.Marshaler {

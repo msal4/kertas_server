@@ -95,9 +95,10 @@ func IDLTE(id uuid.UUID) predicate.Schedule {
 }
 
 // Weekday applies equality check predicate on the "weekday" field. It's identical to WeekdayEQ.
-func Weekday(v int) predicate.Schedule {
+func Weekday(v time.Weekday) predicate.Schedule {
+	vc := int(v)
 	return predicate.Schedule(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldWeekday), v))
+		s.Where(sql.EQ(s.C(FieldWeekday), vc))
 	})
 }
 
@@ -109,31 +110,34 @@ func StartsAt(v time.Time) predicate.Schedule {
 }
 
 // Duration applies equality check predicate on the "duration" field. It's identical to DurationEQ.
-func Duration(v int) predicate.Schedule {
+func Duration(v time.Duration) predicate.Schedule {
+	vc := int64(v)
 	return predicate.Schedule(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldDuration), v))
+		s.Where(sql.EQ(s.C(FieldDuration), vc))
 	})
 }
 
 // WeekdayEQ applies the EQ predicate on the "weekday" field.
-func WeekdayEQ(v int) predicate.Schedule {
+func WeekdayEQ(v time.Weekday) predicate.Schedule {
+	vc := int(v)
 	return predicate.Schedule(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldWeekday), v))
+		s.Where(sql.EQ(s.C(FieldWeekday), vc))
 	})
 }
 
 // WeekdayNEQ applies the NEQ predicate on the "weekday" field.
-func WeekdayNEQ(v int) predicate.Schedule {
+func WeekdayNEQ(v time.Weekday) predicate.Schedule {
+	vc := int(v)
 	return predicate.Schedule(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldWeekday), v))
+		s.Where(sql.NEQ(s.C(FieldWeekday), vc))
 	})
 }
 
 // WeekdayIn applies the In predicate on the "weekday" field.
-func WeekdayIn(vs ...int) predicate.Schedule {
+func WeekdayIn(vs ...time.Weekday) predicate.Schedule {
 	v := make([]interface{}, len(vs))
 	for i := range v {
-		v[i] = vs[i]
+		v[i] = int(vs[i])
 	}
 	return predicate.Schedule(func(s *sql.Selector) {
 		// if not arguments were provided, append the FALSE constants,
@@ -147,10 +151,10 @@ func WeekdayIn(vs ...int) predicate.Schedule {
 }
 
 // WeekdayNotIn applies the NotIn predicate on the "weekday" field.
-func WeekdayNotIn(vs ...int) predicate.Schedule {
+func WeekdayNotIn(vs ...time.Weekday) predicate.Schedule {
 	v := make([]interface{}, len(vs))
 	for i := range v {
-		v[i] = vs[i]
+		v[i] = int(vs[i])
 	}
 	return predicate.Schedule(func(s *sql.Selector) {
 		// if not arguments were provided, append the FALSE constants,
@@ -164,30 +168,34 @@ func WeekdayNotIn(vs ...int) predicate.Schedule {
 }
 
 // WeekdayGT applies the GT predicate on the "weekday" field.
-func WeekdayGT(v int) predicate.Schedule {
+func WeekdayGT(v time.Weekday) predicate.Schedule {
+	vc := int(v)
 	return predicate.Schedule(func(s *sql.Selector) {
-		s.Where(sql.GT(s.C(FieldWeekday), v))
+		s.Where(sql.GT(s.C(FieldWeekday), vc))
 	})
 }
 
 // WeekdayGTE applies the GTE predicate on the "weekday" field.
-func WeekdayGTE(v int) predicate.Schedule {
+func WeekdayGTE(v time.Weekday) predicate.Schedule {
+	vc := int(v)
 	return predicate.Schedule(func(s *sql.Selector) {
-		s.Where(sql.GTE(s.C(FieldWeekday), v))
+		s.Where(sql.GTE(s.C(FieldWeekday), vc))
 	})
 }
 
 // WeekdayLT applies the LT predicate on the "weekday" field.
-func WeekdayLT(v int) predicate.Schedule {
+func WeekdayLT(v time.Weekday) predicate.Schedule {
+	vc := int(v)
 	return predicate.Schedule(func(s *sql.Selector) {
-		s.Where(sql.LT(s.C(FieldWeekday), v))
+		s.Where(sql.LT(s.C(FieldWeekday), vc))
 	})
 }
 
 // WeekdayLTE applies the LTE predicate on the "weekday" field.
-func WeekdayLTE(v int) predicate.Schedule {
+func WeekdayLTE(v time.Weekday) predicate.Schedule {
+	vc := int(v)
 	return predicate.Schedule(func(s *sql.Selector) {
-		s.Where(sql.LTE(s.C(FieldWeekday), v))
+		s.Where(sql.LTE(s.C(FieldWeekday), vc))
 	})
 }
 
@@ -268,24 +276,26 @@ func StartsAtLTE(v time.Time) predicate.Schedule {
 }
 
 // DurationEQ applies the EQ predicate on the "duration" field.
-func DurationEQ(v int) predicate.Schedule {
+func DurationEQ(v time.Duration) predicate.Schedule {
+	vc := int64(v)
 	return predicate.Schedule(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldDuration), v))
+		s.Where(sql.EQ(s.C(FieldDuration), vc))
 	})
 }
 
 // DurationNEQ applies the NEQ predicate on the "duration" field.
-func DurationNEQ(v int) predicate.Schedule {
+func DurationNEQ(v time.Duration) predicate.Schedule {
+	vc := int64(v)
 	return predicate.Schedule(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldDuration), v))
+		s.Where(sql.NEQ(s.C(FieldDuration), vc))
 	})
 }
 
 // DurationIn applies the In predicate on the "duration" field.
-func DurationIn(vs ...int) predicate.Schedule {
+func DurationIn(vs ...time.Duration) predicate.Schedule {
 	v := make([]interface{}, len(vs))
 	for i := range v {
-		v[i] = vs[i]
+		v[i] = int64(vs[i])
 	}
 	return predicate.Schedule(func(s *sql.Selector) {
 		// if not arguments were provided, append the FALSE constants,
@@ -299,10 +309,10 @@ func DurationIn(vs ...int) predicate.Schedule {
 }
 
 // DurationNotIn applies the NotIn predicate on the "duration" field.
-func DurationNotIn(vs ...int) predicate.Schedule {
+func DurationNotIn(vs ...time.Duration) predicate.Schedule {
 	v := make([]interface{}, len(vs))
 	for i := range v {
-		v[i] = vs[i]
+		v[i] = int64(vs[i])
 	}
 	return predicate.Schedule(func(s *sql.Selector) {
 		// if not arguments were provided, append the FALSE constants,
@@ -316,30 +326,34 @@ func DurationNotIn(vs ...int) predicate.Schedule {
 }
 
 // DurationGT applies the GT predicate on the "duration" field.
-func DurationGT(v int) predicate.Schedule {
+func DurationGT(v time.Duration) predicate.Schedule {
+	vc := int64(v)
 	return predicate.Schedule(func(s *sql.Selector) {
-		s.Where(sql.GT(s.C(FieldDuration), v))
+		s.Where(sql.GT(s.C(FieldDuration), vc))
 	})
 }
 
 // DurationGTE applies the GTE predicate on the "duration" field.
-func DurationGTE(v int) predicate.Schedule {
+func DurationGTE(v time.Duration) predicate.Schedule {
+	vc := int64(v)
 	return predicate.Schedule(func(s *sql.Selector) {
-		s.Where(sql.GTE(s.C(FieldDuration), v))
+		s.Where(sql.GTE(s.C(FieldDuration), vc))
 	})
 }
 
 // DurationLT applies the LT predicate on the "duration" field.
-func DurationLT(v int) predicate.Schedule {
+func DurationLT(v time.Duration) predicate.Schedule {
+	vc := int64(v)
 	return predicate.Schedule(func(s *sql.Selector) {
-		s.Where(sql.LT(s.C(FieldDuration), v))
+		s.Where(sql.LT(s.C(FieldDuration), vc))
 	})
 }
 
 // DurationLTE applies the LTE predicate on the "duration" field.
-func DurationLTE(v int) predicate.Schedule {
+func DurationLTE(v time.Duration) predicate.Schedule {
+	vc := int64(v)
 	return predicate.Schedule(func(s *sql.Selector) {
-		s.Where(sql.LTE(s.C(FieldDuration), v))
+		s.Where(sql.LTE(s.C(FieldDuration), vc))
 	})
 }
 

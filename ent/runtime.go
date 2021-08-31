@@ -202,10 +202,6 @@ func init() {
 			return nil
 		}
 	}()
-	// scheduleDescDuration is the schema descriptor for duration field.
-	scheduleDescDuration := scheduleFields[3].Descriptor()
-	// schedule.DefaultDuration holds the default value on creation for the duration field.
-	schedule.DefaultDuration = scheduleDescDuration.Default.(int)
 	// scheduleDescID is the schema descriptor for id field.
 	scheduleDescID := scheduleFields[0].Descriptor()
 	// schedule.DefaultID holds the default value on creation for the id field.

@@ -33,6 +33,13 @@ type AddGroupInput struct {
 	UserID uuid.UUID `json:"userID"`
 }
 
+type AddScheduleInput struct {
+	Weekday  time.Weekday  `json:"weekday"`
+	Duration time.Duration `json:"duration"`
+	StartsAt time.Time     `json:"startsAt"`
+	ClassID  uuid.UUID     `json:"classID"`
+}
+
 type AddSchoolInput struct {
 	Name   string         `json:"name"`
 	Image  graphql.Upload `json:"image"`
@@ -91,6 +98,12 @@ type UpdateClassInput struct {
 type UpdateGroupInput struct {
 	Name   *string `json:"name"`
 	Active *bool   `json:"active"`
+}
+
+type UpdateScheduleInput struct {
+	Weekday  *time.Weekday  `json:"weekday"`
+	Duration *time.Duration `json:"duration"`
+	StartsAt *time.Time     `json:"startsAt"`
 }
 
 type UpdateSchoolInput struct {

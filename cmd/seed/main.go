@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/Netflix/go-env"
@@ -106,7 +107,107 @@ func seed(ctx context.Context, s *service.Service) error {
 		TuitionAmount: 15000000,
 		SchoolID:      sch.ID,
 	})
+	if err != nil {
+		return err
+	}
 	log.Printf("Created stage: %v\n\n", stg)
+
+	tchr, err := s.AddUser(ctx, model.AddUserInput{
+		Name:     "John Doe Teacher",
+		Username: "teacher01",
+		Password: "teacher01pass",
+		Phone:    "07712345672",
+		Role:     user.RoleTeacher,
+		SchoolID: &sch.ID,
+		Active:   true,
+	})
+	if err != nil {
+		return err
+	}
+	log.Printf("Created teacher: %v\n\n", tchr)
+
+	tchr2, err := s.AddUser(ctx, model.AddUserInput{
+		Name:     "Jane Doe Teacher",
+		Username: "teacher02",
+		Password: "teacher02pass",
+		Phone:    "07712345673",
+		Role:     user.RoleTeacher,
+		SchoolID: &sch.ID,
+		Active:   true,
+	})
+	if err != nil {
+		return err
+	}
+	log.Printf("Created teacher: %v\n\n", tchr2)
+
+	cls, err := s.AddClass(ctx, model.AddClassInput{
+		Name:      "الرياضيات",
+		Active:    true,
+		StageID:   stg.ID,
+		TeacherID: tchr.ID,
+	})
+	log.Printf("Created class: %v\n\n", cls)
+	if err != nil {
+		return err
+	}
+
+	cls2, err := s.AddClass(ctx, model.AddClassInput{
+		Name:      "الفيزياء",
+		Active:    true,
+		StageID:   stg.ID,
+		TeacherID: tchr2.ID,
+	})
+	log.Printf("Created class: %v\n\n", cls2)
+	if err != nil {
+		return err
+	}
+
+	cls3, err := s.AddClass(ctx, model.AddClassInput{
+		Name:      "Intermediate English",
+		Active:    true,
+		StageID:   stg.ID,
+		TeacherID: tchr.ID,
+	})
+	if err != nil {
+		return err
+	}
+	log.Printf("Created class: %v\n\n", cls3)
+
+	scd, err := s.AddSchedule(ctx, model.AddScheduleInput{ClassID: cls.ID, Weekday: time.Sunday, Duration: time.Hour / 2, StartsAt: time.Now()})
+	if err != nil {
+		return err
+	}
+	log.Printf("Created schedule: %v\n\n", scd)
+
+	scd, err = s.AddSchedule(ctx, model.AddScheduleInput{ClassID: cls2.ID, Weekday: time.Sunday, Duration: time.Hour / 3, StartsAt: time.Now().Add(time.Hour)})
+	if err != nil {
+		return err
+	}
+	log.Printf("Created schedule: %v\n\n", scd)
+
+	scd, err = s.AddSchedule(ctx, model.AddScheduleInput{ClassID: cls2.ID, Weekday: time.Monday, Duration: time.Hour / 3, StartsAt: time.Now().Add(-time.Hour)})
+	if err != nil {
+		return err
+	}
+	log.Printf("Created schedule: %v\n\n", scd)
+
+	scd, err = s.AddSchedule(ctx, model.AddScheduleInput{ClassID: cls2.ID, Weekday: time.Tuesday, Duration: time.Hour / 3, StartsAt: time.Now().Add(-time.Hour / 2)})
+	if err != nil {
+		return err
+	}
+	log.Printf("Created schedule: %v\n\n", scd)
+
+	scd, err = s.AddSchedule(ctx, model.AddScheduleInput{ClassID: cls3.ID, Weekday: time.Tuesday, Duration: time.Hour / 2, StartsAt: time.Now().Add(-time.Hour / 3)})
+	if err != nil {
+		return err
+	}
+	log.Printf("Created schedule: %v\n\n", scd)
+
+	scd, err = s.AddSchedule(ctx, model.AddScheduleInput{ClassID: cls3.ID, Weekday: time.Monday, Duration: time.Hour / 2, StartsAt: time.Now().Add(time.Hour / 2)})
+	if err != nil {
+		return err
+	}
+	log.Printf("Created schedule: %v\n\n", scd)
 
 	stdt, err := s.AddUser(ctx, model.AddUserInput{
 		Name:     "John Doe",

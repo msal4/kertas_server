@@ -2,6 +2,7 @@ scalar Cursor
 scalar Time
 scalar Upload
 scalar Duration
+scalar Weekday
 
 interface Node {
   id: ID!
@@ -356,7 +357,6 @@ type AssignmentConnection {
   edges: [AssignmentEdge]
 }
 
-
 input AddAssignmentInput {
   name: String!
   description: String
@@ -373,6 +373,26 @@ input UpdateAssignmentInput {
   file: Upload
   dueDate: Time
   duration: Duration
+}
+
+type Schedule {
+  id: ID!
+  weekday: Weekday!
+  duration: Duration!
+  startsAt: Time!
+}
+
+input AddScheduleInput {
+  weekday: Weekday!
+  duration: Duration!
+  startsAt: Time!
+  classID: ID!
+}
+
+input UpdateScheduleInput {
+  weekday: Weekday
+  duration: Duration
+  startsAt: Time
 }
 
 type Query {
@@ -395,6 +415,8 @@ type Query {
 
   assignment(id: ID!): Assignment
   assignments(userID: ID, stageID: ID, schoolID: ID, after: Cursor, first: Int, before: Cursor, last: Int, orderBy: AssignmentOrder, where: AssignmentWhereInput): AssignmentConnection
+
+  schedule(stageID: ID, weekday: Weekday): [Schedule]
 }
 
 type Mutation {
@@ -430,6 +452,10 @@ type Mutation {
   addAssignment(input: AddAssignmentInput!): Assignment
   updateAssignment(id: ID!, input: UpdateAssignmentInput!): Assignment
   deleteAssignment(id: ID!): Boolean!
+
+  addSchedule(input: AddScheduleInput!): Schedule
+  updateSchedule(id: ID!, input: UpdateScheduleInput!): Schedule
+  deleteSchedule(id: ID!): Boolean!
 }
 
 type Subscription {

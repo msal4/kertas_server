@@ -19,12 +19,11 @@ type Schedule struct {
 	// ID of the ent.
 	ID uuid.UUID `json:"id,omitempty"`
 	// Weekday holds the value of the "weekday" field.
-	Weekday int `json:"weekday,omitempty"`
+	Weekday time.Weekday `json:"weekday,omitempty"`
 	// StartsAt holds the value of the "starts_at" field.
 	StartsAt time.Time `json:"starts_at,omitempty"`
 	// Duration holds the value of the "duration" field.
-	// Duration is the lecture duration in minutes
-	Duration int `json:"duration,omitempty"`
+	Duration time.Duration `json:"duration,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the ScheduleQuery when eager-loading is set.
 	Edges           ScheduleEdges `json:"edges"`
@@ -92,7 +91,7 @@ func (s *Schedule) assignValues(columns []string, values []interface{}) error {
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field weekday", values[i])
 			} else if value.Valid {
-				s.Weekday = int(value.Int64)
+				s.Weekday = time.Weekday(value.Int64)
 			}
 		case schedule.FieldStartsAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
@@ -104,7 +103,7 @@ func (s *Schedule) assignValues(columns []string, values []interface{}) error {
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field duration", values[i])
 			} else if value.Valid {
-				s.Duration = int(value.Int64)
+				s.Duration = time.Duration(value.Int64)
 			}
 		case schedule.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullScanner); !ok {

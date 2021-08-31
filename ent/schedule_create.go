@@ -23,8 +23,8 @@ type ScheduleCreate struct {
 }
 
 // SetWeekday sets the "weekday" field.
-func (sc *ScheduleCreate) SetWeekday(i int) *ScheduleCreate {
-	sc.mutation.SetWeekday(i)
+func (sc *ScheduleCreate) SetWeekday(t time.Weekday) *ScheduleCreate {
+	sc.mutation.SetWeekday(t)
 	return sc
 }
 
@@ -35,16 +35,8 @@ func (sc *ScheduleCreate) SetStartsAt(t time.Time) *ScheduleCreate {
 }
 
 // SetDuration sets the "duration" field.
-func (sc *ScheduleCreate) SetDuration(i int) *ScheduleCreate {
-	sc.mutation.SetDuration(i)
-	return sc
-}
-
-// SetNillableDuration sets the "duration" field if the given value is not nil.
-func (sc *ScheduleCreate) SetNillableDuration(i *int) *ScheduleCreate {
-	if i != nil {
-		sc.SetDuration(*i)
-	}
+func (sc *ScheduleCreate) SetDuration(t time.Duration) *ScheduleCreate {
+	sc.mutation.SetDuration(t)
 	return sc
 }
 
@@ -136,10 +128,6 @@ func (sc *ScheduleCreate) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (sc *ScheduleCreate) defaults() {
-	if _, ok := sc.mutation.Duration(); !ok {
-		v := schedule.DefaultDuration
-		sc.mutation.SetDuration(v)
-	}
 	if _, ok := sc.mutation.ID(); !ok {
 		v := schedule.DefaultID()
 		sc.mutation.SetID(v)
@@ -152,7 +140,7 @@ func (sc *ScheduleCreate) check() error {
 		return &ValidationError{Name: "weekday", err: errors.New(`ent: missing required field "weekday"`)}
 	}
 	if v, ok := sc.mutation.Weekday(); ok {
-		if err := schedule.WeekdayValidator(v); err != nil {
+		if err := schedule.WeekdayValidator(int(v)); err != nil {
 			return &ValidationError{Name: "weekday", err: fmt.Errorf(`ent: validator failed for field "weekday": %w`, err)}
 		}
 	}
@@ -215,7 +203,7 @@ func (sc *ScheduleCreate) createSpec() (*Schedule, *sqlgraph.CreateSpec) {
 	}
 	if value, ok := sc.mutation.Duration(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeInt,
+			Type:   field.TypeInt64,
 			Value:  value,
 			Column: schedule.FieldDuration,
 		})

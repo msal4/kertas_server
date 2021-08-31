@@ -629,7 +629,7 @@ func (s *Schedule) Node(ctx context.Context) (node *Node, err error) {
 		return nil, err
 	}
 	node.Fields[0] = &Field{
-		Type:  "int",
+		Type:  "time.Weekday",
 		Name:  "weekday",
 		Value: string(buf),
 	}
@@ -645,7 +645,7 @@ func (s *Schedule) Node(ctx context.Context) (node *Node, err error) {
 		return nil, err
 	}
 	node.Fields[2] = &Field{
-		Type:  "int",
+		Type:  "time.Duration",
 		Name:  "duration",
 		Value: string(buf),
 	}

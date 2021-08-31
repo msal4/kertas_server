@@ -5,6 +5,7 @@ package server
 
 import (
 	"context"
+	"time"
 
 	"github.com/google/uuid"
 	"github.com/msal4/hassah_school_server/auth"
@@ -208,6 +209,30 @@ func (r *mutationResolver) DeleteAssignment(ctx context.Context, id uuid.UUID) (
 	return true, r.s.DeleteAssignment(ctx, id)
 }
 
+func (r *mutationResolver) AddSchedule(ctx context.Context, input model.AddScheduleInput) (*ent.Schedule, error) {
+	if !auth.IsAdmin(ctx) {
+		return nil, auth.UnauthorizedErr
+	}
+
+	return r.s.AddSchedule(ctx, input)
+}
+
+func (r *mutationResolver) UpdateSchedule(ctx context.Context, id uuid.UUID, input model.UpdateScheduleInput) (*ent.Schedule, error) {
+	if !auth.IsAdmin(ctx) {
+		return nil, auth.UnauthorizedErr
+	}
+
+	return r.s.UpdateSchedule(ctx, id, input)
+}
+
+func (r *mutationResolver) DeleteSchedule(ctx context.Context, id uuid.UUID) (bool, error) {
+	if !auth.IsAdmin(ctx) {
+		return false, auth.UnauthorizedErr
+	}
+
+	return true, r.s.DeleteSchedule(ctx, id)
+}
+
 func (r *queryResolver) School(ctx context.Context, id uuid.UUID) (*ent.School, error) {
 	return r.s.EC.School.Get(ctx, id)
 }
@@ -346,6 +371,15 @@ func (r *queryResolver) Assignments(ctx context.Context, userID *uuid.UUID, stag
 		OrderBy: orderBy,
 		Where:   where,
 	})
+}
+
+func (r *queryResolver) Schedule(ctx context.Context, stageID *uuid.UUID, weekday *time.Weekday) ([]*ent.Schedule, error) {
+	u, ok := auth.UserForContext(ctx)
+	if !ok {
+		return nil, auth.UnauthorizedErr
+	}
+
+	return r.s.Schedule(ctx, service.ScheduleOptions{StageID: stageID, Weekday: weekday, UserID: u.ID})
 }
 
 func (r *subscriptionResolver) MessagePosted(ctx context.Context, groupID uuid.UUID) (<-chan *ent.Message, error) {

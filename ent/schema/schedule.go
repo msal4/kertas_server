@@ -1,6 +1,8 @@
 package schema
 
 import (
+	"time"
+
 	"entgo.io/contrib/entgql"
 	"entgo.io/ent"
 	"entgo.io/ent/dialect"
@@ -19,9 +21,9 @@ type Schedule struct {
 func (Schedule) Fields() []ent.Field {
 	return []ent.Field{
 		field.UUID("id", uuid.UUID{}).Default(uuid.New),
-		field.Int("weekday").Min(0).Max(6).Annotations(entgql.OrderField("WEEKDAY")),
+		field.Int("weekday").GoType(time.Weekday(0)).Min(0).Max(6).Annotations(entgql.OrderField("WEEKDAY"), entgql.Type("Weekday")),
 		field.Time("starts_at").SchemaType(map[string]string{dialect.Postgres: "time"}).Annotations(entgql.OrderField("STARTS_AT")),
-		field.Int("duration").Default(60).Comment("Duration is the lecture duration in minutes").Annotations(entgql.OrderField("DURATION")),
+		field.Int64("duration").GoType(time.Duration(0)).Annotations(entgql.OrderField("DURATION"), entgql.Type("Duration")),
 	}
 }
 

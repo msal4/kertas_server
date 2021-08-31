@@ -2570,14 +2570,14 @@ type ScheduleWhereInput struct {
 	IDLTE   *uuid.UUID  `json:"idLTE,omitempty"`
 
 	// "weekday" field predicates.
-	Weekday      *int  `json:"weekday,omitempty"`
-	WeekdayNEQ   *int  `json:"weekdayNEQ,omitempty"`
-	WeekdayIn    []int `json:"weekdayIn,omitempty"`
-	WeekdayNotIn []int `json:"weekdayNotIn,omitempty"`
-	WeekdayGT    *int  `json:"weekdayGT,omitempty"`
-	WeekdayGTE   *int  `json:"weekdayGTE,omitempty"`
-	WeekdayLT    *int  `json:"weekdayLT,omitempty"`
-	WeekdayLTE   *int  `json:"weekdayLTE,omitempty"`
+	Weekday      *time.Weekday  `json:"weekday,omitempty"`
+	WeekdayNEQ   *time.Weekday  `json:"weekdayNEQ,omitempty"`
+	WeekdayIn    []time.Weekday `json:"weekdayIn,omitempty"`
+	WeekdayNotIn []time.Weekday `json:"weekdayNotIn,omitempty"`
+	WeekdayGT    *time.Weekday  `json:"weekdayGT,omitempty"`
+	WeekdayGTE   *time.Weekday  `json:"weekdayGTE,omitempty"`
+	WeekdayLT    *time.Weekday  `json:"weekdayLT,omitempty"`
+	WeekdayLTE   *time.Weekday  `json:"weekdayLTE,omitempty"`
 
 	// "starts_at" field predicates.
 	StartsAt      *time.Time  `json:"startsAt,omitempty"`
@@ -2590,14 +2590,14 @@ type ScheduleWhereInput struct {
 	StartsAtLTE   *time.Time  `json:"startsAtLTE,omitempty"`
 
 	// "duration" field predicates.
-	Duration      *int  `json:"duration,omitempty"`
-	DurationNEQ   *int  `json:"durationNEQ,omitempty"`
-	DurationIn    []int `json:"durationIn,omitempty"`
-	DurationNotIn []int `json:"durationNotIn,omitempty"`
-	DurationGT    *int  `json:"durationGT,omitempty"`
-	DurationGTE   *int  `json:"durationGTE,omitempty"`
-	DurationLT    *int  `json:"durationLT,omitempty"`
-	DurationLTE   *int  `json:"durationLTE,omitempty"`
+	Duration      *time.Duration  `json:"duration,omitempty"`
+	DurationNEQ   *time.Duration  `json:"durationNEQ,omitempty"`
+	DurationIn    []time.Duration `json:"durationIn,omitempty"`
+	DurationNotIn []time.Duration `json:"durationNotIn,omitempty"`
+	DurationGT    *time.Duration  `json:"durationGT,omitempty"`
+	DurationGTE   *time.Duration  `json:"durationGTE,omitempty"`
+	DurationLT    *time.Duration  `json:"durationLT,omitempty"`
+	DurationLTE   *time.Duration  `json:"durationLTE,omitempty"`
 
 	// "class" edge predicates.
 	HasClass     *bool              `json:"hasClass,omitempty"`

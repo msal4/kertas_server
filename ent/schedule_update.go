@@ -31,15 +31,15 @@ func (su *ScheduleUpdate) Where(ps ...predicate.Schedule) *ScheduleUpdate {
 }
 
 // SetWeekday sets the "weekday" field.
-func (su *ScheduleUpdate) SetWeekday(i int) *ScheduleUpdate {
+func (su *ScheduleUpdate) SetWeekday(t time.Weekday) *ScheduleUpdate {
 	su.mutation.ResetWeekday()
-	su.mutation.SetWeekday(i)
+	su.mutation.SetWeekday(t)
 	return su
 }
 
-// AddWeekday adds i to the "weekday" field.
-func (su *ScheduleUpdate) AddWeekday(i int) *ScheduleUpdate {
-	su.mutation.AddWeekday(i)
+// AddWeekday adds t to the "weekday" field.
+func (su *ScheduleUpdate) AddWeekday(t time.Weekday) *ScheduleUpdate {
+	su.mutation.AddWeekday(t)
 	return su
 }
 
@@ -50,23 +50,15 @@ func (su *ScheduleUpdate) SetStartsAt(t time.Time) *ScheduleUpdate {
 }
 
 // SetDuration sets the "duration" field.
-func (su *ScheduleUpdate) SetDuration(i int) *ScheduleUpdate {
+func (su *ScheduleUpdate) SetDuration(t time.Duration) *ScheduleUpdate {
 	su.mutation.ResetDuration()
-	su.mutation.SetDuration(i)
+	su.mutation.SetDuration(t)
 	return su
 }
 
-// SetNillableDuration sets the "duration" field if the given value is not nil.
-func (su *ScheduleUpdate) SetNillableDuration(i *int) *ScheduleUpdate {
-	if i != nil {
-		su.SetDuration(*i)
-	}
-	return su
-}
-
-// AddDuration adds i to the "duration" field.
-func (su *ScheduleUpdate) AddDuration(i int) *ScheduleUpdate {
-	su.mutation.AddDuration(i)
+// AddDuration adds t to the "duration" field.
+func (su *ScheduleUpdate) AddDuration(t time.Duration) *ScheduleUpdate {
+	su.mutation.AddDuration(t)
 	return su
 }
 
@@ -155,7 +147,7 @@ func (su *ScheduleUpdate) ExecX(ctx context.Context) {
 // check runs all checks and user-defined validators on the builder.
 func (su *ScheduleUpdate) check() error {
 	if v, ok := su.mutation.Weekday(); ok {
-		if err := schedule.WeekdayValidator(v); err != nil {
+		if err := schedule.WeekdayValidator(int(v)); err != nil {
 			return &ValidationError{Name: "weekday", err: fmt.Errorf("ent: validator failed for field \"weekday\": %w", err)}
 		}
 	}
@@ -206,14 +198,14 @@ func (su *ScheduleUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := su.mutation.Duration(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeInt,
+			Type:   field.TypeInt64,
 			Value:  value,
 			Column: schedule.FieldDuration,
 		})
 	}
 	if value, ok := su.mutation.AddedDuration(); ok {
 		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
-			Type:   field.TypeInt,
+			Type:   field.TypeInt64,
 			Value:  value,
 			Column: schedule.FieldDuration,
 		})
@@ -273,15 +265,15 @@ type ScheduleUpdateOne struct {
 }
 
 // SetWeekday sets the "weekday" field.
-func (suo *ScheduleUpdateOne) SetWeekday(i int) *ScheduleUpdateOne {
+func (suo *ScheduleUpdateOne) SetWeekday(t time.Weekday) *ScheduleUpdateOne {
 	suo.mutation.ResetWeekday()
-	suo.mutation.SetWeekday(i)
+	suo.mutation.SetWeekday(t)
 	return suo
 }
 
-// AddWeekday adds i to the "weekday" field.
-func (suo *ScheduleUpdateOne) AddWeekday(i int) *ScheduleUpdateOne {
-	suo.mutation.AddWeekday(i)
+// AddWeekday adds t to the "weekday" field.
+func (suo *ScheduleUpdateOne) AddWeekday(t time.Weekday) *ScheduleUpdateOne {
+	suo.mutation.AddWeekday(t)
 	return suo
 }
 
@@ -292,23 +284,15 @@ func (suo *ScheduleUpdateOne) SetStartsAt(t time.Time) *ScheduleUpdateOne {
 }
 
 // SetDuration sets the "duration" field.
-func (suo *ScheduleUpdateOne) SetDuration(i int) *ScheduleUpdateOne {
+func (suo *ScheduleUpdateOne) SetDuration(t time.Duration) *ScheduleUpdateOne {
 	suo.mutation.ResetDuration()
-	suo.mutation.SetDuration(i)
+	suo.mutation.SetDuration(t)
 	return suo
 }
 
-// SetNillableDuration sets the "duration" field if the given value is not nil.
-func (suo *ScheduleUpdateOne) SetNillableDuration(i *int) *ScheduleUpdateOne {
-	if i != nil {
-		suo.SetDuration(*i)
-	}
-	return suo
-}
-
-// AddDuration adds i to the "duration" field.
-func (suo *ScheduleUpdateOne) AddDuration(i int) *ScheduleUpdateOne {
-	suo.mutation.AddDuration(i)
+// AddDuration adds t to the "duration" field.
+func (suo *ScheduleUpdateOne) AddDuration(t time.Duration) *ScheduleUpdateOne {
+	suo.mutation.AddDuration(t)
 	return suo
 }
 
@@ -404,7 +388,7 @@ func (suo *ScheduleUpdateOne) ExecX(ctx context.Context) {
 // check runs all checks and user-defined validators on the builder.
 func (suo *ScheduleUpdateOne) check() error {
 	if v, ok := suo.mutation.Weekday(); ok {
-		if err := schedule.WeekdayValidator(v); err != nil {
+		if err := schedule.WeekdayValidator(int(v)); err != nil {
 			return &ValidationError{Name: "weekday", err: fmt.Errorf("ent: validator failed for field \"weekday\": %w", err)}
 		}
 	}
@@ -472,14 +456,14 @@ func (suo *ScheduleUpdateOne) sqlSave(ctx context.Context) (_node *Schedule, err
 	}
 	if value, ok := suo.mutation.Duration(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeInt,
+			Type:   field.TypeInt64,
 			Value:  value,
 			Column: schedule.FieldDuration,
 		})
 	}
 	if value, ok := suo.mutation.AddedDuration(); ok {
 		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
-			Type:   field.TypeInt,
+			Type:   field.TypeInt64,
 			Value:  value,
 			Column: schedule.FieldDuration,
 		})

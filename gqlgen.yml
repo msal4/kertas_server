@@ -26,6 +26,9 @@ models:
   Duration:
     model:
       - github.com/msal4/hassah_school_server/ent/schema/durationgql.Duration
+  Weekday:
+    model:
+      - github.com/msal4/hassah_school_server/ent/schema/weekdaygql.Weekday
   Node:
     model:
       - github.com/msal4/hassah_school_server/ent.Noder

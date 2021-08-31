@@ -314,7 +314,7 @@ var (
 		{Name: "id", Type: field.TypeUUID},
 		{Name: "weekday", Type: field.TypeInt},
 		{Name: "starts_at", Type: field.TypeTime, SchemaType: map[string]string{"postgres": "time"}},
-		{Name: "duration", Type: field.TypeInt, Default: 60},
+		{Name: "duration", Type: field.TypeInt64},
 		{Name: "class_schedules", Type: field.TypeUUID, Nullable: true},
 	}
 	// SchedulesTable holds the schema information for the "schedules" table.
