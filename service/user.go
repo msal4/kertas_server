@@ -13,6 +13,7 @@ import (
 	"github.com/minio/minio-go/v7"
 	"github.com/msal4/hassah_school_server/auth"
 	"github.com/msal4/hassah_school_server/ent"
+	"github.com/msal4/hassah_school_server/ent/stage"
 	"github.com/msal4/hassah_school_server/ent/user"
 	"github.com/msal4/hassah_school_server/server/model"
 )
@@ -105,6 +106,15 @@ func (s *Service) UpdateUser(ctx context.Context, id uuid.UUID, input model.Upda
 
 	if input.Active != nil {
 		b.SetActive(*input.Active)
+	}
+
+	if input.StageID != nil {
+		stg, err := s.EC.Stage.Query().Where(stage.ID(*input.StageID)).WithSchool().Only(ctx)
+		if err != nil {
+			return nil, err
+		}
+		b.SetStage(stg)
+		b.SetSchool(stg.Edges.School)
 	}
 
 	if input.Image != nil {
