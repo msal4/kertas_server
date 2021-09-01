@@ -14,6 +14,7 @@ import (
 	"github.com/msal4/hassah_school_server/ent/assignmentsubmission"
 	"github.com/msal4/hassah_school_server/ent/attendance"
 	"github.com/msal4/hassah_school_server/ent/class"
+	"github.com/msal4/hassah_school_server/ent/coursegrade"
 	"github.com/msal4/hassah_school_server/ent/grade"
 	"github.com/msal4/hassah_school_server/ent/group"
 	"github.com/msal4/hassah_school_server/ent/message"
@@ -299,6 +300,21 @@ func (uu *UserUpdate) AddGroups(g ...*Group) *UserUpdate {
 	return uu.AddGroupIDs(ids...)
 }
 
+// AddCourseGradeIDs adds the "course_grades" edge to the CourseGrade entity by IDs.
+func (uu *UserUpdate) AddCourseGradeIDs(ids ...uuid.UUID) *UserUpdate {
+	uu.mutation.AddCourseGradeIDs(ids...)
+	return uu
+}
+
+// AddCourseGrades adds the "course_grades" edges to the CourseGrade entity.
+func (uu *UserUpdate) AddCourseGrades(c ...*CourseGrade) *UserUpdate {
+	ids := make([]uuid.UUID, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return uu.AddCourseGradeIDs(ids...)
+}
+
 // Mutation returns the UserMutation object of the builder.
 func (uu *UserUpdate) Mutation() *UserMutation {
 	return uu.mutation
@@ -461,6 +477,27 @@ func (uu *UserUpdate) RemoveGroups(g ...*Group) *UserUpdate {
 		ids[i] = g[i].ID
 	}
 	return uu.RemoveGroupIDs(ids...)
+}
+
+// ClearCourseGrades clears all "course_grades" edges to the CourseGrade entity.
+func (uu *UserUpdate) ClearCourseGrades() *UserUpdate {
+	uu.mutation.ClearCourseGrades()
+	return uu
+}
+
+// RemoveCourseGradeIDs removes the "course_grades" edge to CourseGrade entities by IDs.
+func (uu *UserUpdate) RemoveCourseGradeIDs(ids ...uuid.UUID) *UserUpdate {
+	uu.mutation.RemoveCourseGradeIDs(ids...)
+	return uu
+}
+
+// RemoveCourseGrades removes "course_grades" edges to CourseGrade entities.
+func (uu *UserUpdate) RemoveCourseGrades(c ...*CourseGrade) *UserUpdate {
+	ids := make([]uuid.UUID, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return uu.RemoveCourseGradeIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -1129,6 +1166,60 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	if uu.mutation.CourseGradesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.CourseGradesTable,
+			Columns: []string{user.CourseGradesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: coursegrade.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uu.mutation.RemovedCourseGradesIDs(); len(nodes) > 0 && !uu.mutation.CourseGradesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.CourseGradesTable,
+			Columns: []string{user.CourseGradesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: coursegrade.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uu.mutation.CourseGradesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.CourseGradesTable,
+			Columns: []string{user.CourseGradesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: coursegrade.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if n, err = sqlgraph.UpdateNodes(ctx, uu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{user.Label}
@@ -1410,6 +1501,21 @@ func (uuo *UserUpdateOne) AddGroups(g ...*Group) *UserUpdateOne {
 	return uuo.AddGroupIDs(ids...)
 }
 
+// AddCourseGradeIDs adds the "course_grades" edge to the CourseGrade entity by IDs.
+func (uuo *UserUpdateOne) AddCourseGradeIDs(ids ...uuid.UUID) *UserUpdateOne {
+	uuo.mutation.AddCourseGradeIDs(ids...)
+	return uuo
+}
+
+// AddCourseGrades adds the "course_grades" edges to the CourseGrade entity.
+func (uuo *UserUpdateOne) AddCourseGrades(c ...*CourseGrade) *UserUpdateOne {
+	ids := make([]uuid.UUID, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return uuo.AddCourseGradeIDs(ids...)
+}
+
 // Mutation returns the UserMutation object of the builder.
 func (uuo *UserUpdateOne) Mutation() *UserMutation {
 	return uuo.mutation
@@ -1572,6 +1678,27 @@ func (uuo *UserUpdateOne) RemoveGroups(g ...*Group) *UserUpdateOne {
 		ids[i] = g[i].ID
 	}
 	return uuo.RemoveGroupIDs(ids...)
+}
+
+// ClearCourseGrades clears all "course_grades" edges to the CourseGrade entity.
+func (uuo *UserUpdateOne) ClearCourseGrades() *UserUpdateOne {
+	uuo.mutation.ClearCourseGrades()
+	return uuo
+}
+
+// RemoveCourseGradeIDs removes the "course_grades" edge to CourseGrade entities by IDs.
+func (uuo *UserUpdateOne) RemoveCourseGradeIDs(ids ...uuid.UUID) *UserUpdateOne {
+	uuo.mutation.RemoveCourseGradeIDs(ids...)
+	return uuo
+}
+
+// RemoveCourseGrades removes "course_grades" edges to CourseGrade entities.
+func (uuo *UserUpdateOne) RemoveCourseGrades(c ...*CourseGrade) *UserUpdateOne {
+	ids := make([]uuid.UUID, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return uuo.RemoveCourseGradeIDs(ids...)
 }
 
 // Select allows selecting one or more fields (columns) of the returned entity.
@@ -2256,6 +2383,60 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeUUID,
 					Column: group.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if uuo.mutation.CourseGradesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.CourseGradesTable,
+			Columns: []string{user.CourseGradesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: coursegrade.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uuo.mutation.RemovedCourseGradesIDs(); len(nodes) > 0 && !uuo.mutation.CourseGradesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.CourseGradesTable,
+			Columns: []string{user.CourseGradesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: coursegrade.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uuo.mutation.CourseGradesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.CourseGradesTable,
+			Columns: []string{user.CourseGradesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: coursegrade.FieldID,
 				},
 			},
 		}

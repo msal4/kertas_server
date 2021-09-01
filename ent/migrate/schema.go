@@ -178,6 +178,53 @@ var (
 			},
 		},
 	}
+	// CourseGradesColumns holds the columns for the "course_grades" table.
+	CourseGradesColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeUUID},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "activity_first", Type: field.TypeInt, Nullable: true},
+		{Name: "activity_second", Type: field.TypeInt, Nullable: true},
+		{Name: "written_first", Type: field.TypeInt},
+		{Name: "written_second", Type: field.TypeInt},
+		{Name: "course_final", Type: field.TypeInt},
+		{Name: "class_course_grades", Type: field.TypeUUID, Nullable: true},
+		{Name: "stage_course_grades", Type: field.TypeUUID, Nullable: true},
+		{Name: "user_course_grades", Type: field.TypeUUID, Nullable: true},
+	}
+	// CourseGradesTable holds the schema information for the "course_grades" table.
+	CourseGradesTable = &schema.Table{
+		Name:       "course_grades",
+		Columns:    CourseGradesColumns,
+		PrimaryKey: []*schema.Column{CourseGradesColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "course_grades_classes_course_grades",
+				Columns:    []*schema.Column{CourseGradesColumns[8]},
+				RefColumns: []*schema.Column{ClassesColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+			{
+				Symbol:     "course_grades_stages_course_grades",
+				Columns:    []*schema.Column{CourseGradesColumns[9]},
+				RefColumns: []*schema.Column{StagesColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+			{
+				Symbol:     "course_grades_users_course_grades",
+				Columns:    []*schema.Column{CourseGradesColumns[10]},
+				RefColumns: []*schema.Column{UsersColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+		},
+		Indexes: []*schema.Index{
+			{
+				Name:    "coursegrade_user_course_grades_class_course_grades_stage_course_grades",
+				Unique:  true,
+				Columns: []*schema.Column{CourseGradesColumns[10], CourseGradesColumns[8], CourseGradesColumns[9]},
+			},
+		},
+	}
 	// GradesColumns holds the columns for the "grades" table.
 	GradesColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeUUID},
@@ -552,6 +599,7 @@ var (
 		AssignmentSubmissionsTable,
 		AttendancesTable,
 		ClassesTable,
+		CourseGradesTable,
 		GradesTable,
 		GroupsTable,
 		MessagesTable,
@@ -572,6 +620,9 @@ func init() {
 	AttendancesTable.ForeignKeys[1].RefTable = UsersTable
 	ClassesTable.ForeignKeys[0].RefTable = StagesTable
 	ClassesTable.ForeignKeys[1].RefTable = UsersTable
+	CourseGradesTable.ForeignKeys[0].RefTable = ClassesTable
+	CourseGradesTable.ForeignKeys[1].RefTable = StagesTable
+	CourseGradesTable.ForeignKeys[2].RefTable = UsersTable
 	GradesTable.ForeignKeys[0].RefTable = AssignmentsTable
 	GradesTable.ForeignKeys[1].RefTable = UsersTable
 	GroupsTable.ForeignKeys[0].RefTable = ClassesTable

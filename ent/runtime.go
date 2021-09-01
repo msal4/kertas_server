@@ -10,6 +10,7 @@ import (
 	"github.com/msal4/hassah_school_server/ent/assignmentsubmission"
 	"github.com/msal4/hassah_school_server/ent/attendance"
 	"github.com/msal4/hassah_school_server/ent/class"
+	"github.com/msal4/hassah_school_server/ent/coursegrade"
 	"github.com/msal4/hassah_school_server/ent/grade"
 	"github.com/msal4/hassah_school_server/ent/group"
 	"github.com/msal4/hassah_school_server/ent/message"
@@ -117,6 +118,45 @@ func init() {
 	classDescID := classFields[0].Descriptor()
 	// class.DefaultID holds the default value on creation for the id field.
 	class.DefaultID = classDescID.Default.(func() uuid.UUID)
+	coursegradeMixin := schema.CourseGrade{}.Mixin()
+	coursegradeMixinFields0 := coursegradeMixin[0].Fields()
+	_ = coursegradeMixinFields0
+	coursegradeFields := schema.CourseGrade{}.Fields()
+	_ = coursegradeFields
+	// coursegradeDescCreatedAt is the schema descriptor for created_at field.
+	coursegradeDescCreatedAt := coursegradeMixinFields0[0].Descriptor()
+	// coursegrade.DefaultCreatedAt holds the default value on creation for the created_at field.
+	coursegrade.DefaultCreatedAt = coursegradeDescCreatedAt.Default.(func() time.Time)
+	// coursegradeDescUpdatedAt is the schema descriptor for updated_at field.
+	coursegradeDescUpdatedAt := coursegradeMixinFields0[1].Descriptor()
+	// coursegrade.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	coursegrade.DefaultUpdatedAt = coursegradeDescUpdatedAt.Default.(func() time.Time)
+	// coursegrade.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	coursegrade.UpdateDefaultUpdatedAt = coursegradeDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// coursegradeDescActivityFirst is the schema descriptor for activity_first field.
+	coursegradeDescActivityFirst := coursegradeFields[1].Descriptor()
+	// coursegrade.ActivityFirstValidator is a validator for the "activity_first" field. It is called by the builders before save.
+	coursegrade.ActivityFirstValidator = coursegradeDescActivityFirst.Validators[0].(func(int) error)
+	// coursegradeDescActivitySecond is the schema descriptor for activity_second field.
+	coursegradeDescActivitySecond := coursegradeFields[2].Descriptor()
+	// coursegrade.ActivitySecondValidator is a validator for the "activity_second" field. It is called by the builders before save.
+	coursegrade.ActivitySecondValidator = coursegradeDescActivitySecond.Validators[0].(func(int) error)
+	// coursegradeDescWrittenFirst is the schema descriptor for written_first field.
+	coursegradeDescWrittenFirst := coursegradeFields[3].Descriptor()
+	// coursegrade.WrittenFirstValidator is a validator for the "written_first" field. It is called by the builders before save.
+	coursegrade.WrittenFirstValidator = coursegradeDescWrittenFirst.Validators[0].(func(int) error)
+	// coursegradeDescWrittenSecond is the schema descriptor for written_second field.
+	coursegradeDescWrittenSecond := coursegradeFields[4].Descriptor()
+	// coursegrade.WrittenSecondValidator is a validator for the "written_second" field. It is called by the builders before save.
+	coursegrade.WrittenSecondValidator = coursegradeDescWrittenSecond.Validators[0].(func(int) error)
+	// coursegradeDescCourseFinal is the schema descriptor for course_final field.
+	coursegradeDescCourseFinal := coursegradeFields[5].Descriptor()
+	// coursegrade.CourseFinalValidator is a validator for the "course_final" field. It is called by the builders before save.
+	coursegrade.CourseFinalValidator = coursegradeDescCourseFinal.Validators[0].(func(int) error)
+	// coursegradeDescID is the schema descriptor for id field.
+	coursegradeDescID := coursegradeFields[0].Descriptor()
+	// coursegrade.DefaultID holds the default value on creation for the id field.
+	coursegrade.DefaultID = coursegradeDescID.Default.(func() uuid.UUID)
 	gradeMixin := schema.Grade{}.Mixin()
 	gradeMixinFields0 := gradeMixin[0].Fields()
 	_ = gradeMixinFields0

@@ -102,6 +102,28 @@ type ComplexityRoot struct {
 		Node   func(childComplexity int) int
 	}
 
+	CourseGrade struct {
+		ActivityFirst  func(childComplexity int) int
+		ActivitySecond func(childComplexity int) int
+		CourseFinal    func(childComplexity int) int
+		CreatedAt      func(childComplexity int) int
+		ID             func(childComplexity int) int
+		UpdatedAt      func(childComplexity int) int
+		WrittenFirst   func(childComplexity int) int
+		WrittenSecond  func(childComplexity int) int
+	}
+
+	CourseGradeConnection struct {
+		Edges      func(childComplexity int) int
+		PageInfo   func(childComplexity int) int
+		TotalCount func(childComplexity int) int
+	}
+
+	CourseGradeEdge struct {
+		Cursor func(childComplexity int) int
+		Node   func(childComplexity int) int
+	}
+
 	Group struct {
 		Active    func(childComplexity int) int
 		CreatedAt func(childComplexity int) int
@@ -144,6 +166,7 @@ type ComplexityRoot struct {
 	Mutation struct {
 		AddAssignment           func(childComplexity int, input model.AddAssignmentInput) int
 		AddClass                func(childComplexity int, input model.AddClassInput) int
+		AddCourseGrade          func(childComplexity int, input model.AddCourseGradeInput) int
 		AddGroup                func(childComplexity int, input model.AddGroupInput) int
 		AddSchedule             func(childComplexity int, input model.AddScheduleInput) int
 		AddSchool               func(childComplexity int, input model.AddSchoolInput) int
@@ -151,6 +174,7 @@ type ComplexityRoot struct {
 		AddUser                 func(childComplexity int, input model.AddUserInput) int
 		DeleteAssignment        func(childComplexity int, id uuid.UUID) int
 		DeleteClass             func(childComplexity int, id uuid.UUID) int
+		DeleteCourseGrade       func(childComplexity int, id uuid.UUID) int
 		DeleteGroup             func(childComplexity int, id uuid.UUID) int
 		DeleteSchedule          func(childComplexity int, id uuid.UUID) int
 		DeleteSchool            func(childComplexity int, id uuid.UUID) int
@@ -165,6 +189,7 @@ type ComplexityRoot struct {
 		RefreshTokens           func(childComplexity int, token string) int
 		UpdateAssignment        func(childComplexity int, id uuid.UUID, input model.UpdateAssignmentInput) int
 		UpdateClass             func(childComplexity int, id uuid.UUID, input model.UpdateClassInput) int
+		UpdateCourseGrade       func(childComplexity int, id uuid.UUID, input model.UpdateCourseGradeInput) int
 		UpdateGroup             func(childComplexity int, id uuid.UUID, input model.UpdateGroupInput) int
 		UpdateSchedule          func(childComplexity int, id uuid.UUID, input model.UpdateScheduleInput) int
 		UpdateSchool            func(childComplexity int, id uuid.UUID, input model.UpdateSchoolInput) int
@@ -180,20 +205,21 @@ type ComplexityRoot struct {
 	}
 
 	Query struct {
-		Assignment  func(childComplexity int, id uuid.UUID) int
-		Assignments func(childComplexity int, userID *uuid.UUID, stageID *uuid.UUID, schoolID *uuid.UUID, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.AssignmentOrder, where *ent.AssignmentWhereInput) int
-		Class       func(childComplexity int, id uuid.UUID) int
-		Classes     func(childComplexity int, userID *uuid.UUID, stageID *uuid.UUID, schoolID *uuid.UUID, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.ClassOrder, where *ent.ClassWhereInput) int
-		Group       func(childComplexity int, id uuid.UUID) int
-		Groups      func(childComplexity int, userID *uuid.UUID, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.GroupOrder, where *ent.GroupWhereInput) int
-		Messages    func(childComplexity int, groupID uuid.UUID, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.MessageOrder, where *ent.MessageWhereInput) int
-		Schedule    func(childComplexity int, stageID *uuid.UUID, weekday *time.Weekday) int
-		School      func(childComplexity int, id uuid.UUID) int
-		Schools     func(childComplexity int, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.SchoolOrder, where *ent.SchoolWhereInput) int
-		Stage       func(childComplexity int, id uuid.UUID) int
-		Stages      func(childComplexity int, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.StageOrder, where *ent.StageWhereInput) int
-		User        func(childComplexity int, id uuid.UUID) int
-		Users       func(childComplexity int, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.UserOrder, where *ent.UserWhereInput) int
+		Assignment   func(childComplexity int, id uuid.UUID) int
+		Assignments  func(childComplexity int, userID *uuid.UUID, stageID *uuid.UUID, schoolID *uuid.UUID, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.AssignmentOrder, where *ent.AssignmentWhereInput) int
+		Class        func(childComplexity int, id uuid.UUID) int
+		Classes      func(childComplexity int, userID *uuid.UUID, stageID *uuid.UUID, schoolID *uuid.UUID, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.ClassOrder, where *ent.ClassWhereInput) int
+		CourseGrades func(childComplexity int, studentID *uuid.UUID, stageID *uuid.UUID, classID *uuid.UUID, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.CourseGradeOrder, where *ent.CourseGradeWhereInput) int
+		Group        func(childComplexity int, id uuid.UUID) int
+		Groups       func(childComplexity int, userID *uuid.UUID, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.GroupOrder, where *ent.GroupWhereInput) int
+		Messages     func(childComplexity int, groupID uuid.UUID, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.MessageOrder, where *ent.MessageWhereInput) int
+		Schedule     func(childComplexity int, stageID *uuid.UUID, weekday *time.Weekday) int
+		School       func(childComplexity int, id uuid.UUID) int
+		Schools      func(childComplexity int, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.SchoolOrder, where *ent.SchoolWhereInput) int
+		Stage        func(childComplexity int, id uuid.UUID) int
+		Stages       func(childComplexity int, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.StageOrder, where *ent.StageWhereInput) int
+		User         func(childComplexity int, id uuid.UUID) int
+		Users        func(childComplexity int, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.UserOrder, where *ent.UserWhereInput) int
 	}
 
 	Schedule struct {
@@ -303,6 +329,9 @@ type MutationResolver interface {
 	AddSchedule(ctx context.Context, input model.AddScheduleInput) (*ent.Schedule, error)
 	UpdateSchedule(ctx context.Context, id uuid.UUID, input model.UpdateScheduleInput) (*ent.Schedule, error)
 	DeleteSchedule(ctx context.Context, id uuid.UUID) (bool, error)
+	AddCourseGrade(ctx context.Context, input model.AddCourseGradeInput) (*ent.CourseGrade, error)
+	UpdateCourseGrade(ctx context.Context, id uuid.UUID, input model.UpdateCourseGradeInput) (*ent.CourseGrade, error)
+	DeleteCourseGrade(ctx context.Context, id uuid.UUID) (bool, error)
 }
 type QueryResolver interface {
 	School(ctx context.Context, id uuid.UUID) (*ent.School, error)
@@ -319,6 +348,7 @@ type QueryResolver interface {
 	Assignment(ctx context.Context, id uuid.UUID) (*ent.Assignment, error)
 	Assignments(ctx context.Context, userID *uuid.UUID, stageID *uuid.UUID, schoolID *uuid.UUID, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.AssignmentOrder, where *ent.AssignmentWhereInput) (*ent.AssignmentConnection, error)
 	Schedule(ctx context.Context, stageID *uuid.UUID, weekday *time.Weekday) ([]*ent.Schedule, error)
+	CourseGrades(ctx context.Context, studentID *uuid.UUID, stageID *uuid.UUID, classID *uuid.UUID, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.CourseGradeOrder, where *ent.CourseGradeWhereInput) (*ent.CourseGradeConnection, error)
 }
 type SubscriptionResolver interface {
 	MessagePosted(ctx context.Context, groupID uuid.UUID) (<-chan *ent.Message, error)
@@ -521,6 +551,97 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.ClassEdge.Node(childComplexity), true
 
+	case "CourseGrade.activityFirst":
+		if e.complexity.CourseGrade.ActivityFirst == nil {
+			break
+		}
+
+		return e.complexity.CourseGrade.ActivityFirst(childComplexity), true
+
+	case "CourseGrade.activitySecond":
+		if e.complexity.CourseGrade.ActivitySecond == nil {
+			break
+		}
+
+		return e.complexity.CourseGrade.ActivitySecond(childComplexity), true
+
+	case "CourseGrade.courseFinal":
+		if e.complexity.CourseGrade.CourseFinal == nil {
+			break
+		}
+
+		return e.complexity.CourseGrade.CourseFinal(childComplexity), true
+
+	case "CourseGrade.createdAt":
+		if e.complexity.CourseGrade.CreatedAt == nil {
+			break
+		}
+
+		return e.complexity.CourseGrade.CreatedAt(childComplexity), true
+
+	case "CourseGrade.id":
+		if e.complexity.CourseGrade.ID == nil {
+			break
+		}
+
+		return e.complexity.CourseGrade.ID(childComplexity), true
+
+	case "CourseGrade.updatedAt":
+		if e.complexity.CourseGrade.UpdatedAt == nil {
+			break
+		}
+
+		return e.complexity.CourseGrade.UpdatedAt(childComplexity), true
+
+	case "CourseGrade.writtenFirst":
+		if e.complexity.CourseGrade.WrittenFirst == nil {
+			break
+		}
+
+		return e.complexity.CourseGrade.WrittenFirst(childComplexity), true
+
+	case "CourseGrade.writtenSecond":
+		if e.complexity.CourseGrade.WrittenSecond == nil {
+			break
+		}
+
+		return e.complexity.CourseGrade.WrittenSecond(childComplexity), true
+
+	case "CourseGradeConnection.edges":
+		if e.complexity.CourseGradeConnection.Edges == nil {
+			break
+		}
+
+		return e.complexity.CourseGradeConnection.Edges(childComplexity), true
+
+	case "CourseGradeConnection.pageInfo":
+		if e.complexity.CourseGradeConnection.PageInfo == nil {
+			break
+		}
+
+		return e.complexity.CourseGradeConnection.PageInfo(childComplexity), true
+
+	case "CourseGradeConnection.totalCount":
+		if e.complexity.CourseGradeConnection.TotalCount == nil {
+			break
+		}
+
+		return e.complexity.CourseGradeConnection.TotalCount(childComplexity), true
+
+	case "CourseGradeEdge.cursor":
+		if e.complexity.CourseGradeEdge.Cursor == nil {
+			break
+		}
+
+		return e.complexity.CourseGradeEdge.Cursor(childComplexity), true
+
+	case "CourseGradeEdge.node":
+		if e.complexity.CourseGradeEdge.Node == nil {
+			break
+		}
+
+		return e.complexity.CourseGradeEdge.Node(childComplexity), true
+
 	case "Group.active":
 		if e.complexity.Group.Active == nil {
 			break
@@ -692,6 +813,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.AddClass(childComplexity, args["input"].(model.AddClassInput)), true
 
+	case "Mutation.addCourseGrade":
+		if e.complexity.Mutation.AddCourseGrade == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_addCourseGrade_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.AddCourseGrade(childComplexity, args["input"].(model.AddCourseGradeInput)), true
+
 	case "Mutation.addGroup":
 		if e.complexity.Mutation.AddGroup == nil {
 			break
@@ -775,6 +908,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.DeleteClass(childComplexity, args["id"].(uuid.UUID)), true
+
+	case "Mutation.deleteCourseGrade":
+		if e.complexity.Mutation.DeleteCourseGrade == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_deleteCourseGrade_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.DeleteCourseGrade(childComplexity, args["id"].(uuid.UUID)), true
 
 	case "Mutation.deleteGroup":
 		if e.complexity.Mutation.DeleteGroup == nil {
@@ -944,6 +1089,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.UpdateClass(childComplexity, args["id"].(uuid.UUID), args["input"].(model.UpdateClassInput)), true
 
+	case "Mutation.updateCourseGrade":
+		if e.complexity.Mutation.UpdateCourseGrade == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_updateCourseGrade_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UpdateCourseGrade(childComplexity, args["id"].(uuid.UUID), args["input"].(model.UpdateCourseGradeInput)), true
+
 	case "Mutation.updateGroup":
 		if e.complexity.Mutation.UpdateGroup == nil {
 			break
@@ -1079,6 +1236,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Query.Classes(childComplexity, args["userID"].(*uuid.UUID), args["stageID"].(*uuid.UUID), args["schoolID"].(*uuid.UUID), args["after"].(*ent.Cursor), args["first"].(*int), args["before"].(*ent.Cursor), args["last"].(*int), args["orderBy"].(*ent.ClassOrder), args["where"].(*ent.ClassWhereInput)), true
+
+	case "Query.courseGrades":
+		if e.complexity.Query.CourseGrades == nil {
+			break
+		}
+
+		args, err := ec.field_Query_courseGrades_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.CourseGrades(childComplexity, args["studentID"].(*uuid.UUID), args["stageID"].(*uuid.UUID), args["classID"].(*uuid.UUID), args["after"].(*ent.Cursor), args["first"].(*int), args["before"].(*ent.Cursor), args["last"].(*int), args["orderBy"].(*ent.CourseGradeOrder), args["where"].(*ent.CourseGradeWhereInput)), true
 
 	case "Query.group":
 		if e.complexity.Query.Group == nil {
@@ -1631,19 +1800,19 @@ enum GroupType {
 }
 
 enum OrderDirection {
-    ASC
-    DESC
+  ASC
+  DESC
 }
 
 enum SchoolOrderField {
-    NAME
-    CREATED_AT
-    UPDATED_AT
+  NAME
+  CREATED_AT
+  UPDATED_AT
 }
 
 input SchoolOrder {
-    field: SchoolOrderField
-    direction: OrderDirection!
+  field: SchoolOrderField
+  direction: OrderDirection!
 }
 
 type School implements Node {
@@ -1679,17 +1848,17 @@ input UpdateSchoolInput {
 }
 
 enum UserOrderField {
-    NAME
-    USERNAME
-    PHONE
-    ROLE
-    CREATED_AT
-    UPDATED_AT
+  NAME
+  USERNAME
+  PHONE
+  ROLE
+  CREATED_AT
+  UPDATED_AT
 }
 
 input UserOrder {
-    field: UserOrderField
-    direction: OrderDirection!
+  field: UserOrderField
+  direction: OrderDirection!
 }
 
 type User implements Node {
@@ -1750,14 +1919,14 @@ type Stage implements Node {
 }
 
 enum StageOrderField {
-    NAME
-    CREATED_AT
-    UPDATED_AT
+  NAME
+  CREATED_AT
+  UPDATED_AT
 }
 
 input StageOrder {
-    field: StageOrderField
-    direction: OrderDirection!
+  field: StageOrderField
+  direction: OrderDirection!
 }
 
 type StageEdge {
@@ -1804,14 +1973,14 @@ type Group {
 }
 
 enum GroupOrderField {
-    NAME
-    CREATED_AT
-    UPDATED_AT
+  NAME
+  CREATED_AT
+  UPDATED_AT
 }
 
 input GroupOrder {
-    field: GroupOrderField
-    direction: OrderDirection!
+  field: GroupOrderField
+  direction: OrderDirection!
 }
 
 type GroupEdge {
@@ -1846,14 +2015,14 @@ type Class {
 }
 
 enum ClassOrderField {
-    NAME
-    CREATED_AT
-    UPDATED_AT
+  NAME
+  CREATED_AT
+  UPDATED_AT
 }
 
 input ClassOrder {
-    field: ClassOrderField
-    direction: OrderDirection!
+  field: ClassOrderField
+  direction: OrderDirection!
 }
 
 type ClassEdge {
@@ -1890,13 +2059,13 @@ type Message {
 }
 
 enum MessageOrderField {
-    CREATED_AT
-    UPDATED_AT
+  CREATED_AT
+  UPDATED_AT
 }
 
 input MessageOrder {
-    field: MessageOrderField
-    direction: OrderDirection!
+  field: MessageOrderField
+  direction: OrderDirection!
 }
 
 type MessageEdge {
@@ -1929,17 +2098,17 @@ type Assignment {
 }
 
 enum AssignmentOrderField {
-    NAME
-    DESCRIPTION
-    DUE_DATE
-    DURATION
-    CREATED_AT
-    UPDATED_AT
+  NAME
+  DESCRIPTION
+  DUE_DATE
+  DURATION
+  CREATED_AT
+  UPDATED_AT
 }
 
 input AssignmentOrder {
-    field: AssignmentOrderField
-    direction: OrderDirection!
+  field: AssignmentOrderField
+  direction: OrderDirection!
 }
 
 type AssignmentEdge {
@@ -1991,6 +2160,62 @@ input UpdateScheduleInput {
   startsAt: Time
 }
 
+type CourseGrade {
+  id: ID!
+  activityFirst: Int!
+  activitySecond: Int!
+  writtenFirst: Int!
+  writtenSecond: Int!
+  courseFinal: Int!
+  createdAt: Time!
+  updatedAt: Time!
+}
+
+enum CourseGradeOrderField {
+  ACTIVITY_FIRST
+  ACTIVITY_SECOND
+  WRITTEN_FIRST
+  WRITTEN_SECOND
+  COURSE_FINAL
+  CREATED_AT
+  UPDATED_AT
+}
+
+input CourseGradeOrder {
+  field: CourseGradeOrderField
+  direction: OrderDirection!
+}
+
+type CourseGradeEdge {
+  node: CourseGrade
+  cursor: Cursor!
+}
+
+type CourseGradeConnection {
+  totalCount: Int!
+  pageInfo: PageInfo!
+  edges: [CourseGradeEdge]
+}
+
+input AddCourseGradeInput {
+  studentID: ID!
+  stageID: ID!
+  classID: ID!
+  activityFirst: Int
+  activitySecond: Int
+  writtenFirst: Int
+  writtenSecond: Int
+  courseFinal: Int
+}
+
+input UpdateCourseGradeInput {
+  activityFirst: Int
+  activitySecond: Int
+  writtenFirst: Int
+  writtenSecond: Int
+  courseFinal: Int
+}
+
 type Query {
   school(id: ID!): School
   schools(after: Cursor, first: Int, before: Cursor, last: Int, orderBy: SchoolOrder, where: SchoolWhereInput): SchoolConnection
@@ -2013,6 +2238,8 @@ type Query {
   assignments(userID: ID, stageID: ID, schoolID: ID, after: Cursor, first: Int, before: Cursor, last: Int, orderBy: AssignmentOrder, where: AssignmentWhereInput): AssignmentConnection
 
   schedule(stageID: ID, weekday: Weekday): [Schedule]
+
+  courseGrades(studentID: ID, stageID: ID, classID: ID, after: Cursor, first: Int, before: Cursor, last: Int, orderBy: CourseGradeOrder, where: CourseGradeWhereInput): CourseGradeConnection
 }
 
 type Mutation {
@@ -2052,6 +2279,10 @@ type Mutation {
   addSchedule(input: AddScheduleInput!): Schedule
   updateSchedule(id: ID!, input: UpdateScheduleInput!): Schedule
   deleteSchedule(id: ID!): Boolean!
+
+  addCourseGrade(input: AddCourseGradeInput!): CourseGrade
+  updateCourseGrade(id: ID!, input: UpdateCourseGradeInput!): CourseGrade
+  deleteCourseGrade(id: ID!): Boolean!
 }
 
 type Subscription {
@@ -2465,6 +2696,10 @@ input StageWhereInput {
   """students edge predicates"""
   hasStudents: Boolean
   hasStudentsWith: [UserWhereInput!]
+  
+  """course_grades edge predicates"""
+  hasCourseGrades: Boolean
+  hasCourseGradesWith: [CourseGradeWhereInput!]
 }
 
 """
@@ -2678,6 +2913,10 @@ input ClassWhereInput {
   """schedules edge predicates"""
   hasSchedules: Boolean
   hasSchedulesWith: [ScheduleWhereInput!]
+  
+  """course_grades edge predicates"""
+  hasCourseGrades: Boolean
+  hasCourseGradesWith: [CourseGradeWhereInput!]
 }
 
 """
@@ -3175,6 +3414,116 @@ input UserWhereInput {
   """groups edge predicates"""
   hasGroups: Boolean
   hasGroupsWith: [GroupWhereInput!]
+  
+  """course_grades edge predicates"""
+  hasCourseGrades: Boolean
+  hasCourseGradesWith: [CourseGradeWhereInput!]
+}
+
+"""
+CourseGradeWhereInput is used for filtering CourseGrade objects.
+Input was generated by ent.
+"""
+input CourseGradeWhereInput {
+  not: CourseGradeWhereInput
+  and: [CourseGradeWhereInput!]
+  or: [CourseGradeWhereInput!]
+  
+  """created_at field predicates"""
+  createdAt: Time
+  createdAtNEQ: Time
+  createdAtIn: [Time!]
+  createdAtNotIn: [Time!]
+  createdAtGT: Time
+  createdAtGTE: Time
+  createdAtLT: Time
+  createdAtLTE: Time
+  
+  """updated_at field predicates"""
+  updatedAt: Time
+  updatedAtNEQ: Time
+  updatedAtIn: [Time!]
+  updatedAtNotIn: [Time!]
+  updatedAtGT: Time
+  updatedAtGTE: Time
+  updatedAtLT: Time
+  updatedAtLTE: Time
+  
+  """activity_first field predicates"""
+  activityFirst: Int
+  activityFirstNEQ: Int
+  activityFirstIn: [Int!]
+  activityFirstNotIn: [Int!]
+  activityFirstGT: Int
+  activityFirstGTE: Int
+  activityFirstLT: Int
+  activityFirstLTE: Int
+  activityFirstIsNil: Boolean
+  activityFirstNotNil: Boolean
+  
+  """activity_second field predicates"""
+  activitySecond: Int
+  activitySecondNEQ: Int
+  activitySecondIn: [Int!]
+  activitySecondNotIn: [Int!]
+  activitySecondGT: Int
+  activitySecondGTE: Int
+  activitySecondLT: Int
+  activitySecondLTE: Int
+  activitySecondIsNil: Boolean
+  activitySecondNotNil: Boolean
+  
+  """written_first field predicates"""
+  writtenFirst: Int
+  writtenFirstNEQ: Int
+  writtenFirstIn: [Int!]
+  writtenFirstNotIn: [Int!]
+  writtenFirstGT: Int
+  writtenFirstGTE: Int
+  writtenFirstLT: Int
+  writtenFirstLTE: Int
+  
+  """written_second field predicates"""
+  writtenSecond: Int
+  writtenSecondNEQ: Int
+  writtenSecondIn: [Int!]
+  writtenSecondNotIn: [Int!]
+  writtenSecondGT: Int
+  writtenSecondGTE: Int
+  writtenSecondLT: Int
+  writtenSecondLTE: Int
+  
+  """course_final field predicates"""
+  courseFinal: Int
+  courseFinalNEQ: Int
+  courseFinalIn: [Int!]
+  courseFinalNotIn: [Int!]
+  courseFinalGT: Int
+  courseFinalGTE: Int
+  courseFinalLT: Int
+  courseFinalLTE: Int
+  
+  """id field predicates"""
+  id: ID
+  idNEQ: ID
+  idIn: [ID!]
+  idNotIn: [ID!]
+  idGT: ID
+  idGTE: ID
+  idLT: ID
+  idLTE: ID
+  
+  """student edge predicates"""
+  hasStudent: Boolean
+  hasStudentWith: [UserWhereInput!]
+  
+  """class edge predicates"""
+  hasClass: Boolean
+  hasClassWith: [ClassWhereInput!]
+  
+  """stage edge predicates"""
+  hasStage: Boolean
+  hasStageWith: [StageWhereInput!]
 }
 `, BuiltIn: false},
 }
@@ -3206,6 +3555,21 @@ func (ec *executionContext) field_Mutation_addClass_args(ctx context.Context, ra
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
 		arg0, err = ec.unmarshalNAddClassInput2githubᚗcomᚋmsal4ᚋhassah_school_serverᚋserverᚋmodelᚐAddClassInput(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_addCourseGrade_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 model.AddCourseGradeInput
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg0, err = ec.unmarshalNAddCourseGradeInput2githubᚗcomᚋmsal4ᚋhassah_school_serverᚋserverᚋmodelᚐAddCourseGradeInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -3305,6 +3669,21 @@ func (ec *executionContext) field_Mutation_deleteAssignment_args(ctx context.Con
 }
 
 func (ec *executionContext) field_Mutation_deleteClass_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 uuid.UUID
+	if tmp, ok := rawArgs["id"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+		arg0, err = ec.unmarshalNID2githubᚗcomᚋgoogleᚋuuidᚐUUID(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["id"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_deleteCourseGrade_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
 	var arg0 uuid.UUID
@@ -3539,6 +3918,30 @@ func (ec *executionContext) field_Mutation_updateClass_args(ctx context.Context,
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
 		arg1, err = ec.unmarshalNUpdateClassInput2githubᚗcomᚋmsal4ᚋhassah_school_serverᚋserverᚋmodelᚐUpdateClassInput(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg1
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_updateCourseGrade_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 uuid.UUID
+	if tmp, ok := rawArgs["id"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+		arg0, err = ec.unmarshalNID2githubᚗcomᚋgoogleᚋuuidᚐUUID(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["id"] = arg0
+	var arg1 model.UpdateCourseGradeInput
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg1, err = ec.unmarshalNUpdateCourseGradeInput2githubᚗcomᚋmsal4ᚋhassah_school_serverᚋserverᚋmodelᚐUpdateCourseGradeInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -3878,6 +4281,93 @@ func (ec *executionContext) field_Query_classes_args(ctx context.Context, rawArg
 	if tmp, ok := rawArgs["where"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("where"))
 		arg8, err = ec.unmarshalOClassWhereInput2ᚖgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚐClassWhereInput(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["where"] = arg8
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_courseGrades_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *uuid.UUID
+	if tmp, ok := rawArgs["studentID"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("studentID"))
+		arg0, err = ec.unmarshalOID2ᚖgithubᚗcomᚋgoogleᚋuuidᚐUUID(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["studentID"] = arg0
+	var arg1 *uuid.UUID
+	if tmp, ok := rawArgs["stageID"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("stageID"))
+		arg1, err = ec.unmarshalOID2ᚖgithubᚗcomᚋgoogleᚋuuidᚐUUID(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["stageID"] = arg1
+	var arg2 *uuid.UUID
+	if tmp, ok := rawArgs["classID"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("classID"))
+		arg2, err = ec.unmarshalOID2ᚖgithubᚗcomᚋgoogleᚋuuidᚐUUID(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["classID"] = arg2
+	var arg3 *ent.Cursor
+	if tmp, ok := rawArgs["after"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("after"))
+		arg3, err = ec.unmarshalOCursor2ᚖgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚐCursor(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["after"] = arg3
+	var arg4 *int
+	if tmp, ok := rawArgs["first"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("first"))
+		arg4, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["first"] = arg4
+	var arg5 *ent.Cursor
+	if tmp, ok := rawArgs["before"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("before"))
+		arg5, err = ec.unmarshalOCursor2ᚖgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚐCursor(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["before"] = arg5
+	var arg6 *int
+	if tmp, ok := rawArgs["last"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("last"))
+		arg6, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["last"] = arg6
+	var arg7 *ent.CourseGradeOrder
+	if tmp, ok := rawArgs["orderBy"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("orderBy"))
+		arg7, err = ec.unmarshalOCourseGradeOrder2ᚖgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚐCourseGradeOrder(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["orderBy"] = arg7
+	var arg8 *ent.CourseGradeWhereInput
+	if tmp, ok := rawArgs["where"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("where"))
+		arg8, err = ec.unmarshalOCourseGradeWhereInput2ᚖgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚐCourseGradeWhereInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -5204,6 +5694,455 @@ func (ec *executionContext) _ClassEdge_cursor(ctx context.Context, field graphql
 	}()
 	fc := &graphql.FieldContext{
 		Object:     "ClassEdge",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Cursor, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(ent.Cursor)
+	fc.Result = res
+	return ec.marshalNCursor2githubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚐCursor(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _CourseGrade_id(ctx context.Context, field graphql.CollectedField, obj *ent.CourseGrade) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "CourseGrade",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(uuid.UUID)
+	fc.Result = res
+	return ec.marshalNID2githubᚗcomᚋgoogleᚋuuidᚐUUID(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _CourseGrade_activityFirst(ctx context.Context, field graphql.CollectedField, obj *ent.CourseGrade) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "CourseGrade",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ActivityFirst, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _CourseGrade_activitySecond(ctx context.Context, field graphql.CollectedField, obj *ent.CourseGrade) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "CourseGrade",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ActivitySecond, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _CourseGrade_writtenFirst(ctx context.Context, field graphql.CollectedField, obj *ent.CourseGrade) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "CourseGrade",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.WrittenFirst, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _CourseGrade_writtenSecond(ctx context.Context, field graphql.CollectedField, obj *ent.CourseGrade) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "CourseGrade",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.WrittenSecond, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _CourseGrade_courseFinal(ctx context.Context, field graphql.CollectedField, obj *ent.CourseGrade) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "CourseGrade",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CourseFinal, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _CourseGrade_createdAt(ctx context.Context, field graphql.CollectedField, obj *ent.CourseGrade) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "CourseGrade",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CreatedAt, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(time.Time)
+	fc.Result = res
+	return ec.marshalNTime2timeᚐTime(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _CourseGrade_updatedAt(ctx context.Context, field graphql.CollectedField, obj *ent.CourseGrade) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "CourseGrade",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.UpdatedAt, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(time.Time)
+	fc.Result = res
+	return ec.marshalNTime2timeᚐTime(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _CourseGradeConnection_totalCount(ctx context.Context, field graphql.CollectedField, obj *ent.CourseGradeConnection) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "CourseGradeConnection",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.TotalCount, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _CourseGradeConnection_pageInfo(ctx context.Context, field graphql.CollectedField, obj *ent.CourseGradeConnection) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "CourseGradeConnection",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.PageInfo, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(ent.PageInfo)
+	fc.Result = res
+	return ec.marshalNPageInfo2githubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚐPageInfo(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _CourseGradeConnection_edges(ctx context.Context, field graphql.CollectedField, obj *ent.CourseGradeConnection) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "CourseGradeConnection",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Edges, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*ent.CourseGradeEdge)
+	fc.Result = res
+	return ec.marshalOCourseGradeEdge2ᚕᚖgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚐCourseGradeEdge(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _CourseGradeEdge_node(ctx context.Context, field graphql.CollectedField, obj *ent.CourseGradeEdge) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "CourseGradeEdge",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Node, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*ent.CourseGrade)
+	fc.Result = res
+	return ec.marshalOCourseGrade2ᚖgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚐCourseGrade(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _CourseGradeEdge_cursor(ctx context.Context, field graphql.CollectedField, obj *ent.CourseGradeEdge) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "CourseGradeEdge",
 		Field:      field,
 		Args:       nil,
 		IsMethod:   false,
@@ -7075,6 +8014,126 @@ func (ec *executionContext) _Mutation_deleteSchedule(ctx context.Context, field 
 	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _Mutation_addCourseGrade(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_addCourseGrade_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().AddCourseGrade(rctx, args["input"].(model.AddCourseGradeInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*ent.CourseGrade)
+	fc.Result = res
+	return ec.marshalOCourseGrade2ᚖgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚐCourseGrade(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_updateCourseGrade(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_updateCourseGrade_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().UpdateCourseGrade(rctx, args["id"].(uuid.UUID), args["input"].(model.UpdateCourseGradeInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*ent.CourseGrade)
+	fc.Result = res
+	return ec.marshalOCourseGrade2ᚖgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚐCourseGrade(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_deleteCourseGrade(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_deleteCourseGrade_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().DeleteCourseGrade(rctx, args["id"].(uuid.UUID))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _PageInfo_hasNextPage(ctx context.Context, field graphql.CollectedField, obj *ent.PageInfo) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -7753,6 +8812,45 @@ func (ec *executionContext) _Query_schedule(ctx context.Context, field graphql.C
 	res := resTmp.([]*ent.Schedule)
 	fc.Result = res
 	return ec.marshalOSchedule2ᚕᚖgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚐSchedule(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Query_courseGrades(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Query_courseGrades_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().CourseGrades(rctx, args["studentID"].(*uuid.UUID), args["stageID"].(*uuid.UUID), args["classID"].(*uuid.UUID), args["after"].(*ent.Cursor), args["first"].(*int), args["before"].(*ent.Cursor), args["last"].(*int), args["orderBy"].(*ent.CourseGradeOrder), args["where"].(*ent.CourseGradeWhereInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*ent.CourseGradeConnection)
+	fc.Result = res
+	return ec.marshalOCourseGradeConnection2ᚖgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚐCourseGradeConnection(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query___type(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -10559,6 +11657,82 @@ func (ec *executionContext) unmarshalInputAddClassInput(ctx context.Context, obj
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputAddCourseGradeInput(ctx context.Context, obj interface{}) (model.AddCourseGradeInput, error) {
+	var it model.AddCourseGradeInput
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "studentID":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("studentID"))
+			it.StudentID, err = ec.unmarshalNID2githubᚗcomᚋgoogleᚋuuidᚐUUID(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "stageID":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("stageID"))
+			it.StageID, err = ec.unmarshalNID2githubᚗcomᚋgoogleᚋuuidᚐUUID(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "classID":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("classID"))
+			it.ClassID, err = ec.unmarshalNID2githubᚗcomᚋgoogleᚋuuidᚐUUID(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "activityFirst":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("activityFirst"))
+			it.ActivityFirst, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "activitySecond":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("activitySecond"))
+			it.ActivitySecond, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "writtenFirst":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("writtenFirst"))
+			it.WrittenFirst, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "writtenSecond":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("writtenSecond"))
+			it.WrittenSecond, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "courseFinal":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("courseFinal"))
+			it.CourseFinal, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputAddGroupInput(ctx context.Context, obj interface{}) (model.AddGroupInput, error) {
 	var it model.AddGroupInput
 	var asMap = obj.(map[string]interface{})
@@ -12949,6 +14123,678 @@ func (ec *executionContext) unmarshalInputClassWhereInput(ctx context.Context, o
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasSchedulesWith"))
 			it.HasSchedulesWith, err = ec.unmarshalOScheduleWhereInput2ᚕᚖgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚐScheduleWhereInputᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "hasCourseGrades":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasCourseGrades"))
+			it.HasCourseGrades, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "hasCourseGradesWith":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasCourseGradesWith"))
+			it.HasCourseGradesWith, err = ec.unmarshalOCourseGradeWhereInput2ᚕᚖgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚐCourseGradeWhereInputᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputCourseGradeOrder(ctx context.Context, obj interface{}) (ent.CourseGradeOrder, error) {
+	var it ent.CourseGradeOrder
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "field":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("field"))
+			it.Field, err = ec.unmarshalOCourseGradeOrderField2ᚖgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚐCourseGradeOrderField(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "direction":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("direction"))
+			it.Direction, err = ec.unmarshalNOrderDirection2githubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚐOrderDirection(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputCourseGradeWhereInput(ctx context.Context, obj interface{}) (ent.CourseGradeWhereInput, error) {
+	var it ent.CourseGradeWhereInput
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "not":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("not"))
+			it.Not, err = ec.unmarshalOCourseGradeWhereInput2ᚖgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚐCourseGradeWhereInput(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "and":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("and"))
+			it.And, err = ec.unmarshalOCourseGradeWhereInput2ᚕᚖgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚐCourseGradeWhereInputᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "or":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("or"))
+			it.Or, err = ec.unmarshalOCourseGradeWhereInput2ᚕᚖgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚐCourseGradeWhereInputᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "createdAt":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAt"))
+			it.CreatedAt, err = ec.unmarshalOTime2ᚖtimeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "createdAtNEQ":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAtNEQ"))
+			it.CreatedAtNEQ, err = ec.unmarshalOTime2ᚖtimeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "createdAtIn":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAtIn"))
+			it.CreatedAtIn, err = ec.unmarshalOTime2ᚕtimeᚐTimeᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "createdAtNotIn":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAtNotIn"))
+			it.CreatedAtNotIn, err = ec.unmarshalOTime2ᚕtimeᚐTimeᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "createdAtGT":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAtGT"))
+			it.CreatedAtGT, err = ec.unmarshalOTime2ᚖtimeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "createdAtGTE":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAtGTE"))
+			it.CreatedAtGTE, err = ec.unmarshalOTime2ᚖtimeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "createdAtLT":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAtLT"))
+			it.CreatedAtLT, err = ec.unmarshalOTime2ᚖtimeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "createdAtLTE":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAtLTE"))
+			it.CreatedAtLTE, err = ec.unmarshalOTime2ᚖtimeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "updatedAt":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedAt"))
+			it.UpdatedAt, err = ec.unmarshalOTime2ᚖtimeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "updatedAtNEQ":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedAtNEQ"))
+			it.UpdatedAtNEQ, err = ec.unmarshalOTime2ᚖtimeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "updatedAtIn":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedAtIn"))
+			it.UpdatedAtIn, err = ec.unmarshalOTime2ᚕtimeᚐTimeᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "updatedAtNotIn":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedAtNotIn"))
+			it.UpdatedAtNotIn, err = ec.unmarshalOTime2ᚕtimeᚐTimeᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "updatedAtGT":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedAtGT"))
+			it.UpdatedAtGT, err = ec.unmarshalOTime2ᚖtimeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "updatedAtGTE":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedAtGTE"))
+			it.UpdatedAtGTE, err = ec.unmarshalOTime2ᚖtimeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "updatedAtLT":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedAtLT"))
+			it.UpdatedAtLT, err = ec.unmarshalOTime2ᚖtimeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "updatedAtLTE":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedAtLTE"))
+			it.UpdatedAtLTE, err = ec.unmarshalOTime2ᚖtimeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "activityFirst":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("activityFirst"))
+			it.ActivityFirst, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "activityFirstNEQ":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("activityFirstNEQ"))
+			it.ActivityFirstNEQ, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "activityFirstIn":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("activityFirstIn"))
+			it.ActivityFirstIn, err = ec.unmarshalOInt2ᚕintᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "activityFirstNotIn":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("activityFirstNotIn"))
+			it.ActivityFirstNotIn, err = ec.unmarshalOInt2ᚕintᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "activityFirstGT":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("activityFirstGT"))
+			it.ActivityFirstGT, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "activityFirstGTE":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("activityFirstGTE"))
+			it.ActivityFirstGTE, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "activityFirstLT":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("activityFirstLT"))
+			it.ActivityFirstLT, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "activityFirstLTE":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("activityFirstLTE"))
+			it.ActivityFirstLTE, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "activityFirstIsNil":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("activityFirstIsNil"))
+			it.ActivityFirstIsNil, err = ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "activityFirstNotNil":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("activityFirstNotNil"))
+			it.ActivityFirstNotNil, err = ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "activitySecond":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("activitySecond"))
+			it.ActivitySecond, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "activitySecondNEQ":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("activitySecondNEQ"))
+			it.ActivitySecondNEQ, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "activitySecondIn":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("activitySecondIn"))
+			it.ActivitySecondIn, err = ec.unmarshalOInt2ᚕintᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "activitySecondNotIn":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("activitySecondNotIn"))
+			it.ActivitySecondNotIn, err = ec.unmarshalOInt2ᚕintᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "activitySecondGT":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("activitySecondGT"))
+			it.ActivitySecondGT, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "activitySecondGTE":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("activitySecondGTE"))
+			it.ActivitySecondGTE, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "activitySecondLT":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("activitySecondLT"))
+			it.ActivitySecondLT, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "activitySecondLTE":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("activitySecondLTE"))
+			it.ActivitySecondLTE, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "activitySecondIsNil":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("activitySecondIsNil"))
+			it.ActivitySecondIsNil, err = ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "activitySecondNotNil":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("activitySecondNotNil"))
+			it.ActivitySecondNotNil, err = ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "writtenFirst":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("writtenFirst"))
+			it.WrittenFirst, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "writtenFirstNEQ":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("writtenFirstNEQ"))
+			it.WrittenFirstNEQ, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "writtenFirstIn":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("writtenFirstIn"))
+			it.WrittenFirstIn, err = ec.unmarshalOInt2ᚕintᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "writtenFirstNotIn":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("writtenFirstNotIn"))
+			it.WrittenFirstNotIn, err = ec.unmarshalOInt2ᚕintᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "writtenFirstGT":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("writtenFirstGT"))
+			it.WrittenFirstGT, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "writtenFirstGTE":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("writtenFirstGTE"))
+			it.WrittenFirstGTE, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "writtenFirstLT":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("writtenFirstLT"))
+			it.WrittenFirstLT, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "writtenFirstLTE":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("writtenFirstLTE"))
+			it.WrittenFirstLTE, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "writtenSecond":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("writtenSecond"))
+			it.WrittenSecond, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "writtenSecondNEQ":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("writtenSecondNEQ"))
+			it.WrittenSecondNEQ, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "writtenSecondIn":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("writtenSecondIn"))
+			it.WrittenSecondIn, err = ec.unmarshalOInt2ᚕintᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "writtenSecondNotIn":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("writtenSecondNotIn"))
+			it.WrittenSecondNotIn, err = ec.unmarshalOInt2ᚕintᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "writtenSecondGT":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("writtenSecondGT"))
+			it.WrittenSecondGT, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "writtenSecondGTE":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("writtenSecondGTE"))
+			it.WrittenSecondGTE, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "writtenSecondLT":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("writtenSecondLT"))
+			it.WrittenSecondLT, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "writtenSecondLTE":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("writtenSecondLTE"))
+			it.WrittenSecondLTE, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "courseFinal":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("courseFinal"))
+			it.CourseFinal, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "courseFinalNEQ":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("courseFinalNEQ"))
+			it.CourseFinalNEQ, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "courseFinalIn":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("courseFinalIn"))
+			it.CourseFinalIn, err = ec.unmarshalOInt2ᚕintᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "courseFinalNotIn":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("courseFinalNotIn"))
+			it.CourseFinalNotIn, err = ec.unmarshalOInt2ᚕintᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "courseFinalGT":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("courseFinalGT"))
+			it.CourseFinalGT, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "courseFinalGTE":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("courseFinalGTE"))
+			it.CourseFinalGTE, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "courseFinalLT":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("courseFinalLT"))
+			it.CourseFinalLT, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "courseFinalLTE":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("courseFinalLTE"))
+			it.CourseFinalLTE, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "id":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+			it.ID, err = ec.unmarshalOID2ᚖgithubᚗcomᚋgoogleᚋuuidᚐUUID(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "idNEQ":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("idNEQ"))
+			it.IDNEQ, err = ec.unmarshalOID2ᚖgithubᚗcomᚋgoogleᚋuuidᚐUUID(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "idIn":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("idIn"))
+			it.IDIn, err = ec.unmarshalOID2ᚕgithubᚗcomᚋgoogleᚋuuidᚐUUIDᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "idNotIn":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("idNotIn"))
+			it.IDNotIn, err = ec.unmarshalOID2ᚕgithubᚗcomᚋgoogleᚋuuidᚐUUIDᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "idGT":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("idGT"))
+			it.IDGT, err = ec.unmarshalOID2ᚖgithubᚗcomᚋgoogleᚋuuidᚐUUID(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "idGTE":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("idGTE"))
+			it.IDGTE, err = ec.unmarshalOID2ᚖgithubᚗcomᚋgoogleᚋuuidᚐUUID(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "idLT":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("idLT"))
+			it.IDLT, err = ec.unmarshalOID2ᚖgithubᚗcomᚋgoogleᚋuuidᚐUUID(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "idLTE":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("idLTE"))
+			it.IDLTE, err = ec.unmarshalOID2ᚖgithubᚗcomᚋgoogleᚋuuidᚐUUID(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "hasStudent":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasStudent"))
+			it.HasStudent, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "hasStudentWith":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasStudentWith"))
+			it.HasStudentWith, err = ec.unmarshalOUserWhereInput2ᚕᚖgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚐUserWhereInputᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "hasClass":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasClass"))
+			it.HasClass, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "hasClassWith":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasClassWith"))
+			it.HasClassWith, err = ec.unmarshalOClassWhereInput2ᚕᚖgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚐClassWhereInputᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "hasStage":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasStage"))
+			it.HasStage, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "hasStageWith":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasStageWith"))
+			it.HasStageWith, err = ec.unmarshalOStageWhereInput2ᚕᚖgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚐStageWhereInputᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -16192,6 +18038,22 @@ func (ec *executionContext) unmarshalInputStageWhereInput(ctx context.Context, o
 			if err != nil {
 				return it, err
 			}
+		case "hasCourseGrades":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasCourseGrades"))
+			it.HasCourseGrades, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "hasCourseGradesWith":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasCourseGradesWith"))
+			it.HasCourseGradesWith, err = ec.unmarshalOCourseGradeWhereInput2ᚕᚖgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚐCourseGradeWhereInputᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		}
 	}
 
@@ -16601,6 +18463,58 @@ func (ec *executionContext) unmarshalInputUpdateClassInput(ctx context.Context, 
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("teacherID"))
 			it.TeacherID, err = ec.unmarshalOID2ᚖgithubᚗcomᚋgoogleᚋuuidᚐUUID(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputUpdateCourseGradeInput(ctx context.Context, obj interface{}) (model.UpdateCourseGradeInput, error) {
+	var it model.UpdateCourseGradeInput
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "activityFirst":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("activityFirst"))
+			it.ActivityFirst, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "activitySecond":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("activitySecond"))
+			it.ActivitySecond, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "writtenFirst":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("writtenFirst"))
+			it.WrittenFirst, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "writtenSecond":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("writtenSecond"))
+			it.WrittenSecond, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "courseFinal":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("courseFinal"))
+			it.CourseFinal, err = ec.unmarshalOInt2ᚖint(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -17936,6 +19850,22 @@ func (ec *executionContext) unmarshalInputUserWhereInput(ctx context.Context, ob
 			if err != nil {
 				return it, err
 			}
+		case "hasCourseGrades":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasCourseGrades"))
+			it.HasCourseGrades, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "hasCourseGradesWith":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasCourseGradesWith"))
+			it.HasCourseGradesWith, err = ec.unmarshalOCourseGradeWhereInput2ᚕᚖgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚐCourseGradeWhereInputᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		}
 	}
 
@@ -18223,6 +20153,131 @@ func (ec *executionContext) _ClassEdge(ctx context.Context, sel ast.SelectionSet
 			out.Values[i] = ec._ClassEdge_node(ctx, field, obj)
 		case "cursor":
 			out.Values[i] = ec._ClassEdge_cursor(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var courseGradeImplementors = []string{"CourseGrade"}
+
+func (ec *executionContext) _CourseGrade(ctx context.Context, sel ast.SelectionSet, obj *ent.CourseGrade) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, courseGradeImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("CourseGrade")
+		case "id":
+			out.Values[i] = ec._CourseGrade_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "activityFirst":
+			out.Values[i] = ec._CourseGrade_activityFirst(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "activitySecond":
+			out.Values[i] = ec._CourseGrade_activitySecond(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "writtenFirst":
+			out.Values[i] = ec._CourseGrade_writtenFirst(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "writtenSecond":
+			out.Values[i] = ec._CourseGrade_writtenSecond(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "courseFinal":
+			out.Values[i] = ec._CourseGrade_courseFinal(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "createdAt":
+			out.Values[i] = ec._CourseGrade_createdAt(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "updatedAt":
+			out.Values[i] = ec._CourseGrade_updatedAt(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var courseGradeConnectionImplementors = []string{"CourseGradeConnection"}
+
+func (ec *executionContext) _CourseGradeConnection(ctx context.Context, sel ast.SelectionSet, obj *ent.CourseGradeConnection) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, courseGradeConnectionImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("CourseGradeConnection")
+		case "totalCount":
+			out.Values[i] = ec._CourseGradeConnection_totalCount(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "pageInfo":
+			out.Values[i] = ec._CourseGradeConnection_pageInfo(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "edges":
+			out.Values[i] = ec._CourseGradeConnection_edges(ctx, field, obj)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var courseGradeEdgeImplementors = []string{"CourseGradeEdge"}
+
+func (ec *executionContext) _CourseGradeEdge(ctx context.Context, sel ast.SelectionSet, obj *ent.CourseGradeEdge) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, courseGradeEdgeImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("CourseGradeEdge")
+		case "node":
+			out.Values[i] = ec._CourseGradeEdge_node(ctx, field, obj)
+		case "cursor":
+			out.Values[i] = ec._CourseGradeEdge_cursor(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -18563,6 +20618,15 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		case "addCourseGrade":
+			out.Values[i] = ec._Mutation_addCourseGrade(ctx, field)
+		case "updateCourseGrade":
+			out.Values[i] = ec._Mutation_updateCourseGrade(ctx, field)
+		case "deleteCourseGrade":
+			out.Values[i] = ec._Mutation_deleteCourseGrade(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -18777,6 +20841,17 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_schedule(ctx, field)
+				return res
+			})
+		case "courseGrades":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_courseGrades(ctx, field)
 				return res
 			})
 		case "__type":
@@ -19504,6 +21579,11 @@ func (ec *executionContext) unmarshalNAddClassInput2githubᚗcomᚋmsal4ᚋhassa
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
+func (ec *executionContext) unmarshalNAddCourseGradeInput2githubᚗcomᚋmsal4ᚋhassah_school_serverᚋserverᚋmodelᚐAddCourseGradeInput(ctx context.Context, v interface{}) (model.AddCourseGradeInput, error) {
+	res, err := ec.unmarshalInputAddCourseGradeInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
 func (ec *executionContext) unmarshalNAddGroupInput2githubᚗcomᚋmsal4ᚋhassah_school_serverᚋserverᚋmodelᚐAddGroupInput(ctx context.Context, v interface{}) (model.AddGroupInput, error) {
 	res, err := ec.unmarshalInputAddGroupInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -19561,6 +21641,11 @@ func (ec *executionContext) marshalNBoolean2bool(ctx context.Context, sel ast.Se
 
 func (ec *executionContext) unmarshalNClassWhereInput2ᚖgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚐClassWhereInput(ctx context.Context, v interface{}) (*ent.ClassWhereInput, error) {
 	res, err := ec.unmarshalInputClassWhereInput(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNCourseGradeWhereInput2ᚖgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚐCourseGradeWhereInput(ctx context.Context, v interface{}) (*ent.CourseGradeWhereInput, error) {
+	res, err := ec.unmarshalInputCourseGradeWhereInput(ctx, v)
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
@@ -19769,6 +21854,11 @@ func (ec *executionContext) unmarshalNUpdateAssignmentInput2githubᚗcomᚋmsal4
 
 func (ec *executionContext) unmarshalNUpdateClassInput2githubᚗcomᚋmsal4ᚋhassah_school_serverᚋserverᚋmodelᚐUpdateClassInput(ctx context.Context, v interface{}) (model.UpdateClassInput, error) {
 	res, err := ec.unmarshalInputUpdateClassInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNUpdateCourseGradeInput2githubᚗcomᚋmsal4ᚋhassah_school_serverᚋserverᚋmodelᚐUpdateCourseGradeInput(ctx context.Context, v interface{}) (model.UpdateCourseGradeInput, error) {
+	res, err := ec.unmarshalInputUpdateCourseGradeInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
@@ -20387,6 +22477,123 @@ func (ec *executionContext) unmarshalOClassWhereInput2ᚖgithubᚗcomᚋmsal4ᚋ
 		return nil, nil
 	}
 	res, err := ec.unmarshalInputClassWhereInput(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOCourseGrade2ᚖgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚐCourseGrade(ctx context.Context, sel ast.SelectionSet, v *ent.CourseGrade) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._CourseGrade(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalOCourseGradeConnection2ᚖgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚐCourseGradeConnection(ctx context.Context, sel ast.SelectionSet, v *ent.CourseGradeConnection) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._CourseGradeConnection(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalOCourseGradeEdge2ᚕᚖgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚐCourseGradeEdge(ctx context.Context, sel ast.SelectionSet, v []*ent.CourseGradeEdge) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalOCourseGradeEdge2ᚖgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚐCourseGradeEdge(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+	return ret
+}
+
+func (ec *executionContext) marshalOCourseGradeEdge2ᚖgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚐCourseGradeEdge(ctx context.Context, sel ast.SelectionSet, v *ent.CourseGradeEdge) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._CourseGradeEdge(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalOCourseGradeOrder2ᚖgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚐCourseGradeOrder(ctx context.Context, v interface{}) (*ent.CourseGradeOrder, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputCourseGradeOrder(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalOCourseGradeOrderField2ᚖgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚐCourseGradeOrderField(ctx context.Context, v interface{}) (*ent.CourseGradeOrderField, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var res = new(ent.CourseGradeOrderField)
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOCourseGradeOrderField2ᚖgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚐCourseGradeOrderField(ctx context.Context, sel ast.SelectionSet, v *ent.CourseGradeOrderField) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return v
+}
+
+func (ec *executionContext) unmarshalOCourseGradeWhereInput2ᚕᚖgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚐCourseGradeWhereInputᚄ(ctx context.Context, v interface{}) ([]*ent.CourseGradeWhereInput, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var vSlice []interface{}
+	if v != nil {
+		if tmp1, ok := v.([]interface{}); ok {
+			vSlice = tmp1
+		} else {
+			vSlice = []interface{}{v}
+		}
+	}
+	var err error
+	res := make([]*ent.CourseGradeWhereInput, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalNCourseGradeWhereInput2ᚖgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚐCourseGradeWhereInput(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) unmarshalOCourseGradeWhereInput2ᚖgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚐCourseGradeWhereInput(ctx context.Context, v interface{}) (*ent.CourseGradeWhereInput, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputCourseGradeWhereInput(ctx, v)
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 

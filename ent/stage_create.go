@@ -12,6 +12,7 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/google/uuid"
 	"github.com/msal4/hassah_school_server/ent/class"
+	"github.com/msal4/hassah_school_server/ent/coursegrade"
 	"github.com/msal4/hassah_school_server/ent/school"
 	"github.com/msal4/hassah_school_server/ent/stage"
 	"github.com/msal4/hassah_school_server/ent/tuitionpayment"
@@ -159,6 +160,21 @@ func (sc *StageCreate) AddStudents(u ...*User) *StageCreate {
 		ids[i] = u[i].ID
 	}
 	return sc.AddStudentIDs(ids...)
+}
+
+// AddCourseGradeIDs adds the "course_grades" edge to the CourseGrade entity by IDs.
+func (sc *StageCreate) AddCourseGradeIDs(ids ...uuid.UUID) *StageCreate {
+	sc.mutation.AddCourseGradeIDs(ids...)
+	return sc
+}
+
+// AddCourseGrades adds the "course_grades" edges to the CourseGrade entity.
+func (sc *StageCreate) AddCourseGrades(c ...*CourseGrade) *StageCreate {
+	ids := make([]uuid.UUID, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return sc.AddCourseGradeIDs(ids...)
 }
 
 // Mutation returns the StageMutation object of the builder.
@@ -440,6 +456,25 @@ func (sc *StageCreate) createSpec() (*Stage, *sqlgraph.CreateSpec) {
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeUUID,
 					Column: user.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := sc.mutation.CourseGradesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   stage.CourseGradesTable,
+			Columns: []string{stage.CourseGradesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: coursegrade.FieldID,
 				},
 			},
 		}

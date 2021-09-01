@@ -233,6 +233,30 @@ func (r *mutationResolver) DeleteSchedule(ctx context.Context, id uuid.UUID) (bo
 	return true, r.s.DeleteSchedule(ctx, id)
 }
 
+func (r *mutationResolver) AddCourseGrade(ctx context.Context, input model.AddCourseGradeInput) (*ent.CourseGrade, error) {
+	if !auth.IsAuthorized(ctx, user.RoleSuperAdmin, user.RoleSchoolAdmin, user.RoleTeacher) {
+		return nil, auth.UnauthorizedErr
+	}
+
+	return r.s.AddCourseGrade(ctx, input)
+}
+
+func (r *mutationResolver) UpdateCourseGrade(ctx context.Context, id uuid.UUID, input model.UpdateCourseGradeInput) (*ent.CourseGrade, error) {
+	if !auth.IsAuthorized(ctx, user.RoleSuperAdmin, user.RoleSchoolAdmin, user.RoleTeacher) {
+		return nil, auth.UnauthorizedErr
+	}
+
+	return r.s.UpdateCourseGrade(ctx, id, input)
+}
+
+func (r *mutationResolver) DeleteCourseGrade(ctx context.Context, id uuid.UUID) (bool, error) {
+	if !auth.IsAuthorized(ctx, user.RoleSuperAdmin, user.RoleSchoolAdmin, user.RoleTeacher) {
+		return false, auth.UnauthorizedErr
+	}
+
+	return true, r.s.DeleteCourseGrade(ctx, id)
+}
+
 func (r *queryResolver) School(ctx context.Context, id uuid.UUID) (*ent.School, error) {
 	return r.s.EC.School.Get(ctx, id)
 }
@@ -380,6 +404,10 @@ func (r *queryResolver) Schedule(ctx context.Context, stageID *uuid.UUID, weekda
 	}
 
 	return r.s.Schedule(ctx, service.ScheduleOptions{StageID: stageID, Weekday: weekday, UserID: u.ID})
+}
+
+func (r *queryResolver) CourseGrades(ctx context.Context, studentID *uuid.UUID, stageID *uuid.UUID, classID *uuid.UUID, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.CourseGradeOrder, where *ent.CourseGradeWhereInput) (*ent.CourseGradeConnection, error) {
+	return r.s.CourseGrades(ctx, service.CourseGradesOptions{ClassID: classID, StudentID: studentID, StageID: stageID, After: after, First: first, Before: before, Last: last, OrderBy: orderBy, Where: where})
 }
 
 func (r *subscriptionResolver) MessagePosted(ctx context.Context, groupID uuid.UUID) (<-chan *ent.Message, error) {

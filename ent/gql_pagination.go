@@ -19,6 +19,7 @@ import (
 	"github.com/msal4/hassah_school_server/ent/assignmentsubmission"
 	"github.com/msal4/hassah_school_server/ent/attendance"
 	"github.com/msal4/hassah_school_server/ent/class"
+	"github.com/msal4/hassah_school_server/ent/coursegrade"
 	"github.com/msal4/hassah_school_server/ent/grade"
 	"github.com/msal4/hassah_school_server/ent/group"
 	"github.com/msal4/hassah_school_server/ent/message"
@@ -1489,6 +1490,360 @@ func (c *Class) ToEdge(order *ClassOrder) *ClassEdge {
 	return &ClassEdge{
 		Node:   c,
 		Cursor: order.Field.toCursor(c),
+	}
+}
+
+// CourseGradeEdge is the edge representation of CourseGrade.
+type CourseGradeEdge struct {
+	Node   *CourseGrade `json:"node"`
+	Cursor Cursor       `json:"cursor"`
+}
+
+// CourseGradeConnection is the connection containing edges to CourseGrade.
+type CourseGradeConnection struct {
+	Edges      []*CourseGradeEdge `json:"edges"`
+	PageInfo   PageInfo           `json:"pageInfo"`
+	TotalCount int                `json:"totalCount"`
+}
+
+// CourseGradePaginateOption enables pagination customization.
+type CourseGradePaginateOption func(*courseGradePager) error
+
+// WithCourseGradeOrder configures pagination ordering.
+func WithCourseGradeOrder(order *CourseGradeOrder) CourseGradePaginateOption {
+	if order == nil {
+		order = DefaultCourseGradeOrder
+	}
+	o := *order
+	return func(pager *courseGradePager) error {
+		if err := o.Direction.Validate(); err != nil {
+			return err
+		}
+		if o.Field == nil {
+			o.Field = DefaultCourseGradeOrder.Field
+		}
+		pager.order = &o
+		return nil
+	}
+}
+
+// WithCourseGradeFilter configures pagination filter.
+func WithCourseGradeFilter(filter func(*CourseGradeQuery) (*CourseGradeQuery, error)) CourseGradePaginateOption {
+	return func(pager *courseGradePager) error {
+		if filter == nil {
+			return errors.New("CourseGradeQuery filter cannot be nil")
+		}
+		pager.filter = filter
+		return nil
+	}
+}
+
+type courseGradePager struct {
+	order  *CourseGradeOrder
+	filter func(*CourseGradeQuery) (*CourseGradeQuery, error)
+}
+
+func newCourseGradePager(opts []CourseGradePaginateOption) (*courseGradePager, error) {
+	pager := &courseGradePager{}
+	for _, opt := range opts {
+		if err := opt(pager); err != nil {
+			return nil, err
+		}
+	}
+	if pager.order == nil {
+		pager.order = DefaultCourseGradeOrder
+	}
+	return pager, nil
+}
+
+func (p *courseGradePager) applyFilter(query *CourseGradeQuery) (*CourseGradeQuery, error) {
+	if p.filter != nil {
+		return p.filter(query)
+	}
+	return query, nil
+}
+
+func (p *courseGradePager) toCursor(cg *CourseGrade) Cursor {
+	return p.order.Field.toCursor(cg)
+}
+
+func (p *courseGradePager) applyCursors(query *CourseGradeQuery, after, before *Cursor) *CourseGradeQuery {
+	for _, predicate := range cursorsToPredicates(
+		p.order.Direction, after, before,
+		p.order.Field.field, DefaultCourseGradeOrder.Field.field,
+	) {
+		query = query.Where(predicate)
+	}
+	return query
+}
+
+func (p *courseGradePager) applyOrder(query *CourseGradeQuery, reverse bool) *CourseGradeQuery {
+	direction := p.order.Direction
+	if reverse {
+		direction = direction.reverse()
+	}
+	query = query.Order(direction.orderFunc(p.order.Field.field))
+	if p.order.Field != DefaultCourseGradeOrder.Field {
+		query = query.Order(direction.orderFunc(DefaultCourseGradeOrder.Field.field))
+	}
+	return query
+}
+
+// Paginate executes the query and returns a relay based cursor connection to CourseGrade.
+func (cg *CourseGradeQuery) Paginate(
+	ctx context.Context, after *Cursor, first *int,
+	before *Cursor, last *int, opts ...CourseGradePaginateOption,
+) (*CourseGradeConnection, error) {
+	if err := validateFirstLast(first, last); err != nil {
+		return nil, err
+	}
+	pager, err := newCourseGradePager(opts)
+	if err != nil {
+		return nil, err
+	}
+
+	if cg, err = pager.applyFilter(cg); err != nil {
+		return nil, err
+	}
+
+	conn := &CourseGradeConnection{Edges: []*CourseGradeEdge{}}
+	if !hasCollectedField(ctx, edgesField) || first != nil && *first == 0 || last != nil && *last == 0 {
+		if hasCollectedField(ctx, totalCountField) ||
+			hasCollectedField(ctx, pageInfoField) {
+			count, err := cg.Count(ctx)
+			if err != nil {
+				return nil, err
+			}
+			conn.TotalCount = count
+			conn.PageInfo.HasNextPage = first != nil && count > 0
+			conn.PageInfo.HasPreviousPage = last != nil && count > 0
+		}
+		return conn, nil
+	}
+
+	if (after != nil || first != nil || before != nil || last != nil) && hasCollectedField(ctx, totalCountField) {
+		count, err := cg.Clone().Count(ctx)
+		if err != nil {
+			return nil, err
+		}
+		conn.TotalCount = count
+	}
+
+	cg = pager.applyCursors(cg, after, before)
+	cg = pager.applyOrder(cg, last != nil)
+	var limit int
+	if first != nil {
+		limit = *first + 1
+	} else if last != nil {
+		limit = *last + 1
+	}
+	if limit > 0 {
+		cg = cg.Limit(limit)
+	}
+
+	if field := getCollectedField(ctx, edgesField, nodeField); field != nil {
+		cg = cg.collectField(graphql.GetOperationContext(ctx), *field)
+	}
+
+	nodes, err := cg.All(ctx)
+	if err != nil || len(nodes) == 0 {
+		return conn, err
+	}
+
+	if len(nodes) == limit {
+		conn.PageInfo.HasNextPage = first != nil
+		conn.PageInfo.HasPreviousPage = last != nil
+		nodes = nodes[:len(nodes)-1]
+	}
+
+	var nodeAt func(int) *CourseGrade
+	if last != nil {
+		n := len(nodes) - 1
+		nodeAt = func(i int) *CourseGrade {
+			return nodes[n-i]
+		}
+	} else {
+		nodeAt = func(i int) *CourseGrade {
+			return nodes[i]
+		}
+	}
+
+	conn.Edges = make([]*CourseGradeEdge, len(nodes))
+	for i := range nodes {
+		node := nodeAt(i)
+		conn.Edges[i] = &CourseGradeEdge{
+			Node:   node,
+			Cursor: pager.toCursor(node),
+		}
+	}
+
+	conn.PageInfo.StartCursor = &conn.Edges[0].Cursor
+	conn.PageInfo.EndCursor = &conn.Edges[len(conn.Edges)-1].Cursor
+	if conn.TotalCount == 0 {
+		conn.TotalCount = len(nodes)
+	}
+
+	return conn, nil
+}
+
+var (
+	// CourseGradeOrderFieldCreatedAt orders CourseGrade by created_at.
+	CourseGradeOrderFieldCreatedAt = &CourseGradeOrderField{
+		field: coursegrade.FieldCreatedAt,
+		toCursor: func(cg *CourseGrade) Cursor {
+			return Cursor{
+				ID:    cg.ID,
+				Value: cg.CreatedAt,
+			}
+		},
+	}
+	// CourseGradeOrderFieldUpdatedAt orders CourseGrade by updated_at.
+	CourseGradeOrderFieldUpdatedAt = &CourseGradeOrderField{
+		field: coursegrade.FieldUpdatedAt,
+		toCursor: func(cg *CourseGrade) Cursor {
+			return Cursor{
+				ID:    cg.ID,
+				Value: cg.UpdatedAt,
+			}
+		},
+	}
+	// CourseGradeOrderFieldActivityFirst orders CourseGrade by activity_first.
+	CourseGradeOrderFieldActivityFirst = &CourseGradeOrderField{
+		field: coursegrade.FieldActivityFirst,
+		toCursor: func(cg *CourseGrade) Cursor {
+			return Cursor{
+				ID:    cg.ID,
+				Value: cg.ActivityFirst,
+			}
+		},
+	}
+	// CourseGradeOrderFieldActivitySecond orders CourseGrade by activity_second.
+	CourseGradeOrderFieldActivitySecond = &CourseGradeOrderField{
+		field: coursegrade.FieldActivitySecond,
+		toCursor: func(cg *CourseGrade) Cursor {
+			return Cursor{
+				ID:    cg.ID,
+				Value: cg.ActivitySecond,
+			}
+		},
+	}
+	// CourseGradeOrderFieldWrittenFirst orders CourseGrade by written_first.
+	CourseGradeOrderFieldWrittenFirst = &CourseGradeOrderField{
+		field: coursegrade.FieldWrittenFirst,
+		toCursor: func(cg *CourseGrade) Cursor {
+			return Cursor{
+				ID:    cg.ID,
+				Value: cg.WrittenFirst,
+			}
+		},
+	}
+	// CourseGradeOrderFieldWrittenSecond orders CourseGrade by written_second.
+	CourseGradeOrderFieldWrittenSecond = &CourseGradeOrderField{
+		field: coursegrade.FieldWrittenSecond,
+		toCursor: func(cg *CourseGrade) Cursor {
+			return Cursor{
+				ID:    cg.ID,
+				Value: cg.WrittenSecond,
+			}
+		},
+	}
+	// CourseGradeOrderFieldCourseFinal orders CourseGrade by course_final.
+	CourseGradeOrderFieldCourseFinal = &CourseGradeOrderField{
+		field: coursegrade.FieldCourseFinal,
+		toCursor: func(cg *CourseGrade) Cursor {
+			return Cursor{
+				ID:    cg.ID,
+				Value: cg.CourseFinal,
+			}
+		},
+	}
+)
+
+// String implement fmt.Stringer interface.
+func (f CourseGradeOrderField) String() string {
+	var str string
+	switch f.field {
+	case coursegrade.FieldCreatedAt:
+		str = "CREATED_AT"
+	case coursegrade.FieldUpdatedAt:
+		str = "UPDATED_AT"
+	case coursegrade.FieldActivityFirst:
+		str = "ACTIVITY_FIRST"
+	case coursegrade.FieldActivitySecond:
+		str = "ACTIVITY_SECOND"
+	case coursegrade.FieldWrittenFirst:
+		str = "WRITTEN_FIRST"
+	case coursegrade.FieldWrittenSecond:
+		str = "WRITTEN_SECOND"
+	case coursegrade.FieldCourseFinal:
+		str = "COURSE_FINAL"
+	}
+	return str
+}
+
+// MarshalGQL implements graphql.Marshaler interface.
+func (f CourseGradeOrderField) MarshalGQL(w io.Writer) {
+	io.WriteString(w, strconv.Quote(f.String()))
+}
+
+// UnmarshalGQL implements graphql.Unmarshaler interface.
+func (f *CourseGradeOrderField) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("CourseGradeOrderField %T must be a string", v)
+	}
+	switch str {
+	case "CREATED_AT":
+		*f = *CourseGradeOrderFieldCreatedAt
+	case "UPDATED_AT":
+		*f = *CourseGradeOrderFieldUpdatedAt
+	case "ACTIVITY_FIRST":
+		*f = *CourseGradeOrderFieldActivityFirst
+	case "ACTIVITY_SECOND":
+		*f = *CourseGradeOrderFieldActivitySecond
+	case "WRITTEN_FIRST":
+		*f = *CourseGradeOrderFieldWrittenFirst
+	case "WRITTEN_SECOND":
+		*f = *CourseGradeOrderFieldWrittenSecond
+	case "COURSE_FINAL":
+		*f = *CourseGradeOrderFieldCourseFinal
+	default:
+		return fmt.Errorf("%s is not a valid CourseGradeOrderField", str)
+	}
+	return nil
+}
+
+// CourseGradeOrderField defines the ordering field of CourseGrade.
+type CourseGradeOrderField struct {
+	field    string
+	toCursor func(*CourseGrade) Cursor
+}
+
+// CourseGradeOrder defines the ordering of CourseGrade.
+type CourseGradeOrder struct {
+	Direction OrderDirection         `json:"direction"`
+	Field     *CourseGradeOrderField `json:"field"`
+}
+
+// DefaultCourseGradeOrder is the default ordering of CourseGrade.
+var DefaultCourseGradeOrder = &CourseGradeOrder{
+	Direction: OrderDirectionAsc,
+	Field: &CourseGradeOrderField{
+		field: coursegrade.FieldID,
+		toCursor: func(cg *CourseGrade) Cursor {
+			return Cursor{ID: cg.ID}
+		},
+	},
+}
+
+// ToEdge converts CourseGrade into CourseGradeEdge.
+func (cg *CourseGrade) ToEdge(order *CourseGradeOrder) *CourseGradeEdge {
+	if order == nil {
+		order = DefaultCourseGradeOrder
+	}
+	return &CourseGradeEdge{
+		Node:   cg,
+		Cursor: order.Field.toCursor(cg),
 	}
 }
 

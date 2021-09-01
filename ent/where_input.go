@@ -11,6 +11,7 @@ import (
 	"github.com/msal4/hassah_school_server/ent/assignmentsubmission"
 	"github.com/msal4/hassah_school_server/ent/attendance"
 	"github.com/msal4/hassah_school_server/ent/class"
+	"github.com/msal4/hassah_school_server/ent/coursegrade"
 	"github.com/msal4/hassah_school_server/ent/grade"
 	"github.com/msal4/hassah_school_server/ent/group"
 	"github.com/msal4/hassah_school_server/ent/message"
@@ -1203,6 +1204,10 @@ type ClassWhereInput struct {
 	// "schedules" edge predicates.
 	HasSchedules     *bool                 `json:"hasSchedules,omitempty"`
 	HasSchedulesWith []*ScheduleWhereInput `json:"hasSchedulesWith,omitempty"`
+
+	// "course_grades" edge predicates.
+	HasCourseGrades     *bool                    `json:"hasCourseGrades,omitempty"`
+	HasCourseGradesWith []*CourseGradeWhereInput `json:"hasCourseGradesWith,omitempty"`
 }
 
 // Filter applies the ClassWhereInput filter on the ClassQuery builder.
@@ -1520,6 +1525,24 @@ func (i *ClassWhereInput) P() (predicate.Class, error) {
 		}
 		predicates = append(predicates, class.HasSchedulesWith(with...))
 	}
+	if i.HasCourseGrades != nil {
+		p := class.HasCourseGrades()
+		if !*i.HasCourseGrades {
+			p = class.Not(p)
+		}
+		predicates = append(predicates, p)
+	}
+	if len(i.HasCourseGradesWith) > 0 {
+		with := make([]predicate.CourseGrade, 0, len(i.HasCourseGradesWith))
+		for _, w := range i.HasCourseGradesWith {
+			p, err := w.P()
+			if err != nil {
+				return nil, err
+			}
+			with = append(with, p)
+		}
+		predicates = append(predicates, class.HasCourseGradesWith(with...))
+	}
 	switch len(predicates) {
 	case 0:
 		return nil, fmt.Errorf("github.com/msal4/hassah_school_server/ent: empty predicate ClassWhereInput")
@@ -1527,6 +1550,437 @@ func (i *ClassWhereInput) P() (predicate.Class, error) {
 		return predicates[0], nil
 	default:
 		return class.And(predicates...), nil
+	}
+}
+
+// CourseGradeWhereInput represents a where input for filtering CourseGrade queries.
+type CourseGradeWhereInput struct {
+	Not *CourseGradeWhereInput   `json:"not,omitempty"`
+	Or  []*CourseGradeWhereInput `json:"or,omitempty"`
+	And []*CourseGradeWhereInput `json:"and,omitempty"`
+
+	// "id" field predicates.
+	ID      *uuid.UUID  `json:"id,omitempty"`
+	IDNEQ   *uuid.UUID  `json:"idNEQ,omitempty"`
+	IDIn    []uuid.UUID `json:"idIn,omitempty"`
+	IDNotIn []uuid.UUID `json:"idNotIn,omitempty"`
+	IDGT    *uuid.UUID  `json:"idGT,omitempty"`
+	IDGTE   *uuid.UUID  `json:"idGTE,omitempty"`
+	IDLT    *uuid.UUID  `json:"idLT,omitempty"`
+	IDLTE   *uuid.UUID  `json:"idLTE,omitempty"`
+
+	// "created_at" field predicates.
+	CreatedAt      *time.Time  `json:"createdAt,omitempty"`
+	CreatedAtNEQ   *time.Time  `json:"createdAtNEQ,omitempty"`
+	CreatedAtIn    []time.Time `json:"createdAtIn,omitempty"`
+	CreatedAtNotIn []time.Time `json:"createdAtNotIn,omitempty"`
+	CreatedAtGT    *time.Time  `json:"createdAtGT,omitempty"`
+	CreatedAtGTE   *time.Time  `json:"createdAtGTE,omitempty"`
+	CreatedAtLT    *time.Time  `json:"createdAtLT,omitempty"`
+	CreatedAtLTE   *time.Time  `json:"createdAtLTE,omitempty"`
+
+	// "updated_at" field predicates.
+	UpdatedAt      *time.Time  `json:"updatedAt,omitempty"`
+	UpdatedAtNEQ   *time.Time  `json:"updatedAtNEQ,omitempty"`
+	UpdatedAtIn    []time.Time `json:"updatedAtIn,omitempty"`
+	UpdatedAtNotIn []time.Time `json:"updatedAtNotIn,omitempty"`
+	UpdatedAtGT    *time.Time  `json:"updatedAtGT,omitempty"`
+	UpdatedAtGTE   *time.Time  `json:"updatedAtGTE,omitempty"`
+	UpdatedAtLT    *time.Time  `json:"updatedAtLT,omitempty"`
+	UpdatedAtLTE   *time.Time  `json:"updatedAtLTE,omitempty"`
+
+	// "activity_first" field predicates.
+	ActivityFirst       *int  `json:"activityFirst,omitempty"`
+	ActivityFirstNEQ    *int  `json:"activityFirstNEQ,omitempty"`
+	ActivityFirstIn     []int `json:"activityFirstIn,omitempty"`
+	ActivityFirstNotIn  []int `json:"activityFirstNotIn,omitempty"`
+	ActivityFirstGT     *int  `json:"activityFirstGT,omitempty"`
+	ActivityFirstGTE    *int  `json:"activityFirstGTE,omitempty"`
+	ActivityFirstLT     *int  `json:"activityFirstLT,omitempty"`
+	ActivityFirstLTE    *int  `json:"activityFirstLTE,omitempty"`
+	ActivityFirstIsNil  bool  `json:"activityFirstIsNil,omitempty"`
+	ActivityFirstNotNil bool  `json:"activityFirstNotNil,omitempty"`
+
+	// "activity_second" field predicates.
+	ActivitySecond       *int  `json:"activitySecond,omitempty"`
+	ActivitySecondNEQ    *int  `json:"activitySecondNEQ,omitempty"`
+	ActivitySecondIn     []int `json:"activitySecondIn,omitempty"`
+	ActivitySecondNotIn  []int `json:"activitySecondNotIn,omitempty"`
+	ActivitySecondGT     *int  `json:"activitySecondGT,omitempty"`
+	ActivitySecondGTE    *int  `json:"activitySecondGTE,omitempty"`
+	ActivitySecondLT     *int  `json:"activitySecondLT,omitempty"`
+	ActivitySecondLTE    *int  `json:"activitySecondLTE,omitempty"`
+	ActivitySecondIsNil  bool  `json:"activitySecondIsNil,omitempty"`
+	ActivitySecondNotNil bool  `json:"activitySecondNotNil,omitempty"`
+
+	// "written_first" field predicates.
+	WrittenFirst      *int  `json:"writtenFirst,omitempty"`
+	WrittenFirstNEQ   *int  `json:"writtenFirstNEQ,omitempty"`
+	WrittenFirstIn    []int `json:"writtenFirstIn,omitempty"`
+	WrittenFirstNotIn []int `json:"writtenFirstNotIn,omitempty"`
+	WrittenFirstGT    *int  `json:"writtenFirstGT,omitempty"`
+	WrittenFirstGTE   *int  `json:"writtenFirstGTE,omitempty"`
+	WrittenFirstLT    *int  `json:"writtenFirstLT,omitempty"`
+	WrittenFirstLTE   *int  `json:"writtenFirstLTE,omitempty"`
+
+	// "written_second" field predicates.
+	WrittenSecond      *int  `json:"writtenSecond,omitempty"`
+	WrittenSecondNEQ   *int  `json:"writtenSecondNEQ,omitempty"`
+	WrittenSecondIn    []int `json:"writtenSecondIn,omitempty"`
+	WrittenSecondNotIn []int `json:"writtenSecondNotIn,omitempty"`
+	WrittenSecondGT    *int  `json:"writtenSecondGT,omitempty"`
+	WrittenSecondGTE   *int  `json:"writtenSecondGTE,omitempty"`
+	WrittenSecondLT    *int  `json:"writtenSecondLT,omitempty"`
+	WrittenSecondLTE   *int  `json:"writtenSecondLTE,omitempty"`
+
+	// "course_final" field predicates.
+	CourseFinal      *int  `json:"courseFinal,omitempty"`
+	CourseFinalNEQ   *int  `json:"courseFinalNEQ,omitempty"`
+	CourseFinalIn    []int `json:"courseFinalIn,omitempty"`
+	CourseFinalNotIn []int `json:"courseFinalNotIn,omitempty"`
+	CourseFinalGT    *int  `json:"courseFinalGT,omitempty"`
+	CourseFinalGTE   *int  `json:"courseFinalGTE,omitempty"`
+	CourseFinalLT    *int  `json:"courseFinalLT,omitempty"`
+	CourseFinalLTE   *int  `json:"courseFinalLTE,omitempty"`
+
+	// "student" edge predicates.
+	HasStudent     *bool             `json:"hasStudent,omitempty"`
+	HasStudentWith []*UserWhereInput `json:"hasStudentWith,omitempty"`
+
+	// "class" edge predicates.
+	HasClass     *bool              `json:"hasClass,omitempty"`
+	HasClassWith []*ClassWhereInput `json:"hasClassWith,omitempty"`
+
+	// "stage" edge predicates.
+	HasStage     *bool              `json:"hasStage,omitempty"`
+	HasStageWith []*StageWhereInput `json:"hasStageWith,omitempty"`
+}
+
+// Filter applies the CourseGradeWhereInput filter on the CourseGradeQuery builder.
+func (i *CourseGradeWhereInput) Filter(q *CourseGradeQuery) (*CourseGradeQuery, error) {
+	if i == nil {
+		return q, nil
+	}
+	p, err := i.P()
+	if err != nil {
+		return nil, err
+	}
+	return q.Where(p), nil
+}
+
+// P returns a predicate for filtering coursegrades.
+// An error is returned if the input is empty or invalid.
+func (i *CourseGradeWhereInput) P() (predicate.CourseGrade, error) {
+	var predicates []predicate.CourseGrade
+	if i.Not != nil {
+		p, err := i.Not.P()
+		if err != nil {
+			return nil, err
+		}
+		predicates = append(predicates, coursegrade.Not(p))
+	}
+	switch n := len(i.Or); {
+	case n == 1:
+		p, err := i.Or[0].P()
+		if err != nil {
+			return nil, err
+		}
+		predicates = append(predicates, p)
+	case n > 1:
+		or := make([]predicate.CourseGrade, 0, n)
+		for _, w := range i.Or {
+			p, err := w.P()
+			if err != nil {
+				return nil, err
+			}
+			or = append(or, p)
+		}
+		predicates = append(predicates, coursegrade.Or(or...))
+	}
+	switch n := len(i.And); {
+	case n == 1:
+		p, err := i.And[0].P()
+		if err != nil {
+			return nil, err
+		}
+		predicates = append(predicates, p)
+	case n > 1:
+		and := make([]predicate.CourseGrade, 0, n)
+		for _, w := range i.And {
+			p, err := w.P()
+			if err != nil {
+				return nil, err
+			}
+			and = append(and, p)
+		}
+		predicates = append(predicates, coursegrade.And(and...))
+	}
+	if i.ID != nil {
+		predicates = append(predicates, coursegrade.IDEQ(*i.ID))
+	}
+	if i.IDNEQ != nil {
+		predicates = append(predicates, coursegrade.IDNEQ(*i.IDNEQ))
+	}
+	if len(i.IDIn) > 0 {
+		predicates = append(predicates, coursegrade.IDIn(i.IDIn...))
+	}
+	if len(i.IDNotIn) > 0 {
+		predicates = append(predicates, coursegrade.IDNotIn(i.IDNotIn...))
+	}
+	if i.IDGT != nil {
+		predicates = append(predicates, coursegrade.IDGT(*i.IDGT))
+	}
+	if i.IDGTE != nil {
+		predicates = append(predicates, coursegrade.IDGTE(*i.IDGTE))
+	}
+	if i.IDLT != nil {
+		predicates = append(predicates, coursegrade.IDLT(*i.IDLT))
+	}
+	if i.IDLTE != nil {
+		predicates = append(predicates, coursegrade.IDLTE(*i.IDLTE))
+	}
+	if i.CreatedAt != nil {
+		predicates = append(predicates, coursegrade.CreatedAtEQ(*i.CreatedAt))
+	}
+	if i.CreatedAtNEQ != nil {
+		predicates = append(predicates, coursegrade.CreatedAtNEQ(*i.CreatedAtNEQ))
+	}
+	if len(i.CreatedAtIn) > 0 {
+		predicates = append(predicates, coursegrade.CreatedAtIn(i.CreatedAtIn...))
+	}
+	if len(i.CreatedAtNotIn) > 0 {
+		predicates = append(predicates, coursegrade.CreatedAtNotIn(i.CreatedAtNotIn...))
+	}
+	if i.CreatedAtGT != nil {
+		predicates = append(predicates, coursegrade.CreatedAtGT(*i.CreatedAtGT))
+	}
+	if i.CreatedAtGTE != nil {
+		predicates = append(predicates, coursegrade.CreatedAtGTE(*i.CreatedAtGTE))
+	}
+	if i.CreatedAtLT != nil {
+		predicates = append(predicates, coursegrade.CreatedAtLT(*i.CreatedAtLT))
+	}
+	if i.CreatedAtLTE != nil {
+		predicates = append(predicates, coursegrade.CreatedAtLTE(*i.CreatedAtLTE))
+	}
+	if i.UpdatedAt != nil {
+		predicates = append(predicates, coursegrade.UpdatedAtEQ(*i.UpdatedAt))
+	}
+	if i.UpdatedAtNEQ != nil {
+		predicates = append(predicates, coursegrade.UpdatedAtNEQ(*i.UpdatedAtNEQ))
+	}
+	if len(i.UpdatedAtIn) > 0 {
+		predicates = append(predicates, coursegrade.UpdatedAtIn(i.UpdatedAtIn...))
+	}
+	if len(i.UpdatedAtNotIn) > 0 {
+		predicates = append(predicates, coursegrade.UpdatedAtNotIn(i.UpdatedAtNotIn...))
+	}
+	if i.UpdatedAtGT != nil {
+		predicates = append(predicates, coursegrade.UpdatedAtGT(*i.UpdatedAtGT))
+	}
+	if i.UpdatedAtGTE != nil {
+		predicates = append(predicates, coursegrade.UpdatedAtGTE(*i.UpdatedAtGTE))
+	}
+	if i.UpdatedAtLT != nil {
+		predicates = append(predicates, coursegrade.UpdatedAtLT(*i.UpdatedAtLT))
+	}
+	if i.UpdatedAtLTE != nil {
+		predicates = append(predicates, coursegrade.UpdatedAtLTE(*i.UpdatedAtLTE))
+	}
+	if i.ActivityFirst != nil {
+		predicates = append(predicates, coursegrade.ActivityFirstEQ(*i.ActivityFirst))
+	}
+	if i.ActivityFirstNEQ != nil {
+		predicates = append(predicates, coursegrade.ActivityFirstNEQ(*i.ActivityFirstNEQ))
+	}
+	if len(i.ActivityFirstIn) > 0 {
+		predicates = append(predicates, coursegrade.ActivityFirstIn(i.ActivityFirstIn...))
+	}
+	if len(i.ActivityFirstNotIn) > 0 {
+		predicates = append(predicates, coursegrade.ActivityFirstNotIn(i.ActivityFirstNotIn...))
+	}
+	if i.ActivityFirstGT != nil {
+		predicates = append(predicates, coursegrade.ActivityFirstGT(*i.ActivityFirstGT))
+	}
+	if i.ActivityFirstGTE != nil {
+		predicates = append(predicates, coursegrade.ActivityFirstGTE(*i.ActivityFirstGTE))
+	}
+	if i.ActivityFirstLT != nil {
+		predicates = append(predicates, coursegrade.ActivityFirstLT(*i.ActivityFirstLT))
+	}
+	if i.ActivityFirstLTE != nil {
+		predicates = append(predicates, coursegrade.ActivityFirstLTE(*i.ActivityFirstLTE))
+	}
+	if i.ActivityFirstIsNil {
+		predicates = append(predicates, coursegrade.ActivityFirstIsNil())
+	}
+	if i.ActivityFirstNotNil {
+		predicates = append(predicates, coursegrade.ActivityFirstNotNil())
+	}
+	if i.ActivitySecond != nil {
+		predicates = append(predicates, coursegrade.ActivitySecondEQ(*i.ActivitySecond))
+	}
+	if i.ActivitySecondNEQ != nil {
+		predicates = append(predicates, coursegrade.ActivitySecondNEQ(*i.ActivitySecondNEQ))
+	}
+	if len(i.ActivitySecondIn) > 0 {
+		predicates = append(predicates, coursegrade.ActivitySecondIn(i.ActivitySecondIn...))
+	}
+	if len(i.ActivitySecondNotIn) > 0 {
+		predicates = append(predicates, coursegrade.ActivitySecondNotIn(i.ActivitySecondNotIn...))
+	}
+	if i.ActivitySecondGT != nil {
+		predicates = append(predicates, coursegrade.ActivitySecondGT(*i.ActivitySecondGT))
+	}
+	if i.ActivitySecondGTE != nil {
+		predicates = append(predicates, coursegrade.ActivitySecondGTE(*i.ActivitySecondGTE))
+	}
+	if i.ActivitySecondLT != nil {
+		predicates = append(predicates, coursegrade.ActivitySecondLT(*i.ActivitySecondLT))
+	}
+	if i.ActivitySecondLTE != nil {
+		predicates = append(predicates, coursegrade.ActivitySecondLTE(*i.ActivitySecondLTE))
+	}
+	if i.ActivitySecondIsNil {
+		predicates = append(predicates, coursegrade.ActivitySecondIsNil())
+	}
+	if i.ActivitySecondNotNil {
+		predicates = append(predicates, coursegrade.ActivitySecondNotNil())
+	}
+	if i.WrittenFirst != nil {
+		predicates = append(predicates, coursegrade.WrittenFirstEQ(*i.WrittenFirst))
+	}
+	if i.WrittenFirstNEQ != nil {
+		predicates = append(predicates, coursegrade.WrittenFirstNEQ(*i.WrittenFirstNEQ))
+	}
+	if len(i.WrittenFirstIn) > 0 {
+		predicates = append(predicates, coursegrade.WrittenFirstIn(i.WrittenFirstIn...))
+	}
+	if len(i.WrittenFirstNotIn) > 0 {
+		predicates = append(predicates, coursegrade.WrittenFirstNotIn(i.WrittenFirstNotIn...))
+	}
+	if i.WrittenFirstGT != nil {
+		predicates = append(predicates, coursegrade.WrittenFirstGT(*i.WrittenFirstGT))
+	}
+	if i.WrittenFirstGTE != nil {
+		predicates = append(predicates, coursegrade.WrittenFirstGTE(*i.WrittenFirstGTE))
+	}
+	if i.WrittenFirstLT != nil {
+		predicates = append(predicates, coursegrade.WrittenFirstLT(*i.WrittenFirstLT))
+	}
+	if i.WrittenFirstLTE != nil {
+		predicates = append(predicates, coursegrade.WrittenFirstLTE(*i.WrittenFirstLTE))
+	}
+	if i.WrittenSecond != nil {
+		predicates = append(predicates, coursegrade.WrittenSecondEQ(*i.WrittenSecond))
+	}
+	if i.WrittenSecondNEQ != nil {
+		predicates = append(predicates, coursegrade.WrittenSecondNEQ(*i.WrittenSecondNEQ))
+	}
+	if len(i.WrittenSecondIn) > 0 {
+		predicates = append(predicates, coursegrade.WrittenSecondIn(i.WrittenSecondIn...))
+	}
+	if len(i.WrittenSecondNotIn) > 0 {
+		predicates = append(predicates, coursegrade.WrittenSecondNotIn(i.WrittenSecondNotIn...))
+	}
+	if i.WrittenSecondGT != nil {
+		predicates = append(predicates, coursegrade.WrittenSecondGT(*i.WrittenSecondGT))
+	}
+	if i.WrittenSecondGTE != nil {
+		predicates = append(predicates, coursegrade.WrittenSecondGTE(*i.WrittenSecondGTE))
+	}
+	if i.WrittenSecondLT != nil {
+		predicates = append(predicates, coursegrade.WrittenSecondLT(*i.WrittenSecondLT))
+	}
+	if i.WrittenSecondLTE != nil {
+		predicates = append(predicates, coursegrade.WrittenSecondLTE(*i.WrittenSecondLTE))
+	}
+	if i.CourseFinal != nil {
+		predicates = append(predicates, coursegrade.CourseFinalEQ(*i.CourseFinal))
+	}
+	if i.CourseFinalNEQ != nil {
+		predicates = append(predicates, coursegrade.CourseFinalNEQ(*i.CourseFinalNEQ))
+	}
+	if len(i.CourseFinalIn) > 0 {
+		predicates = append(predicates, coursegrade.CourseFinalIn(i.CourseFinalIn...))
+	}
+	if len(i.CourseFinalNotIn) > 0 {
+		predicates = append(predicates, coursegrade.CourseFinalNotIn(i.CourseFinalNotIn...))
+	}
+	if i.CourseFinalGT != nil {
+		predicates = append(predicates, coursegrade.CourseFinalGT(*i.CourseFinalGT))
+	}
+	if i.CourseFinalGTE != nil {
+		predicates = append(predicates, coursegrade.CourseFinalGTE(*i.CourseFinalGTE))
+	}
+	if i.CourseFinalLT != nil {
+		predicates = append(predicates, coursegrade.CourseFinalLT(*i.CourseFinalLT))
+	}
+	if i.CourseFinalLTE != nil {
+		predicates = append(predicates, coursegrade.CourseFinalLTE(*i.CourseFinalLTE))
+	}
+
+	if i.HasStudent != nil {
+		p := coursegrade.HasStudent()
+		if !*i.HasStudent {
+			p = coursegrade.Not(p)
+		}
+		predicates = append(predicates, p)
+	}
+	if len(i.HasStudentWith) > 0 {
+		with := make([]predicate.User, 0, len(i.HasStudentWith))
+		for _, w := range i.HasStudentWith {
+			p, err := w.P()
+			if err != nil {
+				return nil, err
+			}
+			with = append(with, p)
+		}
+		predicates = append(predicates, coursegrade.HasStudentWith(with...))
+	}
+	if i.HasClass != nil {
+		p := coursegrade.HasClass()
+		if !*i.HasClass {
+			p = coursegrade.Not(p)
+		}
+		predicates = append(predicates, p)
+	}
+	if len(i.HasClassWith) > 0 {
+		with := make([]predicate.Class, 0, len(i.HasClassWith))
+		for _, w := range i.HasClassWith {
+			p, err := w.P()
+			if err != nil {
+				return nil, err
+			}
+			with = append(with, p)
+		}
+		predicates = append(predicates, coursegrade.HasClassWith(with...))
+	}
+	if i.HasStage != nil {
+		p := coursegrade.HasStage()
+		if !*i.HasStage {
+			p = coursegrade.Not(p)
+		}
+		predicates = append(predicates, p)
+	}
+	if len(i.HasStageWith) > 0 {
+		with := make([]predicate.Stage, 0, len(i.HasStageWith))
+		for _, w := range i.HasStageWith {
+			p, err := w.P()
+			if err != nil {
+				return nil, err
+			}
+			with = append(with, p)
+		}
+		predicates = append(predicates, coursegrade.HasStageWith(with...))
+	}
+	switch len(predicates) {
+	case 0:
+		return nil, fmt.Errorf("github.com/msal4/hassah_school_server/ent: empty predicate CourseGradeWhereInput")
+	case 1:
+		return predicates[0], nil
+	default:
+		return coursegrade.And(predicates...), nil
 	}
 }
 
@@ -3332,6 +3786,10 @@ type StageWhereInput struct {
 	// "students" edge predicates.
 	HasStudents     *bool             `json:"hasStudents,omitempty"`
 	HasStudentsWith []*UserWhereInput `json:"hasStudentsWith,omitempty"`
+
+	// "course_grades" edge predicates.
+	HasCourseGrades     *bool                    `json:"hasCourseGrades,omitempty"`
+	HasCourseGradesWith []*CourseGradeWhereInput `json:"hasCourseGradesWith,omitempty"`
 }
 
 // Filter applies the StageWhereInput filter on the StageQuery builder.
@@ -3675,6 +4133,24 @@ func (i *StageWhereInput) P() (predicate.Stage, error) {
 			with = append(with, p)
 		}
 		predicates = append(predicates, stage.HasStudentsWith(with...))
+	}
+	if i.HasCourseGrades != nil {
+		p := stage.HasCourseGrades()
+		if !*i.HasCourseGrades {
+			p = stage.Not(p)
+		}
+		predicates = append(predicates, p)
+	}
+	if len(i.HasCourseGradesWith) > 0 {
+		with := make([]predicate.CourseGrade, 0, len(i.HasCourseGradesWith))
+		for _, w := range i.HasCourseGradesWith {
+			p, err := w.P()
+			if err != nil {
+				return nil, err
+			}
+			with = append(with, p)
+		}
+		predicates = append(predicates, stage.HasCourseGradesWith(with...))
 	}
 	switch len(predicates) {
 	case 0:
@@ -4123,6 +4599,10 @@ type UserWhereInput struct {
 	// "groups" edge predicates.
 	HasGroups     *bool              `json:"hasGroups,omitempty"`
 	HasGroupsWith []*GroupWhereInput `json:"hasGroupsWith,omitempty"`
+
+	// "course_grades" edge predicates.
+	HasCourseGrades     *bool                    `json:"hasCourseGrades,omitempty"`
+	HasCourseGradesWith []*CourseGradeWhereInput `json:"hasCourseGradesWith,omitempty"`
 }
 
 // Filter applies the UserWhereInput filter on the UserQuery builder.
@@ -4691,6 +5171,24 @@ func (i *UserWhereInput) P() (predicate.User, error) {
 			with = append(with, p)
 		}
 		predicates = append(predicates, user.HasGroupsWith(with...))
+	}
+	if i.HasCourseGrades != nil {
+		p := user.HasCourseGrades()
+		if !*i.HasCourseGrades {
+			p = user.Not(p)
+		}
+		predicates = append(predicates, p)
+	}
+	if len(i.HasCourseGradesWith) > 0 {
+		with := make([]predicate.CourseGrade, 0, len(i.HasCourseGradesWith))
+		for _, w := range i.HasCourseGradesWith {
+			p, err := w.P()
+			if err != nil {
+				return nil, err
+			}
+			with = append(with, p)
+		}
+		predicates = append(predicates, user.HasCourseGradesWith(with...))
 	}
 	switch len(predicates) {
 	case 0:

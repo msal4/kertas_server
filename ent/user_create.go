@@ -14,6 +14,7 @@ import (
 	"github.com/msal4/hassah_school_server/ent/assignmentsubmission"
 	"github.com/msal4/hassah_school_server/ent/attendance"
 	"github.com/msal4/hassah_school_server/ent/class"
+	"github.com/msal4/hassah_school_server/ent/coursegrade"
 	"github.com/msal4/hassah_school_server/ent/grade"
 	"github.com/msal4/hassah_school_server/ent/group"
 	"github.com/msal4/hassah_school_server/ent/message"
@@ -305,6 +306,21 @@ func (uc *UserCreate) AddGroups(g ...*Group) *UserCreate {
 		ids[i] = g[i].ID
 	}
 	return uc.AddGroupIDs(ids...)
+}
+
+// AddCourseGradeIDs adds the "course_grades" edge to the CourseGrade entity by IDs.
+func (uc *UserCreate) AddCourseGradeIDs(ids ...uuid.UUID) *UserCreate {
+	uc.mutation.AddCourseGradeIDs(ids...)
+	return uc
+}
+
+// AddCourseGrades adds the "course_grades" edges to the CourseGrade entity.
+func (uc *UserCreate) AddCourseGrades(c ...*CourseGrade) *UserCreate {
+	ids := make([]uuid.UUID, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return uc.AddCourseGradeIDs(ids...)
 }
 
 // Mutation returns the UserMutation object of the builder.
@@ -759,6 +775,25 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeUUID,
 					Column: group.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := uc.mutation.CourseGradesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.CourseGradesTable,
+			Columns: []string{user.CourseGradesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: coursegrade.FieldID,
 				},
 			},
 		}

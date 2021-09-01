@@ -58,6 +58,8 @@ const (
 	EdgeGrades = "grades"
 	// EdgeGroups holds the string denoting the groups edge name in mutations.
 	EdgeGroups = "groups"
+	// EdgeCourseGrades holds the string denoting the course_grades edge name in mutations.
+	EdgeCourseGrades = "course_grades"
 	// Table holds the table name of the user in the database.
 	Table = "users"
 	// StageTable is the table that holds the stage relation/edge.
@@ -121,6 +123,13 @@ const (
 	// GroupsInverseTable is the table name for the Group entity.
 	// It exists in this package in order to avoid circular dependency with the "group" package.
 	GroupsInverseTable = "groups"
+	// CourseGradesTable is the table that holds the course_grades relation/edge.
+	CourseGradesTable = "course_grades"
+	// CourseGradesInverseTable is the table name for the CourseGrade entity.
+	// It exists in this package in order to avoid circular dependency with the "coursegrade" package.
+	CourseGradesInverseTable = "course_grades"
+	// CourseGradesColumn is the table column denoting the course_grades relation/edge.
+	CourseGradesColumn = "user_course_grades"
 )
 
 // Columns holds all SQL columns for user fields.

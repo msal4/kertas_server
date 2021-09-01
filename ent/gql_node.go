@@ -15,6 +15,7 @@ import (
 	"github.com/msal4/hassah_school_server/ent/assignmentsubmission"
 	"github.com/msal4/hassah_school_server/ent/attendance"
 	"github.com/msal4/hassah_school_server/ent/class"
+	"github.com/msal4/hassah_school_server/ent/coursegrade"
 	"github.com/msal4/hassah_school_server/ent/grade"
 	"github.com/msal4/hassah_school_server/ent/group"
 	"github.com/msal4/hassah_school_server/ent/message"
@@ -296,7 +297,7 @@ func (c *Class) Node(ctx context.Context) (node *Node, err error) {
 		ID:     c.ID,
 		Type:   "Class",
 		Fields: make([]*Field, 5),
-		Edges:  make([]*Edge, 6),
+		Edges:  make([]*Edge, 7),
 	}
 	var buf []byte
 	if buf, err = json.Marshal(c.CreatedAt); err != nil {
@@ -396,6 +397,113 @@ func (c *Class) Node(ctx context.Context) (node *Node, err error) {
 	err = c.QuerySchedules().
 		Select(schedule.FieldID).
 		Scan(ctx, &node.Edges[5].IDs)
+	if err != nil {
+		return nil, err
+	}
+	node.Edges[6] = &Edge{
+		Type: "CourseGrade",
+		Name: "course_grades",
+	}
+	err = c.QueryCourseGrades().
+		Select(coursegrade.FieldID).
+		Scan(ctx, &node.Edges[6].IDs)
+	if err != nil {
+		return nil, err
+	}
+	return node, nil
+}
+
+func (cg *CourseGrade) Node(ctx context.Context) (node *Node, err error) {
+	node = &Node{
+		ID:     cg.ID,
+		Type:   "CourseGrade",
+		Fields: make([]*Field, 7),
+		Edges:  make([]*Edge, 3),
+	}
+	var buf []byte
+	if buf, err = json.Marshal(cg.CreatedAt); err != nil {
+		return nil, err
+	}
+	node.Fields[0] = &Field{
+		Type:  "time.Time",
+		Name:  "created_at",
+		Value: string(buf),
+	}
+	if buf, err = json.Marshal(cg.UpdatedAt); err != nil {
+		return nil, err
+	}
+	node.Fields[1] = &Field{
+		Type:  "time.Time",
+		Name:  "updated_at",
+		Value: string(buf),
+	}
+	if buf, err = json.Marshal(cg.ActivityFirst); err != nil {
+		return nil, err
+	}
+	node.Fields[2] = &Field{
+		Type:  "int",
+		Name:  "activity_first",
+		Value: string(buf),
+	}
+	if buf, err = json.Marshal(cg.ActivitySecond); err != nil {
+		return nil, err
+	}
+	node.Fields[3] = &Field{
+		Type:  "int",
+		Name:  "activity_second",
+		Value: string(buf),
+	}
+	if buf, err = json.Marshal(cg.WrittenFirst); err != nil {
+		return nil, err
+	}
+	node.Fields[4] = &Field{
+		Type:  "int",
+		Name:  "written_first",
+		Value: string(buf),
+	}
+	if buf, err = json.Marshal(cg.WrittenSecond); err != nil {
+		return nil, err
+	}
+	node.Fields[5] = &Field{
+		Type:  "int",
+		Name:  "written_second",
+		Value: string(buf),
+	}
+	if buf, err = json.Marshal(cg.CourseFinal); err != nil {
+		return nil, err
+	}
+	node.Fields[6] = &Field{
+		Type:  "int",
+		Name:  "course_final",
+		Value: string(buf),
+	}
+	node.Edges[0] = &Edge{
+		Type: "User",
+		Name: "student",
+	}
+	err = cg.QueryStudent().
+		Select(user.FieldID).
+		Scan(ctx, &node.Edges[0].IDs)
+	if err != nil {
+		return nil, err
+	}
+	node.Edges[1] = &Edge{
+		Type: "Class",
+		Name: "class",
+	}
+	err = cg.QueryClass().
+		Select(class.FieldID).
+		Scan(ctx, &node.Edges[1].IDs)
+	if err != nil {
+		return nil, err
+	}
+	node.Edges[2] = &Edge{
+		Type: "Stage",
+		Name: "stage",
+	}
+	err = cg.QueryStage().
+		Select(stage.FieldID).
+		Scan(ctx, &node.Edges[2].IDs)
 	if err != nil {
 		return nil, err
 	}
@@ -754,7 +862,7 @@ func (s *Stage) Node(ctx context.Context) (node *Node, err error) {
 		ID:     s.ID,
 		Type:   "Stage",
 		Fields: make([]*Field, 7),
-		Edges:  make([]*Edge, 4),
+		Edges:  make([]*Edge, 5),
 	}
 	var buf []byte
 	if buf, err = json.Marshal(s.CreatedAt); err != nil {
@@ -853,6 +961,16 @@ func (s *Stage) Node(ctx context.Context) (node *Node, err error) {
 	if err != nil {
 		return nil, err
 	}
+	node.Edges[4] = &Edge{
+		Type: "CourseGrade",
+		Name: "course_grades",
+	}
+	err = s.QueryCourseGrades().
+		Select(coursegrade.FieldID).
+		Scan(ctx, &node.Edges[4].IDs)
+	if err != nil {
+		return nil, err
+	}
 	return node, nil
 }
 
@@ -916,7 +1034,7 @@ func (u *User) Node(ctx context.Context) (node *Node, err error) {
 		ID:     u.ID,
 		Type:   "User",
 		Fields: make([]*Field, 12),
-		Edges:  make([]*Edge, 9),
+		Edges:  make([]*Edge, 10),
 	}
 	var buf []byte
 	if buf, err = json.Marshal(u.CreatedAt); err != nil {
@@ -1097,6 +1215,16 @@ func (u *User) Node(ctx context.Context) (node *Node, err error) {
 	if err != nil {
 		return nil, err
 	}
+	node.Edges[9] = &Edge{
+		Type: "CourseGrade",
+		Name: "course_grades",
+	}
+	err = u.QueryCourseGrades().
+		Select(coursegrade.FieldID).
+		Scan(ctx, &node.Edges[9].IDs)
+	if err != nil {
+		return nil, err
+	}
 	return node, nil
 }
 
@@ -1194,6 +1322,14 @@ func (c *Client) noder(ctx context.Context, table string, id uuid.UUID) (Noder, 
 	case class.Table:
 		n, err := c.Class.Query().
 			Where(class.ID(id)).
+			Only(ctx)
+		if err != nil {
+			return nil, err
+		}
+		return n, nil
+	case coursegrade.Table:
+		n, err := c.CourseGrade.Query().
+			Where(coursegrade.ID(id)).
 			Only(ctx)
 		if err != nil {
 			return nil, err
@@ -1375,6 +1511,18 @@ func (c *Client) noders(ctx context.Context, table string, ids []uuid.UUID) ([]N
 	case class.Table:
 		nodes, err := c.Class.Query().
 			Where(class.IDIn(ids...)).
+			All(ctx)
+		if err != nil {
+			return nil, err
+		}
+		for _, node := range nodes {
+			for _, noder := range idmap[node.ID] {
+				*noder = node
+			}
+		}
+	case coursegrade.Table:
+		nodes, err := c.CourseGrade.Query().
+			Where(coursegrade.IDIn(ids...)).
 			All(ctx)
 		if err != nil {
 			return nil, err

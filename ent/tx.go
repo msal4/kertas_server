@@ -20,6 +20,8 @@ type Tx struct {
 	Attendance *AttendanceClient
 	// Class is the client for interacting with the Class builders.
 	Class *ClassClient
+	// CourseGrade is the client for interacting with the CourseGrade builders.
+	CourseGrade *CourseGradeClient
 	// Grade is the client for interacting with the Grade builders.
 	Grade *GradeClient
 	// Group is the client for interacting with the Group builders.
@@ -175,6 +177,7 @@ func (tx *Tx) init() {
 	tx.AssignmentSubmission = NewAssignmentSubmissionClient(tx.config)
 	tx.Attendance = NewAttendanceClient(tx.config)
 	tx.Class = NewClassClient(tx.config)
+	tx.CourseGrade = NewCourseGradeClient(tx.config)
 	tx.Grade = NewGradeClient(tx.config)
 	tx.Group = NewGroupClient(tx.config)
 	tx.Message = NewMessageClient(tx.config)

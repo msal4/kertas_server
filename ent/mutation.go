@@ -13,6 +13,7 @@ import (
 	"github.com/msal4/hassah_school_server/ent/assignmentsubmission"
 	"github.com/msal4/hassah_school_server/ent/attendance"
 	"github.com/msal4/hassah_school_server/ent/class"
+	"github.com/msal4/hassah_school_server/ent/coursegrade"
 	"github.com/msal4/hassah_school_server/ent/grade"
 	"github.com/msal4/hassah_school_server/ent/group"
 	"github.com/msal4/hassah_school_server/ent/message"
@@ -39,6 +40,7 @@ const (
 	TypeAssignmentSubmission = "AssignmentSubmission"
 	TypeAttendance           = "Attendance"
 	TypeClass                = "Class"
+	TypeCourseGrade          = "CourseGrade"
 	TypeGrade                = "Grade"
 	TypeGroup                = "Group"
 	TypeMessage              = "Message"
@@ -2331,33 +2333,36 @@ func (m *AttendanceMutation) ResetEdge(name string) error {
 // ClassMutation represents an operation that mutates the Class nodes in the graph.
 type ClassMutation struct {
 	config
-	op                 Op
-	typ                string
-	id                 *uuid.UUID
-	created_at         *time.Time
-	updated_at         *time.Time
-	name               *string
-	active             *bool
-	deleted_at         *time.Time
-	clearedFields      map[string]struct{}
-	stage              *uuid.UUID
-	clearedstage       bool
-	teacher            *uuid.UUID
-	clearedteacher     bool
-	group              *uuid.UUID
-	clearedgroup       bool
-	assignments        map[uuid.UUID]struct{}
-	removedassignments map[uuid.UUID]struct{}
-	clearedassignments bool
-	attendances        map[uuid.UUID]struct{}
-	removedattendances map[uuid.UUID]struct{}
-	clearedattendances bool
-	schedules          map[uuid.UUID]struct{}
-	removedschedules   map[uuid.UUID]struct{}
-	clearedschedules   bool
-	done               bool
-	oldValue           func(context.Context) (*Class, error)
-	predicates         []predicate.Class
+	op                   Op
+	typ                  string
+	id                   *uuid.UUID
+	created_at           *time.Time
+	updated_at           *time.Time
+	name                 *string
+	active               *bool
+	deleted_at           *time.Time
+	clearedFields        map[string]struct{}
+	stage                *uuid.UUID
+	clearedstage         bool
+	teacher              *uuid.UUID
+	clearedteacher       bool
+	group                *uuid.UUID
+	clearedgroup         bool
+	assignments          map[uuid.UUID]struct{}
+	removedassignments   map[uuid.UUID]struct{}
+	clearedassignments   bool
+	attendances          map[uuid.UUID]struct{}
+	removedattendances   map[uuid.UUID]struct{}
+	clearedattendances   bool
+	schedules            map[uuid.UUID]struct{}
+	removedschedules     map[uuid.UUID]struct{}
+	clearedschedules     bool
+	course_grades        map[uuid.UUID]struct{}
+	removedcourse_grades map[uuid.UUID]struct{}
+	clearedcourse_grades bool
+	done                 bool
+	oldValue             func(context.Context) (*Class, error)
+	predicates           []predicate.Class
 }
 
 var _ ent.Mutation = (*ClassMutation)(nil)
@@ -2917,6 +2922,60 @@ func (m *ClassMutation) ResetSchedules() {
 	m.removedschedules = nil
 }
 
+// AddCourseGradeIDs adds the "course_grades" edge to the CourseGrade entity by ids.
+func (m *ClassMutation) AddCourseGradeIDs(ids ...uuid.UUID) {
+	if m.course_grades == nil {
+		m.course_grades = make(map[uuid.UUID]struct{})
+	}
+	for i := range ids {
+		m.course_grades[ids[i]] = struct{}{}
+	}
+}
+
+// ClearCourseGrades clears the "course_grades" edge to the CourseGrade entity.
+func (m *ClassMutation) ClearCourseGrades() {
+	m.clearedcourse_grades = true
+}
+
+// CourseGradesCleared reports if the "course_grades" edge to the CourseGrade entity was cleared.
+func (m *ClassMutation) CourseGradesCleared() bool {
+	return m.clearedcourse_grades
+}
+
+// RemoveCourseGradeIDs removes the "course_grades" edge to the CourseGrade entity by IDs.
+func (m *ClassMutation) RemoveCourseGradeIDs(ids ...uuid.UUID) {
+	if m.removedcourse_grades == nil {
+		m.removedcourse_grades = make(map[uuid.UUID]struct{})
+	}
+	for i := range ids {
+		delete(m.course_grades, ids[i])
+		m.removedcourse_grades[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedCourseGrades returns the removed IDs of the "course_grades" edge to the CourseGrade entity.
+func (m *ClassMutation) RemovedCourseGradesIDs() (ids []uuid.UUID) {
+	for id := range m.removedcourse_grades {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// CourseGradesIDs returns the "course_grades" edge IDs in the mutation.
+func (m *ClassMutation) CourseGradesIDs() (ids []uuid.UUID) {
+	for id := range m.course_grades {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetCourseGrades resets all changes to the "course_grades" edge.
+func (m *ClassMutation) ResetCourseGrades() {
+	m.course_grades = nil
+	m.clearedcourse_grades = false
+	m.removedcourse_grades = nil
+}
+
 // Where appends a list predicates to the ClassMutation builder.
 func (m *ClassMutation) Where(ps ...predicate.Class) {
 	m.predicates = append(m.predicates, ps...)
@@ -3112,7 +3171,7 @@ func (m *ClassMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *ClassMutation) AddedEdges() []string {
-	edges := make([]string, 0, 6)
+	edges := make([]string, 0, 7)
 	if m.stage != nil {
 		edges = append(edges, class.EdgeStage)
 	}
@@ -3130,6 +3189,9 @@ func (m *ClassMutation) AddedEdges() []string {
 	}
 	if m.schedules != nil {
 		edges = append(edges, class.EdgeSchedules)
+	}
+	if m.course_grades != nil {
+		edges = append(edges, class.EdgeCourseGrades)
 	}
 	return edges
 }
@@ -3168,13 +3230,19 @@ func (m *ClassMutation) AddedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case class.EdgeCourseGrades:
+		ids := make([]ent.Value, 0, len(m.course_grades))
+		for id := range m.course_grades {
+			ids = append(ids, id)
+		}
+		return ids
 	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *ClassMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 6)
+	edges := make([]string, 0, 7)
 	if m.removedassignments != nil {
 		edges = append(edges, class.EdgeAssignments)
 	}
@@ -3183,6 +3251,9 @@ func (m *ClassMutation) RemovedEdges() []string {
 	}
 	if m.removedschedules != nil {
 		edges = append(edges, class.EdgeSchedules)
+	}
+	if m.removedcourse_grades != nil {
+		edges = append(edges, class.EdgeCourseGrades)
 	}
 	return edges
 }
@@ -3209,13 +3280,19 @@ func (m *ClassMutation) RemovedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case class.EdgeCourseGrades:
+		ids := make([]ent.Value, 0, len(m.removedcourse_grades))
+		for id := range m.removedcourse_grades {
+			ids = append(ids, id)
+		}
+		return ids
 	}
 	return nil
 }
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *ClassMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 6)
+	edges := make([]string, 0, 7)
 	if m.clearedstage {
 		edges = append(edges, class.EdgeStage)
 	}
@@ -3233,6 +3310,9 @@ func (m *ClassMutation) ClearedEdges() []string {
 	}
 	if m.clearedschedules {
 		edges = append(edges, class.EdgeSchedules)
+	}
+	if m.clearedcourse_grades {
+		edges = append(edges, class.EdgeCourseGrades)
 	}
 	return edges
 }
@@ -3253,6 +3333,8 @@ func (m *ClassMutation) EdgeCleared(name string) bool {
 		return m.clearedattendances
 	case class.EdgeSchedules:
 		return m.clearedschedules
+	case class.EdgeCourseGrades:
+		return m.clearedcourse_grades
 	}
 	return false
 }
@@ -3296,8 +3378,1031 @@ func (m *ClassMutation) ResetEdge(name string) error {
 	case class.EdgeSchedules:
 		m.ResetSchedules()
 		return nil
+	case class.EdgeCourseGrades:
+		m.ResetCourseGrades()
+		return nil
 	}
 	return fmt.Errorf("unknown Class edge %s", name)
+}
+
+// CourseGradeMutation represents an operation that mutates the CourseGrade nodes in the graph.
+type CourseGradeMutation struct {
+	config
+	op                 Op
+	typ                string
+	id                 *uuid.UUID
+	created_at         *time.Time
+	updated_at         *time.Time
+	activity_first     *int
+	addactivity_first  *int
+	activity_second    *int
+	addactivity_second *int
+	written_first      *int
+	addwritten_first   *int
+	written_second     *int
+	addwritten_second  *int
+	course_final       *int
+	addcourse_final    *int
+	clearedFields      map[string]struct{}
+	student            *uuid.UUID
+	clearedstudent     bool
+	class              *uuid.UUID
+	clearedclass       bool
+	stage              *uuid.UUID
+	clearedstage       bool
+	done               bool
+	oldValue           func(context.Context) (*CourseGrade, error)
+	predicates         []predicate.CourseGrade
+}
+
+var _ ent.Mutation = (*CourseGradeMutation)(nil)
+
+// coursegradeOption allows management of the mutation configuration using functional options.
+type coursegradeOption func(*CourseGradeMutation)
+
+// newCourseGradeMutation creates new mutation for the CourseGrade entity.
+func newCourseGradeMutation(c config, op Op, opts ...coursegradeOption) *CourseGradeMutation {
+	m := &CourseGradeMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeCourseGrade,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withCourseGradeID sets the ID field of the mutation.
+func withCourseGradeID(id uuid.UUID) coursegradeOption {
+	return func(m *CourseGradeMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *CourseGrade
+		)
+		m.oldValue = func(ctx context.Context) (*CourseGrade, error) {
+			once.Do(func() {
+				if m.done {
+					err = fmt.Errorf("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().CourseGrade.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withCourseGrade sets the old CourseGrade of the mutation.
+func withCourseGrade(node *CourseGrade) coursegradeOption {
+	return func(m *CourseGradeMutation) {
+		m.oldValue = func(context.Context) (*CourseGrade, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m CourseGradeMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m CourseGradeMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, fmt.Errorf("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of CourseGrade entities.
+func (m *CourseGradeMutation) SetID(id uuid.UUID) {
+	m.id = &id
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *CourseGradeMutation) ID() (id uuid.UUID, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (m *CourseGradeMutation) SetCreatedAt(t time.Time) {
+	m.created_at = &t
+}
+
+// CreatedAt returns the value of the "created_at" field in the mutation.
+func (m *CourseGradeMutation) CreatedAt() (r time.Time, exists bool) {
+	v := m.created_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreatedAt returns the old "created_at" field's value of the CourseGrade entity.
+// If the CourseGrade object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *CourseGradeMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldCreatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldCreatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreatedAt: %w", err)
+	}
+	return oldValue.CreatedAt, nil
+}
+
+// ResetCreatedAt resets all changes to the "created_at" field.
+func (m *CourseGradeMutation) ResetCreatedAt() {
+	m.created_at = nil
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (m *CourseGradeMutation) SetUpdatedAt(t time.Time) {
+	m.updated_at = &t
+}
+
+// UpdatedAt returns the value of the "updated_at" field in the mutation.
+func (m *CourseGradeMutation) UpdatedAt() (r time.Time, exists bool) {
+	v := m.updated_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUpdatedAt returns the old "updated_at" field's value of the CourseGrade entity.
+// If the CourseGrade object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *CourseGradeMutation) OldUpdatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldUpdatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldUpdatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUpdatedAt: %w", err)
+	}
+	return oldValue.UpdatedAt, nil
+}
+
+// ResetUpdatedAt resets all changes to the "updated_at" field.
+func (m *CourseGradeMutation) ResetUpdatedAt() {
+	m.updated_at = nil
+}
+
+// SetActivityFirst sets the "activity_first" field.
+func (m *CourseGradeMutation) SetActivityFirst(i int) {
+	m.activity_first = &i
+	m.addactivity_first = nil
+}
+
+// ActivityFirst returns the value of the "activity_first" field in the mutation.
+func (m *CourseGradeMutation) ActivityFirst() (r int, exists bool) {
+	v := m.activity_first
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldActivityFirst returns the old "activity_first" field's value of the CourseGrade entity.
+// If the CourseGrade object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *CourseGradeMutation) OldActivityFirst(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldActivityFirst is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldActivityFirst requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldActivityFirst: %w", err)
+	}
+	return oldValue.ActivityFirst, nil
+}
+
+// AddActivityFirst adds i to the "activity_first" field.
+func (m *CourseGradeMutation) AddActivityFirst(i int) {
+	if m.addactivity_first != nil {
+		*m.addactivity_first += i
+	} else {
+		m.addactivity_first = &i
+	}
+}
+
+// AddedActivityFirst returns the value that was added to the "activity_first" field in this mutation.
+func (m *CourseGradeMutation) AddedActivityFirst() (r int, exists bool) {
+	v := m.addactivity_first
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ClearActivityFirst clears the value of the "activity_first" field.
+func (m *CourseGradeMutation) ClearActivityFirst() {
+	m.activity_first = nil
+	m.addactivity_first = nil
+	m.clearedFields[coursegrade.FieldActivityFirst] = struct{}{}
+}
+
+// ActivityFirstCleared returns if the "activity_first" field was cleared in this mutation.
+func (m *CourseGradeMutation) ActivityFirstCleared() bool {
+	_, ok := m.clearedFields[coursegrade.FieldActivityFirst]
+	return ok
+}
+
+// ResetActivityFirst resets all changes to the "activity_first" field.
+func (m *CourseGradeMutation) ResetActivityFirst() {
+	m.activity_first = nil
+	m.addactivity_first = nil
+	delete(m.clearedFields, coursegrade.FieldActivityFirst)
+}
+
+// SetActivitySecond sets the "activity_second" field.
+func (m *CourseGradeMutation) SetActivitySecond(i int) {
+	m.activity_second = &i
+	m.addactivity_second = nil
+}
+
+// ActivitySecond returns the value of the "activity_second" field in the mutation.
+func (m *CourseGradeMutation) ActivitySecond() (r int, exists bool) {
+	v := m.activity_second
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldActivitySecond returns the old "activity_second" field's value of the CourseGrade entity.
+// If the CourseGrade object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *CourseGradeMutation) OldActivitySecond(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldActivitySecond is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldActivitySecond requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldActivitySecond: %w", err)
+	}
+	return oldValue.ActivitySecond, nil
+}
+
+// AddActivitySecond adds i to the "activity_second" field.
+func (m *CourseGradeMutation) AddActivitySecond(i int) {
+	if m.addactivity_second != nil {
+		*m.addactivity_second += i
+	} else {
+		m.addactivity_second = &i
+	}
+}
+
+// AddedActivitySecond returns the value that was added to the "activity_second" field in this mutation.
+func (m *CourseGradeMutation) AddedActivitySecond() (r int, exists bool) {
+	v := m.addactivity_second
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ClearActivitySecond clears the value of the "activity_second" field.
+func (m *CourseGradeMutation) ClearActivitySecond() {
+	m.activity_second = nil
+	m.addactivity_second = nil
+	m.clearedFields[coursegrade.FieldActivitySecond] = struct{}{}
+}
+
+// ActivitySecondCleared returns if the "activity_second" field was cleared in this mutation.
+func (m *CourseGradeMutation) ActivitySecondCleared() bool {
+	_, ok := m.clearedFields[coursegrade.FieldActivitySecond]
+	return ok
+}
+
+// ResetActivitySecond resets all changes to the "activity_second" field.
+func (m *CourseGradeMutation) ResetActivitySecond() {
+	m.activity_second = nil
+	m.addactivity_second = nil
+	delete(m.clearedFields, coursegrade.FieldActivitySecond)
+}
+
+// SetWrittenFirst sets the "written_first" field.
+func (m *CourseGradeMutation) SetWrittenFirst(i int) {
+	m.written_first = &i
+	m.addwritten_first = nil
+}
+
+// WrittenFirst returns the value of the "written_first" field in the mutation.
+func (m *CourseGradeMutation) WrittenFirst() (r int, exists bool) {
+	v := m.written_first
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldWrittenFirst returns the old "written_first" field's value of the CourseGrade entity.
+// If the CourseGrade object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *CourseGradeMutation) OldWrittenFirst(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldWrittenFirst is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldWrittenFirst requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldWrittenFirst: %w", err)
+	}
+	return oldValue.WrittenFirst, nil
+}
+
+// AddWrittenFirst adds i to the "written_first" field.
+func (m *CourseGradeMutation) AddWrittenFirst(i int) {
+	if m.addwritten_first != nil {
+		*m.addwritten_first += i
+	} else {
+		m.addwritten_first = &i
+	}
+}
+
+// AddedWrittenFirst returns the value that was added to the "written_first" field in this mutation.
+func (m *CourseGradeMutation) AddedWrittenFirst() (r int, exists bool) {
+	v := m.addwritten_first
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetWrittenFirst resets all changes to the "written_first" field.
+func (m *CourseGradeMutation) ResetWrittenFirst() {
+	m.written_first = nil
+	m.addwritten_first = nil
+}
+
+// SetWrittenSecond sets the "written_second" field.
+func (m *CourseGradeMutation) SetWrittenSecond(i int) {
+	m.written_second = &i
+	m.addwritten_second = nil
+}
+
+// WrittenSecond returns the value of the "written_second" field in the mutation.
+func (m *CourseGradeMutation) WrittenSecond() (r int, exists bool) {
+	v := m.written_second
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldWrittenSecond returns the old "written_second" field's value of the CourseGrade entity.
+// If the CourseGrade object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *CourseGradeMutation) OldWrittenSecond(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldWrittenSecond is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldWrittenSecond requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldWrittenSecond: %w", err)
+	}
+	return oldValue.WrittenSecond, nil
+}
+
+// AddWrittenSecond adds i to the "written_second" field.
+func (m *CourseGradeMutation) AddWrittenSecond(i int) {
+	if m.addwritten_second != nil {
+		*m.addwritten_second += i
+	} else {
+		m.addwritten_second = &i
+	}
+}
+
+// AddedWrittenSecond returns the value that was added to the "written_second" field in this mutation.
+func (m *CourseGradeMutation) AddedWrittenSecond() (r int, exists bool) {
+	v := m.addwritten_second
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetWrittenSecond resets all changes to the "written_second" field.
+func (m *CourseGradeMutation) ResetWrittenSecond() {
+	m.written_second = nil
+	m.addwritten_second = nil
+}
+
+// SetCourseFinal sets the "course_final" field.
+func (m *CourseGradeMutation) SetCourseFinal(i int) {
+	m.course_final = &i
+	m.addcourse_final = nil
+}
+
+// CourseFinal returns the value of the "course_final" field in the mutation.
+func (m *CourseGradeMutation) CourseFinal() (r int, exists bool) {
+	v := m.course_final
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCourseFinal returns the old "course_final" field's value of the CourseGrade entity.
+// If the CourseGrade object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *CourseGradeMutation) OldCourseFinal(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldCourseFinal is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldCourseFinal requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCourseFinal: %w", err)
+	}
+	return oldValue.CourseFinal, nil
+}
+
+// AddCourseFinal adds i to the "course_final" field.
+func (m *CourseGradeMutation) AddCourseFinal(i int) {
+	if m.addcourse_final != nil {
+		*m.addcourse_final += i
+	} else {
+		m.addcourse_final = &i
+	}
+}
+
+// AddedCourseFinal returns the value that was added to the "course_final" field in this mutation.
+func (m *CourseGradeMutation) AddedCourseFinal() (r int, exists bool) {
+	v := m.addcourse_final
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetCourseFinal resets all changes to the "course_final" field.
+func (m *CourseGradeMutation) ResetCourseFinal() {
+	m.course_final = nil
+	m.addcourse_final = nil
+}
+
+// SetStudentID sets the "student" edge to the User entity by id.
+func (m *CourseGradeMutation) SetStudentID(id uuid.UUID) {
+	m.student = &id
+}
+
+// ClearStudent clears the "student" edge to the User entity.
+func (m *CourseGradeMutation) ClearStudent() {
+	m.clearedstudent = true
+}
+
+// StudentCleared reports if the "student" edge to the User entity was cleared.
+func (m *CourseGradeMutation) StudentCleared() bool {
+	return m.clearedstudent
+}
+
+// StudentID returns the "student" edge ID in the mutation.
+func (m *CourseGradeMutation) StudentID() (id uuid.UUID, exists bool) {
+	if m.student != nil {
+		return *m.student, true
+	}
+	return
+}
+
+// StudentIDs returns the "student" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// StudentID instead. It exists only for internal usage by the builders.
+func (m *CourseGradeMutation) StudentIDs() (ids []uuid.UUID) {
+	if id := m.student; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetStudent resets all changes to the "student" edge.
+func (m *CourseGradeMutation) ResetStudent() {
+	m.student = nil
+	m.clearedstudent = false
+}
+
+// SetClassID sets the "class" edge to the Class entity by id.
+func (m *CourseGradeMutation) SetClassID(id uuid.UUID) {
+	m.class = &id
+}
+
+// ClearClass clears the "class" edge to the Class entity.
+func (m *CourseGradeMutation) ClearClass() {
+	m.clearedclass = true
+}
+
+// ClassCleared reports if the "class" edge to the Class entity was cleared.
+func (m *CourseGradeMutation) ClassCleared() bool {
+	return m.clearedclass
+}
+
+// ClassID returns the "class" edge ID in the mutation.
+func (m *CourseGradeMutation) ClassID() (id uuid.UUID, exists bool) {
+	if m.class != nil {
+		return *m.class, true
+	}
+	return
+}
+
+// ClassIDs returns the "class" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// ClassID instead. It exists only for internal usage by the builders.
+func (m *CourseGradeMutation) ClassIDs() (ids []uuid.UUID) {
+	if id := m.class; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetClass resets all changes to the "class" edge.
+func (m *CourseGradeMutation) ResetClass() {
+	m.class = nil
+	m.clearedclass = false
+}
+
+// SetStageID sets the "stage" edge to the Stage entity by id.
+func (m *CourseGradeMutation) SetStageID(id uuid.UUID) {
+	m.stage = &id
+}
+
+// ClearStage clears the "stage" edge to the Stage entity.
+func (m *CourseGradeMutation) ClearStage() {
+	m.clearedstage = true
+}
+
+// StageCleared reports if the "stage" edge to the Stage entity was cleared.
+func (m *CourseGradeMutation) StageCleared() bool {
+	return m.clearedstage
+}
+
+// StageID returns the "stage" edge ID in the mutation.
+func (m *CourseGradeMutation) StageID() (id uuid.UUID, exists bool) {
+	if m.stage != nil {
+		return *m.stage, true
+	}
+	return
+}
+
+// StageIDs returns the "stage" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// StageID instead. It exists only for internal usage by the builders.
+func (m *CourseGradeMutation) StageIDs() (ids []uuid.UUID) {
+	if id := m.stage; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetStage resets all changes to the "stage" edge.
+func (m *CourseGradeMutation) ResetStage() {
+	m.stage = nil
+	m.clearedstage = false
+}
+
+// Where appends a list predicates to the CourseGradeMutation builder.
+func (m *CourseGradeMutation) Where(ps ...predicate.CourseGrade) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// Op returns the operation name.
+func (m *CourseGradeMutation) Op() Op {
+	return m.op
+}
+
+// Type returns the node type of this mutation (CourseGrade).
+func (m *CourseGradeMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *CourseGradeMutation) Fields() []string {
+	fields := make([]string, 0, 7)
+	if m.created_at != nil {
+		fields = append(fields, coursegrade.FieldCreatedAt)
+	}
+	if m.updated_at != nil {
+		fields = append(fields, coursegrade.FieldUpdatedAt)
+	}
+	if m.activity_first != nil {
+		fields = append(fields, coursegrade.FieldActivityFirst)
+	}
+	if m.activity_second != nil {
+		fields = append(fields, coursegrade.FieldActivitySecond)
+	}
+	if m.written_first != nil {
+		fields = append(fields, coursegrade.FieldWrittenFirst)
+	}
+	if m.written_second != nil {
+		fields = append(fields, coursegrade.FieldWrittenSecond)
+	}
+	if m.course_final != nil {
+		fields = append(fields, coursegrade.FieldCourseFinal)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *CourseGradeMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case coursegrade.FieldCreatedAt:
+		return m.CreatedAt()
+	case coursegrade.FieldUpdatedAt:
+		return m.UpdatedAt()
+	case coursegrade.FieldActivityFirst:
+		return m.ActivityFirst()
+	case coursegrade.FieldActivitySecond:
+		return m.ActivitySecond()
+	case coursegrade.FieldWrittenFirst:
+		return m.WrittenFirst()
+	case coursegrade.FieldWrittenSecond:
+		return m.WrittenSecond()
+	case coursegrade.FieldCourseFinal:
+		return m.CourseFinal()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *CourseGradeMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case coursegrade.FieldCreatedAt:
+		return m.OldCreatedAt(ctx)
+	case coursegrade.FieldUpdatedAt:
+		return m.OldUpdatedAt(ctx)
+	case coursegrade.FieldActivityFirst:
+		return m.OldActivityFirst(ctx)
+	case coursegrade.FieldActivitySecond:
+		return m.OldActivitySecond(ctx)
+	case coursegrade.FieldWrittenFirst:
+		return m.OldWrittenFirst(ctx)
+	case coursegrade.FieldWrittenSecond:
+		return m.OldWrittenSecond(ctx)
+	case coursegrade.FieldCourseFinal:
+		return m.OldCourseFinal(ctx)
+	}
+	return nil, fmt.Errorf("unknown CourseGrade field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *CourseGradeMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case coursegrade.FieldCreatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreatedAt(v)
+		return nil
+	case coursegrade.FieldUpdatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUpdatedAt(v)
+		return nil
+	case coursegrade.FieldActivityFirst:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetActivityFirst(v)
+		return nil
+	case coursegrade.FieldActivitySecond:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetActivitySecond(v)
+		return nil
+	case coursegrade.FieldWrittenFirst:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetWrittenFirst(v)
+		return nil
+	case coursegrade.FieldWrittenSecond:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetWrittenSecond(v)
+		return nil
+	case coursegrade.FieldCourseFinal:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCourseFinal(v)
+		return nil
+	}
+	return fmt.Errorf("unknown CourseGrade field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *CourseGradeMutation) AddedFields() []string {
+	var fields []string
+	if m.addactivity_first != nil {
+		fields = append(fields, coursegrade.FieldActivityFirst)
+	}
+	if m.addactivity_second != nil {
+		fields = append(fields, coursegrade.FieldActivitySecond)
+	}
+	if m.addwritten_first != nil {
+		fields = append(fields, coursegrade.FieldWrittenFirst)
+	}
+	if m.addwritten_second != nil {
+		fields = append(fields, coursegrade.FieldWrittenSecond)
+	}
+	if m.addcourse_final != nil {
+		fields = append(fields, coursegrade.FieldCourseFinal)
+	}
+	return fields
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *CourseGradeMutation) AddedField(name string) (ent.Value, bool) {
+	switch name {
+	case coursegrade.FieldActivityFirst:
+		return m.AddedActivityFirst()
+	case coursegrade.FieldActivitySecond:
+		return m.AddedActivitySecond()
+	case coursegrade.FieldWrittenFirst:
+		return m.AddedWrittenFirst()
+	case coursegrade.FieldWrittenSecond:
+		return m.AddedWrittenSecond()
+	case coursegrade.FieldCourseFinal:
+		return m.AddedCourseFinal()
+	}
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *CourseGradeMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	case coursegrade.FieldActivityFirst:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddActivityFirst(v)
+		return nil
+	case coursegrade.FieldActivitySecond:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddActivitySecond(v)
+		return nil
+	case coursegrade.FieldWrittenFirst:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddWrittenFirst(v)
+		return nil
+	case coursegrade.FieldWrittenSecond:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddWrittenSecond(v)
+		return nil
+	case coursegrade.FieldCourseFinal:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddCourseFinal(v)
+		return nil
+	}
+	return fmt.Errorf("unknown CourseGrade numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *CourseGradeMutation) ClearedFields() []string {
+	var fields []string
+	if m.FieldCleared(coursegrade.FieldActivityFirst) {
+		fields = append(fields, coursegrade.FieldActivityFirst)
+	}
+	if m.FieldCleared(coursegrade.FieldActivitySecond) {
+		fields = append(fields, coursegrade.FieldActivitySecond)
+	}
+	return fields
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *CourseGradeMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *CourseGradeMutation) ClearField(name string) error {
+	switch name {
+	case coursegrade.FieldActivityFirst:
+		m.ClearActivityFirst()
+		return nil
+	case coursegrade.FieldActivitySecond:
+		m.ClearActivitySecond()
+		return nil
+	}
+	return fmt.Errorf("unknown CourseGrade nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *CourseGradeMutation) ResetField(name string) error {
+	switch name {
+	case coursegrade.FieldCreatedAt:
+		m.ResetCreatedAt()
+		return nil
+	case coursegrade.FieldUpdatedAt:
+		m.ResetUpdatedAt()
+		return nil
+	case coursegrade.FieldActivityFirst:
+		m.ResetActivityFirst()
+		return nil
+	case coursegrade.FieldActivitySecond:
+		m.ResetActivitySecond()
+		return nil
+	case coursegrade.FieldWrittenFirst:
+		m.ResetWrittenFirst()
+		return nil
+	case coursegrade.FieldWrittenSecond:
+		m.ResetWrittenSecond()
+		return nil
+	case coursegrade.FieldCourseFinal:
+		m.ResetCourseFinal()
+		return nil
+	}
+	return fmt.Errorf("unknown CourseGrade field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *CourseGradeMutation) AddedEdges() []string {
+	edges := make([]string, 0, 3)
+	if m.student != nil {
+		edges = append(edges, coursegrade.EdgeStudent)
+	}
+	if m.class != nil {
+		edges = append(edges, coursegrade.EdgeClass)
+	}
+	if m.stage != nil {
+		edges = append(edges, coursegrade.EdgeStage)
+	}
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *CourseGradeMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case coursegrade.EdgeStudent:
+		if id := m.student; id != nil {
+			return []ent.Value{*id}
+		}
+	case coursegrade.EdgeClass:
+		if id := m.class; id != nil {
+			return []ent.Value{*id}
+		}
+	case coursegrade.EdgeStage:
+		if id := m.stage; id != nil {
+			return []ent.Value{*id}
+		}
+	}
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *CourseGradeMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 3)
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *CourseGradeMutation) RemovedIDs(name string) []ent.Value {
+	switch name {
+	}
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *CourseGradeMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 3)
+	if m.clearedstudent {
+		edges = append(edges, coursegrade.EdgeStudent)
+	}
+	if m.clearedclass {
+		edges = append(edges, coursegrade.EdgeClass)
+	}
+	if m.clearedstage {
+		edges = append(edges, coursegrade.EdgeStage)
+	}
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *CourseGradeMutation) EdgeCleared(name string) bool {
+	switch name {
+	case coursegrade.EdgeStudent:
+		return m.clearedstudent
+	case coursegrade.EdgeClass:
+		return m.clearedclass
+	case coursegrade.EdgeStage:
+		return m.clearedstage
+	}
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *CourseGradeMutation) ClearEdge(name string) error {
+	switch name {
+	case coursegrade.EdgeStudent:
+		m.ClearStudent()
+		return nil
+	case coursegrade.EdgeClass:
+		m.ClearClass()
+		return nil
+	case coursegrade.EdgeStage:
+		m.ClearStage()
+		return nil
+	}
+	return fmt.Errorf("unknown CourseGrade unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *CourseGradeMutation) ResetEdge(name string) error {
+	switch name {
+	case coursegrade.EdgeStudent:
+		m.ResetStudent()
+		return nil
+	case coursegrade.EdgeClass:
+		m.ResetClass()
+		return nil
+	case coursegrade.EdgeStage:
+		m.ResetStage()
+		return nil
+	}
+	return fmt.Errorf("unknown CourseGrade edge %s", name)
 }
 
 // GradeMutation represents an operation that mutates the Grade nodes in the graph.
@@ -6783,32 +7888,35 @@ func (m *SchoolMutation) ResetEdge(name string) error {
 // StageMutation represents an operation that mutates the Stage nodes in the graph.
 type StageMutation struct {
 	config
-	op                Op
-	typ               string
-	id                *uuid.UUID
-	created_at        *time.Time
-	updated_at        *time.Time
-	name              *string
-	tuition_amount    *int
-	addtuition_amount *int
-	directory         *string
-	active            *bool
-	deleted_at        *time.Time
-	clearedFields     map[string]struct{}
-	school            *uuid.UUID
-	clearedschool     bool
-	classes           map[uuid.UUID]struct{}
-	removedclasses    map[uuid.UUID]struct{}
-	clearedclasses    bool
-	payments          map[uuid.UUID]struct{}
-	removedpayments   map[uuid.UUID]struct{}
-	clearedpayments   bool
-	students          map[uuid.UUID]struct{}
-	removedstudents   map[uuid.UUID]struct{}
-	clearedstudents   bool
-	done              bool
-	oldValue          func(context.Context) (*Stage, error)
-	predicates        []predicate.Stage
+	op                   Op
+	typ                  string
+	id                   *uuid.UUID
+	created_at           *time.Time
+	updated_at           *time.Time
+	name                 *string
+	tuition_amount       *int
+	addtuition_amount    *int
+	directory            *string
+	active               *bool
+	deleted_at           *time.Time
+	clearedFields        map[string]struct{}
+	school               *uuid.UUID
+	clearedschool        bool
+	classes              map[uuid.UUID]struct{}
+	removedclasses       map[uuid.UUID]struct{}
+	clearedclasses       bool
+	payments             map[uuid.UUID]struct{}
+	removedpayments      map[uuid.UUID]struct{}
+	clearedpayments      bool
+	students             map[uuid.UUID]struct{}
+	removedstudents      map[uuid.UUID]struct{}
+	clearedstudents      bool
+	course_grades        map[uuid.UUID]struct{}
+	removedcourse_grades map[uuid.UUID]struct{}
+	clearedcourse_grades bool
+	done                 bool
+	oldValue             func(context.Context) (*Stage, error)
+	predicates           []predicate.Stage
 }
 
 var _ ent.Mutation = (*StageMutation)(nil)
@@ -7382,6 +8490,60 @@ func (m *StageMutation) ResetStudents() {
 	m.removedstudents = nil
 }
 
+// AddCourseGradeIDs adds the "course_grades" edge to the CourseGrade entity by ids.
+func (m *StageMutation) AddCourseGradeIDs(ids ...uuid.UUID) {
+	if m.course_grades == nil {
+		m.course_grades = make(map[uuid.UUID]struct{})
+	}
+	for i := range ids {
+		m.course_grades[ids[i]] = struct{}{}
+	}
+}
+
+// ClearCourseGrades clears the "course_grades" edge to the CourseGrade entity.
+func (m *StageMutation) ClearCourseGrades() {
+	m.clearedcourse_grades = true
+}
+
+// CourseGradesCleared reports if the "course_grades" edge to the CourseGrade entity was cleared.
+func (m *StageMutation) CourseGradesCleared() bool {
+	return m.clearedcourse_grades
+}
+
+// RemoveCourseGradeIDs removes the "course_grades" edge to the CourseGrade entity by IDs.
+func (m *StageMutation) RemoveCourseGradeIDs(ids ...uuid.UUID) {
+	if m.removedcourse_grades == nil {
+		m.removedcourse_grades = make(map[uuid.UUID]struct{})
+	}
+	for i := range ids {
+		delete(m.course_grades, ids[i])
+		m.removedcourse_grades[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedCourseGrades returns the removed IDs of the "course_grades" edge to the CourseGrade entity.
+func (m *StageMutation) RemovedCourseGradesIDs() (ids []uuid.UUID) {
+	for id := range m.removedcourse_grades {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// CourseGradesIDs returns the "course_grades" edge IDs in the mutation.
+func (m *StageMutation) CourseGradesIDs() (ids []uuid.UUID) {
+	for id := range m.course_grades {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetCourseGrades resets all changes to the "course_grades" edge.
+func (m *StageMutation) ResetCourseGrades() {
+	m.course_grades = nil
+	m.clearedcourse_grades = false
+	m.removedcourse_grades = nil
+}
+
 // Where appends a list predicates to the StageMutation builder.
 func (m *StageMutation) Where(ps ...predicate.Stage) {
 	m.predicates = append(m.predicates, ps...)
@@ -7626,7 +8788,7 @@ func (m *StageMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *StageMutation) AddedEdges() []string {
-	edges := make([]string, 0, 4)
+	edges := make([]string, 0, 5)
 	if m.school != nil {
 		edges = append(edges, stage.EdgeSchool)
 	}
@@ -7638,6 +8800,9 @@ func (m *StageMutation) AddedEdges() []string {
 	}
 	if m.students != nil {
 		edges = append(edges, stage.EdgeStudents)
+	}
+	if m.course_grades != nil {
+		edges = append(edges, stage.EdgeCourseGrades)
 	}
 	return edges
 }
@@ -7668,13 +8833,19 @@ func (m *StageMutation) AddedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case stage.EdgeCourseGrades:
+		ids := make([]ent.Value, 0, len(m.course_grades))
+		for id := range m.course_grades {
+			ids = append(ids, id)
+		}
+		return ids
 	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *StageMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 4)
+	edges := make([]string, 0, 5)
 	if m.removedclasses != nil {
 		edges = append(edges, stage.EdgeClasses)
 	}
@@ -7683,6 +8854,9 @@ func (m *StageMutation) RemovedEdges() []string {
 	}
 	if m.removedstudents != nil {
 		edges = append(edges, stage.EdgeStudents)
+	}
+	if m.removedcourse_grades != nil {
+		edges = append(edges, stage.EdgeCourseGrades)
 	}
 	return edges
 }
@@ -7709,13 +8883,19 @@ func (m *StageMutation) RemovedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case stage.EdgeCourseGrades:
+		ids := make([]ent.Value, 0, len(m.removedcourse_grades))
+		for id := range m.removedcourse_grades {
+			ids = append(ids, id)
+		}
+		return ids
 	}
 	return nil
 }
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *StageMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 4)
+	edges := make([]string, 0, 5)
 	if m.clearedschool {
 		edges = append(edges, stage.EdgeSchool)
 	}
@@ -7727,6 +8907,9 @@ func (m *StageMutation) ClearedEdges() []string {
 	}
 	if m.clearedstudents {
 		edges = append(edges, stage.EdgeStudents)
+	}
+	if m.clearedcourse_grades {
+		edges = append(edges, stage.EdgeCourseGrades)
 	}
 	return edges
 }
@@ -7743,6 +8926,8 @@ func (m *StageMutation) EdgeCleared(name string) bool {
 		return m.clearedpayments
 	case stage.EdgeStudents:
 		return m.clearedstudents
+	case stage.EdgeCourseGrades:
+		return m.clearedcourse_grades
 	}
 	return false
 }
@@ -7773,6 +8958,9 @@ func (m *StageMutation) ResetEdge(name string) error {
 		return nil
 	case stage.EdgeStudents:
 		m.ResetStudents()
+		return nil
+	case stage.EdgeCourseGrades:
+		m.ResetCourseGrades()
 		return nil
 	}
 	return fmt.Errorf("unknown Stage edge %s", name)
@@ -8351,51 +9539,54 @@ func (m *TuitionPaymentMutation) ResetEdge(name string) error {
 // UserMutation represents an operation that mutates the User nodes in the graph.
 type UserMutation struct {
 	config
-	op                 Op
-	typ                string
-	id                 *uuid.UUID
-	created_at         *time.Time
-	updated_at         *time.Time
-	name               *string
-	username           *string
-	password           *string
-	phone              *string
-	image              *string
-	directory          *string
-	token_version      *int
-	addtoken_version   *int
-	role               *user.Role
-	active             *bool
-	deleted_at         *time.Time
-	clearedFields      map[string]struct{}
-	stage              *uuid.UUID
-	clearedstage       bool
-	school             *uuid.UUID
-	clearedschool      bool
-	classes            map[uuid.UUID]struct{}
-	removedclasses     map[uuid.UUID]struct{}
-	clearedclasses     bool
-	messages           map[uuid.UUID]struct{}
-	removedmessages    map[uuid.UUID]struct{}
-	clearedmessages    bool
-	submissions        map[uuid.UUID]struct{}
-	removedsubmissions map[uuid.UUID]struct{}
-	clearedsubmissions bool
-	attendances        map[uuid.UUID]struct{}
-	removedattendances map[uuid.UUID]struct{}
-	clearedattendances bool
-	payments           map[uuid.UUID]struct{}
-	removedpayments    map[uuid.UUID]struct{}
-	clearedpayments    bool
-	grades             map[uuid.UUID]struct{}
-	removedgrades      map[uuid.UUID]struct{}
-	clearedgrades      bool
-	groups             map[uuid.UUID]struct{}
-	removedgroups      map[uuid.UUID]struct{}
-	clearedgroups      bool
-	done               bool
-	oldValue           func(context.Context) (*User, error)
-	predicates         []predicate.User
+	op                   Op
+	typ                  string
+	id                   *uuid.UUID
+	created_at           *time.Time
+	updated_at           *time.Time
+	name                 *string
+	username             *string
+	password             *string
+	phone                *string
+	image                *string
+	directory            *string
+	token_version        *int
+	addtoken_version     *int
+	role                 *user.Role
+	active               *bool
+	deleted_at           *time.Time
+	clearedFields        map[string]struct{}
+	stage                *uuid.UUID
+	clearedstage         bool
+	school               *uuid.UUID
+	clearedschool        bool
+	classes              map[uuid.UUID]struct{}
+	removedclasses       map[uuid.UUID]struct{}
+	clearedclasses       bool
+	messages             map[uuid.UUID]struct{}
+	removedmessages      map[uuid.UUID]struct{}
+	clearedmessages      bool
+	submissions          map[uuid.UUID]struct{}
+	removedsubmissions   map[uuid.UUID]struct{}
+	clearedsubmissions   bool
+	attendances          map[uuid.UUID]struct{}
+	removedattendances   map[uuid.UUID]struct{}
+	clearedattendances   bool
+	payments             map[uuid.UUID]struct{}
+	removedpayments      map[uuid.UUID]struct{}
+	clearedpayments      bool
+	grades               map[uuid.UUID]struct{}
+	removedgrades        map[uuid.UUID]struct{}
+	clearedgrades        bool
+	groups               map[uuid.UUID]struct{}
+	removedgroups        map[uuid.UUID]struct{}
+	clearedgroups        bool
+	course_grades        map[uuid.UUID]struct{}
+	removedcourse_grades map[uuid.UUID]struct{}
+	clearedcourse_grades bool
+	done                 bool
+	oldValue             func(context.Context) (*User, error)
+	predicates           []predicate.User
 }
 
 var _ ent.Mutation = (*UserMutation)(nil)
@@ -9417,6 +10608,60 @@ func (m *UserMutation) ResetGroups() {
 	m.removedgroups = nil
 }
 
+// AddCourseGradeIDs adds the "course_grades" edge to the CourseGrade entity by ids.
+func (m *UserMutation) AddCourseGradeIDs(ids ...uuid.UUID) {
+	if m.course_grades == nil {
+		m.course_grades = make(map[uuid.UUID]struct{})
+	}
+	for i := range ids {
+		m.course_grades[ids[i]] = struct{}{}
+	}
+}
+
+// ClearCourseGrades clears the "course_grades" edge to the CourseGrade entity.
+func (m *UserMutation) ClearCourseGrades() {
+	m.clearedcourse_grades = true
+}
+
+// CourseGradesCleared reports if the "course_grades" edge to the CourseGrade entity was cleared.
+func (m *UserMutation) CourseGradesCleared() bool {
+	return m.clearedcourse_grades
+}
+
+// RemoveCourseGradeIDs removes the "course_grades" edge to the CourseGrade entity by IDs.
+func (m *UserMutation) RemoveCourseGradeIDs(ids ...uuid.UUID) {
+	if m.removedcourse_grades == nil {
+		m.removedcourse_grades = make(map[uuid.UUID]struct{})
+	}
+	for i := range ids {
+		delete(m.course_grades, ids[i])
+		m.removedcourse_grades[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedCourseGrades returns the removed IDs of the "course_grades" edge to the CourseGrade entity.
+func (m *UserMutation) RemovedCourseGradesIDs() (ids []uuid.UUID) {
+	for id := range m.removedcourse_grades {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// CourseGradesIDs returns the "course_grades" edge IDs in the mutation.
+func (m *UserMutation) CourseGradesIDs() (ids []uuid.UUID) {
+	for id := range m.course_grades {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetCourseGrades resets all changes to the "course_grades" edge.
+func (m *UserMutation) ResetCourseGrades() {
+	m.course_grades = nil
+	m.clearedcourse_grades = false
+	m.removedcourse_grades = nil
+}
+
 // Where appends a list predicates to the UserMutation builder.
 func (m *UserMutation) Where(ps ...predicate.User) {
 	m.predicates = append(m.predicates, ps...)
@@ -9752,7 +10997,7 @@ func (m *UserMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *UserMutation) AddedEdges() []string {
-	edges := make([]string, 0, 9)
+	edges := make([]string, 0, 10)
 	if m.stage != nil {
 		edges = append(edges, user.EdgeStage)
 	}
@@ -9779,6 +11024,9 @@ func (m *UserMutation) AddedEdges() []string {
 	}
 	if m.groups != nil {
 		edges = append(edges, user.EdgeGroups)
+	}
+	if m.course_grades != nil {
+		edges = append(edges, user.EdgeCourseGrades)
 	}
 	return edges
 }
@@ -9837,13 +11085,19 @@ func (m *UserMutation) AddedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case user.EdgeCourseGrades:
+		ids := make([]ent.Value, 0, len(m.course_grades))
+		for id := range m.course_grades {
+			ids = append(ids, id)
+		}
+		return ids
 	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *UserMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 9)
+	edges := make([]string, 0, 10)
 	if m.removedclasses != nil {
 		edges = append(edges, user.EdgeClasses)
 	}
@@ -9864,6 +11118,9 @@ func (m *UserMutation) RemovedEdges() []string {
 	}
 	if m.removedgroups != nil {
 		edges = append(edges, user.EdgeGroups)
+	}
+	if m.removedcourse_grades != nil {
+		edges = append(edges, user.EdgeCourseGrades)
 	}
 	return edges
 }
@@ -9914,13 +11171,19 @@ func (m *UserMutation) RemovedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case user.EdgeCourseGrades:
+		ids := make([]ent.Value, 0, len(m.removedcourse_grades))
+		for id := range m.removedcourse_grades {
+			ids = append(ids, id)
+		}
+		return ids
 	}
 	return nil
 }
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *UserMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 9)
+	edges := make([]string, 0, 10)
 	if m.clearedstage {
 		edges = append(edges, user.EdgeStage)
 	}
@@ -9948,6 +11211,9 @@ func (m *UserMutation) ClearedEdges() []string {
 	if m.clearedgroups {
 		edges = append(edges, user.EdgeGroups)
 	}
+	if m.clearedcourse_grades {
+		edges = append(edges, user.EdgeCourseGrades)
+	}
 	return edges
 }
 
@@ -9973,6 +11239,8 @@ func (m *UserMutation) EdgeCleared(name string) bool {
 		return m.clearedgrades
 	case user.EdgeGroups:
 		return m.clearedgroups
+	case user.EdgeCourseGrades:
+		return m.clearedcourse_grades
 	}
 	return false
 }
@@ -10021,6 +11289,9 @@ func (m *UserMutation) ResetEdge(name string) error {
 		return nil
 	case user.EdgeGroups:
 		m.ResetGroups()
+		return nil
+	case user.EdgeCourseGrades:
+		m.ResetCourseGrades()
 		return nil
 	}
 	return fmt.Errorf("unknown User edge %s", name)

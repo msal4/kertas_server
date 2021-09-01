@@ -35,19 +35,19 @@ enum GroupType {
 }
 
 enum OrderDirection {
-    ASC
-    DESC
+  ASC
+  DESC
 }
 
 enum SchoolOrderField {
-    NAME
-    CREATED_AT
-    UPDATED_AT
+  NAME
+  CREATED_AT
+  UPDATED_AT
 }
 
 input SchoolOrder {
-    field: SchoolOrderField
-    direction: OrderDirection!
+  field: SchoolOrderField
+  direction: OrderDirection!
 }
 
 type School implements Node {
@@ -83,17 +83,17 @@ input UpdateSchoolInput {
 }
 
 enum UserOrderField {
-    NAME
-    USERNAME
-    PHONE
-    ROLE
-    CREATED_AT
-    UPDATED_AT
+  NAME
+  USERNAME
+  PHONE
+  ROLE
+  CREATED_AT
+  UPDATED_AT
 }
 
 input UserOrder {
-    field: UserOrderField
-    direction: OrderDirection!
+  field: UserOrderField
+  direction: OrderDirection!
 }
 
 type User implements Node {
@@ -154,14 +154,14 @@ type Stage implements Node {
 }
 
 enum StageOrderField {
-    NAME
-    CREATED_AT
-    UPDATED_AT
+  NAME
+  CREATED_AT
+  UPDATED_AT
 }
 
 input StageOrder {
-    field: StageOrderField
-    direction: OrderDirection!
+  field: StageOrderField
+  direction: OrderDirection!
 }
 
 type StageEdge {
@@ -208,14 +208,14 @@ type Group {
 }
 
 enum GroupOrderField {
-    NAME
-    CREATED_AT
-    UPDATED_AT
+  NAME
+  CREATED_AT
+  UPDATED_AT
 }
 
 input GroupOrder {
-    field: GroupOrderField
-    direction: OrderDirection!
+  field: GroupOrderField
+  direction: OrderDirection!
 }
 
 type GroupEdge {
@@ -250,14 +250,14 @@ type Class {
 }
 
 enum ClassOrderField {
-    NAME
-    CREATED_AT
-    UPDATED_AT
+  NAME
+  CREATED_AT
+  UPDATED_AT
 }
 
 input ClassOrder {
-    field: ClassOrderField
-    direction: OrderDirection!
+  field: ClassOrderField
+  direction: OrderDirection!
 }
 
 type ClassEdge {
@@ -294,13 +294,13 @@ type Message {
 }
 
 enum MessageOrderField {
-    CREATED_AT
-    UPDATED_AT
+  CREATED_AT
+  UPDATED_AT
 }
 
 input MessageOrder {
-    field: MessageOrderField
-    direction: OrderDirection!
+  field: MessageOrderField
+  direction: OrderDirection!
 }
 
 type MessageEdge {
@@ -333,17 +333,17 @@ type Assignment {
 }
 
 enum AssignmentOrderField {
-    NAME
-    DESCRIPTION
-    DUE_DATE
-    DURATION
-    CREATED_AT
-    UPDATED_AT
+  NAME
+  DESCRIPTION
+  DUE_DATE
+  DURATION
+  CREATED_AT
+  UPDATED_AT
 }
 
 input AssignmentOrder {
-    field: AssignmentOrderField
-    direction: OrderDirection!
+  field: AssignmentOrderField
+  direction: OrderDirection!
 }
 
 type AssignmentEdge {
@@ -395,6 +395,62 @@ input UpdateScheduleInput {
   startsAt: Time
 }
 
+type CourseGrade {
+  id: ID!
+  activityFirst: Int!
+  activitySecond: Int!
+  writtenFirst: Int!
+  writtenSecond: Int!
+  courseFinal: Int!
+  createdAt: Time!
+  updatedAt: Time!
+}
+
+enum CourseGradeOrderField {
+  ACTIVITY_FIRST
+  ACTIVITY_SECOND
+  WRITTEN_FIRST
+  WRITTEN_SECOND
+  COURSE_FINAL
+  CREATED_AT
+  UPDATED_AT
+}
+
+input CourseGradeOrder {
+  field: CourseGradeOrderField
+  direction: OrderDirection!
+}
+
+type CourseGradeEdge {
+  node: CourseGrade
+  cursor: Cursor!
+}
+
+type CourseGradeConnection {
+  totalCount: Int!
+  pageInfo: PageInfo!
+  edges: [CourseGradeEdge]
+}
+
+input AddCourseGradeInput {
+  studentID: ID!
+  stageID: ID!
+  classID: ID!
+  activityFirst: Int
+  activitySecond: Int
+  writtenFirst: Int
+  writtenSecond: Int
+  courseFinal: Int
+}
+
+input UpdateCourseGradeInput {
+  activityFirst: Int
+  activitySecond: Int
+  writtenFirst: Int
+  writtenSecond: Int
+  courseFinal: Int
+}
+
 type Query {
   school(id: ID!): School
   schools(after: Cursor, first: Int, before: Cursor, last: Int, orderBy: SchoolOrder, where: SchoolWhereInput): SchoolConnection
@@ -417,6 +473,8 @@ type Query {
   assignments(userID: ID, stageID: ID, schoolID: ID, after: Cursor, first: Int, before: Cursor, last: Int, orderBy: AssignmentOrder, where: AssignmentWhereInput): AssignmentConnection
 
   schedule(stageID: ID, weekday: Weekday): [Schedule]
+
+  courseGrades(studentID: ID, stageID: ID, classID: ID, after: Cursor, first: Int, before: Cursor, last: Int, orderBy: CourseGradeOrder, where: CourseGradeWhereInput): CourseGradeConnection
 }
 
 type Mutation {
@@ -456,6 +514,10 @@ type Mutation {
   addSchedule(input: AddScheduleInput!): Schedule
   updateSchedule(id: ID!, input: UpdateScheduleInput!): Schedule
   deleteSchedule(id: ID!): Boolean!
+
+  addCourseGrade(input: AddCourseGradeInput!): CourseGrade
+  updateCourseGrade(id: ID!, input: UpdateCourseGradeInput!): CourseGrade
+  deleteCourseGrade(id: ID!): Boolean!
 }
 
 type Subscription {

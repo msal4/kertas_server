@@ -28,6 +28,7 @@ type hooks struct {
 	AssignmentSubmission []ent.Hook
 	Attendance           []ent.Hook
 	Class                []ent.Hook
+	CourseGrade          []ent.Hook
 	Grade                []ent.Hook
 	Group                []ent.Hook
 	Message              []ent.Hook

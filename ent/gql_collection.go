@@ -57,6 +57,18 @@ func (c *ClassQuery) collectField(ctx *graphql.OperationContext, field graphql.C
 }
 
 // CollectFields tells the query-builder to eagerly load connected nodes by resolver context.
+func (cg *CourseGradeQuery) CollectFields(ctx context.Context, satisfies ...string) *CourseGradeQuery {
+	if fc := graphql.GetFieldContext(ctx); fc != nil {
+		cg = cg.collectField(graphql.GetOperationContext(ctx), fc.Field, satisfies...)
+	}
+	return cg
+}
+
+func (cg *CourseGradeQuery) collectField(ctx *graphql.OperationContext, field graphql.CollectedField, satisfies ...string) *CourseGradeQuery {
+	return cg
+}
+
+// CollectFields tells the query-builder to eagerly load connected nodes by resolver context.
 func (gr *GradeQuery) CollectFields(ctx context.Context, satisfies ...string) *GradeQuery {
 	if fc := graphql.GetFieldContext(ctx); fc != nil {
 		gr = gr.collectField(graphql.GetOperationContext(ctx), fc.Field, satisfies...)

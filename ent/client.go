@@ -14,6 +14,7 @@ import (
 	"github.com/msal4/hassah_school_server/ent/assignmentsubmission"
 	"github.com/msal4/hassah_school_server/ent/attendance"
 	"github.com/msal4/hassah_school_server/ent/class"
+	"github.com/msal4/hassah_school_server/ent/coursegrade"
 	"github.com/msal4/hassah_school_server/ent/grade"
 	"github.com/msal4/hassah_school_server/ent/group"
 	"github.com/msal4/hassah_school_server/ent/message"
@@ -41,6 +42,8 @@ type Client struct {
 	Attendance *AttendanceClient
 	// Class is the client for interacting with the Class builders.
 	Class *ClassClient
+	// CourseGrade is the client for interacting with the CourseGrade builders.
+	CourseGrade *CourseGradeClient
 	// Grade is the client for interacting with the Grade builders.
 	Grade *GradeClient
 	// Group is the client for interacting with the Group builders.
@@ -74,6 +77,7 @@ func (c *Client) init() {
 	c.AssignmentSubmission = NewAssignmentSubmissionClient(c.config)
 	c.Attendance = NewAttendanceClient(c.config)
 	c.Class = NewClassClient(c.config)
+	c.CourseGrade = NewCourseGradeClient(c.config)
 	c.Grade = NewGradeClient(c.config)
 	c.Group = NewGroupClient(c.config)
 	c.Message = NewMessageClient(c.config)
@@ -119,6 +123,7 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		AssignmentSubmission: NewAssignmentSubmissionClient(cfg),
 		Attendance:           NewAttendanceClient(cfg),
 		Class:                NewClassClient(cfg),
+		CourseGrade:          NewCourseGradeClient(cfg),
 		Grade:                NewGradeClient(cfg),
 		Group:                NewGroupClient(cfg),
 		Message:              NewMessageClient(cfg),
@@ -149,6 +154,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		AssignmentSubmission: NewAssignmentSubmissionClient(cfg),
 		Attendance:           NewAttendanceClient(cfg),
 		Class:                NewClassClient(cfg),
+		CourseGrade:          NewCourseGradeClient(cfg),
 		Grade:                NewGradeClient(cfg),
 		Group:                NewGroupClient(cfg),
 		Message:              NewMessageClient(cfg),
@@ -190,6 +196,7 @@ func (c *Client) Use(hooks ...Hook) {
 	c.AssignmentSubmission.Use(hooks...)
 	c.Attendance.Use(hooks...)
 	c.Class.Use(hooks...)
+	c.CourseGrade.Use(hooks...)
 	c.Grade.Use(hooks...)
 	c.Group.Use(hooks...)
 	c.Message.Use(hooks...)
@@ -763,9 +770,163 @@ func (c *ClassClient) QuerySchedules(cl *Class) *ScheduleQuery {
 	return query
 }
 
+// QueryCourseGrades queries the course_grades edge of a Class.
+func (c *ClassClient) QueryCourseGrades(cl *Class) *CourseGradeQuery {
+	query := &CourseGradeQuery{config: c.config}
+	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+		id := cl.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(class.Table, class.FieldID, id),
+			sqlgraph.To(coursegrade.Table, coursegrade.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, class.CourseGradesTable, class.CourseGradesColumn),
+		)
+		fromV = sqlgraph.Neighbors(cl.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // Hooks returns the client hooks.
 func (c *ClassClient) Hooks() []Hook {
 	return c.hooks.Class
+}
+
+// CourseGradeClient is a client for the CourseGrade schema.
+type CourseGradeClient struct {
+	config
+}
+
+// NewCourseGradeClient returns a client for the CourseGrade from the given config.
+func NewCourseGradeClient(c config) *CourseGradeClient {
+	return &CourseGradeClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `coursegrade.Hooks(f(g(h())))`.
+func (c *CourseGradeClient) Use(hooks ...Hook) {
+	c.hooks.CourseGrade = append(c.hooks.CourseGrade, hooks...)
+}
+
+// Create returns a create builder for CourseGrade.
+func (c *CourseGradeClient) Create() *CourseGradeCreate {
+	mutation := newCourseGradeMutation(c.config, OpCreate)
+	return &CourseGradeCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of CourseGrade entities.
+func (c *CourseGradeClient) CreateBulk(builders ...*CourseGradeCreate) *CourseGradeCreateBulk {
+	return &CourseGradeCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for CourseGrade.
+func (c *CourseGradeClient) Update() *CourseGradeUpdate {
+	mutation := newCourseGradeMutation(c.config, OpUpdate)
+	return &CourseGradeUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *CourseGradeClient) UpdateOne(cg *CourseGrade) *CourseGradeUpdateOne {
+	mutation := newCourseGradeMutation(c.config, OpUpdateOne, withCourseGrade(cg))
+	return &CourseGradeUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *CourseGradeClient) UpdateOneID(id uuid.UUID) *CourseGradeUpdateOne {
+	mutation := newCourseGradeMutation(c.config, OpUpdateOne, withCourseGradeID(id))
+	return &CourseGradeUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for CourseGrade.
+func (c *CourseGradeClient) Delete() *CourseGradeDelete {
+	mutation := newCourseGradeMutation(c.config, OpDelete)
+	return &CourseGradeDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a delete builder for the given entity.
+func (c *CourseGradeClient) DeleteOne(cg *CourseGrade) *CourseGradeDeleteOne {
+	return c.DeleteOneID(cg.ID)
+}
+
+// DeleteOneID returns a delete builder for the given id.
+func (c *CourseGradeClient) DeleteOneID(id uuid.UUID) *CourseGradeDeleteOne {
+	builder := c.Delete().Where(coursegrade.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &CourseGradeDeleteOne{builder}
+}
+
+// Query returns a query builder for CourseGrade.
+func (c *CourseGradeClient) Query() *CourseGradeQuery {
+	return &CourseGradeQuery{
+		config: c.config,
+	}
+}
+
+// Get returns a CourseGrade entity by its id.
+func (c *CourseGradeClient) Get(ctx context.Context, id uuid.UUID) (*CourseGrade, error) {
+	return c.Query().Where(coursegrade.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *CourseGradeClient) GetX(ctx context.Context, id uuid.UUID) *CourseGrade {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryStudent queries the student edge of a CourseGrade.
+func (c *CourseGradeClient) QueryStudent(cg *CourseGrade) *UserQuery {
+	query := &UserQuery{config: c.config}
+	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+		id := cg.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(coursegrade.Table, coursegrade.FieldID, id),
+			sqlgraph.To(user.Table, user.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, coursegrade.StudentTable, coursegrade.StudentColumn),
+		)
+		fromV = sqlgraph.Neighbors(cg.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryClass queries the class edge of a CourseGrade.
+func (c *CourseGradeClient) QueryClass(cg *CourseGrade) *ClassQuery {
+	query := &ClassQuery{config: c.config}
+	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+		id := cg.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(coursegrade.Table, coursegrade.FieldID, id),
+			sqlgraph.To(class.Table, class.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, coursegrade.ClassTable, coursegrade.ClassColumn),
+		)
+		fromV = sqlgraph.Neighbors(cg.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryStage queries the stage edge of a CourseGrade.
+func (c *CourseGradeClient) QueryStage(cg *CourseGrade) *StageQuery {
+	query := &StageQuery{config: c.config}
+	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+		id := cg.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(coursegrade.Table, coursegrade.FieldID, id),
+			sqlgraph.To(stage.Table, stage.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, coursegrade.StageTable, coursegrade.StageColumn),
+		)
+		fromV = sqlgraph.Neighbors(cg.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *CourseGradeClient) Hooks() []Hook {
+	return c.hooks.CourseGrade
 }
 
 // GradeClient is a client for the Grade schema.
@@ -1527,6 +1688,22 @@ func (c *StageClient) QueryStudents(s *Stage) *UserQuery {
 	return query
 }
 
+// QueryCourseGrades queries the course_grades edge of a Stage.
+func (c *StageClient) QueryCourseGrades(s *Stage) *CourseGradeQuery {
+	query := &CourseGradeQuery{config: c.config}
+	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+		id := s.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(stage.Table, stage.FieldID, id),
+			sqlgraph.To(coursegrade.Table, coursegrade.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, stage.CourseGradesTable, stage.CourseGradesColumn),
+		)
+		fromV = sqlgraph.Neighbors(s.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // Hooks returns the client hooks.
 func (c *StageClient) Hooks() []Hook {
 	return c.hooks.Stage
@@ -1876,6 +2053,22 @@ func (c *UserClient) QueryGroups(u *User) *GroupQuery {
 			sqlgraph.From(user.Table, user.FieldID, id),
 			sqlgraph.To(group.Table, group.FieldID),
 			sqlgraph.Edge(sqlgraph.M2M, false, user.GroupsTable, user.GroupsPrimaryKey...),
+		)
+		fromV = sqlgraph.Neighbors(u.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryCourseGrades queries the course_grades edge of a User.
+func (c *UserClient) QueryCourseGrades(u *User) *CourseGradeQuery {
+	query := &CourseGradeQuery{config: c.config}
+	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+		id := u.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(user.Table, user.FieldID, id),
+			sqlgraph.To(coursegrade.Table, coursegrade.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, user.CourseGradesTable, user.CourseGradesColumn),
 		)
 		fromV = sqlgraph.Neighbors(u.driver.Dialect(), step)
 		return fromV, nil

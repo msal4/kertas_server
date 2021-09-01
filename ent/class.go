@@ -51,9 +51,11 @@ type ClassEdges struct {
 	Attendances []*Attendance `json:"attendances,omitempty"`
 	// Schedules holds the value of the schedules edge.
 	Schedules []*Schedule `json:"schedules,omitempty"`
+	// CourseGrades holds the value of the course_grades edge.
+	CourseGrades []*CourseGrade `json:"course_grades,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [6]bool
+	loadedTypes [7]bool
 }
 
 // StageOrErr returns the Stage value or an error if the edge
@@ -123,6 +125,15 @@ func (e ClassEdges) SchedulesOrErr() ([]*Schedule, error) {
 		return e.Schedules, nil
 	}
 	return nil, &NotLoadedError{edge: "schedules"}
+}
+
+// CourseGradesOrErr returns the CourseGrades value or an error if the edge
+// was not loaded in eager-loading.
+func (e ClassEdges) CourseGradesOrErr() ([]*CourseGrade, error) {
+	if e.loadedTypes[6] {
+		return e.CourseGrades, nil
+	}
+	return nil, &NotLoadedError{edge: "course_grades"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -241,6 +252,11 @@ func (c *Class) QueryAttendances() *AttendanceQuery {
 // QuerySchedules queries the "schedules" edge of the Class entity.
 func (c *Class) QuerySchedules() *ScheduleQuery {
 	return (&ClassClient{config: c.config}).QuerySchedules(c)
+}
+
+// QueryCourseGrades queries the "course_grades" edge of the Class entity.
+func (c *Class) QueryCourseGrades() *CourseGradeQuery {
+	return (&ClassClient{config: c.config}).QueryCourseGrades(c)
 }
 
 // Update returns a builder for updating this Class.

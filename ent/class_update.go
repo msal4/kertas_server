@@ -15,6 +15,7 @@ import (
 	"github.com/msal4/hassah_school_server/ent/assignment"
 	"github.com/msal4/hassah_school_server/ent/attendance"
 	"github.com/msal4/hassah_school_server/ent/class"
+	"github.com/msal4/hassah_school_server/ent/coursegrade"
 	"github.com/msal4/hassah_school_server/ent/group"
 	"github.com/msal4/hassah_school_server/ent/predicate"
 	"github.com/msal4/hassah_school_server/ent/schedule"
@@ -153,6 +154,21 @@ func (cu *ClassUpdate) AddSchedules(s ...*Schedule) *ClassUpdate {
 	return cu.AddScheduleIDs(ids...)
 }
 
+// AddCourseGradeIDs adds the "course_grades" edge to the CourseGrade entity by IDs.
+func (cu *ClassUpdate) AddCourseGradeIDs(ids ...uuid.UUID) *ClassUpdate {
+	cu.mutation.AddCourseGradeIDs(ids...)
+	return cu
+}
+
+// AddCourseGrades adds the "course_grades" edges to the CourseGrade entity.
+func (cu *ClassUpdate) AddCourseGrades(c ...*CourseGrade) *ClassUpdate {
+	ids := make([]uuid.UUID, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return cu.AddCourseGradeIDs(ids...)
+}
+
 // Mutation returns the ClassMutation object of the builder.
 func (cu *ClassUpdate) Mutation() *ClassMutation {
 	return cu.mutation
@@ -237,6 +253,27 @@ func (cu *ClassUpdate) RemoveSchedules(s ...*Schedule) *ClassUpdate {
 		ids[i] = s[i].ID
 	}
 	return cu.RemoveScheduleIDs(ids...)
+}
+
+// ClearCourseGrades clears all "course_grades" edges to the CourseGrade entity.
+func (cu *ClassUpdate) ClearCourseGrades() *ClassUpdate {
+	cu.mutation.ClearCourseGrades()
+	return cu
+}
+
+// RemoveCourseGradeIDs removes the "course_grades" edge to CourseGrade entities by IDs.
+func (cu *ClassUpdate) RemoveCourseGradeIDs(ids ...uuid.UUID) *ClassUpdate {
+	cu.mutation.RemoveCourseGradeIDs(ids...)
+	return cu
+}
+
+// RemoveCourseGrades removes "course_grades" edges to CourseGrade entities.
+func (cu *ClassUpdate) RemoveCourseGrades(c ...*CourseGrade) *ClassUpdate {
+	ids := make([]uuid.UUID, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return cu.RemoveCourseGradeIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -646,6 +683,60 @@ func (cu *ClassUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	if cu.mutation.CourseGradesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   class.CourseGradesTable,
+			Columns: []string{class.CourseGradesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: coursegrade.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := cu.mutation.RemovedCourseGradesIDs(); len(nodes) > 0 && !cu.mutation.CourseGradesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   class.CourseGradesTable,
+			Columns: []string{class.CourseGradesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: coursegrade.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := cu.mutation.CourseGradesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   class.CourseGradesTable,
+			Columns: []string{class.CourseGradesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: coursegrade.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if n, err = sqlgraph.UpdateNodes(ctx, cu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{class.Label}
@@ -783,6 +874,21 @@ func (cuo *ClassUpdateOne) AddSchedules(s ...*Schedule) *ClassUpdateOne {
 	return cuo.AddScheduleIDs(ids...)
 }
 
+// AddCourseGradeIDs adds the "course_grades" edge to the CourseGrade entity by IDs.
+func (cuo *ClassUpdateOne) AddCourseGradeIDs(ids ...uuid.UUID) *ClassUpdateOne {
+	cuo.mutation.AddCourseGradeIDs(ids...)
+	return cuo
+}
+
+// AddCourseGrades adds the "course_grades" edges to the CourseGrade entity.
+func (cuo *ClassUpdateOne) AddCourseGrades(c ...*CourseGrade) *ClassUpdateOne {
+	ids := make([]uuid.UUID, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return cuo.AddCourseGradeIDs(ids...)
+}
+
 // Mutation returns the ClassMutation object of the builder.
 func (cuo *ClassUpdateOne) Mutation() *ClassMutation {
 	return cuo.mutation
@@ -867,6 +973,27 @@ func (cuo *ClassUpdateOne) RemoveSchedules(s ...*Schedule) *ClassUpdateOne {
 		ids[i] = s[i].ID
 	}
 	return cuo.RemoveScheduleIDs(ids...)
+}
+
+// ClearCourseGrades clears all "course_grades" edges to the CourseGrade entity.
+func (cuo *ClassUpdateOne) ClearCourseGrades() *ClassUpdateOne {
+	cuo.mutation.ClearCourseGrades()
+	return cuo
+}
+
+// RemoveCourseGradeIDs removes the "course_grades" edge to CourseGrade entities by IDs.
+func (cuo *ClassUpdateOne) RemoveCourseGradeIDs(ids ...uuid.UUID) *ClassUpdateOne {
+	cuo.mutation.RemoveCourseGradeIDs(ids...)
+	return cuo
+}
+
+// RemoveCourseGrades removes "course_grades" edges to CourseGrade entities.
+func (cuo *ClassUpdateOne) RemoveCourseGrades(c ...*CourseGrade) *ClassUpdateOne {
+	ids := make([]uuid.UUID, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return cuo.RemoveCourseGradeIDs(ids...)
 }
 
 // Select allows selecting one or more fields (columns) of the returned entity.
@@ -1292,6 +1419,60 @@ func (cuo *ClassUpdateOne) sqlSave(ctx context.Context) (_node *Class, err error
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeUUID,
 					Column: schedule.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if cuo.mutation.CourseGradesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   class.CourseGradesTable,
+			Columns: []string{class.CourseGradesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: coursegrade.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := cuo.mutation.RemovedCourseGradesIDs(); len(nodes) > 0 && !cuo.mutation.CourseGradesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   class.CourseGradesTable,
+			Columns: []string{class.CourseGradesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: coursegrade.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := cuo.mutation.CourseGradesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   class.CourseGradesTable,
+			Columns: []string{class.CourseGradesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: coursegrade.FieldID,
 				},
 			},
 		}

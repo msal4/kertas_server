@@ -27,6 +27,17 @@ type AddClassInput struct {
 	StageID   uuid.UUID `json:"stageID"`
 }
 
+type AddCourseGradeInput struct {
+	StudentID      uuid.UUID `json:"studentID"`
+	StageID        uuid.UUID `json:"stageID"`
+	ClassID        uuid.UUID `json:"classID"`
+	ActivityFirst  *int      `json:"activityFirst"`
+	ActivitySecond *int      `json:"activitySecond"`
+	WrittenFirst   *int      `json:"writtenFirst"`
+	WrittenSecond  *int      `json:"writtenSecond"`
+	CourseFinal    *int      `json:"courseFinal"`
+}
+
 type AddGroupInput struct {
 	Name   string    `json:"name"`
 	Active bool      `json:"active"`
@@ -93,6 +104,14 @@ type UpdateClassInput struct {
 	Name      *string    `json:"name"`
 	Active    *bool      `json:"active"`
 	TeacherID *uuid.UUID `json:"teacherID"`
+}
+
+type UpdateCourseGradeInput struct {
+	ActivityFirst  *int `json:"activityFirst"`
+	ActivitySecond *int `json:"activitySecond"`
+	WrittenFirst   *int `json:"writtenFirst"`
+	WrittenSecond  *int `json:"writtenSecond"`
+	CourseFinal    *int `json:"courseFinal"`
 }
 
 type UpdateGroupInput struct {

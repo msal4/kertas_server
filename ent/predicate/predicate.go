@@ -18,6 +18,9 @@ type Attendance func(*sql.Selector)
 // Class is the predicate function for class builders.
 type Class func(*sql.Selector)
 
+// CourseGrade is the predicate function for coursegrade builders.
+type CourseGrade func(*sql.Selector)
+
 // Grade is the predicate function for grade builders.
 type Grade func(*sql.Selector)
 

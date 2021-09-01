@@ -70,9 +70,11 @@ type UserEdges struct {
 	Grades []*Grade `json:"grades,omitempty"`
 	// Groups holds the value of the groups edge.
 	Groups []*Group `json:"groups,omitempty"`
+	// CourseGrades holds the value of the course_grades edge.
+	CourseGrades []*CourseGrade `json:"course_grades,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [9]bool
+	loadedTypes [10]bool
 }
 
 // StageOrErr returns the Stage value or an error if the edge
@@ -164,6 +166,15 @@ func (e UserEdges) GroupsOrErr() ([]*Group, error) {
 		return e.Groups, nil
 	}
 	return nil, &NotLoadedError{edge: "groups"}
+}
+
+// CourseGradesOrErr returns the CourseGrades value or an error if the edge
+// was not loaded in eager-loading.
+func (e UserEdges) CourseGradesOrErr() ([]*CourseGrade, error) {
+	if e.loadedTypes[9] {
+		return e.CourseGrades, nil
+	}
+	return nil, &NotLoadedError{edge: "course_grades"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -341,6 +352,11 @@ func (u *User) QueryGrades() *GradeQuery {
 // QueryGroups queries the "groups" edge of the User entity.
 func (u *User) QueryGroups() *GroupQuery {
 	return (&UserClient{config: u.config}).QueryGroups(u)
+}
+
+// QueryCourseGrades queries the "course_grades" edge of the User entity.
+func (u *User) QueryCourseGrades() *CourseGradeQuery {
+	return (&UserClient{config: u.config}).QueryCourseGrades(u)
 }
 
 // Update returns a builder for updating this User.

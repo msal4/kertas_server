@@ -35,6 +35,8 @@ const (
 	EdgeAttendances = "attendances"
 	// EdgeSchedules holds the string denoting the schedules edge name in mutations.
 	EdgeSchedules = "schedules"
+	// EdgeCourseGrades holds the string denoting the course_grades edge name in mutations.
+	EdgeCourseGrades = "course_grades"
 	// Table holds the table name of the class in the database.
 	Table = "classes"
 	// StageTable is the table that holds the stage relation/edge.
@@ -79,6 +81,13 @@ const (
 	SchedulesInverseTable = "schedules"
 	// SchedulesColumn is the table column denoting the schedules relation/edge.
 	SchedulesColumn = "class_schedules"
+	// CourseGradesTable is the table that holds the course_grades relation/edge.
+	CourseGradesTable = "course_grades"
+	// CourseGradesInverseTable is the table name for the CourseGrade entity.
+	// It exists in this package in order to avoid circular dependency with the "coursegrade" package.
+	CourseGradesInverseTable = "course_grades"
+	// CourseGradesColumn is the table column denoting the course_grades relation/edge.
+	CourseGradesColumn = "class_course_grades"
 )
 
 // Columns holds all SQL columns for class fields.

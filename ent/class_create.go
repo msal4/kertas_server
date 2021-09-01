@@ -14,6 +14,7 @@ import (
 	"github.com/msal4/hassah_school_server/ent/assignment"
 	"github.com/msal4/hassah_school_server/ent/attendance"
 	"github.com/msal4/hassah_school_server/ent/class"
+	"github.com/msal4/hassah_school_server/ent/coursegrade"
 	"github.com/msal4/hassah_school_server/ent/group"
 	"github.com/msal4/hassah_school_server/ent/schedule"
 	"github.com/msal4/hassah_school_server/ent/stage"
@@ -171,6 +172,21 @@ func (cc *ClassCreate) AddSchedules(s ...*Schedule) *ClassCreate {
 		ids[i] = s[i].ID
 	}
 	return cc.AddScheduleIDs(ids...)
+}
+
+// AddCourseGradeIDs adds the "course_grades" edge to the CourseGrade entity by IDs.
+func (cc *ClassCreate) AddCourseGradeIDs(ids ...uuid.UUID) *ClassCreate {
+	cc.mutation.AddCourseGradeIDs(ids...)
+	return cc
+}
+
+// AddCourseGrades adds the "course_grades" edges to the CourseGrade entity.
+func (cc *ClassCreate) AddCourseGrades(c ...*CourseGrade) *ClassCreate {
+	ids := make([]uuid.UUID, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return cc.AddCourseGradeIDs(ids...)
 }
 
 // Mutation returns the ClassMutation object of the builder.
@@ -470,6 +486,25 @@ func (cc *ClassCreate) createSpec() (*Class, *sqlgraph.CreateSpec) {
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeUUID,
 					Column: schedule.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := cc.mutation.CourseGradesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   class.CourseGradesTable,
+			Columns: []string{class.CourseGradesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: coursegrade.FieldID,
 				},
 			},
 		}

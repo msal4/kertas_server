@@ -59,6 +59,7 @@ func (User) Edges() []ent.Edge {
 		edge.To("payments", TuitionPayment.Type).Annotations(entsql.Annotation{OnDelete: entsql.Cascade}),
 		edge.To("grades", Grade.Type).Annotations(entsql.Annotation{OnDelete: entsql.Cascade}),
 		edge.To("groups", Group.Type).Annotations(entsql.Annotation{OnDelete: entsql.Cascade}),
+		edge.To("course_grades", CourseGrade.Type).Annotations(entsql.Annotation{OnDelete: entsql.Cascade}),
 	}
 }
 

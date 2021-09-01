@@ -16,6 +16,7 @@ import (
 	"github.com/msal4/hassah_school_server/ent/assignment"
 	"github.com/msal4/hassah_school_server/ent/attendance"
 	"github.com/msal4/hassah_school_server/ent/class"
+	"github.com/msal4/hassah_school_server/ent/coursegrade"
 	"github.com/msal4/hassah_school_server/ent/group"
 	"github.com/msal4/hassah_school_server/ent/predicate"
 	"github.com/msal4/hassah_school_server/ent/schedule"
@@ -33,13 +34,14 @@ type ClassQuery struct {
 	fields     []string
 	predicates []predicate.Class
 	// eager-loading edges.
-	withStage       *StageQuery
-	withTeacher     *UserQuery
-	withGroup       *GroupQuery
-	withAssignments *AssignmentQuery
-	withAttendances *AttendanceQuery
-	withSchedules   *ScheduleQuery
-	withFKs         bool
+	withStage        *StageQuery
+	withTeacher      *UserQuery
+	withGroup        *GroupQuery
+	withAssignments  *AssignmentQuery
+	withAttendances  *AttendanceQuery
+	withSchedules    *ScheduleQuery
+	withCourseGrades *CourseGradeQuery
+	withFKs          bool
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -201,6 +203,28 @@ func (cq *ClassQuery) QuerySchedules() *ScheduleQuery {
 			sqlgraph.From(class.Table, class.FieldID, selector),
 			sqlgraph.To(schedule.Table, schedule.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, class.SchedulesTable, class.SchedulesColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(cq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryCourseGrades chains the current query on the "course_grades" edge.
+func (cq *ClassQuery) QueryCourseGrades() *CourseGradeQuery {
+	query := &CourseGradeQuery{config: cq.config}
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := cq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := cq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(class.Table, class.FieldID, selector),
+			sqlgraph.To(coursegrade.Table, coursegrade.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, class.CourseGradesTable, class.CourseGradesColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(cq.driver.Dialect(), step)
 		return fromU, nil
@@ -384,17 +408,18 @@ func (cq *ClassQuery) Clone() *ClassQuery {
 		return nil
 	}
 	return &ClassQuery{
-		config:          cq.config,
-		limit:           cq.limit,
-		offset:          cq.offset,
-		order:           append([]OrderFunc{}, cq.order...),
-		predicates:      append([]predicate.Class{}, cq.predicates...),
-		withStage:       cq.withStage.Clone(),
-		withTeacher:     cq.withTeacher.Clone(),
-		withGroup:       cq.withGroup.Clone(),
-		withAssignments: cq.withAssignments.Clone(),
-		withAttendances: cq.withAttendances.Clone(),
-		withSchedules:   cq.withSchedules.Clone(),
+		config:           cq.config,
+		limit:            cq.limit,
+		offset:           cq.offset,
+		order:            append([]OrderFunc{}, cq.order...),
+		predicates:       append([]predicate.Class{}, cq.predicates...),
+		withStage:        cq.withStage.Clone(),
+		withTeacher:      cq.withTeacher.Clone(),
+		withGroup:        cq.withGroup.Clone(),
+		withAssignments:  cq.withAssignments.Clone(),
+		withAttendances:  cq.withAttendances.Clone(),
+		withSchedules:    cq.withSchedules.Clone(),
+		withCourseGrades: cq.withCourseGrades.Clone(),
 		// clone intermediate query.
 		sql:  cq.sql.Clone(),
 		path: cq.path,
@@ -467,6 +492,17 @@ func (cq *ClassQuery) WithSchedules(opts ...func(*ScheduleQuery)) *ClassQuery {
 	return cq
 }
 
+// WithCourseGrades tells the query-builder to eager-load the nodes that are connected to
+// the "course_grades" edge. The optional arguments are used to configure the query builder of the edge.
+func (cq *ClassQuery) WithCourseGrades(opts ...func(*CourseGradeQuery)) *ClassQuery {
+	query := &CourseGradeQuery{config: cq.config}
+	for _, opt := range opts {
+		opt(query)
+	}
+	cq.withCourseGrades = query
+	return cq
+}
+
 // GroupBy is used to group vertices by one or more fields/columns.
 // It is often used with aggregate functions, like: count, max, mean, min, sum.
 //
@@ -533,13 +569,14 @@ func (cq *ClassQuery) sqlAll(ctx context.Context) ([]*Class, error) {
 		nodes       = []*Class{}
 		withFKs     = cq.withFKs
 		_spec       = cq.querySpec()
-		loadedTypes = [6]bool{
+		loadedTypes = [7]bool{
 			cq.withStage != nil,
 			cq.withTeacher != nil,
 			cq.withGroup != nil,
 			cq.withAssignments != nil,
 			cq.withAttendances != nil,
 			cq.withSchedules != nil,
+			cq.withCourseGrades != nil,
 		}
 	)
 	if cq.withStage != nil || cq.withTeacher != nil {
@@ -738,6 +775,35 @@ func (cq *ClassQuery) sqlAll(ctx context.Context) ([]*Class, error) {
 				return nil, fmt.Errorf(`unexpected foreign-key "class_schedules" returned %v for node %v`, *fk, n.ID)
 			}
 			node.Edges.Schedules = append(node.Edges.Schedules, n)
+		}
+	}
+
+	if query := cq.withCourseGrades; query != nil {
+		fks := make([]driver.Value, 0, len(nodes))
+		nodeids := make(map[uuid.UUID]*Class)
+		for i := range nodes {
+			fks = append(fks, nodes[i].ID)
+			nodeids[nodes[i].ID] = nodes[i]
+			nodes[i].Edges.CourseGrades = []*CourseGrade{}
+		}
+		query.withFKs = true
+		query.Where(predicate.CourseGrade(func(s *sql.Selector) {
+			s.Where(sql.InValues(class.CourseGradesColumn, fks...))
+		}))
+		neighbors, err := query.All(ctx)
+		if err != nil {
+			return nil, err
+		}
+		for _, n := range neighbors {
+			fk := n.class_course_grades
+			if fk == nil {
+				return nil, fmt.Errorf(`foreign-key "class_course_grades" is nil for node %v`, n.ID)
+			}
+			node, ok := nodeids[*fk]
+			if !ok {
+				return nil, fmt.Errorf(`unexpected foreign-key "class_course_grades" returned %v for node %v`, *fk, n.ID)
+			}
+			node.Edges.CourseGrades = append(node.Edges.CourseGrades, n)
 		}
 	}
 

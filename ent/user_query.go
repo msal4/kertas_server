@@ -16,6 +16,7 @@ import (
 	"github.com/msal4/hassah_school_server/ent/assignmentsubmission"
 	"github.com/msal4/hassah_school_server/ent/attendance"
 	"github.com/msal4/hassah_school_server/ent/class"
+	"github.com/msal4/hassah_school_server/ent/coursegrade"
 	"github.com/msal4/hassah_school_server/ent/grade"
 	"github.com/msal4/hassah_school_server/ent/group"
 	"github.com/msal4/hassah_school_server/ent/message"
@@ -36,16 +37,17 @@ type UserQuery struct {
 	fields     []string
 	predicates []predicate.User
 	// eager-loading edges.
-	withStage       *StageQuery
-	withSchool      *SchoolQuery
-	withClasses     *ClassQuery
-	withMessages    *MessageQuery
-	withSubmissions *AssignmentSubmissionQuery
-	withAttendances *AttendanceQuery
-	withPayments    *TuitionPaymentQuery
-	withGrades      *GradeQuery
-	withGroups      *GroupQuery
-	withFKs         bool
+	withStage        *StageQuery
+	withSchool       *SchoolQuery
+	withClasses      *ClassQuery
+	withMessages     *MessageQuery
+	withSubmissions  *AssignmentSubmissionQuery
+	withAttendances  *AttendanceQuery
+	withPayments     *TuitionPaymentQuery
+	withGrades       *GradeQuery
+	withGroups       *GroupQuery
+	withCourseGrades *CourseGradeQuery
+	withFKs          bool
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -280,6 +282,28 @@ func (uq *UserQuery) QueryGroups() *GroupQuery {
 	return query
 }
 
+// QueryCourseGrades chains the current query on the "course_grades" edge.
+func (uq *UserQuery) QueryCourseGrades() *CourseGradeQuery {
+	query := &CourseGradeQuery{config: uq.config}
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := uq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := uq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(user.Table, user.FieldID, selector),
+			sqlgraph.To(coursegrade.Table, coursegrade.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, user.CourseGradesTable, user.CourseGradesColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(uq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
 // First returns the first User entity from the query.
 // Returns a *NotFoundError when no User was found.
 func (uq *UserQuery) First(ctx context.Context) (*User, error) {
@@ -456,20 +480,21 @@ func (uq *UserQuery) Clone() *UserQuery {
 		return nil
 	}
 	return &UserQuery{
-		config:          uq.config,
-		limit:           uq.limit,
-		offset:          uq.offset,
-		order:           append([]OrderFunc{}, uq.order...),
-		predicates:      append([]predicate.User{}, uq.predicates...),
-		withStage:       uq.withStage.Clone(),
-		withSchool:      uq.withSchool.Clone(),
-		withClasses:     uq.withClasses.Clone(),
-		withMessages:    uq.withMessages.Clone(),
-		withSubmissions: uq.withSubmissions.Clone(),
-		withAttendances: uq.withAttendances.Clone(),
-		withPayments:    uq.withPayments.Clone(),
-		withGrades:      uq.withGrades.Clone(),
-		withGroups:      uq.withGroups.Clone(),
+		config:           uq.config,
+		limit:            uq.limit,
+		offset:           uq.offset,
+		order:            append([]OrderFunc{}, uq.order...),
+		predicates:       append([]predicate.User{}, uq.predicates...),
+		withStage:        uq.withStage.Clone(),
+		withSchool:       uq.withSchool.Clone(),
+		withClasses:      uq.withClasses.Clone(),
+		withMessages:     uq.withMessages.Clone(),
+		withSubmissions:  uq.withSubmissions.Clone(),
+		withAttendances:  uq.withAttendances.Clone(),
+		withPayments:     uq.withPayments.Clone(),
+		withGrades:       uq.withGrades.Clone(),
+		withGroups:       uq.withGroups.Clone(),
+		withCourseGrades: uq.withCourseGrades.Clone(),
 		// clone intermediate query.
 		sql:  uq.sql.Clone(),
 		path: uq.path,
@@ -575,6 +600,17 @@ func (uq *UserQuery) WithGroups(opts ...func(*GroupQuery)) *UserQuery {
 	return uq
 }
 
+// WithCourseGrades tells the query-builder to eager-load the nodes that are connected to
+// the "course_grades" edge. The optional arguments are used to configure the query builder of the edge.
+func (uq *UserQuery) WithCourseGrades(opts ...func(*CourseGradeQuery)) *UserQuery {
+	query := &CourseGradeQuery{config: uq.config}
+	for _, opt := range opts {
+		opt(query)
+	}
+	uq.withCourseGrades = query
+	return uq
+}
+
 // GroupBy is used to group vertices by one or more fields/columns.
 // It is often used with aggregate functions, like: count, max, mean, min, sum.
 //
@@ -641,7 +677,7 @@ func (uq *UserQuery) sqlAll(ctx context.Context) ([]*User, error) {
 		nodes       = []*User{}
 		withFKs     = uq.withFKs
 		_spec       = uq.querySpec()
-		loadedTypes = [9]bool{
+		loadedTypes = [10]bool{
 			uq.withStage != nil,
 			uq.withSchool != nil,
 			uq.withClasses != nil,
@@ -651,6 +687,7 @@ func (uq *UserQuery) sqlAll(ctx context.Context) ([]*User, error) {
 			uq.withPayments != nil,
 			uq.withGrades != nil,
 			uq.withGroups != nil,
+			uq.withCourseGrades != nil,
 		}
 	)
 	if uq.withStage != nil || uq.withSchool != nil {
@@ -973,6 +1010,35 @@ func (uq *UserQuery) sqlAll(ctx context.Context) ([]*User, error) {
 			for i := range nodes {
 				nodes[i].Edges.Groups = append(nodes[i].Edges.Groups, n)
 			}
+		}
+	}
+
+	if query := uq.withCourseGrades; query != nil {
+		fks := make([]driver.Value, 0, len(nodes))
+		nodeids := make(map[uuid.UUID]*User)
+		for i := range nodes {
+			fks = append(fks, nodes[i].ID)
+			nodeids[nodes[i].ID] = nodes[i]
+			nodes[i].Edges.CourseGrades = []*CourseGrade{}
+		}
+		query.withFKs = true
+		query.Where(predicate.CourseGrade(func(s *sql.Selector) {
+			s.Where(sql.InValues(user.CourseGradesColumn, fks...))
+		}))
+		neighbors, err := query.All(ctx)
+		if err != nil {
+			return nil, err
+		}
+		for _, n := range neighbors {
+			fk := n.user_course_grades
+			if fk == nil {
+				return nil, fmt.Errorf(`foreign-key "user_course_grades" is nil for node %v`, n.ID)
+			}
+			node, ok := nodeids[*fk]
+			if !ok {
+				return nil, fmt.Errorf(`unexpected foreign-key "user_course_grades" returned %v for node %v`, *fk, n.ID)
+			}
+			node.Edges.CourseGrades = append(node.Edges.CourseGrades, n)
 		}
 	}
 
