@@ -18,7 +18,7 @@ import (
 	"github.com/msal4/hassah_school_server/server/model"
 )
 
-type UserListOptions struct {
+type UsersOptions struct {
 	After   *ent.Cursor
 	First   *int
 	Before  *ent.Cursor
@@ -27,7 +27,7 @@ type UserListOptions struct {
 	Where   *ent.UserWhereInput
 }
 
-func (s *Service) Users(ctx context.Context, opts UserListOptions) (*ent.UserConnection, error) {
+func (s *Service) Users(ctx context.Context, opts UsersOptions) (*ent.UserConnection, error) {
 	return s.EC.User.Query().Paginate(ctx, opts.After, opts.First, opts.Before, opts.Last,
 		ent.WithUserOrder(opts.OrderBy), ent.WithUserFilter(opts.Where.Filter))
 }

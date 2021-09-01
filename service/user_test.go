@@ -25,7 +25,7 @@ func TestUsers(t *testing.T) {
 	ctx := context.Background()
 
 	t.Run("empty", func(t *testing.T) {
-		users, err := s.Users(ctx, service.UserListOptions{})
+		users, err := s.Users(ctx, service.UsersOptions{})
 		require.NoError(t, err)
 		require.NotNil(t, users)
 		require.Empty(t, users.Edges)
@@ -37,7 +37,7 @@ func TestUsers(t *testing.T) {
 		want := s.EC.User.Create().SetName("test name").SetUsername("msal").SetPassword("test password").SetPhone("test phone").
 			SetDirectory("testdir").SaveX(ctx)
 
-		users, err := s.Users(ctx, service.UserListOptions{})
+		users, err := s.Users(ctx, service.UsersOptions{})
 		require.NoError(t, err)
 		require.NotNil(t, users)
 		require.Len(t, users.Edges, 1)
@@ -62,7 +62,7 @@ func TestUsers(t *testing.T) {
 		b := s.EC.User.Query().Order(ent.Asc(user.FieldCreatedAt))
 		want := b.AllX(ctx)
 
-		conn, err := s.Users(ctx, service.UserListOptions{
+		conn, err := s.Users(ctx, service.UsersOptions{
 			OrderBy: &ent.UserOrder{Field: ent.UserOrderFieldCreatedAt, Direction: ent.OrderDirectionAsc},
 		})
 
@@ -86,7 +86,7 @@ func TestUsers(t *testing.T) {
 
 		want = b.Where(user.Active(false)).AllX(ctx)
 
-		conn, err = s.Users(ctx, service.UserListOptions{
+		conn, err = s.Users(ctx, service.UsersOptions{
 			Where:   &ent.UserWhereInput{Active: ptr.Bool(false)},
 			OrderBy: &ent.UserOrder{Field: ent.UserOrderFieldCreatedAt, Direction: ent.OrderDirectionAsc},
 		})

@@ -279,7 +279,7 @@ func (r *queryResolver) Users(ctx context.Context, after *ent.Cursor, first *int
 		return nil, auth.UnauthorizedErr
 	}
 
-	return r.s.Users(ctx, service.UserListOptions{
+	return r.s.Users(ctx, service.UsersOptions{
 		After:   after,
 		First:   first,
 		Before:  before,
