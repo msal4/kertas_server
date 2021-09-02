@@ -1,24 +1,22 @@
 #!/bin/bash
 
-rm -rf ./build
-echo removed ./build directory
+if rm -r ./build; then
+    echo removed ./build directory
+fi
 
-go build -o build/migrate cmd/migrate-schema/main.go
-if [ $? -ne 0 ]; then
+if ! go build -o build/migrate cmd/migrate-schema/main.go; then
     echo failed to build migrate tool
     exit
 fi
 echo built migrate cmd in build/migrate
 
-go build -o build/seed cmd/seed/main.go
-if [ $? -ne 0 ]; then
+if ! go build -o build/seed cmd/seed/main.go; then
     echo failed to build seed tool
     exit
 fi
 echo built seed cmd in build/seed
 
-go build -o build/server cmd/server/main.go
-if [ $? -ne 0 ]; then
+if ! go build -o build/server cmd/server/main.go; then
     echo failed to build server
     exit
 fi
