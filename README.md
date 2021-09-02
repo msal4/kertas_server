@@ -8,5 +8,5 @@
 - [x] Refactor
 - [x] Setup authorization
 - [ ] Stages and the file/document system
-- [ ] Implement chat
+- [x] Implement chat
 - [ ] Fulltext search
