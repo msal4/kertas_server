@@ -3,7 +3,7 @@ dbml-error.log
 .DS_Store
 
 build/
-build.zip
+kertas.zip
 .idea/
 .vscode/
 .env

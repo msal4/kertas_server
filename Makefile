@@ -9,3 +9,5 @@ seed:
 	@go run cmd/seed/main.go
 test:
 	@go test -cover -v ./...
+bundle:
+	@./bundle.sh
