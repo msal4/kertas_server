@@ -91,15 +91,15 @@ var (
 // State defines the type for the "state" enum field.
 type State string
 
-// StatePRESENT is the default value of the State enum.
-const DefaultState = StatePRESENT
+// StatePresent is the default value of the State enum.
+const DefaultState = StatePresent
 
 // State values.
 const (
-	StatePRESENT         State = "PRESENT"
-	StateABSENT          State = "ABSENT"
-	StateEXCUSED_ABSENCE State = "EXCUSED_ABSENCE"
-	StateSICK            State = "SICK"
+	StatePresent        State = "PRESENT"
+	StateAbsent         State = "ABSENT"
+	StateExcusedAbsence State = "EXCUSED_ABSENCE"
+	StateSick           State = "SICK"
 )
 
 func (s State) String() string {
@@ -109,7 +109,7 @@ func (s State) String() string {
 // StateValidator is a validator for the "state" field enum values. It is called by the builders before save.
 func StateValidator(s State) error {
 	switch s {
-	case StatePRESENT, StateABSENT, StateEXCUSED_ABSENCE, StateSICK:
+	case StatePresent, StateAbsent, StateExcusedAbsence, StateSick:
 		return nil
 	default:
 		return fmt.Errorf("attendance: invalid enum value for state field: %q", s)

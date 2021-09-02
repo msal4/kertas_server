@@ -16,6 +16,91 @@ import (
 	"github.com/msal4/hassah_school_server/service"
 )
 
+func (r *assignmentResolver) Class(ctx context.Context, obj *ent.Assignment) (*ent.Class, error) {
+	return obj.Class(ctx)
+}
+
+func (r *assignmentResolver) Submissions(ctx context.Context, obj *ent.Assignment, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.AssignmentSubmissionOrder, where *ent.AssignmentSubmissionWhereInput) (*ent.AssignmentSubmissionConnection, error) {
+	return obj.QuerySubmissions().Paginate(ctx, after, first, before, last,
+		ent.WithAssignmentSubmissionOrder(orderBy), ent.WithAssignmentSubmissionFilter(where.Filter))
+}
+
+func (r *assignmentSubmissionResolver) Student(ctx context.Context, obj *ent.AssignmentSubmission) (*ent.User, error) {
+	return obj.Student(ctx)
+}
+
+func (r *assignmentSubmissionResolver) Assignment(ctx context.Context, obj *ent.AssignmentSubmission) (*ent.Assignment, error) {
+	return obj.Assignment(ctx)
+}
+
+func (r *attendanceResolver) Class(ctx context.Context, obj *ent.Attendance) (*ent.Class, error) {
+	return obj.Class(ctx)
+}
+
+func (r *attendanceResolver) Student(ctx context.Context, obj *ent.Attendance) (*ent.User, error) {
+	return obj.Student(ctx)
+}
+
+func (r *classResolver) Stage(ctx context.Context, obj *ent.Class) (*ent.Stage, error) {
+	return obj.Stage(ctx)
+}
+
+func (r *classResolver) Teacher(ctx context.Context, obj *ent.Class) (*ent.User, error) {
+	return obj.Teacher(ctx)
+}
+
+func (r *classResolver) Group(ctx context.Context, obj *ent.Class) (*ent.Group, error) {
+	return obj.Group(ctx)
+}
+
+func (r *classResolver) Assignments(ctx context.Context, obj *ent.Class, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.AssignmentOrder, where *ent.AssignmentWhereInput) (*ent.AssignmentConnection, error) {
+	return obj.QueryAssignments().Paginate(ctx, after, first, before, last, ent.WithAssignmentOrder(orderBy), ent.WithAssignmentFilter(where.Filter))
+}
+
+func (r *classResolver) Attendances(ctx context.Context, obj *ent.Class, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.AttendanceOrder, where *ent.AttendanceWhereInput) (*ent.AttendanceConnection, error) {
+	return obj.QueryAttendances().Paginate(ctx, after, first, before, last, ent.WithAttendanceOrder(orderBy), ent.WithAttendanceFilter(where.Filter))
+}
+
+func (r *classResolver) Schedules(ctx context.Context, obj *ent.Class, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.ScheduleOrder, where *ent.ScheduleWhereInput) (*ent.ScheduleConnection, error) {
+	return obj.QuerySchedules().Paginate(ctx, after, first, before, last, ent.WithScheduleOrder(orderBy), ent.WithScheduleFilter(where.Filter))
+}
+
+func (r *classResolver) CourseGrades(ctx context.Context, obj *ent.Class, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.CourseGradeOrder, where *ent.CourseGradeWhereInput) (*ent.CourseGradeConnection, error) {
+	return obj.QueryCourseGrades().Paginate(ctx, after, first, before, last, ent.WithCourseGradeOrder(orderBy), ent.WithCourseGradeFilter(where.Filter))
+}
+
+func (r *courseGradeResolver) Student(ctx context.Context, obj *ent.CourseGrade) (*ent.User, error) {
+	return obj.Student(ctx)
+}
+
+func (r *courseGradeResolver) Class(ctx context.Context, obj *ent.CourseGrade) (*ent.Class, error) {
+	return obj.Class(ctx)
+}
+
+func (r *courseGradeResolver) Stage(ctx context.Context, obj *ent.CourseGrade) (*ent.Stage, error) {
+	return obj.Stage(ctx)
+}
+
+func (r *groupResolver) Class(ctx context.Context, obj *ent.Group) (*ent.Class, error) {
+	return obj.Class(ctx)
+}
+
+func (r *groupResolver) Users(ctx context.Context, obj *ent.Group) ([]*ent.User, error) {
+	return obj.Users(ctx)
+}
+
+func (r *groupResolver) Messages(ctx context.Context, obj *ent.Group, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.MessageOrder, where *ent.MessageWhereInput) (*ent.MessageConnection, error) {
+	return obj.QueryMessages().Paginate(ctx, after, first, before, last, ent.WithMessageOrder(orderBy), ent.WithMessageFilter(where.Filter))
+}
+
+func (r *messageResolver) Group(ctx context.Context, obj *ent.Message) (*ent.Group, error) {
+	return obj.Group(ctx)
+}
+
+func (r *messageResolver) Owner(ctx context.Context, obj *ent.Message) (*ent.User, error) {
+	return obj.Owner(ctx)
+}
+
 func (r *mutationResolver) AddSchool(ctx context.Context, input model.AddSchoolInput) (*ent.School, error) {
 	if !auth.IsSuperAdmin(ctx) {
 		return nil, auth.UnauthorizedErr
@@ -290,6 +375,15 @@ func (r *mutationResolver) DeleteCourseGrade(ctx context.Context, id uuid.UUID) 
 	return true, r.s.DeleteCourseGrade(ctx, id)
 }
 
+func (r *queryResolver) Me(ctx context.Context) (*ent.User, error) {
+	u, ok := auth.UserForContext(ctx)
+	if !ok {
+		return nil, auth.UnauthorizedErr
+	}
+
+	return r.s.EC.User.Get(ctx, u.ID)
+}
+
 func (r *queryResolver) School(ctx context.Context, id uuid.UUID) (*ent.School, error) {
 	return r.s.EC.School.Get(ctx, id)
 }
@@ -458,6 +552,41 @@ func (r *queryResolver) CourseGrades(ctx context.Context, studentID *uuid.UUID, 
 	return r.s.CourseGrades(ctx, service.CourseGradesOptions{ClassID: classID, StudentID: studentID, StageID: stageID, After: after, First: first, Before: before, Last: last, OrderBy: orderBy, Where: where})
 }
 
+func (r *scheduleResolver) Class(ctx context.Context, obj *ent.Schedule) (*ent.Class, error) {
+	return obj.Class(ctx)
+}
+
+func (r *schoolResolver) Users(ctx context.Context, obj *ent.School, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.UserOrder, where *ent.UserWhereInput) (*ent.UserConnection, error) {
+	return obj.QueryUsers().Paginate(ctx, after, first, before, last, ent.WithUserOrder(orderBy), ent.WithUserFilter(where.Filter))
+}
+
+func (r *schoolResolver) Stages(ctx context.Context, obj *ent.School, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.StageOrder, where *ent.StageWhereInput) (*ent.StageConnection, error) {
+	return obj.QueryStages().Paginate(ctx, after, first, before, last, ent.WithStageOrder(orderBy), ent.WithStageFilter(where.Filter))
+}
+
+func (r *stageResolver) School(ctx context.Context, obj *ent.Stage) (*ent.School, error) {
+	return obj.School(ctx)
+}
+
+func (r *stageResolver) Classes(ctx context.Context, obj *ent.Stage, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.ClassOrder, where *ent.ClassWhereInput) (*ent.ClassConnection, error) {
+	return obj.QueryClasses().Paginate(ctx, after, first, before, last,
+		ent.WithClassOrder(orderBy), ent.WithClassFilter(where.Filter))
+}
+
+func (r *stageResolver) Payments(ctx context.Context, obj *ent.Stage, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.TuitionPaymentOrder, where *ent.TuitionPaymentWhereInput) (*ent.TuitionPaymentConnection, error) {
+	return obj.QueryPayments().Paginate(ctx, after, first, before, last,
+		ent.WithTuitionPaymentOrder(orderBy), ent.WithTuitionPaymentFilter(where.Filter))
+}
+
+func (r *stageResolver) Students(ctx context.Context, obj *ent.Stage, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.UserOrder, where *ent.UserWhereInput) (*ent.UserConnection, error) {
+	return obj.QueryStudents().Paginate(ctx, after, first, before, last,
+		ent.WithUserOrder(orderBy), ent.WithUserFilter(where.Filter))
+}
+
+func (r *stageResolver) CourseGrades(ctx context.Context, obj *ent.Stage) ([]*ent.CourseGrade, error) {
+	return obj.CourseGrades(ctx)
+}
+
 func (r *subscriptionResolver) MessagePosted(ctx context.Context, groupID uuid.UUID) (<-chan *ent.Message, error) {
 	u, ok := auth.UserForContext(ctx)
 	if !ok {
@@ -467,15 +596,103 @@ func (r *subscriptionResolver) MessagePosted(ctx context.Context, groupID uuid.U
 	return r.s.RegisterGroupObserver(ctx, groupID, u.ID)
 }
 
+func (r *tuitionPaymentResolver) Student(ctx context.Context, obj *ent.TuitionPayment) (*ent.User, error) {
+	return obj.Student(ctx)
+}
+
+func (r *tuitionPaymentResolver) Stage(ctx context.Context, obj *ent.TuitionPayment) (*ent.Stage, error) {
+	return obj.Stage(ctx)
+}
+
+func (r *userResolver) Stage(ctx context.Context, obj *ent.User) (*ent.Stage, error) {
+	return obj.Stage(ctx)
+}
+
+func (r *userResolver) School(ctx context.Context, obj *ent.User) (*ent.School, error) {
+	return obj.School(ctx)
+}
+
+func (r *userResolver) Messages(ctx context.Context, obj *ent.User, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.MessageOrder, where *ent.MessageWhereInput) (*ent.MessageConnection, error) {
+	return obj.QueryMessages().Paginate(ctx, after, first, before, last, ent.WithMessageOrder(orderBy), ent.WithMessageFilter(where.Filter))
+}
+
+func (r *userResolver) Groups(ctx context.Context, obj *ent.User, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.GroupOrder, where *ent.GroupWhereInput) (*ent.GroupConnection, error) {
+	return obj.QueryGroups().Paginate(ctx, after, first, before, last, ent.WithGroupOrder(orderBy), ent.WithGroupFilter(where.Filter))
+}
+
+func (r *userResolver) Classes(ctx context.Context, obj *ent.User, stageID *uuid.UUID, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.ClassOrder, where *ent.ClassWhereInput) (*ent.ClassConnection, error) {
+	return obj.QueryClasses().Paginate(ctx, after, first, before, last, ent.WithClassOrder(orderBy), ent.WithClassFilter(where.Filter))
+}
+
+func (r *userResolver) AssignmentSubmissions(ctx context.Context, obj *ent.User, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.AssignmentSubmissionOrder, where *ent.AssignmentSubmissionWhereInput) (*ent.AssignmentSubmissionConnection, error) {
+	return obj.QuerySubmissions().Paginate(ctx, after, first, before, last, ent.WithAssignmentSubmissionOrder(orderBy), ent.WithAssignmentSubmissionFilter(where.Filter))
+}
+
+func (r *userResolver) CourseGrades(ctx context.Context, obj *ent.User) ([]*ent.CourseGrade, error) {
+	return obj.CourseGrades(ctx)
+}
+
+// Assignment returns generated.AssignmentResolver implementation.
+func (r *Resolver) Assignment() generated.AssignmentResolver { return &assignmentResolver{r} }
+
+// AssignmentSubmission returns generated.AssignmentSubmissionResolver implementation.
+func (r *Resolver) AssignmentSubmission() generated.AssignmentSubmissionResolver {
+	return &assignmentSubmissionResolver{r}
+}
+
+// Attendance returns generated.AttendanceResolver implementation.
+func (r *Resolver) Attendance() generated.AttendanceResolver { return &attendanceResolver{r} }
+
+// Class returns generated.ClassResolver implementation.
+func (r *Resolver) Class() generated.ClassResolver { return &classResolver{r} }
+
+// CourseGrade returns generated.CourseGradeResolver implementation.
+func (r *Resolver) CourseGrade() generated.CourseGradeResolver { return &courseGradeResolver{r} }
+
+// Group returns generated.GroupResolver implementation.
+func (r *Resolver) Group() generated.GroupResolver { return &groupResolver{r} }
+
+// Message returns generated.MessageResolver implementation.
+func (r *Resolver) Message() generated.MessageResolver { return &messageResolver{r} }
+
 // Mutation returns generated.MutationResolver implementation.
 func (r *Resolver) Mutation() generated.MutationResolver { return &mutationResolver{r} }
 
 // Query returns generated.QueryResolver implementation.
 func (r *Resolver) Query() generated.QueryResolver { return &queryResolver{r} }
 
+// Schedule returns generated.ScheduleResolver implementation.
+func (r *Resolver) Schedule() generated.ScheduleResolver { return &scheduleResolver{r} }
+
+// School returns generated.SchoolResolver implementation.
+func (r *Resolver) School() generated.SchoolResolver { return &schoolResolver{r} }
+
+// Stage returns generated.StageResolver implementation.
+func (r *Resolver) Stage() generated.StageResolver { return &stageResolver{r} }
+
 // Subscription returns generated.SubscriptionResolver implementation.
 func (r *Resolver) Subscription() generated.SubscriptionResolver { return &subscriptionResolver{r} }
 
+// TuitionPayment returns generated.TuitionPaymentResolver implementation.
+func (r *Resolver) TuitionPayment() generated.TuitionPaymentResolver {
+	return &tuitionPaymentResolver{r}
+}
+
+// User returns generated.UserResolver implementation.
+func (r *Resolver) User() generated.UserResolver { return &userResolver{r} }
+
+type assignmentResolver struct{ *Resolver }
+type assignmentSubmissionResolver struct{ *Resolver }
+type attendanceResolver struct{ *Resolver }
+type classResolver struct{ *Resolver }
+type courseGradeResolver struct{ *Resolver }
+type groupResolver struct{ *Resolver }
+type messageResolver struct{ *Resolver }
 type mutationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
+type scheduleResolver struct{ *Resolver }
+type schoolResolver struct{ *Resolver }
+type stageResolver struct{ *Resolver }
 type subscriptionResolver struct{ *Resolver }
+type tuitionPaymentResolver struct{ *Resolver }
+type userResolver struct{ *Resolver }

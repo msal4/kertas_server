@@ -1,3 +1,6 @@
+directive @goField(forceResolver: Boolean, name: String) on INPUT_FIELD_DEFINITION
+    | FIELD_DEFINITION
+
 scalar Cursor
 scalar Time
 scalar Upload
@@ -57,6 +60,9 @@ type School implements Node {
   image: String
   createdAt: Time!
   updatedAt: Time!
+
+  users(after: Cursor, first: Int, before: Cursor, last: Int, orderBy: UserOrder, where: UserWhereInput): UserConnection @goField(forceResolver: true)
+  stages(after: Cursor, first: Int, before: Cursor, last: Int, orderBy: StageOrder, where: StageWhereInput): StageConnection @goField(forceResolver: true)
 }
 
 type SchoolEdge {
@@ -104,10 +110,18 @@ type User implements Node {
   image: String!
   role: Role!
   active: Boolean!
-  school: School
-  stage: Stage
   createdAt: Time!
   updatedAt: Time!
+
+  stage: Stage! @goField(forceResolver: true)
+  school: School! @goField(forceResolver: true)
+
+
+  messages(after: Cursor, first: Int, before: Cursor, last: Int, orderBy: MessageOrder, where: MessageWhereInput): MessageConnection @goField(forceResolver: true)
+  groups(after: Cursor, first: Int, before: Cursor, last: Int, orderBy: GroupOrder, where: GroupWhereInput): GroupConnection @goField(forceResolver: true)
+  classes(stageID: ID, after: Cursor, first: Int, before: Cursor, last: Int, orderBy: ClassOrder, where: ClassWhereInput): ClassConnection @goField(forceResolver: true)
+  assignmentSubmissions(after: Cursor, first: Int, before: Cursor, last: Int, orderBy: AssignmentSubmissionOrder, where: AssignmentSubmissionWhereInput): AssignmentSubmissionConnection @goField(forceResolver: true)
+  courseGrades: [CourseGrade!]! @goField(forceResolver: true)
 }
 
 type UserEdge {
@@ -148,9 +162,15 @@ type Stage implements Node {
   name: String!
   tuitionAmount: Int!
   active: Boolean!
-  school: School!
   createdAt: Time!
   updatedAt: Time!
+
+  school: School! @goField(forceResolver: true)
+
+  classes(after: Cursor, first: Int, before: Cursor, last: Int, orderBy: ClassOrder, where: ClassWhereInput): ClassConnection @goField(forceResolver: true)
+  payments(after: Cursor, first: Int, before: Cursor, last: Int, orderBy: TuitionPaymentOrder, where: TuitionPaymentWhereInput): TuitionPaymentConnection @goField(forceResolver: true)
+  students(after: Cursor, first: Int, before: Cursor, last: Int, orderBy: UserOrder, where: UserWhereInput): UserConnection @goField(forceResolver: true)
+  courseGrades: [CourseGrade!] @goField(forceResolver: true)
 }
 
 enum StageOrderField {
@@ -198,13 +218,18 @@ type AuthData {
   refreshToken: String!
 }
 
-type Group {
+type Group implements Node {
   id: ID!
   name: String!
   groupType: GroupType!
   active: Boolean!
   createdAt: Time!
   updatedAt: Time!
+
+  class: Class! @goField(forceResolver: true)
+  users: [User!] @goField(forceResolver: true)
+
+  messages(after: Cursor, first: Int, before: Cursor, last: Int, orderBy: MessageOrder, where: MessageWhereInput): MessageConnection @goField(forceResolver: true)
 }
 
 enum GroupOrderField {
@@ -241,12 +266,21 @@ input UpdateGroupInput {
   active: Boolean
 }
 
-type Class {
+type Class implements Node {
   id: ID!
   name: String!
   active: Boolean!
   createdAt: Time!
   updatedAt: Time!
+
+  stage: Stage! @goField(forceResolver: true)
+  teacher: User! @goField(forceResolver: true)
+  group: Group! @goField(forceResolver: true)
+
+  assignments(after: Cursor, first: Int, before: Cursor, last: Int, orderBy: AssignmentOrder, where: AssignmentWhereInput): AssignmentConnection @goField(forceResolver: true)
+  attendances(after: Cursor, first: Int, before: Cursor, last: Int, orderBy: AttendanceOrder, where: AttendanceWhereInput): AttendanceConnection @goField(forceResolver: true)
+  schedules(after: Cursor, first: Int, before: Cursor, last: Int, orderBy: ScheduleOrder, where: ScheduleWhereInput): ScheduleConnection @goField(forceResolver: true)
+  courseGrades(after: Cursor, first: Int, before: Cursor, last: Int, orderBy: CourseGradeOrder, where: CourseGradeWhereInput): CourseGradeConnection @goField(forceResolver: true)
 }
 
 enum ClassOrderField {
@@ -285,12 +319,15 @@ input UpdateClassInput {
   teacherID: ID
 }
 
-type Message {
+type Message implements Node {
   id: ID!
   content: String!
   attachment: String!
   createdAt: Time!
   updatedAt: Time!
+
+  group: Group! @goField(forceResolver: true)
+  owner: User! @goField(forceResolver: true)
 }
 
 enum MessageOrderField {
@@ -320,7 +357,7 @@ input PostMessageInput {
   attachment: Upload
 }
 
-type Assignment {
+type Assignment implements Node {
   id: ID!
   name: String!
   description: String
@@ -330,6 +367,10 @@ type Assignment {
   file: String
   createdAt: Time!
   updatedAt: Time!
+
+  class: Class! @goField(forceResolver: true)
+
+  submissions(after: Cursor, first: Int, before: Cursor, last: Int, orderBy: AssignmentSubmissionOrder, where: AssignmentSubmissionWhereInput): AssignmentSubmissionConnection @goField(forceResolver: true)
 }
 
 enum AssignmentOrderField {
@@ -375,11 +416,37 @@ input UpdateAssignmentInput {
   duration: Duration
 }
 
-type Schedule {
+type Schedule implements Node {
   id: ID!
   weekday: Weekday!
   duration: Duration!
   startsAt: Time!
+
+  class: Class! @goField(forceResolver: true)
+}
+
+enum ScheduleOrderField {
+  WEEKDAY
+  STARTS_AT
+  DURATION
+  CREATED_AT
+  UPDATED_AT
+}
+
+input ScheduleOrder {
+  field: ScheduleOrderField
+  direction: OrderDirection!
+}
+
+type ScheduleEdge {
+  node: Schedule
+  cursor: Cursor!
+}
+
+type ScheduleConnection {
+  totalCount: Int!
+  pageInfo: PageInfo!
+  edges: [ScheduleEdge]
 }
 
 input AddScheduleInput {
@@ -395,7 +462,7 @@ input UpdateScheduleInput {
   startsAt: Time
 }
 
-type CourseGrade {
+type CourseGrade implements Node {
   id: ID!
   activityFirst: Int!
   activitySecond: Int!
@@ -404,6 +471,10 @@ type CourseGrade {
   courseFinal: Int!
   createdAt: Time!
   updatedAt: Time!
+
+  student: User! @goField(forceResolver: true)
+  class: Class! @goField(forceResolver: true)
+  stage: Stage! @goField(forceResolver: true)
 }
 
 enum CourseGradeOrderField {
@@ -451,12 +522,15 @@ input UpdateCourseGradeInput {
   courseFinal: Int
 }
 
-type AssignmentSubmission {
+type AssignmentSubmission implements Node {
   id: ID!
   files: [String!]!
   submittedAt: Time
   createdAt: Time!
   updatedAt: Time!
+
+  student: User! @goField(forceResolver: true)
+  assignment: Assignment! @goField(forceResolver: true)
 }
 
 enum AssignmentSubmissionOrderField {
@@ -492,79 +566,152 @@ input UpdateAssignmentSubmissionInput {
   submittedAt: Time
 }
 
+enum AttendanceState {
+  PRESENT
+  ABSENT
+  EXCUSED_ABSENT
+  SICK
+}
+
+type Attendance implements Node {
+  id: ID!
+  date: Time!
+  state: AttendanceState!
+  createdAt: Time!
+  updatedAt: Time!
+
+  class: Class! @goField(forceResolver: true)
+  student: User! @goField(forceResolver: true)
+}
+
+enum AttendanceOrderField {
+  DATE
+  CREATED_AT
+  UPDATED_AT
+}
+
+input AttendanceOrder {
+  field: AttendanceOrderField
+  direction: OrderDirection!
+}
+
+type AttendanceEdge {
+  node: Attendance
+  cursor: Cursor!
+}
+
+type AttendanceConnection {
+  totalCount: Int!
+  pageInfo: PageInfo!
+  edges: [AttendanceEdge]
+}
+
+type TuitionPayment implements Node {
+  id: ID!
+  paidAmount: Int!
+  createdAt: Time!
+  updatedAt: Time!
+
+  student: User! @goField(forceResolver: true)
+  stage: Stage! @goField(forceResolver: true)
+}
+
+enum TuitionPaymentOrderField {
+  PAID_AMOUNT
+  CREATED_AT
+  UPDATED_AT
+}
+
+input TuitionPaymentOrder {
+  field: TuitionPaymentOrderField
+  direction: OrderDirection!
+}
+
+type TuitionPaymentEdge {
+  node: TuitionPayment
+  cursor: Cursor!
+}
+
+type TuitionPaymentConnection {
+  totalCount: Int!
+  pageInfo: PageInfo!
+  edges: [TuitionPaymentEdge]
+}
 
 type Query {
-  school(id: ID!): School
-  schools(after: Cursor, first: Int, before: Cursor, last: Int, orderBy: SchoolOrder, where: SchoolWhereInput): SchoolConnection
+  me: User!
 
-  user(id: ID!): User
-  users(after: Cursor, first: Int, before: Cursor, last: Int, orderBy: UserOrder, where: UserWhereInput): UserConnection
+  school(id: ID!): School!
+  schools(after: Cursor, first: Int, before: Cursor, last: Int, orderBy: SchoolOrder, where: SchoolWhereInput): SchoolConnection!
 
-  stage(id: ID!): Stage
-  stages(after: Cursor, first: Int, before: Cursor, last: Int, orderBy: StageOrder, where: StageWhereInput): StageConnection
+  user(id: ID!): User!
+  users(after: Cursor, first: Int, before: Cursor, last: Int, orderBy: UserOrder, where: UserWhereInput): UserConnection!
 
-  messages(groupID: ID!, after: Cursor, first: Int, before: Cursor, last: Int, orderBy: MessageOrder, where: MessageWhereInput): MessageConnection
+  stage(id: ID!): Stage!
+  stages(after: Cursor, first: Int, before: Cursor, last: Int, orderBy: StageOrder, where: StageWhereInput): StageConnection!
 
-  group(id: ID!): Group
-  groups(userID: ID, after: Cursor, first: Int, before: Cursor, last: Int, orderBy: GroupOrder, where: GroupWhereInput): GroupConnection
+  messages(groupID: ID!, after: Cursor, first: Int, before: Cursor, last: Int, orderBy: MessageOrder, where: MessageWhereInput): MessageConnection!
 
-  class(id: ID!): Class
-  classes(userID: ID, stageID: ID, schoolID: ID, after: Cursor, first: Int, before: Cursor, last: Int, orderBy: ClassOrder, where: ClassWhereInput): ClassConnection
+  group(id: ID!): Group!
+  groups(userID: ID, after: Cursor, first: Int, before: Cursor, last: Int, orderBy: GroupOrder, where: GroupWhereInput): GroupConnection!
 
-  assignment(id: ID!): Assignment
-  assignments(userID: ID, stageID: ID, schoolID: ID, after: Cursor, first: Int, before: Cursor, last: Int, orderBy: AssignmentOrder, where: AssignmentWhereInput): AssignmentConnection
-  assignmentSubmissions(assignmentID: ID, after: Cursor, first: Int, before: Cursor, last: Int, orderBy: AssignmentSubmissionOrder, where: AssignmentSubmissionWhereInput): AssignmentSubmissionConnection
+  class(id: ID!): Class!
+  classes(userID: ID, stageID: ID, schoolID: ID, after: Cursor, first: Int, before: Cursor, last: Int, orderBy: ClassOrder, where: ClassWhereInput): ClassConnection!
 
-  schedule(stageID: ID, weekday: Weekday): [Schedule]
+  assignment(id: ID!): Assignment!
+  assignments(userID: ID, stageID: ID, schoolID: ID, after: Cursor, first: Int, before: Cursor, last: Int, orderBy: AssignmentOrder, where: AssignmentWhereInput): AssignmentConnection!
+  assignmentSubmissions(assignmentID: ID, after: Cursor, first: Int, before: Cursor, last: Int, orderBy: AssignmentSubmissionOrder, where: AssignmentSubmissionWhereInput): AssignmentSubmissionConnection!
 
-  courseGrades(studentID: ID, stageID: ID, classID: ID, after: Cursor, first: Int, before: Cursor, last: Int, orderBy: CourseGradeOrder, where: CourseGradeWhereInput): CourseGradeConnection
+  schedule(stageID: ID, weekday: Weekday): [Schedule!]!
+
+  courseGrades(studentID: ID, stageID: ID, classID: ID, after: Cursor, first: Int, before: Cursor, last: Int, orderBy: CourseGradeOrder, where: CourseGradeWhereInput): CourseGradeConnection!
 }
 
 type Mutation {
-  addSchool(input: AddSchoolInput!): School
-  updateSchool(id: ID!, input: UpdateSchoolInput!): School
+  addSchool(input: AddSchoolInput!): School!
+  updateSchool(id: ID!, input: UpdateSchoolInput!): School!
   deleteSchool(id: ID!): Boolean!
   deleteSchoolPermanently(id: ID!): Boolean!
 
-  addUser(input: AddUserInput!): User
-  updateUser(id: ID!, input: UpdateUserInput!): User
+  addUser(input: AddUserInput!): User!
+  updateUser(id: ID!, input: UpdateUserInput!): User!
   deleteUser(id: ID!): Boolean!
   deleteUserPermanently(id: ID!): Boolean!
 
-  addStage(input: AddStageInput!): Stage
-  updateStage(id: ID!, input: UpdateStageInput!): Stage
+  addStage(input: AddStageInput!): Stage!
+  updateStage(id: ID!, input: UpdateStageInput!): Stage!
   deleteStage(id: ID!): Boolean!
   deleteStagePermanently(id: ID!): Boolean!
 
-  loginAdmin(input: LoginInput!): AuthData
-  loginUser(input: LoginInput!): AuthData
-  refreshTokens(token: String!): AuthData
+  loginAdmin(input: LoginInput!): AuthData!
+  loginUser(input: LoginInput!): AuthData!
+  refreshTokens(token: String!): AuthData!
 
-  postMessage(input: PostMessageInput!): Message
+  postMessage(input: PostMessageInput!): Message!
 
-  addGroup(input: AddGroupInput!): Group
-  updateGroup(id: ID!, input: UpdateGroupInput!): Group
+  addGroup(input: AddGroupInput!): Group!
+  updateGroup(id: ID!, input: UpdateGroupInput!): Group!
   deleteGroup(id: ID!): Boolean!
 
-  addClass(input: AddClassInput!): Class
-  updateClass(id: ID!, input: UpdateClassInput!): Class
+  addClass(input: AddClassInput!): Class!
+  updateClass(id: ID!, input: UpdateClassInput!): Class!
   deleteClass(id: ID!): Boolean!
 
-  addAssignment(input: AddAssignmentInput!): Assignment
-  updateAssignment(id: ID!, input: UpdateAssignmentInput!): Assignment
+  addAssignment(input: AddAssignmentInput!): Assignment!
+  updateAssignment(id: ID!, input: UpdateAssignmentInput!): Assignment!
   deleteAssignment(id: ID!): Boolean!
 
-  addAssignmentSubmission(input: AddAssignmentSubmissionInput!): AssignmentSubmission
-  updateAssignmentSubmission(id: ID!, input: UpdateAssignmentSubmissionInput!): AssignmentSubmission
-  deleteAssignmentSubmissionFile(id: ID!, index: Int!): AssignmentSubmission
+  addAssignmentSubmission(input: AddAssignmentSubmissionInput!): AssignmentSubmission!
+  updateAssignmentSubmission(id: ID!, input: UpdateAssignmentSubmissionInput!): AssignmentSubmission!
+  deleteAssignmentSubmissionFile(id: ID!, index: Int!): AssignmentSubmission!
   deleteAssignmentSubmission(id: ID!): Boolean!
 
-  addSchedule(input: AddScheduleInput!): Schedule
-  updateSchedule(id: ID!, input: UpdateScheduleInput!): Schedule
+  addSchedule(input: AddScheduleInput!): Schedule!
+  updateSchedule(id: ID!, input: UpdateScheduleInput!): Schedule!
   deleteSchedule(id: ID!): Boolean!
 
-  addCourseGrade(input: AddCourseGradeInput!): CourseGrade
-  updateCourseGrade(id: ID!, input: UpdateCourseGradeInput!): CourseGrade
+  addCourseGrade(input: AddCourseGradeInput!): CourseGrade!
+  updateCourseGrade(id: ID!, input: UpdateCourseGradeInput!): CourseGrade!
   deleteCourseGrade(id: ID!): Boolean!
 }
 

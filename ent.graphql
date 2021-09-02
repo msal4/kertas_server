@@ -177,10 +177,10 @@ input AttendanceWhereInput {
   dateLTE: Time
   
   """state field predicates"""
-  state: State
-  stateNEQ: State
-  stateIn: [State!]
-  stateNotIn: [State!]
+  state: AttendanceState
+  stateNEQ: AttendanceState
+  stateIn: [AttendanceState!]
+  stateNotIn: [AttendanceState!]
   
   """id field predicates"""
   id: ID

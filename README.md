@@ -9,5 +9,5 @@
 - [x] Setup authorization
 - [ ] Stages and the file/document system
 - [x] Implement chat
-- [ ] Implement resolvers for edges
+- [x] Implement resolvers for edges
 - [ ] Use dataloaders

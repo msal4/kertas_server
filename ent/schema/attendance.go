@@ -20,7 +20,12 @@ func (Attendance) Fields() []ent.Field {
 	return []ent.Field{
 		field.UUID("id", uuid.UUID{}).Default(uuid.New),
 		field.Time("date").SchemaType(map[string]string{dialect.Postgres: "date"}).Annotations(entgql.OrderField("DATE")),
-		field.Enum("state").Values("PRESENT", "ABSENT", "EXCUSED_ABSENCE", "SICK").Default("PRESENT").Annotations(entgql.OrderField("STATE")),
+		field.Enum("state").NamedValues(
+			"Present", "PRESENT",
+			"Absent", "ABSENT",
+			"ExcusedAbsence", "EXCUSED_ABSENCE",
+			"Sick", "SICK",
+		).Default("PRESENT").Annotations(entgql.OrderField("STATE")),
 	}
 }
 

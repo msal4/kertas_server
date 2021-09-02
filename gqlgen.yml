@@ -32,7 +32,7 @@ models:
   Node:
     model:
       - github.com/msal4/hassah_school_server/ent.Noder
-  State:
+  AttendanceState:
     model:
       - github.com/msal4/hassah_school_server/ent/attendance.State
   Role:

@@ -117,7 +117,7 @@ func TestSchools(t *testing.T) {
 		err = json.NewDecoder(w.Body).Decode(&resp)
 		require.NoError(t, err)
 
-		require.Nil(t, resp.Data.Schools)
+		require.Nil(t, resp.Data)
 		require.NotEmpty(t, resp.Errors)
 		require.Equal(t, auth.UnauthorizedErr.Error(), resp.Errors[0].Message)
 	})
