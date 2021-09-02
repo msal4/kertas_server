@@ -19,6 +19,7 @@ import (
 	"github.com/msal4/hassah_school_server/server"
 	"github.com/msal4/hassah_school_server/server/model"
 	"github.com/msal4/hassah_school_server/service"
+	"github.com/msal4/hassah_school_server/util/ptr"
 	"gopkg.in/yaml.v2"
 )
 
@@ -222,6 +223,27 @@ func seed(ctx context.Context, s *service.Service) error {
 		return err
 	}
 	log.Printf("Created student: %v\n\n", stdt)
+
+	f.Seek(0, 0)
+
+	ass, err := s.AddAssignment(ctx, model.AddAssignmentInput{
+		ClassID:     cls3.ID,
+		Name:        "new assign",
+		Description: ptr.Str("descsdfksdkfj s"),
+		File:        &graphql.Upload{File: f, Filename: f.Name(), Size: stat.Size(), ContentType: "image/jpeg"},
+		DueDate:     time.Now().Add(time.Hour * 100),
+	})
+	if err != nil {
+		return err
+	}
+	log.Printf("Created assignment: %v\n\n", ass)
+
+	f.Seek(0, 0)
+	sub, err := s.AddAssignmentSubmission(ctx, stdt.ID, model.AddAssignmentSubmissionInput{
+		AssignmentID: ass.ID,
+		Files:        []*graphql.Upload{{File: f, Filename: f.Name(), Size: stat.Size(), ContentType: "image/jpeg"}},
+	})
+	log.Printf("Created submission: %v\n\n", sub)
 
 	return nil
 }

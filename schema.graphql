@@ -451,6 +451,48 @@ input UpdateCourseGradeInput {
   courseFinal: Int
 }
 
+type AssignmentSubmission {
+  id: ID!
+  files: [String!]!
+  submittedAt: Time
+  createdAt: Time!
+  updatedAt: Time!
+}
+
+enum AssignmentSubmissionOrderField {
+  SUBMITTED_AT
+  CREATED_AT
+  UPDATED_AT
+}
+
+input AssignmentSubmissionOrder {
+  field: AssignmentSubmissionOrderField
+  direction: OrderDirection!
+}
+
+type AssignmentSubmissionEdge {
+  node: AssignmentSubmission
+  cursor: Cursor!
+}
+
+type AssignmentSubmissionConnection {
+  totalCount: Int!
+  pageInfo: PageInfo!
+  edges: [AssignmentSubmissionEdge]
+}
+
+input AddAssignmentSubmissionInput {
+  assignmentID: ID!
+  files: [Upload!]!
+  submittedAt: Time
+}
+
+input UpdateAssignmentSubmissionInput {
+  files: [Upload!]!
+  submittedAt: Time
+}
+
+
 type Query {
   school(id: ID!): School
   schools(after: Cursor, first: Int, before: Cursor, last: Int, orderBy: SchoolOrder, where: SchoolWhereInput): SchoolConnection
@@ -471,6 +513,7 @@ type Query {
 
   assignment(id: ID!): Assignment
   assignments(userID: ID, stageID: ID, schoolID: ID, after: Cursor, first: Int, before: Cursor, last: Int, orderBy: AssignmentOrder, where: AssignmentWhereInput): AssignmentConnection
+  assignmentSubmissions(assignmentID: ID, after: Cursor, first: Int, before: Cursor, last: Int, orderBy: AssignmentSubmissionOrder, where: AssignmentSubmissionWhereInput): AssignmentSubmissionConnection
 
   schedule(stageID: ID, weekday: Weekday): [Schedule]
 
@@ -510,6 +553,11 @@ type Mutation {
   addAssignment(input: AddAssignmentInput!): Assignment
   updateAssignment(id: ID!, input: UpdateAssignmentInput!): Assignment
   deleteAssignment(id: ID!): Boolean!
+
+  addAssignmentSubmission(input: AddAssignmentSubmissionInput!): AssignmentSubmission
+  updateAssignmentSubmission(id: ID!, input: UpdateAssignmentSubmissionInput!): AssignmentSubmission
+  deleteAssignmentSubmissionFile(id: ID!, index: Int!): AssignmentSubmission
+  deleteAssignmentSubmission(id: ID!): Boolean!
 
   addSchedule(input: AddScheduleInput!): Schedule
   updateSchedule(id: ID!, input: UpdateScheduleInput!): Schedule

@@ -78,6 +78,25 @@ type ComplexityRoot struct {
 		Node   func(childComplexity int) int
 	}
 
+	AssignmentSubmission struct {
+		CreatedAt   func(childComplexity int) int
+		Files       func(childComplexity int) int
+		ID          func(childComplexity int) int
+		SubmittedAt func(childComplexity int) int
+		UpdatedAt   func(childComplexity int) int
+	}
+
+	AssignmentSubmissionConnection struct {
+		Edges      func(childComplexity int) int
+		PageInfo   func(childComplexity int) int
+		TotalCount func(childComplexity int) int
+	}
+
+	AssignmentSubmissionEdge struct {
+		Cursor func(childComplexity int) int
+		Node   func(childComplexity int) int
+	}
+
 	AuthData struct {
 		AccessToken  func(childComplexity int) int
 		RefreshToken func(childComplexity int) int
@@ -164,37 +183,41 @@ type ComplexityRoot struct {
 	}
 
 	Mutation struct {
-		AddAssignment           func(childComplexity int, input model.AddAssignmentInput) int
-		AddClass                func(childComplexity int, input model.AddClassInput) int
-		AddCourseGrade          func(childComplexity int, input model.AddCourseGradeInput) int
-		AddGroup                func(childComplexity int, input model.AddGroupInput) int
-		AddSchedule             func(childComplexity int, input model.AddScheduleInput) int
-		AddSchool               func(childComplexity int, input model.AddSchoolInput) int
-		AddStage                func(childComplexity int, input model.AddStageInput) int
-		AddUser                 func(childComplexity int, input model.AddUserInput) int
-		DeleteAssignment        func(childComplexity int, id uuid.UUID) int
-		DeleteClass             func(childComplexity int, id uuid.UUID) int
-		DeleteCourseGrade       func(childComplexity int, id uuid.UUID) int
-		DeleteGroup             func(childComplexity int, id uuid.UUID) int
-		DeleteSchedule          func(childComplexity int, id uuid.UUID) int
-		DeleteSchool            func(childComplexity int, id uuid.UUID) int
-		DeleteSchoolPermanently func(childComplexity int, id uuid.UUID) int
-		DeleteStage             func(childComplexity int, id uuid.UUID) int
-		DeleteStagePermanently  func(childComplexity int, id uuid.UUID) int
-		DeleteUser              func(childComplexity int, id uuid.UUID) int
-		DeleteUserPermanently   func(childComplexity int, id uuid.UUID) int
-		LoginAdmin              func(childComplexity int, input model.LoginInput) int
-		LoginUser               func(childComplexity int, input model.LoginInput) int
-		PostMessage             func(childComplexity int, input model.PostMessageInput) int
-		RefreshTokens           func(childComplexity int, token string) int
-		UpdateAssignment        func(childComplexity int, id uuid.UUID, input model.UpdateAssignmentInput) int
-		UpdateClass             func(childComplexity int, id uuid.UUID, input model.UpdateClassInput) int
-		UpdateCourseGrade       func(childComplexity int, id uuid.UUID, input model.UpdateCourseGradeInput) int
-		UpdateGroup             func(childComplexity int, id uuid.UUID, input model.UpdateGroupInput) int
-		UpdateSchedule          func(childComplexity int, id uuid.UUID, input model.UpdateScheduleInput) int
-		UpdateSchool            func(childComplexity int, id uuid.UUID, input model.UpdateSchoolInput) int
-		UpdateStage             func(childComplexity int, id uuid.UUID, input model.UpdateStageInput) int
-		UpdateUser              func(childComplexity int, id uuid.UUID, input model.UpdateUserInput) int
+		AddAssignment                  func(childComplexity int, input model.AddAssignmentInput) int
+		AddAssignmentSubmission        func(childComplexity int, input model.AddAssignmentSubmissionInput) int
+		AddClass                       func(childComplexity int, input model.AddClassInput) int
+		AddCourseGrade                 func(childComplexity int, input model.AddCourseGradeInput) int
+		AddGroup                       func(childComplexity int, input model.AddGroupInput) int
+		AddSchedule                    func(childComplexity int, input model.AddScheduleInput) int
+		AddSchool                      func(childComplexity int, input model.AddSchoolInput) int
+		AddStage                       func(childComplexity int, input model.AddStageInput) int
+		AddUser                        func(childComplexity int, input model.AddUserInput) int
+		DeleteAssignment               func(childComplexity int, id uuid.UUID) int
+		DeleteAssignmentSubmission     func(childComplexity int, id uuid.UUID) int
+		DeleteAssignmentSubmissionFile func(childComplexity int, id uuid.UUID, index int) int
+		DeleteClass                    func(childComplexity int, id uuid.UUID) int
+		DeleteCourseGrade              func(childComplexity int, id uuid.UUID) int
+		DeleteGroup                    func(childComplexity int, id uuid.UUID) int
+		DeleteSchedule                 func(childComplexity int, id uuid.UUID) int
+		DeleteSchool                   func(childComplexity int, id uuid.UUID) int
+		DeleteSchoolPermanently        func(childComplexity int, id uuid.UUID) int
+		DeleteStage                    func(childComplexity int, id uuid.UUID) int
+		DeleteStagePermanently         func(childComplexity int, id uuid.UUID) int
+		DeleteUser                     func(childComplexity int, id uuid.UUID) int
+		DeleteUserPermanently          func(childComplexity int, id uuid.UUID) int
+		LoginAdmin                     func(childComplexity int, input model.LoginInput) int
+		LoginUser                      func(childComplexity int, input model.LoginInput) int
+		PostMessage                    func(childComplexity int, input model.PostMessageInput) int
+		RefreshTokens                  func(childComplexity int, token string) int
+		UpdateAssignment               func(childComplexity int, id uuid.UUID, input model.UpdateAssignmentInput) int
+		UpdateAssignmentSubmission     func(childComplexity int, id uuid.UUID, input model.UpdateAssignmentSubmissionInput) int
+		UpdateClass                    func(childComplexity int, id uuid.UUID, input model.UpdateClassInput) int
+		UpdateCourseGrade              func(childComplexity int, id uuid.UUID, input model.UpdateCourseGradeInput) int
+		UpdateGroup                    func(childComplexity int, id uuid.UUID, input model.UpdateGroupInput) int
+		UpdateSchedule                 func(childComplexity int, id uuid.UUID, input model.UpdateScheduleInput) int
+		UpdateSchool                   func(childComplexity int, id uuid.UUID, input model.UpdateSchoolInput) int
+		UpdateStage                    func(childComplexity int, id uuid.UUID, input model.UpdateStageInput) int
+		UpdateUser                     func(childComplexity int, id uuid.UUID, input model.UpdateUserInput) int
 	}
 
 	PageInfo struct {
@@ -205,21 +228,22 @@ type ComplexityRoot struct {
 	}
 
 	Query struct {
-		Assignment   func(childComplexity int, id uuid.UUID) int
-		Assignments  func(childComplexity int, userID *uuid.UUID, stageID *uuid.UUID, schoolID *uuid.UUID, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.AssignmentOrder, where *ent.AssignmentWhereInput) int
-		Class        func(childComplexity int, id uuid.UUID) int
-		Classes      func(childComplexity int, userID *uuid.UUID, stageID *uuid.UUID, schoolID *uuid.UUID, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.ClassOrder, where *ent.ClassWhereInput) int
-		CourseGrades func(childComplexity int, studentID *uuid.UUID, stageID *uuid.UUID, classID *uuid.UUID, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.CourseGradeOrder, where *ent.CourseGradeWhereInput) int
-		Group        func(childComplexity int, id uuid.UUID) int
-		Groups       func(childComplexity int, userID *uuid.UUID, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.GroupOrder, where *ent.GroupWhereInput) int
-		Messages     func(childComplexity int, groupID uuid.UUID, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.MessageOrder, where *ent.MessageWhereInput) int
-		Schedule     func(childComplexity int, stageID *uuid.UUID, weekday *time.Weekday) int
-		School       func(childComplexity int, id uuid.UUID) int
-		Schools      func(childComplexity int, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.SchoolOrder, where *ent.SchoolWhereInput) int
-		Stage        func(childComplexity int, id uuid.UUID) int
-		Stages       func(childComplexity int, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.StageOrder, where *ent.StageWhereInput) int
-		User         func(childComplexity int, id uuid.UUID) int
-		Users        func(childComplexity int, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.UserOrder, where *ent.UserWhereInput) int
+		Assignment            func(childComplexity int, id uuid.UUID) int
+		AssignmentSubmissions func(childComplexity int, assignmentID *uuid.UUID, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.AssignmentSubmissionOrder, where *ent.AssignmentSubmissionWhereInput) int
+		Assignments           func(childComplexity int, userID *uuid.UUID, stageID *uuid.UUID, schoolID *uuid.UUID, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.AssignmentOrder, where *ent.AssignmentWhereInput) int
+		Class                 func(childComplexity int, id uuid.UUID) int
+		Classes               func(childComplexity int, userID *uuid.UUID, stageID *uuid.UUID, schoolID *uuid.UUID, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.ClassOrder, where *ent.ClassWhereInput) int
+		CourseGrades          func(childComplexity int, studentID *uuid.UUID, stageID *uuid.UUID, classID *uuid.UUID, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.CourseGradeOrder, where *ent.CourseGradeWhereInput) int
+		Group                 func(childComplexity int, id uuid.UUID) int
+		Groups                func(childComplexity int, userID *uuid.UUID, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.GroupOrder, where *ent.GroupWhereInput) int
+		Messages              func(childComplexity int, groupID uuid.UUID, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.MessageOrder, where *ent.MessageWhereInput) int
+		Schedule              func(childComplexity int, stageID *uuid.UUID, weekday *time.Weekday) int
+		School                func(childComplexity int, id uuid.UUID) int
+		Schools               func(childComplexity int, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.SchoolOrder, where *ent.SchoolWhereInput) int
+		Stage                 func(childComplexity int, id uuid.UUID) int
+		Stages                func(childComplexity int, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.StageOrder, where *ent.StageWhereInput) int
+		User                  func(childComplexity int, id uuid.UUID) int
+		Users                 func(childComplexity int, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.UserOrder, where *ent.UserWhereInput) int
 	}
 
 	Schedule struct {
@@ -326,6 +350,10 @@ type MutationResolver interface {
 	AddAssignment(ctx context.Context, input model.AddAssignmentInput) (*ent.Assignment, error)
 	UpdateAssignment(ctx context.Context, id uuid.UUID, input model.UpdateAssignmentInput) (*ent.Assignment, error)
 	DeleteAssignment(ctx context.Context, id uuid.UUID) (bool, error)
+	AddAssignmentSubmission(ctx context.Context, input model.AddAssignmentSubmissionInput) (*ent.AssignmentSubmission, error)
+	UpdateAssignmentSubmission(ctx context.Context, id uuid.UUID, input model.UpdateAssignmentSubmissionInput) (*ent.AssignmentSubmission, error)
+	DeleteAssignmentSubmissionFile(ctx context.Context, id uuid.UUID, index int) (*ent.AssignmentSubmission, error)
+	DeleteAssignmentSubmission(ctx context.Context, id uuid.UUID) (bool, error)
 	AddSchedule(ctx context.Context, input model.AddScheduleInput) (*ent.Schedule, error)
 	UpdateSchedule(ctx context.Context, id uuid.UUID, input model.UpdateScheduleInput) (*ent.Schedule, error)
 	DeleteSchedule(ctx context.Context, id uuid.UUID) (bool, error)
@@ -347,6 +375,7 @@ type QueryResolver interface {
 	Classes(ctx context.Context, userID *uuid.UUID, stageID *uuid.UUID, schoolID *uuid.UUID, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.ClassOrder, where *ent.ClassWhereInput) (*ent.ClassConnection, error)
 	Assignment(ctx context.Context, id uuid.UUID) (*ent.Assignment, error)
 	Assignments(ctx context.Context, userID *uuid.UUID, stageID *uuid.UUID, schoolID *uuid.UUID, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.AssignmentOrder, where *ent.AssignmentWhereInput) (*ent.AssignmentConnection, error)
+	AssignmentSubmissions(ctx context.Context, assignmentID *uuid.UUID, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.AssignmentSubmissionOrder, where *ent.AssignmentSubmissionWhereInput) (*ent.AssignmentSubmissionConnection, error)
 	Schedule(ctx context.Context, stageID *uuid.UUID, weekday *time.Weekday) ([]*ent.Schedule, error)
 	CourseGrades(ctx context.Context, studentID *uuid.UUID, stageID *uuid.UUID, classID *uuid.UUID, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.CourseGradeOrder, where *ent.CourseGradeWhereInput) (*ent.CourseGradeConnection, error)
 }
@@ -466,6 +495,76 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.AssignmentEdge.Node(childComplexity), true
+
+	case "AssignmentSubmission.createdAt":
+		if e.complexity.AssignmentSubmission.CreatedAt == nil {
+			break
+		}
+
+		return e.complexity.AssignmentSubmission.CreatedAt(childComplexity), true
+
+	case "AssignmentSubmission.files":
+		if e.complexity.AssignmentSubmission.Files == nil {
+			break
+		}
+
+		return e.complexity.AssignmentSubmission.Files(childComplexity), true
+
+	case "AssignmentSubmission.id":
+		if e.complexity.AssignmentSubmission.ID == nil {
+			break
+		}
+
+		return e.complexity.AssignmentSubmission.ID(childComplexity), true
+
+	case "AssignmentSubmission.submittedAt":
+		if e.complexity.AssignmentSubmission.SubmittedAt == nil {
+			break
+		}
+
+		return e.complexity.AssignmentSubmission.SubmittedAt(childComplexity), true
+
+	case "AssignmentSubmission.updatedAt":
+		if e.complexity.AssignmentSubmission.UpdatedAt == nil {
+			break
+		}
+
+		return e.complexity.AssignmentSubmission.UpdatedAt(childComplexity), true
+
+	case "AssignmentSubmissionConnection.edges":
+		if e.complexity.AssignmentSubmissionConnection.Edges == nil {
+			break
+		}
+
+		return e.complexity.AssignmentSubmissionConnection.Edges(childComplexity), true
+
+	case "AssignmentSubmissionConnection.pageInfo":
+		if e.complexity.AssignmentSubmissionConnection.PageInfo == nil {
+			break
+		}
+
+		return e.complexity.AssignmentSubmissionConnection.PageInfo(childComplexity), true
+
+	case "AssignmentSubmissionConnection.totalCount":
+		if e.complexity.AssignmentSubmissionConnection.TotalCount == nil {
+			break
+		}
+
+		return e.complexity.AssignmentSubmissionConnection.TotalCount(childComplexity), true
+
+	case "AssignmentSubmissionEdge.cursor":
+		if e.complexity.AssignmentSubmissionEdge.Cursor == nil {
+			break
+		}
+
+		return e.complexity.AssignmentSubmissionEdge.Cursor(childComplexity), true
+
+	case "AssignmentSubmissionEdge.node":
+		if e.complexity.AssignmentSubmissionEdge.Node == nil {
+			break
+		}
+
+		return e.complexity.AssignmentSubmissionEdge.Node(childComplexity), true
 
 	case "AuthData.accessToken":
 		if e.complexity.AuthData.AccessToken == nil {
@@ -801,6 +900,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.AddAssignment(childComplexity, args["input"].(model.AddAssignmentInput)), true
 
+	case "Mutation.addAssignmentSubmission":
+		if e.complexity.Mutation.AddAssignmentSubmission == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_addAssignmentSubmission_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.AddAssignmentSubmission(childComplexity, args["input"].(model.AddAssignmentSubmissionInput)), true
+
 	case "Mutation.addClass":
 		if e.complexity.Mutation.AddClass == nil {
 			break
@@ -896,6 +1007,30 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.DeleteAssignment(childComplexity, args["id"].(uuid.UUID)), true
+
+	case "Mutation.deleteAssignmentSubmission":
+		if e.complexity.Mutation.DeleteAssignmentSubmission == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_deleteAssignmentSubmission_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.DeleteAssignmentSubmission(childComplexity, args["id"].(uuid.UUID)), true
+
+	case "Mutation.deleteAssignmentSubmissionFile":
+		if e.complexity.Mutation.DeleteAssignmentSubmissionFile == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_deleteAssignmentSubmissionFile_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.DeleteAssignmentSubmissionFile(childComplexity, args["id"].(uuid.UUID), args["index"].(int)), true
 
 	case "Mutation.deleteClass":
 		if e.complexity.Mutation.DeleteClass == nil {
@@ -1077,6 +1212,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.UpdateAssignment(childComplexity, args["id"].(uuid.UUID), args["input"].(model.UpdateAssignmentInput)), true
 
+	case "Mutation.updateAssignmentSubmission":
+		if e.complexity.Mutation.UpdateAssignmentSubmission == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_updateAssignmentSubmission_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UpdateAssignmentSubmission(childComplexity, args["id"].(uuid.UUID), args["input"].(model.UpdateAssignmentSubmissionInput)), true
+
 	case "Mutation.updateClass":
 		if e.complexity.Mutation.UpdateClass == nil {
 			break
@@ -1200,6 +1347,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Query.Assignment(childComplexity, args["id"].(uuid.UUID)), true
+
+	case "Query.assignmentSubmissions":
+		if e.complexity.Query.AssignmentSubmissions == nil {
+			break
+		}
+
+		args, err := ec.field_Query_assignmentSubmissions_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.AssignmentSubmissions(childComplexity, args["assignmentID"].(*uuid.UUID), args["after"].(*ent.Cursor), args["first"].(*int), args["before"].(*ent.Cursor), args["last"].(*int), args["orderBy"].(*ent.AssignmentSubmissionOrder), args["where"].(*ent.AssignmentSubmissionWhereInput)), true
 
 	case "Query.assignments":
 		if e.complexity.Query.Assignments == nil {
@@ -2216,6 +2375,48 @@ input UpdateCourseGradeInput {
   courseFinal: Int
 }
 
+type AssignmentSubmission {
+  id: ID!
+  files: [String!]!
+  submittedAt: Time
+  createdAt: Time!
+  updatedAt: Time!
+}
+
+enum AssignmentSubmissionOrderField {
+  SUBMITTED_AT
+  CREATED_AT
+  UPDATED_AT
+}
+
+input AssignmentSubmissionOrder {
+  field: AssignmentSubmissionOrderField
+  direction: OrderDirection!
+}
+
+type AssignmentSubmissionEdge {
+  node: AssignmentSubmission
+  cursor: Cursor!
+}
+
+type AssignmentSubmissionConnection {
+  totalCount: Int!
+  pageInfo: PageInfo!
+  edges: [AssignmentSubmissionEdge]
+}
+
+input AddAssignmentSubmissionInput {
+  assignmentID: ID!
+  files: [Upload!]!
+  submittedAt: Time
+}
+
+input UpdateAssignmentSubmissionInput {
+  files: [Upload!]!
+  submittedAt: Time
+}
+
+
 type Query {
   school(id: ID!): School
   schools(after: Cursor, first: Int, before: Cursor, last: Int, orderBy: SchoolOrder, where: SchoolWhereInput): SchoolConnection
@@ -2236,6 +2437,7 @@ type Query {
 
   assignment(id: ID!): Assignment
   assignments(userID: ID, stageID: ID, schoolID: ID, after: Cursor, first: Int, before: Cursor, last: Int, orderBy: AssignmentOrder, where: AssignmentWhereInput): AssignmentConnection
+  assignmentSubmissions(assignmentID: ID, after: Cursor, first: Int, before: Cursor, last: Int, orderBy: AssignmentSubmissionOrder, where: AssignmentSubmissionWhereInput): AssignmentSubmissionConnection
 
   schedule(stageID: ID, weekday: Weekday): [Schedule]
 
@@ -2275,6 +2477,11 @@ type Mutation {
   addAssignment(input: AddAssignmentInput!): Assignment
   updateAssignment(id: ID!, input: UpdateAssignmentInput!): Assignment
   deleteAssignment(id: ID!): Boolean!
+
+  addAssignmentSubmission(input: AddAssignmentSubmissionInput!): AssignmentSubmission
+  updateAssignmentSubmission(id: ID!, input: UpdateAssignmentSubmissionInput!): AssignmentSubmission
+  deleteAssignmentSubmissionFile(id: ID!, index: Int!): AssignmentSubmission
+  deleteAssignmentSubmission(id: ID!): Boolean!
 
   addSchedule(input: AddScheduleInput!): Schedule
   updateSchedule(id: ID!, input: UpdateScheduleInput!): Schedule
@@ -3533,6 +3740,21 @@ var parsedSchema = gqlparser.MustLoadSchema(sources...)
 
 // region    ***************************** args.gotpl *****************************
 
+func (ec *executionContext) field_Mutation_addAssignmentSubmission_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 model.AddAssignmentSubmissionInput
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg0, err = ec.unmarshalNAddAssignmentSubmissionInput2githubᚗcomᚋmsal4ᚋhassah_school_serverᚋserverᚋmodelᚐAddAssignmentSubmissionInput(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
 func (ec *executionContext) field_Mutation_addAssignment_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -3650,6 +3872,45 @@ func (ec *executionContext) field_Mutation_addUser_args(ctx context.Context, raw
 		}
 	}
 	args["input"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_deleteAssignmentSubmissionFile_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 uuid.UUID
+	if tmp, ok := rawArgs["id"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+		arg0, err = ec.unmarshalNID2githubᚗcomᚋgoogleᚋuuidᚐUUID(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["id"] = arg0
+	var arg1 int
+	if tmp, ok := rawArgs["index"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("index"))
+		arg1, err = ec.unmarshalNInt2int(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["index"] = arg1
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_deleteAssignmentSubmission_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 uuid.UUID
+	if tmp, ok := rawArgs["id"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+		arg0, err = ec.unmarshalNID2githubᚗcomᚋgoogleᚋuuidᚐUUID(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["id"] = arg0
 	return args, nil
 }
 
@@ -3878,6 +4139,30 @@ func (ec *executionContext) field_Mutation_refreshTokens_args(ctx context.Contex
 	return args, nil
 }
 
+func (ec *executionContext) field_Mutation_updateAssignmentSubmission_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 uuid.UUID
+	if tmp, ok := rawArgs["id"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+		arg0, err = ec.unmarshalNID2githubᚗcomᚋgoogleᚋuuidᚐUUID(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["id"] = arg0
+	var arg1 model.UpdateAssignmentSubmissionInput
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg1, err = ec.unmarshalNUpdateAssignmentSubmissionInput2githubᚗcomᚋmsal4ᚋhassah_school_serverᚋserverᚋmodelᚐUpdateAssignmentSubmissionInput(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg1
+	return args, nil
+}
+
 func (ec *executionContext) field_Mutation_updateAssignment_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -4082,6 +4367,75 @@ func (ec *executionContext) field_Query___type_args(ctx context.Context, rawArgs
 		}
 	}
 	args["name"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_assignmentSubmissions_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *uuid.UUID
+	if tmp, ok := rawArgs["assignmentID"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("assignmentID"))
+		arg0, err = ec.unmarshalOID2ᚖgithubᚗcomᚋgoogleᚋuuidᚐUUID(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["assignmentID"] = arg0
+	var arg1 *ent.Cursor
+	if tmp, ok := rawArgs["after"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("after"))
+		arg1, err = ec.unmarshalOCursor2ᚖgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚐCursor(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["after"] = arg1
+	var arg2 *int
+	if tmp, ok := rawArgs["first"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("first"))
+		arg2, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["first"] = arg2
+	var arg3 *ent.Cursor
+	if tmp, ok := rawArgs["before"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("before"))
+		arg3, err = ec.unmarshalOCursor2ᚖgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚐCursor(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["before"] = arg3
+	var arg4 *int
+	if tmp, ok := rawArgs["last"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("last"))
+		arg4, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["last"] = arg4
+	var arg5 *ent.AssignmentSubmissionOrder
+	if tmp, ok := rawArgs["orderBy"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("orderBy"))
+		arg5, err = ec.unmarshalOAssignmentSubmissionOrder2ᚖgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚐAssignmentSubmissionOrder(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["orderBy"] = arg5
+	var arg6 *ent.AssignmentSubmissionWhereInput
+	if tmp, ok := rawArgs["where"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("where"))
+		arg6, err = ec.unmarshalOAssignmentSubmissionWhereInput2ᚖgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚐAssignmentSubmissionWhereInput(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["where"] = arg6
 	return args, nil
 }
 
@@ -5280,6 +5634,347 @@ func (ec *executionContext) _AssignmentEdge_cursor(ctx context.Context, field gr
 	}()
 	fc := &graphql.FieldContext{
 		Object:     "AssignmentEdge",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Cursor, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(ent.Cursor)
+	fc.Result = res
+	return ec.marshalNCursor2githubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚐCursor(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _AssignmentSubmission_id(ctx context.Context, field graphql.CollectedField, obj *ent.AssignmentSubmission) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "AssignmentSubmission",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(uuid.UUID)
+	fc.Result = res
+	return ec.marshalNID2githubᚗcomᚋgoogleᚋuuidᚐUUID(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _AssignmentSubmission_files(ctx context.Context, field graphql.CollectedField, obj *ent.AssignmentSubmission) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "AssignmentSubmission",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Files, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]string)
+	fc.Result = res
+	return ec.marshalNString2ᚕstringᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _AssignmentSubmission_submittedAt(ctx context.Context, field graphql.CollectedField, obj *ent.AssignmentSubmission) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "AssignmentSubmission",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.SubmittedAt, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*time.Time)
+	fc.Result = res
+	return ec.marshalOTime2ᚖtimeᚐTime(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _AssignmentSubmission_createdAt(ctx context.Context, field graphql.CollectedField, obj *ent.AssignmentSubmission) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "AssignmentSubmission",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CreatedAt, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(time.Time)
+	fc.Result = res
+	return ec.marshalNTime2timeᚐTime(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _AssignmentSubmission_updatedAt(ctx context.Context, field graphql.CollectedField, obj *ent.AssignmentSubmission) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "AssignmentSubmission",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.UpdatedAt, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(time.Time)
+	fc.Result = res
+	return ec.marshalNTime2timeᚐTime(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _AssignmentSubmissionConnection_totalCount(ctx context.Context, field graphql.CollectedField, obj *ent.AssignmentSubmissionConnection) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "AssignmentSubmissionConnection",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.TotalCount, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _AssignmentSubmissionConnection_pageInfo(ctx context.Context, field graphql.CollectedField, obj *ent.AssignmentSubmissionConnection) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "AssignmentSubmissionConnection",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.PageInfo, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(ent.PageInfo)
+	fc.Result = res
+	return ec.marshalNPageInfo2githubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚐPageInfo(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _AssignmentSubmissionConnection_edges(ctx context.Context, field graphql.CollectedField, obj *ent.AssignmentSubmissionConnection) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "AssignmentSubmissionConnection",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Edges, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*ent.AssignmentSubmissionEdge)
+	fc.Result = res
+	return ec.marshalOAssignmentSubmissionEdge2ᚕᚖgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚐAssignmentSubmissionEdge(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _AssignmentSubmissionEdge_node(ctx context.Context, field graphql.CollectedField, obj *ent.AssignmentSubmissionEdge) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "AssignmentSubmissionEdge",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Node, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*ent.AssignmentSubmission)
+	fc.Result = res
+	return ec.marshalOAssignmentSubmission2ᚖgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚐAssignmentSubmission(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _AssignmentSubmissionEdge_cursor(ctx context.Context, field graphql.CollectedField, obj *ent.AssignmentSubmissionEdge) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "AssignmentSubmissionEdge",
 		Field:      field,
 		Args:       nil,
 		IsMethod:   false,
@@ -7894,6 +8589,165 @@ func (ec *executionContext) _Mutation_deleteAssignment(ctx context.Context, fiel
 	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _Mutation_addAssignmentSubmission(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_addAssignmentSubmission_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().AddAssignmentSubmission(rctx, args["input"].(model.AddAssignmentSubmissionInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*ent.AssignmentSubmission)
+	fc.Result = res
+	return ec.marshalOAssignmentSubmission2ᚖgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚐAssignmentSubmission(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_updateAssignmentSubmission(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_updateAssignmentSubmission_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().UpdateAssignmentSubmission(rctx, args["id"].(uuid.UUID), args["input"].(model.UpdateAssignmentSubmissionInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*ent.AssignmentSubmission)
+	fc.Result = res
+	return ec.marshalOAssignmentSubmission2ᚖgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚐAssignmentSubmission(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_deleteAssignmentSubmissionFile(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_deleteAssignmentSubmissionFile_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().DeleteAssignmentSubmissionFile(rctx, args["id"].(uuid.UUID), args["index"].(int))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*ent.AssignmentSubmission)
+	fc.Result = res
+	return ec.marshalOAssignmentSubmission2ᚖgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚐAssignmentSubmission(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_deleteAssignmentSubmission(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_deleteAssignmentSubmission_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().DeleteAssignmentSubmission(rctx, args["id"].(uuid.UUID))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _Mutation_addSchedule(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -8773,6 +9627,45 @@ func (ec *executionContext) _Query_assignments(ctx context.Context, field graphq
 	res := resTmp.(*ent.AssignmentConnection)
 	fc.Result = res
 	return ec.marshalOAssignmentConnection2ᚖgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚐAssignmentConnection(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Query_assignmentSubmissions(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Query_assignmentSubmissions_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().AssignmentSubmissions(rctx, args["assignmentID"].(*uuid.UUID), args["after"].(*ent.Cursor), args["first"].(*int), args["before"].(*ent.Cursor), args["last"].(*int), args["orderBy"].(*ent.AssignmentSubmissionOrder), args["where"].(*ent.AssignmentSubmissionWhereInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*ent.AssignmentSubmissionConnection)
+	fc.Result = res
+	return ec.marshalOAssignmentSubmissionConnection2ᚖgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚐAssignmentSubmissionConnection(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_schedule(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -11609,6 +12502,42 @@ func (ec *executionContext) unmarshalInputAddAssignmentInput(ctx context.Context
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputAddAssignmentSubmissionInput(ctx context.Context, obj interface{}) (model.AddAssignmentSubmissionInput, error) {
+	var it model.AddAssignmentSubmissionInput
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "assignmentID":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("assignmentID"))
+			it.AssignmentID, err = ec.unmarshalNID2githubᚗcomᚋgoogleᚋuuidᚐUUID(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "files":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("files"))
+			it.Files, err = ec.unmarshalNUpload2ᚕᚖgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚐUploadᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "submittedAt":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("submittedAt"))
+			it.SubmittedAt, err = ec.unmarshalOTime2ᚖtimeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputAddClassInput(ctx context.Context, obj interface{}) (model.AddClassInput, error) {
 	var it model.AddClassInput
 	var asMap = obj.(map[string]interface{})
@@ -12007,6 +12936,34 @@ func (ec *executionContext) unmarshalInputAssignmentOrder(ctx context.Context, o
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("field"))
 			it.Field, err = ec.unmarshalOAssignmentOrderField2ᚖgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚐAssignmentOrderField(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "direction":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("direction"))
+			it.Direction, err = ec.unmarshalNOrderDirection2githubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚐOrderDirection(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputAssignmentSubmissionOrder(ctx context.Context, obj interface{}) (ent.AssignmentSubmissionOrder, error) {
+	var it ent.AssignmentSubmissionOrder
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "field":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("field"))
+			it.Field, err = ec.unmarshalOAssignmentSubmissionOrderField2ᚖgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚐAssignmentSubmissionOrderField(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -18436,6 +19393,34 @@ func (ec *executionContext) unmarshalInputUpdateAssignmentInput(ctx context.Cont
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputUpdateAssignmentSubmissionInput(ctx context.Context, obj interface{}) (model.UpdateAssignmentSubmissionInput, error) {
+	var it model.UpdateAssignmentSubmissionInput
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "files":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("files"))
+			it.Files, err = ec.unmarshalNUpload2ᚕᚖgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚐUploadᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "submittedAt":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("submittedAt"))
+			it.SubmittedAt, err = ec.unmarshalOTime2ᚖtimeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputUpdateClassInput(ctx context.Context, obj interface{}) (model.UpdateClassInput, error) {
 	var it model.UpdateClassInput
 	var asMap = obj.(map[string]interface{})
@@ -20025,6 +21010,113 @@ func (ec *executionContext) _AssignmentEdge(ctx context.Context, sel ast.Selecti
 	return out
 }
 
+var assignmentSubmissionImplementors = []string{"AssignmentSubmission"}
+
+func (ec *executionContext) _AssignmentSubmission(ctx context.Context, sel ast.SelectionSet, obj *ent.AssignmentSubmission) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, assignmentSubmissionImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("AssignmentSubmission")
+		case "id":
+			out.Values[i] = ec._AssignmentSubmission_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "files":
+			out.Values[i] = ec._AssignmentSubmission_files(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "submittedAt":
+			out.Values[i] = ec._AssignmentSubmission_submittedAt(ctx, field, obj)
+		case "createdAt":
+			out.Values[i] = ec._AssignmentSubmission_createdAt(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "updatedAt":
+			out.Values[i] = ec._AssignmentSubmission_updatedAt(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var assignmentSubmissionConnectionImplementors = []string{"AssignmentSubmissionConnection"}
+
+func (ec *executionContext) _AssignmentSubmissionConnection(ctx context.Context, sel ast.SelectionSet, obj *ent.AssignmentSubmissionConnection) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, assignmentSubmissionConnectionImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("AssignmentSubmissionConnection")
+		case "totalCount":
+			out.Values[i] = ec._AssignmentSubmissionConnection_totalCount(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "pageInfo":
+			out.Values[i] = ec._AssignmentSubmissionConnection_pageInfo(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "edges":
+			out.Values[i] = ec._AssignmentSubmissionConnection_edges(ctx, field, obj)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var assignmentSubmissionEdgeImplementors = []string{"AssignmentSubmissionEdge"}
+
+func (ec *executionContext) _AssignmentSubmissionEdge(ctx context.Context, sel ast.SelectionSet, obj *ent.AssignmentSubmissionEdge) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, assignmentSubmissionEdgeImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("AssignmentSubmissionEdge")
+		case "node":
+			out.Values[i] = ec._AssignmentSubmissionEdge_node(ctx, field, obj)
+		case "cursor":
+			out.Values[i] = ec._AssignmentSubmissionEdge_cursor(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
 var authDataImplementors = []string{"AuthData"}
 
 func (ec *executionContext) _AuthData(ctx context.Context, sel ast.SelectionSet, obj *model.AuthData) graphql.Marshaler {
@@ -20609,6 +21701,17 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		case "addAssignmentSubmission":
+			out.Values[i] = ec._Mutation_addAssignmentSubmission(ctx, field)
+		case "updateAssignmentSubmission":
+			out.Values[i] = ec._Mutation_updateAssignmentSubmission(ctx, field)
+		case "deleteAssignmentSubmissionFile":
+			out.Values[i] = ec._Mutation_deleteAssignmentSubmissionFile(ctx, field)
+		case "deleteAssignmentSubmission":
+			out.Values[i] = ec._Mutation_deleteAssignmentSubmission(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		case "addSchedule":
 			out.Values[i] = ec._Mutation_addSchedule(ctx, field)
 		case "updateSchedule":
@@ -20830,6 +21933,17 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_assignments(ctx, field)
+				return res
+			})
+		case "assignmentSubmissions":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_assignmentSubmissions(ctx, field)
 				return res
 			})
 		case "schedule":
@@ -21574,6 +22688,11 @@ func (ec *executionContext) unmarshalNAddAssignmentInput2githubᚗcomᚋmsal4ᚋ
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
+func (ec *executionContext) unmarshalNAddAssignmentSubmissionInput2githubᚗcomᚋmsal4ᚋhassah_school_serverᚋserverᚋmodelᚐAddAssignmentSubmissionInput(ctx context.Context, v interface{}) (model.AddAssignmentSubmissionInput, error) {
+	res, err := ec.unmarshalInputAddAssignmentSubmissionInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
 func (ec *executionContext) unmarshalNAddClassInput2githubᚗcomᚋmsal4ᚋhassah_school_serverᚋserverᚋmodelᚐAddClassInput(ctx context.Context, v interface{}) (model.AddClassInput, error) {
 	res, err := ec.unmarshalInputAddClassInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -21827,6 +22946,36 @@ func (ec *executionContext) marshalNString2string(ctx context.Context, sel ast.S
 	return res
 }
 
+func (ec *executionContext) unmarshalNString2ᚕstringᚄ(ctx context.Context, v interface{}) ([]string, error) {
+	var vSlice []interface{}
+	if v != nil {
+		if tmp1, ok := v.([]interface{}); ok {
+			vSlice = tmp1
+		} else {
+			vSlice = []interface{}{v}
+		}
+	}
+	var err error
+	res := make([]string, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalNString2string(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) marshalNString2ᚕstringᚄ(ctx context.Context, sel ast.SelectionSet, v []string) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	for i := range v {
+		ret[i] = ec.marshalNString2string(ctx, sel, v[i])
+	}
+
+	return ret
+}
+
 func (ec *executionContext) unmarshalNTime2timeᚐTime(ctx context.Context, v interface{}) (time.Time, error) {
 	res, err := graphql.UnmarshalTime(v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -21849,6 +22998,11 @@ func (ec *executionContext) unmarshalNTuitionPaymentWhereInput2ᚖgithubᚗcom�
 
 func (ec *executionContext) unmarshalNUpdateAssignmentInput2githubᚗcomᚋmsal4ᚋhassah_school_serverᚋserverᚋmodelᚐUpdateAssignmentInput(ctx context.Context, v interface{}) (model.UpdateAssignmentInput, error) {
 	res, err := ec.unmarshalInputUpdateAssignmentInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNUpdateAssignmentSubmissionInput2githubᚗcomᚋmsal4ᚋhassah_school_serverᚋserverᚋmodelᚐUpdateAssignmentSubmissionInput(ctx context.Context, v interface{}) (model.UpdateAssignmentSubmissionInput, error) {
+	res, err := ec.unmarshalInputUpdateAssignmentSubmissionInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
@@ -21894,6 +23048,57 @@ func (ec *executionContext) unmarshalNUpload2githubᚗcomᚋ99designsᚋgqlgen�
 
 func (ec *executionContext) marshalNUpload2githubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚐUpload(ctx context.Context, sel ast.SelectionSet, v graphql.Upload) graphql.Marshaler {
 	res := graphql.MarshalUpload(v)
+	if res == graphql.Null {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+	}
+	return res
+}
+
+func (ec *executionContext) unmarshalNUpload2ᚕᚖgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚐUploadᚄ(ctx context.Context, v interface{}) ([]*graphql.Upload, error) {
+	var vSlice []interface{}
+	if v != nil {
+		if tmp1, ok := v.([]interface{}); ok {
+			vSlice = tmp1
+		} else {
+			vSlice = []interface{}{v}
+		}
+	}
+	var err error
+	res := make([]*graphql.Upload, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalNUpload2ᚖgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚐUpload(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) marshalNUpload2ᚕᚖgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚐUploadᚄ(ctx context.Context, sel ast.SelectionSet, v []*graphql.Upload) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	for i := range v {
+		ret[i] = ec.marshalNUpload2ᚖgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚐUpload(ctx, sel, v[i])
+	}
+
+	return ret
+}
+
+func (ec *executionContext) unmarshalNUpload2ᚖgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚐUpload(ctx context.Context, v interface{}) (*graphql.Upload, error) {
+	res, err := graphql.UnmarshalUpload(v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNUpload2ᚖgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚐUpload(ctx context.Context, sel ast.SelectionSet, v *graphql.Upload) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := graphql.MarshalUpload(*v)
 	if res == graphql.Null {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")
@@ -22230,6 +23435,91 @@ func (ec *executionContext) unmarshalOAssignmentOrderField2ᚖgithubᚗcomᚋmsa
 }
 
 func (ec *executionContext) marshalOAssignmentOrderField2ᚖgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚐAssignmentOrderField(ctx context.Context, sel ast.SelectionSet, v *ent.AssignmentOrderField) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return v
+}
+
+func (ec *executionContext) marshalOAssignmentSubmission2ᚖgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚐAssignmentSubmission(ctx context.Context, sel ast.SelectionSet, v *ent.AssignmentSubmission) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._AssignmentSubmission(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalOAssignmentSubmissionConnection2ᚖgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚐAssignmentSubmissionConnection(ctx context.Context, sel ast.SelectionSet, v *ent.AssignmentSubmissionConnection) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._AssignmentSubmissionConnection(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalOAssignmentSubmissionEdge2ᚕᚖgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚐAssignmentSubmissionEdge(ctx context.Context, sel ast.SelectionSet, v []*ent.AssignmentSubmissionEdge) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalOAssignmentSubmissionEdge2ᚖgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚐAssignmentSubmissionEdge(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+	return ret
+}
+
+func (ec *executionContext) marshalOAssignmentSubmissionEdge2ᚖgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚐAssignmentSubmissionEdge(ctx context.Context, sel ast.SelectionSet, v *ent.AssignmentSubmissionEdge) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._AssignmentSubmissionEdge(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalOAssignmentSubmissionOrder2ᚖgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚐAssignmentSubmissionOrder(ctx context.Context, v interface{}) (*ent.AssignmentSubmissionOrder, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputAssignmentSubmissionOrder(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalOAssignmentSubmissionOrderField2ᚖgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚐAssignmentSubmissionOrderField(ctx context.Context, v interface{}) (*ent.AssignmentSubmissionOrderField, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var res = new(ent.AssignmentSubmissionOrderField)
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOAssignmentSubmissionOrderField2ᚖgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚐAssignmentSubmissionOrderField(ctx context.Context, sel ast.SelectionSet, v *ent.AssignmentSubmissionOrderField) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}

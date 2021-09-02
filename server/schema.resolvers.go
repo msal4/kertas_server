@@ -209,6 +209,39 @@ func (r *mutationResolver) DeleteAssignment(ctx context.Context, id uuid.UUID) (
 	return true, r.s.DeleteAssignment(ctx, id)
 }
 
+func (r *mutationResolver) AddAssignmentSubmission(ctx context.Context, input model.AddAssignmentSubmissionInput) (*ent.AssignmentSubmission, error) {
+	u, ok := auth.UserForContext(ctx)
+	if !ok || u.Role != user.RoleStudent {
+		return nil, auth.UnauthorizedErr
+	}
+
+	return r.s.AddAssignmentSubmission(ctx, u.ID, input)
+}
+
+func (r *mutationResolver) UpdateAssignmentSubmission(ctx context.Context, id uuid.UUID, input model.UpdateAssignmentSubmissionInput) (*ent.AssignmentSubmission, error) {
+	if !auth.IsStudent(ctx) {
+		return nil, auth.UnauthorizedErr
+	}
+
+	return r.s.UpdateAssignmentSubmission(ctx, id, input)
+}
+
+func (r *mutationResolver) DeleteAssignmentSubmissionFile(ctx context.Context, id uuid.UUID, index int) (*ent.AssignmentSubmission, error) {
+	if !auth.IsStudent(ctx) {
+		return nil, auth.UnauthorizedErr
+	}
+
+	return r.s.DeleteAssignmentSubmissionFile(ctx, id, index)
+}
+
+func (r *mutationResolver) DeleteAssignmentSubmission(ctx context.Context, id uuid.UUID) (bool, error) {
+	if !auth.IsAuthorized(ctx) {
+		return false, auth.UnauthorizedErr
+	}
+
+	return true, r.s.DeleteAssignmentSubmission(ctx, id)
+}
+
 func (r *mutationResolver) AddSchedule(ctx context.Context, input model.AddScheduleInput) (*ent.Schedule, error) {
 	if !auth.IsAdmin(ctx) {
 		return nil, auth.UnauthorizedErr
@@ -388,6 +421,21 @@ func (r *queryResolver) Assignments(ctx context.Context, userID *uuid.UUID, stag
 
 	return r.s.Assignments(ctx, service.AssignmentsOptions{
 		UserID:  *userID,
+		After:   after,
+		First:   first,
+		Before:  before,
+		Last:    last,
+		OrderBy: orderBy,
+		Where:   where,
+	})
+}
+
+func (r *queryResolver) AssignmentSubmissions(ctx context.Context, assignmentID *uuid.UUID, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.AssignmentSubmissionOrder, where *ent.AssignmentSubmissionWhereInput) (*ent.AssignmentSubmissionConnection, error) {
+	if !auth.IsAuthorized(ctx) {
+		return nil, auth.UnauthorizedErr
+	}
+
+	return r.s.AssignmentSubmissions(ctx, *assignmentID, service.AssignmentSubmissionsOptions{
 		After:   after,
 		First:   first,
 		Before:  before,

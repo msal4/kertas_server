@@ -20,6 +20,12 @@ type AddAssignmentInput struct {
 	Duration    *time.Duration  `json:"duration"`
 }
 
+type AddAssignmentSubmissionInput struct {
+	AssignmentID uuid.UUID         `json:"assignmentID"`
+	Files        []*graphql.Upload `json:"files"`
+	SubmittedAt  *time.Time        `json:"submittedAt"`
+}
+
 type AddClassInput struct {
 	Name      string    `json:"name"`
 	Active    bool      `json:"active"`
@@ -98,6 +104,11 @@ type UpdateAssignmentInput struct {
 	File        *graphql.Upload `json:"file"`
 	DueDate     *time.Time      `json:"dueDate"`
 	Duration    *time.Duration  `json:"duration"`
+}
+
+type UpdateAssignmentSubmissionInput struct {
+	Files       []*graphql.Upload `json:"files"`
+	SubmittedAt *time.Time        `json:"submittedAt"`
 }
 
 type UpdateClassInput struct {
