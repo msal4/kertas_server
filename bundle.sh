@@ -1,9 +1,6 @@
 #!/bin/bash
 
 rm -rf ./build
-if [ $? -ne 0 ]; then
-    exit
-fi
 echo removed ./build directory
 
 go build -o build/migrate cmd/migrate-schema/main.go
