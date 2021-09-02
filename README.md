@@ -9,4 +9,5 @@
 - [x] Setup authorization
 - [ ] Stages and the file/document system
 - [x] Implement chat
-- [ ] Fulltext search
+- [ ] Implement resolvers for edges
+- [ ] Use dataloaders
