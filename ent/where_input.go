@@ -1649,6 +1649,21 @@ type CourseGradeWhereInput struct {
 	CourseFinalIsNil  bool  `json:"courseFinalIsNil,omitempty"`
 	CourseFinalNotNil bool  `json:"courseFinalNotNil,omitempty"`
 
+	// "year" field predicates.
+	Year             *string  `json:"year,omitempty"`
+	YearNEQ          *string  `json:"yearNEQ,omitempty"`
+	YearIn           []string `json:"yearIn,omitempty"`
+	YearNotIn        []string `json:"yearNotIn,omitempty"`
+	YearGT           *string  `json:"yearGT,omitempty"`
+	YearGTE          *string  `json:"yearGTE,omitempty"`
+	YearLT           *string  `json:"yearLT,omitempty"`
+	YearLTE          *string  `json:"yearLTE,omitempty"`
+	YearContains     *string  `json:"yearContains,omitempty"`
+	YearHasPrefix    *string  `json:"yearHasPrefix,omitempty"`
+	YearHasSuffix    *string  `json:"yearHasSuffix,omitempty"`
+	YearEqualFold    *string  `json:"yearEqualFold,omitempty"`
+	YearContainsFold *string  `json:"yearContainsFold,omitempty"`
+
 	// "student" edge predicates.
 	HasStudent     *bool             `json:"hasStudent,omitempty"`
 	HasStudentWith []*UserWhereInput `json:"hasStudentWith,omitempty"`
@@ -1942,6 +1957,45 @@ func (i *CourseGradeWhereInput) P() (predicate.CourseGrade, error) {
 	}
 	if i.CourseFinalNotNil {
 		predicates = append(predicates, coursegrade.CourseFinalNotNil())
+	}
+	if i.Year != nil {
+		predicates = append(predicates, coursegrade.YearEQ(*i.Year))
+	}
+	if i.YearNEQ != nil {
+		predicates = append(predicates, coursegrade.YearNEQ(*i.YearNEQ))
+	}
+	if len(i.YearIn) > 0 {
+		predicates = append(predicates, coursegrade.YearIn(i.YearIn...))
+	}
+	if len(i.YearNotIn) > 0 {
+		predicates = append(predicates, coursegrade.YearNotIn(i.YearNotIn...))
+	}
+	if i.YearGT != nil {
+		predicates = append(predicates, coursegrade.YearGT(*i.YearGT))
+	}
+	if i.YearGTE != nil {
+		predicates = append(predicates, coursegrade.YearGTE(*i.YearGTE))
+	}
+	if i.YearLT != nil {
+		predicates = append(predicates, coursegrade.YearLT(*i.YearLT))
+	}
+	if i.YearLTE != nil {
+		predicates = append(predicates, coursegrade.YearLTE(*i.YearLTE))
+	}
+	if i.YearContains != nil {
+		predicates = append(predicates, coursegrade.YearContains(*i.YearContains))
+	}
+	if i.YearHasPrefix != nil {
+		predicates = append(predicates, coursegrade.YearHasPrefix(*i.YearHasPrefix))
+	}
+	if i.YearHasSuffix != nil {
+		predicates = append(predicates, coursegrade.YearHasSuffix(*i.YearHasSuffix))
+	}
+	if i.YearEqualFold != nil {
+		predicates = append(predicates, coursegrade.YearEqualFold(*i.YearEqualFold))
+	}
+	if i.YearContainsFold != nil {
+		predicates = append(predicates, coursegrade.YearContainsFold(*i.YearContainsFold))
 	}
 
 	if i.HasStudent != nil {

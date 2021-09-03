@@ -53,6 +53,7 @@ type AddCourseGradeInput struct {
 	WrittenFirst   *int      `json:"writtenFirst"`
 	WrittenSecond  *int      `json:"writtenSecond"`
 	CourseFinal    *int      `json:"courseFinal"`
+	Year           string    `json:"year"`
 }
 
 type AddGroupInput struct {

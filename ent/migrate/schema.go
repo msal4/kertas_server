@@ -188,6 +188,7 @@ var (
 		{Name: "written_first", Type: field.TypeInt, Nullable: true},
 		{Name: "written_second", Type: field.TypeInt, Nullable: true},
 		{Name: "course_final", Type: field.TypeInt, Nullable: true},
+		{Name: "year", Type: field.TypeString},
 		{Name: "class_course_grades", Type: field.TypeUUID, Nullable: true},
 		{Name: "stage_course_grades", Type: field.TypeUUID, Nullable: true},
 		{Name: "user_course_grades", Type: field.TypeUUID, Nullable: true},
@@ -200,19 +201,19 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "course_grades_classes_course_grades",
-				Columns:    []*schema.Column{CourseGradesColumns[8]},
+				Columns:    []*schema.Column{CourseGradesColumns[9]},
 				RefColumns: []*schema.Column{ClassesColumns[0]},
 				OnDelete:   schema.Cascade,
 			},
 			{
 				Symbol:     "course_grades_stages_course_grades",
-				Columns:    []*schema.Column{CourseGradesColumns[9]},
+				Columns:    []*schema.Column{CourseGradesColumns[10]},
 				RefColumns: []*schema.Column{StagesColumns[0]},
 				OnDelete:   schema.Cascade,
 			},
 			{
 				Symbol:     "course_grades_users_course_grades",
-				Columns:    []*schema.Column{CourseGradesColumns[10]},
+				Columns:    []*schema.Column{CourseGradesColumns[11]},
 				RefColumns: []*schema.Column{UsersColumns[0]},
 				OnDelete:   schema.Cascade,
 			},
@@ -221,7 +222,7 @@ var (
 			{
 				Name:    "coursegrade_user_course_grades_class_course_grades_stage_course_grades",
 				Unique:  true,
-				Columns: []*schema.Column{CourseGradesColumns[10], CourseGradesColumns[8], CourseGradesColumns[9]},
+				Columns: []*schema.Column{CourseGradesColumns[11], CourseGradesColumns[9], CourseGradesColumns[10]},
 			},
 		},
 	}

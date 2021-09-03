@@ -1757,6 +1757,16 @@ var (
 			}
 		},
 	}
+	// CourseGradeOrderFieldYear orders CourseGrade by year.
+	CourseGradeOrderFieldYear = &CourseGradeOrderField{
+		field: coursegrade.FieldYear,
+		toCursor: func(cg *CourseGrade) Cursor {
+			return Cursor{
+				ID:    cg.ID,
+				Value: cg.Year,
+			}
+		},
+	}
 )
 
 // String implement fmt.Stringer interface.
@@ -1777,6 +1787,8 @@ func (f CourseGradeOrderField) String() string {
 		str = "WRITTEN_SECOND"
 	case coursegrade.FieldCourseFinal:
 		str = "COURSE_FINAL"
+	case coursegrade.FieldYear:
+		str = "YEAR"
 	}
 	return str
 }
@@ -1807,6 +1819,8 @@ func (f *CourseGradeOrderField) UnmarshalGQL(v interface{}) error {
 		*f = *CourseGradeOrderFieldWrittenSecond
 	case "COURSE_FINAL":
 		*f = *CourseGradeOrderFieldCourseFinal
+	case "YEAR":
+		*f = *CourseGradeOrderFieldYear
 	default:
 		return fmt.Errorf("%s is not a valid CourseGradeOrderField", str)
 	}

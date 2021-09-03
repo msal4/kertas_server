@@ -3403,6 +3403,7 @@ type CourseGradeMutation struct {
 	addwritten_second  *int
 	course_final       *int
 	addcourse_final    *int
+	year               *string
 	clearedFields      map[string]struct{}
 	student            *uuid.UUID
 	clearedstudent     bool
@@ -3922,6 +3923,42 @@ func (m *CourseGradeMutation) ResetCourseFinal() {
 	delete(m.clearedFields, coursegrade.FieldCourseFinal)
 }
 
+// SetYear sets the "year" field.
+func (m *CourseGradeMutation) SetYear(s string) {
+	m.year = &s
+}
+
+// Year returns the value of the "year" field in the mutation.
+func (m *CourseGradeMutation) Year() (r string, exists bool) {
+	v := m.year
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldYear returns the old "year" field's value of the CourseGrade entity.
+// If the CourseGrade object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *CourseGradeMutation) OldYear(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldYear is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldYear requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldYear: %w", err)
+	}
+	return oldValue.Year, nil
+}
+
+// ResetYear resets all changes to the "year" field.
+func (m *CourseGradeMutation) ResetYear() {
+	m.year = nil
+}
+
 // SetStudentID sets the "student" edge to the User entity by id.
 func (m *CourseGradeMutation) SetStudentID(id uuid.UUID) {
 	m.student = &id
@@ -4058,7 +4095,7 @@ func (m *CourseGradeMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *CourseGradeMutation) Fields() []string {
-	fields := make([]string, 0, 7)
+	fields := make([]string, 0, 8)
 	if m.created_at != nil {
 		fields = append(fields, coursegrade.FieldCreatedAt)
 	}
@@ -4079,6 +4116,9 @@ func (m *CourseGradeMutation) Fields() []string {
 	}
 	if m.course_final != nil {
 		fields = append(fields, coursegrade.FieldCourseFinal)
+	}
+	if m.year != nil {
+		fields = append(fields, coursegrade.FieldYear)
 	}
 	return fields
 }
@@ -4102,6 +4142,8 @@ func (m *CourseGradeMutation) Field(name string) (ent.Value, bool) {
 		return m.WrittenSecond()
 	case coursegrade.FieldCourseFinal:
 		return m.CourseFinal()
+	case coursegrade.FieldYear:
+		return m.Year()
 	}
 	return nil, false
 }
@@ -4125,6 +4167,8 @@ func (m *CourseGradeMutation) OldField(ctx context.Context, name string) (ent.Va
 		return m.OldWrittenSecond(ctx)
 	case coursegrade.FieldCourseFinal:
 		return m.OldCourseFinal(ctx)
+	case coursegrade.FieldYear:
+		return m.OldYear(ctx)
 	}
 	return nil, fmt.Errorf("unknown CourseGrade field %s", name)
 }
@@ -4182,6 +4226,13 @@ func (m *CourseGradeMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetCourseFinal(v)
+		return nil
+	case coursegrade.FieldYear:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetYear(v)
 		return nil
 	}
 	return fmt.Errorf("unknown CourseGrade field %s", name)
@@ -4348,6 +4399,9 @@ func (m *CourseGradeMutation) ResetField(name string) error {
 		return nil
 	case coursegrade.FieldCourseFinal:
 		m.ResetCourseFinal()
+		return nil
+	case coursegrade.FieldYear:
+		m.ResetYear()
 		return nil
 	}
 	return fmt.Errorf("unknown CourseGrade field %s", name)

@@ -27,6 +27,8 @@ const (
 	FieldWrittenSecond = "written_second"
 	// FieldCourseFinal holds the string denoting the course_final field in the database.
 	FieldCourseFinal = "course_final"
+	// FieldYear holds the string denoting the year field in the database.
+	FieldYear = "year"
 	// EdgeStudent holds the string denoting the student edge name in mutations.
 	EdgeStudent = "student"
 	// EdgeClass holds the string denoting the class edge name in mutations.
@@ -68,6 +70,7 @@ var Columns = []string{
 	FieldWrittenFirst,
 	FieldWrittenSecond,
 	FieldCourseFinal,
+	FieldYear,
 }
 
 // ForeignKeys holds the SQL foreign-keys that are owned by the "course_grades"
@@ -110,6 +113,8 @@ var (
 	WrittenSecondValidator func(int) error
 	// CourseFinalValidator is a validator for the "course_final" field. It is called by the builders before save.
 	CourseFinalValidator func(int) error
+	// YearValidator is a validator for the "year" field. It is called by the builders before save.
+	YearValidator func(string) error
 	// DefaultID holds the default value on creation for the "id" field.
 	DefaultID func() uuid.UUID
 )

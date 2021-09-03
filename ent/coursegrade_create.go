@@ -122,6 +122,12 @@ func (cgc *CourseGradeCreate) SetNillableCourseFinal(i *int) *CourseGradeCreate 
 	return cgc
 }
 
+// SetYear sets the "year" field.
+func (cgc *CourseGradeCreate) SetYear(s string) *CourseGradeCreate {
+	cgc.mutation.SetYear(s)
+	return cgc
+}
+
 // SetID sets the "id" field.
 func (cgc *CourseGradeCreate) SetID(u uuid.UUID) *CourseGradeCreate {
 	cgc.mutation.SetID(u)
@@ -279,6 +285,14 @@ func (cgc *CourseGradeCreate) check() error {
 			return &ValidationError{Name: "course_final", err: fmt.Errorf(`ent: validator failed for field "course_final": %w`, err)}
 		}
 	}
+	if _, ok := cgc.mutation.Year(); !ok {
+		return &ValidationError{Name: "year", err: errors.New(`ent: missing required field "year"`)}
+	}
+	if v, ok := cgc.mutation.Year(); ok {
+		if err := coursegrade.YearValidator(v); err != nil {
+			return &ValidationError{Name: "year", err: fmt.Errorf(`ent: validator failed for field "year": %w`, err)}
+		}
+	}
 	if _, ok := cgc.mutation.StudentID(); !ok {
 		return &ValidationError{Name: "student", err: errors.New("ent: missing required edge \"student\"")}
 	}
@@ -375,6 +389,14 @@ func (cgc *CourseGradeCreate) createSpec() (*CourseGrade, *sqlgraph.CreateSpec) 
 			Column: coursegrade.FieldCourseFinal,
 		})
 		_node.CourseFinal = &value
+	}
+	if value, ok := cgc.mutation.Year(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: coursegrade.FieldYear,
+		})
+		_node.Year = value
 	}
 	if nodes := cgc.mutation.StudentIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{

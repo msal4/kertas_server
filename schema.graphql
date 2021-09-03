@@ -469,6 +469,7 @@ type CourseGrade implements Node {
   writtenFirst: Int
   writtenSecond: Int
   courseFinal: Int
+  year: String!
   createdAt: Time!
   updatedAt: Time!
 
@@ -483,6 +484,7 @@ enum CourseGradeOrderField {
   WRITTEN_FIRST
   WRITTEN_SECOND
   COURSE_FINAL
+  YEAR
   CREATED_AT
   UPDATED_AT
 }
@@ -512,6 +514,7 @@ input AddCourseGradeInput {
   writtenFirst: Int
   writtenSecond: Int
   courseFinal: Int
+  year: String!
 }
 
 input UpdateCourseGradeInput {

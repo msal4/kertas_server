@@ -153,6 +153,10 @@ func init() {
 	coursegradeDescCourseFinal := coursegradeFields[5].Descriptor()
 	// coursegrade.CourseFinalValidator is a validator for the "course_final" field. It is called by the builders before save.
 	coursegrade.CourseFinalValidator = coursegradeDescCourseFinal.Validators[0].(func(int) error)
+	// coursegradeDescYear is the schema descriptor for year field.
+	coursegradeDescYear := coursegradeFields[6].Descriptor()
+	// coursegrade.YearValidator is a validator for the "year" field. It is called by the builders before save.
+	coursegrade.YearValidator = coursegradeDescYear.Validators[0].(func(string) error)
 	// coursegradeDescID is the schema descriptor for id field.
 	coursegradeDescID := coursegradeFields[0].Descriptor()
 	// coursegrade.DefaultID holds the default value on creation for the id field.

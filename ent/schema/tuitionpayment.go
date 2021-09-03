@@ -1,9 +1,6 @@
 package schema
 
 import (
-	"errors"
-	"regexp"
-
 	"entgo.io/contrib/entgql"
 	"entgo.io/ent"
 	"entgo.io/ent/schema/edge"
@@ -17,19 +14,11 @@ type TuitionPayment struct {
 	ent.Schema
 }
 
-var yearExp = regexp.MustCompile("\\d{4}-\\d{4}")
-
 // Fields of the TuitionPayment.
 func (TuitionPayment) Fields() []ent.Field {
 	return []ent.Field{
 		field.UUID("id", uuid.UUID{}).Default(uuid.New),
-		field.String("year").Validate(func(s string) error {
-			if !yearExp.Match([]byte(s)) {
-				return errors.New("invalid year: format must be YYYY-YYYY")
-			}
-
-			return nil
-		}).Annotations(entgql.OrderField("YEAR")),
+		field.String("year").Validate(validateYear).Annotations(entgql.OrderField("YEAR")),
 		field.Int("paid_amount").Annotations(entgql.OrderField("PAID_AMOUNT")),
 	}
 }

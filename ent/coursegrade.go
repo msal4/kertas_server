@@ -34,6 +34,8 @@ type CourseGrade struct {
 	WrittenSecond *int `json:"written_second,omitempty"`
 	// CourseFinal holds the value of the "course_final" field.
 	CourseFinal *int `json:"course_final,omitempty"`
+	// Year holds the value of the "year" field.
+	Year string `json:"year,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the CourseGradeQuery when eager-loading is set.
 	Edges               CourseGradeEdges `json:"edges"`
@@ -104,6 +106,8 @@ func (*CourseGrade) scanValues(columns []string) ([]interface{}, error) {
 		switch columns[i] {
 		case coursegrade.FieldActivityFirst, coursegrade.FieldActivitySecond, coursegrade.FieldWrittenFirst, coursegrade.FieldWrittenSecond, coursegrade.FieldCourseFinal:
 			values[i] = new(sql.NullInt64)
+		case coursegrade.FieldYear:
+			values[i] = new(sql.NullString)
 		case coursegrade.FieldCreatedAt, coursegrade.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
 		case coursegrade.FieldID:
@@ -181,6 +185,12 @@ func (cg *CourseGrade) assignValues(columns []string, values []interface{}) erro
 			} else if value.Valid {
 				cg.CourseFinal = new(int)
 				*cg.CourseFinal = int(value.Int64)
+			}
+		case coursegrade.FieldYear:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field year", values[i])
+			} else if value.Valid {
+				cg.Year = value.String
 			}
 		case coursegrade.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullScanner); !ok {
@@ -270,6 +280,8 @@ func (cg *CourseGrade) String() string {
 		builder.WriteString(", course_final=")
 		builder.WriteString(fmt.Sprintf("%v", *v))
 	}
+	builder.WriteString(", year=")
+	builder.WriteString(cg.Year)
 	builder.WriteByte(')')
 	return builder.String()
 }

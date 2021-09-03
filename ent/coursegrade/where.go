@@ -143,6 +143,13 @@ func CourseFinal(v int) predicate.CourseGrade {
 	})
 }
 
+// Year applies equality check predicate on the "year" field. It's identical to YearEQ.
+func Year(v string) predicate.CourseGrade {
+	return predicate.CourseGrade(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldYear), v))
+	})
+}
+
 // CreatedAtEQ applies the EQ predicate on the "created_at" field.
 func CreatedAtEQ(v time.Time) predicate.CourseGrade {
 	return predicate.CourseGrade(func(s *sql.Selector) {
@@ -742,6 +749,117 @@ func CourseFinalIsNil() predicate.CourseGrade {
 func CourseFinalNotNil() predicate.CourseGrade {
 	return predicate.CourseGrade(func(s *sql.Selector) {
 		s.Where(sql.NotNull(s.C(FieldCourseFinal)))
+	})
+}
+
+// YearEQ applies the EQ predicate on the "year" field.
+func YearEQ(v string) predicate.CourseGrade {
+	return predicate.CourseGrade(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldYear), v))
+	})
+}
+
+// YearNEQ applies the NEQ predicate on the "year" field.
+func YearNEQ(v string) predicate.CourseGrade {
+	return predicate.CourseGrade(func(s *sql.Selector) {
+		s.Where(sql.NEQ(s.C(FieldYear), v))
+	})
+}
+
+// YearIn applies the In predicate on the "year" field.
+func YearIn(vs ...string) predicate.CourseGrade {
+	v := make([]interface{}, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.CourseGrade(func(s *sql.Selector) {
+		// if not arguments were provided, append the FALSE constants,
+		// since we can't apply "IN ()". This will make this predicate falsy.
+		if len(v) == 0 {
+			s.Where(sql.False())
+			return
+		}
+		s.Where(sql.In(s.C(FieldYear), v...))
+	})
+}
+
+// YearNotIn applies the NotIn predicate on the "year" field.
+func YearNotIn(vs ...string) predicate.CourseGrade {
+	v := make([]interface{}, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.CourseGrade(func(s *sql.Selector) {
+		// if not arguments were provided, append the FALSE constants,
+		// since we can't apply "IN ()". This will make this predicate falsy.
+		if len(v) == 0 {
+			s.Where(sql.False())
+			return
+		}
+		s.Where(sql.NotIn(s.C(FieldYear), v...))
+	})
+}
+
+// YearGT applies the GT predicate on the "year" field.
+func YearGT(v string) predicate.CourseGrade {
+	return predicate.CourseGrade(func(s *sql.Selector) {
+		s.Where(sql.GT(s.C(FieldYear), v))
+	})
+}
+
+// YearGTE applies the GTE predicate on the "year" field.
+func YearGTE(v string) predicate.CourseGrade {
+	return predicate.CourseGrade(func(s *sql.Selector) {
+		s.Where(sql.GTE(s.C(FieldYear), v))
+	})
+}
+
+// YearLT applies the LT predicate on the "year" field.
+func YearLT(v string) predicate.CourseGrade {
+	return predicate.CourseGrade(func(s *sql.Selector) {
+		s.Where(sql.LT(s.C(FieldYear), v))
+	})
+}
+
+// YearLTE applies the LTE predicate on the "year" field.
+func YearLTE(v string) predicate.CourseGrade {
+	return predicate.CourseGrade(func(s *sql.Selector) {
+		s.Where(sql.LTE(s.C(FieldYear), v))
+	})
+}
+
+// YearContains applies the Contains predicate on the "year" field.
+func YearContains(v string) predicate.CourseGrade {
+	return predicate.CourseGrade(func(s *sql.Selector) {
+		s.Where(sql.Contains(s.C(FieldYear), v))
+	})
+}
+
+// YearHasPrefix applies the HasPrefix predicate on the "year" field.
+func YearHasPrefix(v string) predicate.CourseGrade {
+	return predicate.CourseGrade(func(s *sql.Selector) {
+		s.Where(sql.HasPrefix(s.C(FieldYear), v))
+	})
+}
+
+// YearHasSuffix applies the HasSuffix predicate on the "year" field.
+func YearHasSuffix(v string) predicate.CourseGrade {
+	return predicate.CourseGrade(func(s *sql.Selector) {
+		s.Where(sql.HasSuffix(s.C(FieldYear), v))
+	})
+}
+
+// YearEqualFold applies the EqualFold predicate on the "year" field.
+func YearEqualFold(v string) predicate.CourseGrade {
+	return predicate.CourseGrade(func(s *sql.Selector) {
+		s.Where(sql.EqualFold(s.C(FieldYear), v))
+	})
+}
+
+// YearContainsFold applies the ContainsFold predicate on the "year" field.
+func YearContainsFold(v string) predicate.CourseGrade {
+	return predicate.CourseGrade(func(s *sql.Selector) {
+		s.Where(sql.ContainsFold(s.C(FieldYear), v))
 	})
 }
 

@@ -166,6 +166,12 @@ func (cgu *CourseGradeUpdate) ClearCourseFinal() *CourseGradeUpdate {
 	return cgu
 }
 
+// SetYear sets the "year" field.
+func (cgu *CourseGradeUpdate) SetYear(s string) *CourseGradeUpdate {
+	cgu.mutation.SetYear(s)
+	return cgu
+}
+
 // SetStudentID sets the "student" edge to the User entity by ID.
 func (cgu *CourseGradeUpdate) SetStudentID(id uuid.UUID) *CourseGradeUpdate {
 	cgu.mutation.SetStudentID(id)
@@ -318,6 +324,11 @@ func (cgu *CourseGradeUpdate) check() error {
 			return &ValidationError{Name: "course_final", err: fmt.Errorf("ent: validator failed for field \"course_final\": %w", err)}
 		}
 	}
+	if v, ok := cgu.mutation.Year(); ok {
+		if err := coursegrade.YearValidator(v); err != nil {
+			return &ValidationError{Name: "year", err: fmt.Errorf("ent: validator failed for field \"year\": %w", err)}
+		}
+	}
 	if _, ok := cgu.mutation.StudentID(); cgu.mutation.StudentCleared() && !ok {
 		return errors.New("ent: clearing a required unique edge \"student\"")
 	}
@@ -453,6 +464,13 @@ func (cgu *CourseGradeUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
 			Type:   field.TypeInt,
 			Column: coursegrade.FieldCourseFinal,
+		})
+	}
+	if value, ok := cgu.mutation.Year(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: coursegrade.FieldYear,
 		})
 	}
 	if cgu.mutation.StudentCleared() {
@@ -714,6 +732,12 @@ func (cguo *CourseGradeUpdateOne) ClearCourseFinal() *CourseGradeUpdateOne {
 	return cguo
 }
 
+// SetYear sets the "year" field.
+func (cguo *CourseGradeUpdateOne) SetYear(s string) *CourseGradeUpdateOne {
+	cguo.mutation.SetYear(s)
+	return cguo
+}
+
 // SetStudentID sets the "student" edge to the User entity by ID.
 func (cguo *CourseGradeUpdateOne) SetStudentID(id uuid.UUID) *CourseGradeUpdateOne {
 	cguo.mutation.SetStudentID(id)
@@ -873,6 +897,11 @@ func (cguo *CourseGradeUpdateOne) check() error {
 			return &ValidationError{Name: "course_final", err: fmt.Errorf("ent: validator failed for field \"course_final\": %w", err)}
 		}
 	}
+	if v, ok := cguo.mutation.Year(); ok {
+		if err := coursegrade.YearValidator(v); err != nil {
+			return &ValidationError{Name: "year", err: fmt.Errorf("ent: validator failed for field \"year\": %w", err)}
+		}
+	}
 	if _, ok := cguo.mutation.StudentID(); cguo.mutation.StudentCleared() && !ok {
 		return errors.New("ent: clearing a required unique edge \"student\"")
 	}
@@ -1025,6 +1054,13 @@ func (cguo *CourseGradeUpdateOne) sqlSave(ctx context.Context) (_node *CourseGra
 		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
 			Type:   field.TypeInt,
 			Column: coursegrade.FieldCourseFinal,
+		})
+	}
+	if value, ok := cguo.mutation.Year(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: coursegrade.FieldYear,
 		})
 	}
 	if cguo.mutation.StudentCleared() {

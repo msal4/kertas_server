@@ -22,6 +22,7 @@ func (CourseGrade) Fields() []ent.Field {
 		field.Int("written_first").Positive().Optional().Nillable().Annotations(entgql.OrderField("WRITTEN_FIRST")),
 		field.Int("written_second").Positive().Optional().Nillable().Annotations(entgql.OrderField("WRITTEN_SECOND")),
 		field.Int("course_final").Positive().Optional().Nillable().Annotations(entgql.OrderField("COURSE_FINAL")),
+		field.String("year").Validate(validateYear).Annotations(entgql.OrderField("YEAR")),
 	}
 }
 

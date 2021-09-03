@@ -1233,6 +1233,21 @@ input CourseGradeWhereInput {
   courseFinalIsNil: Boolean
   courseFinalNotNil: Boolean
   
+  """year field predicates"""
+  year: String
+  yearNEQ: String
+  yearIn: [String!]
+  yearNotIn: [String!]
+  yearGT: String
+  yearGTE: String
+  yearLT: String
+  yearLTE: String
+  yearContains: String
+  yearHasPrefix: String
+  yearHasSuffix: String
+  yearEqualFold: String
+  yearContainsFold: String
+  
   """id field predicates"""
   id: ID
   idNEQ: ID

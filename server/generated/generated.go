@@ -171,6 +171,7 @@ type ComplexityRoot struct {
 		UpdatedAt      func(childComplexity int) int
 		WrittenFirst   func(childComplexity int) int
 		WrittenSecond  func(childComplexity int) int
+		Year           func(childComplexity int) int
 	}
 
 	CourseGradeConnection struct {
@@ -1049,6 +1050,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.CourseGrade.WrittenSecond(childComplexity), true
+
+	case "CourseGrade.year":
+		if e.complexity.CourseGrade.Year == nil {
+			break
+		}
+
+		return e.complexity.CourseGrade.Year(childComplexity), true
 
 	case "CourseGradeConnection.edges":
 		if e.complexity.CourseGradeConnection.Edges == nil {
@@ -3140,6 +3148,7 @@ type CourseGrade implements Node {
   writtenFirst: Int
   writtenSecond: Int
   courseFinal: Int
+  year: String!
   createdAt: Time!
   updatedAt: Time!
 
@@ -3154,6 +3163,7 @@ enum CourseGradeOrderField {
   WRITTEN_FIRST
   WRITTEN_SECOND
   COURSE_FINAL
+  YEAR
   CREATED_AT
   UPDATED_AT
 }
@@ -3183,6 +3193,7 @@ input AddCourseGradeInput {
   writtenFirst: Int
   writtenSecond: Int
   courseFinal: Int
+  year: String!
 }
 
 input UpdateCourseGradeInput {
@@ -4663,6 +4674,21 @@ input CourseGradeWhereInput {
   courseFinalLTE: Int
   courseFinalIsNil: Boolean
   courseFinalNotNil: Boolean
+  
+  """year field predicates"""
+  year: String
+  yearNEQ: String
+  yearIn: [String!]
+  yearNotIn: [String!]
+  yearGT: String
+  yearGTE: String
+  yearLT: String
+  yearLTE: String
+  yearContains: String
+  yearHasPrefix: String
+  yearHasSuffix: String
+  yearEqualFold: String
+  yearContainsFold: String
   
   """id field predicates"""
   id: ID
@@ -9614,6 +9640,41 @@ func (ec *executionContext) _CourseGrade_courseFinal(ctx context.Context, field 
 	res := resTmp.(*int)
 	fc.Result = res
 	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _CourseGrade_year(ctx context.Context, field graphql.CollectedField, obj *ent.CourseGrade) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "CourseGrade",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Year, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _CourseGrade_createdAt(ctx context.Context, field graphql.CollectedField, obj *ent.CourseGrade) (ret graphql.Marshaler) {
@@ -17532,6 +17593,14 @@ func (ec *executionContext) unmarshalInputAddCourseGradeInput(ctx context.Contex
 			if err != nil {
 				return it, err
 			}
+		case "year":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("year"))
+			it.Year, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		}
 	}
 
@@ -20636,6 +20705,110 @@ func (ec *executionContext) unmarshalInputCourseGradeWhereInput(ctx context.Cont
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("courseFinalNotNil"))
 			it.CourseFinalNotNil, err = ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "year":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("year"))
+			it.Year, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "yearNEQ":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("yearNEQ"))
+			it.YearNEQ, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "yearIn":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("yearIn"))
+			it.YearIn, err = ec.unmarshalOString2ᚕstringᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "yearNotIn":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("yearNotIn"))
+			it.YearNotIn, err = ec.unmarshalOString2ᚕstringᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "yearGT":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("yearGT"))
+			it.YearGT, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "yearGTE":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("yearGTE"))
+			it.YearGTE, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "yearLT":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("yearLT"))
+			it.YearLT, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "yearLTE":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("yearLTE"))
+			it.YearLTE, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "yearContains":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("yearContains"))
+			it.YearContains, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "yearHasPrefix":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("yearHasPrefix"))
+			it.YearHasPrefix, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "yearHasSuffix":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("yearHasSuffix"))
+			it.YearHasSuffix, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "yearEqualFold":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("yearEqualFold"))
+			it.YearEqualFold, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "yearContainsFold":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("yearContainsFold"))
+			it.YearContainsFold, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -26819,6 +26992,11 @@ func (ec *executionContext) _CourseGrade(ctx context.Context, sel ast.SelectionS
 			out.Values[i] = ec._CourseGrade_writtenSecond(ctx, field, obj)
 		case "courseFinal":
 			out.Values[i] = ec._CourseGrade_courseFinal(ctx, field, obj)
+		case "year":
+			out.Values[i] = ec._CourseGrade_year(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
 		case "createdAt":
 			out.Values[i] = ec._CourseGrade_createdAt(ctx, field, obj)
 			if out.Values[i] == graphql.Null {

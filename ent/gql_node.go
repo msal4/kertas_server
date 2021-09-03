@@ -417,7 +417,7 @@ func (cg *CourseGrade) Node(ctx context.Context) (node *Node, err error) {
 	node = &Node{
 		ID:     cg.ID,
 		Type:   "CourseGrade",
-		Fields: make([]*Field, 7),
+		Fields: make([]*Field, 8),
 		Edges:  make([]*Edge, 3),
 	}
 	var buf []byte
@@ -475,6 +475,14 @@ func (cg *CourseGrade) Node(ctx context.Context) (node *Node, err error) {
 	node.Fields[6] = &Field{
 		Type:  "int",
 		Name:  "course_final",
+		Value: string(buf),
+	}
+	if buf, err = json.Marshal(cg.Year); err != nil {
+		return nil, err
+	}
+	node.Fields[7] = &Field{
+		Type:  "string",
+		Name:  "year",
 		Value: string(buf),
 	}
 	node.Edges[0] = &Edge{
