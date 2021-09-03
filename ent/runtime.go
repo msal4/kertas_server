@@ -327,6 +327,10 @@ func init() {
 	tuitionpayment.DefaultUpdatedAt = tuitionpaymentDescUpdatedAt.Default.(func() time.Time)
 	// tuitionpayment.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
 	tuitionpayment.UpdateDefaultUpdatedAt = tuitionpaymentDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// tuitionpaymentDescYear is the schema descriptor for year field.
+	tuitionpaymentDescYear := tuitionpaymentFields[1].Descriptor()
+	// tuitionpayment.YearValidator is a validator for the "year" field. It is called by the builders before save.
+	tuitionpayment.YearValidator = tuitionpaymentDescYear.Validators[0].(func(string) error)
 	// tuitionpaymentDescID is the schema descriptor for id field.
 	tuitionpaymentDescID := tuitionpaymentFields[0].Descriptor()
 	// tuitionpayment.DefaultID holds the default value on creation for the id field.

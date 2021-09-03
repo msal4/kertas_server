@@ -113,15 +113,15 @@ type User implements Node {
   createdAt: Time!
   updatedAt: Time!
 
-  stage: Stage! @goField(forceResolver: true)
-  school: School! @goField(forceResolver: true)
-
+  stage: Stage
+  school: School
 
   messages(after: Cursor, first: Int, before: Cursor, last: Int, orderBy: MessageOrder, where: MessageWhereInput): MessageConnection @goField(forceResolver: true)
   groups(after: Cursor, first: Int, before: Cursor, last: Int, orderBy: GroupOrder, where: GroupWhereInput): GroupConnection @goField(forceResolver: true)
   classes(stageID: ID, after: Cursor, first: Int, before: Cursor, last: Int, orderBy: ClassOrder, where: ClassWhereInput): ClassConnection @goField(forceResolver: true)
   assignmentSubmissions(after: Cursor, first: Int, before: Cursor, last: Int, orderBy: AssignmentSubmissionOrder, where: AssignmentSubmissionWhereInput): AssignmentSubmissionConnection @goField(forceResolver: true)
-  courseGrades: [CourseGrade!]! @goField(forceResolver: true)
+  payments(after: Cursor, first: Int, before: Cursor, last: Int, orderBy: TuitionPaymentOrder, where: TuitionPaymentWhereInput): TuitionPaymentConnection @goField(forceResolver: true)
+  courseGrades: [CourseGrade!]!
 }
 
 type UserEdge {
@@ -165,12 +165,12 @@ type Stage implements Node {
   createdAt: Time!
   updatedAt: Time!
 
-  school: School! @goField(forceResolver: true)
+  school: School!
 
   classes(after: Cursor, first: Int, before: Cursor, last: Int, orderBy: ClassOrder, where: ClassWhereInput): ClassConnection @goField(forceResolver: true)
   payments(after: Cursor, first: Int, before: Cursor, last: Int, orderBy: TuitionPaymentOrder, where: TuitionPaymentWhereInput): TuitionPaymentConnection @goField(forceResolver: true)
   students(after: Cursor, first: Int, before: Cursor, last: Int, orderBy: UserOrder, where: UserWhereInput): UserConnection @goField(forceResolver: true)
-  courseGrades: [CourseGrade!] @goField(forceResolver: true)
+  courseGrades: [CourseGrade!]
 }
 
 enum StageOrderField {
@@ -226,8 +226,8 @@ type Group implements Node {
   createdAt: Time!
   updatedAt: Time!
 
-  class: Class! @goField(forceResolver: true)
-  users: [User!] @goField(forceResolver: true)
+  class: Class
+  users: [User!]
 
   messages(after: Cursor, first: Int, before: Cursor, last: Int, orderBy: MessageOrder, where: MessageWhereInput): MessageConnection @goField(forceResolver: true)
 }
@@ -273,9 +273,9 @@ type Class implements Node {
   createdAt: Time!
   updatedAt: Time!
 
-  stage: Stage! @goField(forceResolver: true)
-  teacher: User! @goField(forceResolver: true)
-  group: Group! @goField(forceResolver: true)
+  stage: Stage!
+  teacher: User!
+  group: Group!
 
   assignments(after: Cursor, first: Int, before: Cursor, last: Int, orderBy: AssignmentOrder, where: AssignmentWhereInput): AssignmentConnection @goField(forceResolver: true)
   attendances(after: Cursor, first: Int, before: Cursor, last: Int, orderBy: AttendanceOrder, where: AttendanceWhereInput): AttendanceConnection @goField(forceResolver: true)
@@ -326,8 +326,8 @@ type Message implements Node {
   createdAt: Time!
   updatedAt: Time!
 
-  group: Group! @goField(forceResolver: true)
-  owner: User! @goField(forceResolver: true)
+  group: Group!
+  owner: User!
 }
 
 enum MessageOrderField {
@@ -368,7 +368,7 @@ type Assignment implements Node {
   createdAt: Time!
   updatedAt: Time!
 
-  class: Class! @goField(forceResolver: true)
+  class: Class!
 
   submissions(after: Cursor, first: Int, before: Cursor, last: Int, orderBy: AssignmentSubmissionOrder, where: AssignmentSubmissionWhereInput): AssignmentSubmissionConnection @goField(forceResolver: true)
 }
@@ -422,7 +422,7 @@ type Schedule implements Node {
   duration: Duration!
   startsAt: Time!
 
-  class: Class! @goField(forceResolver: true)
+  class: Class!
 }
 
 enum ScheduleOrderField {
@@ -464,17 +464,17 @@ input UpdateScheduleInput {
 
 type CourseGrade implements Node {
   id: ID!
-  activityFirst: Int!
-  activitySecond: Int!
-  writtenFirst: Int!
-  writtenSecond: Int!
-  courseFinal: Int!
+  activityFirst: Int
+  activitySecond: Int
+  writtenFirst: Int
+  writtenSecond: Int
+  courseFinal: Int
   createdAt: Time!
   updatedAt: Time!
 
-  student: User! @goField(forceResolver: true)
-  class: Class! @goField(forceResolver: true)
-  stage: Stage! @goField(forceResolver: true)
+  student: User!
+  class: Class!
+  stage: Stage!
 }
 
 enum CourseGradeOrderField {
@@ -529,8 +529,8 @@ type AssignmentSubmission implements Node {
   createdAt: Time!
   updatedAt: Time!
 
-  student: User! @goField(forceResolver: true)
-  assignment: Assignment! @goField(forceResolver: true)
+  student: User!
+  assignment: Assignment!
 }
 
 enum AssignmentSubmissionOrderField {
@@ -580,8 +580,8 @@ type Attendance implements Node {
   createdAt: Time!
   updatedAt: Time!
 
-  class: Class! @goField(forceResolver: true)
-  student: User! @goField(forceResolver: true)
+  class: Class!
+  student: User!
 }
 
 enum AttendanceOrderField {
@@ -606,18 +606,33 @@ type AttendanceConnection {
   edges: [AttendanceEdge]
 }
 
+input AddAttendanceInput {
+  date: Time!
+  state: AttendanceState!
+
+  classID: ID!
+  studentID: ID!
+}
+
+input UpdateAttendanceInput {
+  date: Time
+  state: AttendanceState
+}
+
 type TuitionPayment implements Node {
   id: ID!
+  year: String!
   paidAmount: Int!
   createdAt: Time!
   updatedAt: Time!
 
-  student: User! @goField(forceResolver: true)
-  stage: Stage! @goField(forceResolver: true)
+  student: User!
+  stage: Stage!
 }
 
 enum TuitionPaymentOrderField {
   PAID_AMOUNT
+  YEAR
   CREATED_AT
   UPDATED_AT
 }
@@ -636,6 +651,18 @@ type TuitionPaymentConnection {
   totalCount: Int!
   pageInfo: PageInfo!
   edges: [TuitionPaymentEdge]
+}
+
+input AddTuitionPaymentInput {
+  stageID: ID!
+  studentID: ID!
+  year: String!
+  paidAmount: Int!
+}
+
+input UpdateTuitionPaymentInput {
+  year: String
+  paidAmount: Int
 }
 
 type Query {
@@ -665,6 +692,10 @@ type Query {
   schedule(stageID: ID, weekday: Weekday): [Schedule!]!
 
   courseGrades(studentID: ID, stageID: ID, classID: ID, after: Cursor, first: Int, before: Cursor, last: Int, orderBy: CourseGradeOrder, where: CourseGradeWhereInput): CourseGradeConnection!
+
+  tuitionPayments(studentID: ID, stageID: ID, after: Cursor, first: Int, before: Cursor, last: Int, orderBy: TuitionPaymentOrder, where: TuitionPaymentWhereInput): TuitionPaymentConnection!
+
+  attendances(studentID: ID, classID: ID, after: Cursor, first: Int, before: Cursor, last: Int, orderBy: AttendanceOrder, where: AttendanceWhereInput): AttendanceConnection!
 }
 
 type Mutation {
@@ -713,6 +744,14 @@ type Mutation {
   addCourseGrade(input: AddCourseGradeInput!): CourseGrade!
   updateCourseGrade(id: ID!, input: UpdateCourseGradeInput!): CourseGrade!
   deleteCourseGrade(id: ID!): Boolean!
+
+  addTuitionPayment(input: AddTuitionPaymentInput!): TuitionPayment!
+  updateTuitionPayment(id: ID!, input: UpdateTuitionPaymentInput!): TuitionPayment!
+  deleteTuitionPayment(id: ID!): Boolean!
+
+  addAttendance(input: AddAttendanceInput!): Attendance!
+  updateAttendance(id: ID!, input: UpdateAttendanceInput!): Attendance!
+  deleteAttendance(id: ID!): Boolean!
 }
 
 type Subscription {

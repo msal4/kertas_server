@@ -440,6 +440,21 @@ input TuitionPaymentWhereInput {
   updatedAtLT: Time
   updatedAtLTE: Time
   
+  """year field predicates"""
+  year: String
+  yearNEQ: String
+  yearIn: [String!]
+  yearNotIn: [String!]
+  yearGT: String
+  yearGTE: String
+  yearLT: String
+  yearLTE: String
+  yearContains: String
+  yearHasPrefix: String
+  yearHasSuffix: String
+  yearEqualFold: String
+  yearContainsFold: String
+  
   """paid_amount field predicates"""
   paidAmount: Int
   paidAmountNEQ: Int
@@ -1191,6 +1206,8 @@ input CourseGradeWhereInput {
   writtenFirstGTE: Int
   writtenFirstLT: Int
   writtenFirstLTE: Int
+  writtenFirstIsNil: Boolean
+  writtenFirstNotNil: Boolean
   
   """written_second field predicates"""
   writtenSecond: Int
@@ -1201,6 +1218,8 @@ input CourseGradeWhereInput {
   writtenSecondGTE: Int
   writtenSecondLT: Int
   writtenSecondLTE: Int
+  writtenSecondIsNil: Boolean
+  writtenSecondNotNil: Boolean
   
   """course_final field predicates"""
   courseFinal: Int
@@ -1211,6 +1230,8 @@ input CourseGradeWhereInput {
   courseFinalGTE: Int
   courseFinalLT: Int
   courseFinalLTE: Int
+  courseFinalIsNil: Boolean
+  courseFinalNotNil: Boolean
   
   """id field predicates"""
   id: ID

@@ -17,6 +17,8 @@ const (
 	FieldCreatedAt = "created_at"
 	// FieldUpdatedAt holds the string denoting the updated_at field in the database.
 	FieldUpdatedAt = "updated_at"
+	// FieldYear holds the string denoting the year field in the database.
+	FieldYear = "year"
 	// FieldPaidAmount holds the string denoting the paid_amount field in the database.
 	FieldPaidAmount = "paid_amount"
 	// EdgeStudent holds the string denoting the student edge name in mutations.
@@ -46,6 +48,7 @@ var Columns = []string{
 	FieldID,
 	FieldCreatedAt,
 	FieldUpdatedAt,
+	FieldYear,
 	FieldPaidAmount,
 }
 
@@ -78,6 +81,8 @@ var (
 	DefaultUpdatedAt func() time.Time
 	// UpdateDefaultUpdatedAt holds the default value on update for the "updated_at" field.
 	UpdateDefaultUpdatedAt func() time.Time
+	// YearValidator is a validator for the "year" field. It is called by the builders before save.
+	YearValidator func(string) error
 	// DefaultID holds the default value on creation for the "id" field.
 	DefaultID func() uuid.UUID
 )

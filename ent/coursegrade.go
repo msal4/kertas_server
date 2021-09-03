@@ -25,15 +25,15 @@ type CourseGrade struct {
 	// UpdatedAt holds the value of the "updated_at" field.
 	UpdatedAt time.Time `json:"updated_at,omitempty"`
 	// ActivityFirst holds the value of the "activity_first" field.
-	ActivityFirst int `json:"activity_first,omitempty"`
+	ActivityFirst *int `json:"activity_first,omitempty"`
 	// ActivitySecond holds the value of the "activity_second" field.
-	ActivitySecond int `json:"activity_second,omitempty"`
+	ActivitySecond *int `json:"activity_second,omitempty"`
 	// WrittenFirst holds the value of the "written_first" field.
-	WrittenFirst int `json:"written_first,omitempty"`
+	WrittenFirst *int `json:"written_first,omitempty"`
 	// WrittenSecond holds the value of the "written_second" field.
-	WrittenSecond int `json:"written_second,omitempty"`
+	WrittenSecond *int `json:"written_second,omitempty"`
 	// CourseFinal holds the value of the "course_final" field.
-	CourseFinal int `json:"course_final,omitempty"`
+	CourseFinal *int `json:"course_final,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the CourseGradeQuery when eager-loading is set.
 	Edges               CourseGradeEdges `json:"edges"`
@@ -151,31 +151,36 @@ func (cg *CourseGrade) assignValues(columns []string, values []interface{}) erro
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field activity_first", values[i])
 			} else if value.Valid {
-				cg.ActivityFirst = int(value.Int64)
+				cg.ActivityFirst = new(int)
+				*cg.ActivityFirst = int(value.Int64)
 			}
 		case coursegrade.FieldActivitySecond:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field activity_second", values[i])
 			} else if value.Valid {
-				cg.ActivitySecond = int(value.Int64)
+				cg.ActivitySecond = new(int)
+				*cg.ActivitySecond = int(value.Int64)
 			}
 		case coursegrade.FieldWrittenFirst:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field written_first", values[i])
 			} else if value.Valid {
-				cg.WrittenFirst = int(value.Int64)
+				cg.WrittenFirst = new(int)
+				*cg.WrittenFirst = int(value.Int64)
 			}
 		case coursegrade.FieldWrittenSecond:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field written_second", values[i])
 			} else if value.Valid {
-				cg.WrittenSecond = int(value.Int64)
+				cg.WrittenSecond = new(int)
+				*cg.WrittenSecond = int(value.Int64)
 			}
 		case coursegrade.FieldCourseFinal:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field course_final", values[i])
 			} else if value.Valid {
-				cg.CourseFinal = int(value.Int64)
+				cg.CourseFinal = new(int)
+				*cg.CourseFinal = int(value.Int64)
 			}
 		case coursegrade.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullScanner); !ok {
@@ -245,16 +250,26 @@ func (cg *CourseGrade) String() string {
 	builder.WriteString(cg.CreatedAt.Format(time.ANSIC))
 	builder.WriteString(", updated_at=")
 	builder.WriteString(cg.UpdatedAt.Format(time.ANSIC))
-	builder.WriteString(", activity_first=")
-	builder.WriteString(fmt.Sprintf("%v", cg.ActivityFirst))
-	builder.WriteString(", activity_second=")
-	builder.WriteString(fmt.Sprintf("%v", cg.ActivitySecond))
-	builder.WriteString(", written_first=")
-	builder.WriteString(fmt.Sprintf("%v", cg.WrittenFirst))
-	builder.WriteString(", written_second=")
-	builder.WriteString(fmt.Sprintf("%v", cg.WrittenSecond))
-	builder.WriteString(", course_final=")
-	builder.WriteString(fmt.Sprintf("%v", cg.CourseFinal))
+	if v := cg.ActivityFirst; v != nil {
+		builder.WriteString(", activity_first=")
+		builder.WriteString(fmt.Sprintf("%v", *v))
+	}
+	if v := cg.ActivitySecond; v != nil {
+		builder.WriteString(", activity_second=")
+		builder.WriteString(fmt.Sprintf("%v", *v))
+	}
+	if v := cg.WrittenFirst; v != nil {
+		builder.WriteString(", written_first=")
+		builder.WriteString(fmt.Sprintf("%v", *v))
+	}
+	if v := cg.WrittenSecond; v != nil {
+		builder.WriteString(", written_second=")
+		builder.WriteString(fmt.Sprintf("%v", *v))
+	}
+	if v := cg.CourseFinal; v != nil {
+		builder.WriteString(", course_final=")
+		builder.WriteString(fmt.Sprintf("%v", *v))
+	}
 	builder.WriteByte(')')
 	return builder.String()
 }

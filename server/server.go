@@ -49,7 +49,7 @@ func NewDefaultServer(cfg Config) (*http.ServeMux, error) {
 		cfg.DatabaseDialect = dialect.Postgres
 	}
 
-	entOpts := []ent.Option{}
+	var entOpts []ent.Option
 	if cfg.Debug {
 		entOpts = append(entOpts, ent.Debug())
 	}

@@ -1614,34 +1614,40 @@ type CourseGradeWhereInput struct {
 	ActivitySecondNotNil bool  `json:"activitySecondNotNil,omitempty"`
 
 	// "written_first" field predicates.
-	WrittenFirst      *int  `json:"writtenFirst,omitempty"`
-	WrittenFirstNEQ   *int  `json:"writtenFirstNEQ,omitempty"`
-	WrittenFirstIn    []int `json:"writtenFirstIn,omitempty"`
-	WrittenFirstNotIn []int `json:"writtenFirstNotIn,omitempty"`
-	WrittenFirstGT    *int  `json:"writtenFirstGT,omitempty"`
-	WrittenFirstGTE   *int  `json:"writtenFirstGTE,omitempty"`
-	WrittenFirstLT    *int  `json:"writtenFirstLT,omitempty"`
-	WrittenFirstLTE   *int  `json:"writtenFirstLTE,omitempty"`
+	WrittenFirst       *int  `json:"writtenFirst,omitempty"`
+	WrittenFirstNEQ    *int  `json:"writtenFirstNEQ,omitempty"`
+	WrittenFirstIn     []int `json:"writtenFirstIn,omitempty"`
+	WrittenFirstNotIn  []int `json:"writtenFirstNotIn,omitempty"`
+	WrittenFirstGT     *int  `json:"writtenFirstGT,omitempty"`
+	WrittenFirstGTE    *int  `json:"writtenFirstGTE,omitempty"`
+	WrittenFirstLT     *int  `json:"writtenFirstLT,omitempty"`
+	WrittenFirstLTE    *int  `json:"writtenFirstLTE,omitempty"`
+	WrittenFirstIsNil  bool  `json:"writtenFirstIsNil,omitempty"`
+	WrittenFirstNotNil bool  `json:"writtenFirstNotNil,omitempty"`
 
 	// "written_second" field predicates.
-	WrittenSecond      *int  `json:"writtenSecond,omitempty"`
-	WrittenSecondNEQ   *int  `json:"writtenSecondNEQ,omitempty"`
-	WrittenSecondIn    []int `json:"writtenSecondIn,omitempty"`
-	WrittenSecondNotIn []int `json:"writtenSecondNotIn,omitempty"`
-	WrittenSecondGT    *int  `json:"writtenSecondGT,omitempty"`
-	WrittenSecondGTE   *int  `json:"writtenSecondGTE,omitempty"`
-	WrittenSecondLT    *int  `json:"writtenSecondLT,omitempty"`
-	WrittenSecondLTE   *int  `json:"writtenSecondLTE,omitempty"`
+	WrittenSecond       *int  `json:"writtenSecond,omitempty"`
+	WrittenSecondNEQ    *int  `json:"writtenSecondNEQ,omitempty"`
+	WrittenSecondIn     []int `json:"writtenSecondIn,omitempty"`
+	WrittenSecondNotIn  []int `json:"writtenSecondNotIn,omitempty"`
+	WrittenSecondGT     *int  `json:"writtenSecondGT,omitempty"`
+	WrittenSecondGTE    *int  `json:"writtenSecondGTE,omitempty"`
+	WrittenSecondLT     *int  `json:"writtenSecondLT,omitempty"`
+	WrittenSecondLTE    *int  `json:"writtenSecondLTE,omitempty"`
+	WrittenSecondIsNil  bool  `json:"writtenSecondIsNil,omitempty"`
+	WrittenSecondNotNil bool  `json:"writtenSecondNotNil,omitempty"`
 
 	// "course_final" field predicates.
-	CourseFinal      *int  `json:"courseFinal,omitempty"`
-	CourseFinalNEQ   *int  `json:"courseFinalNEQ,omitempty"`
-	CourseFinalIn    []int `json:"courseFinalIn,omitempty"`
-	CourseFinalNotIn []int `json:"courseFinalNotIn,omitempty"`
-	CourseFinalGT    *int  `json:"courseFinalGT,omitempty"`
-	CourseFinalGTE   *int  `json:"courseFinalGTE,omitempty"`
-	CourseFinalLT    *int  `json:"courseFinalLT,omitempty"`
-	CourseFinalLTE   *int  `json:"courseFinalLTE,omitempty"`
+	CourseFinal       *int  `json:"courseFinal,omitempty"`
+	CourseFinalNEQ    *int  `json:"courseFinalNEQ,omitempty"`
+	CourseFinalIn     []int `json:"courseFinalIn,omitempty"`
+	CourseFinalNotIn  []int `json:"courseFinalNotIn,omitempty"`
+	CourseFinalGT     *int  `json:"courseFinalGT,omitempty"`
+	CourseFinalGTE    *int  `json:"courseFinalGTE,omitempty"`
+	CourseFinalLT     *int  `json:"courseFinalLT,omitempty"`
+	CourseFinalLTE    *int  `json:"courseFinalLTE,omitempty"`
+	CourseFinalIsNil  bool  `json:"courseFinalIsNil,omitempty"`
+	CourseFinalNotNil bool  `json:"courseFinalNotNil,omitempty"`
 
 	// "student" edge predicates.
 	HasStudent     *bool             `json:"hasStudent,omitempty"`
@@ -1871,6 +1877,12 @@ func (i *CourseGradeWhereInput) P() (predicate.CourseGrade, error) {
 	if i.WrittenFirstLTE != nil {
 		predicates = append(predicates, coursegrade.WrittenFirstLTE(*i.WrittenFirstLTE))
 	}
+	if i.WrittenFirstIsNil {
+		predicates = append(predicates, coursegrade.WrittenFirstIsNil())
+	}
+	if i.WrittenFirstNotNil {
+		predicates = append(predicates, coursegrade.WrittenFirstNotNil())
+	}
 	if i.WrittenSecond != nil {
 		predicates = append(predicates, coursegrade.WrittenSecondEQ(*i.WrittenSecond))
 	}
@@ -1895,6 +1907,12 @@ func (i *CourseGradeWhereInput) P() (predicate.CourseGrade, error) {
 	if i.WrittenSecondLTE != nil {
 		predicates = append(predicates, coursegrade.WrittenSecondLTE(*i.WrittenSecondLTE))
 	}
+	if i.WrittenSecondIsNil {
+		predicates = append(predicates, coursegrade.WrittenSecondIsNil())
+	}
+	if i.WrittenSecondNotNil {
+		predicates = append(predicates, coursegrade.WrittenSecondNotNil())
+	}
 	if i.CourseFinal != nil {
 		predicates = append(predicates, coursegrade.CourseFinalEQ(*i.CourseFinal))
 	}
@@ -1918,6 +1936,12 @@ func (i *CourseGradeWhereInput) P() (predicate.CourseGrade, error) {
 	}
 	if i.CourseFinalLTE != nil {
 		predicates = append(predicates, coursegrade.CourseFinalLTE(*i.CourseFinalLTE))
+	}
+	if i.CourseFinalIsNil {
+		predicates = append(predicates, coursegrade.CourseFinalIsNil())
+	}
+	if i.CourseFinalNotNil {
+		predicates = append(predicates, coursegrade.CourseFinalNotNil())
 	}
 
 	if i.HasStudent != nil {
@@ -4198,6 +4222,21 @@ type TuitionPaymentWhereInput struct {
 	UpdatedAtLT    *time.Time  `json:"updatedAtLT,omitempty"`
 	UpdatedAtLTE   *time.Time  `json:"updatedAtLTE,omitempty"`
 
+	// "year" field predicates.
+	Year             *string  `json:"year,omitempty"`
+	YearNEQ          *string  `json:"yearNEQ,omitempty"`
+	YearIn           []string `json:"yearIn,omitempty"`
+	YearNotIn        []string `json:"yearNotIn,omitempty"`
+	YearGT           *string  `json:"yearGT,omitempty"`
+	YearGTE          *string  `json:"yearGTE,omitempty"`
+	YearLT           *string  `json:"yearLT,omitempty"`
+	YearLTE          *string  `json:"yearLTE,omitempty"`
+	YearContains     *string  `json:"yearContains,omitempty"`
+	YearHasPrefix    *string  `json:"yearHasPrefix,omitempty"`
+	YearHasSuffix    *string  `json:"yearHasSuffix,omitempty"`
+	YearEqualFold    *string  `json:"yearEqualFold,omitempty"`
+	YearContainsFold *string  `json:"yearContainsFold,omitempty"`
+
 	// "paid_amount" field predicates.
 	PaidAmount      *int  `json:"paidAmount,omitempty"`
 	PaidAmountNEQ   *int  `json:"paidAmountNEQ,omitempty"`
@@ -4347,6 +4386,45 @@ func (i *TuitionPaymentWhereInput) P() (predicate.TuitionPayment, error) {
 	}
 	if i.UpdatedAtLTE != nil {
 		predicates = append(predicates, tuitionpayment.UpdatedAtLTE(*i.UpdatedAtLTE))
+	}
+	if i.Year != nil {
+		predicates = append(predicates, tuitionpayment.YearEQ(*i.Year))
+	}
+	if i.YearNEQ != nil {
+		predicates = append(predicates, tuitionpayment.YearNEQ(*i.YearNEQ))
+	}
+	if len(i.YearIn) > 0 {
+		predicates = append(predicates, tuitionpayment.YearIn(i.YearIn...))
+	}
+	if len(i.YearNotIn) > 0 {
+		predicates = append(predicates, tuitionpayment.YearNotIn(i.YearNotIn...))
+	}
+	if i.YearGT != nil {
+		predicates = append(predicates, tuitionpayment.YearGT(*i.YearGT))
+	}
+	if i.YearGTE != nil {
+		predicates = append(predicates, tuitionpayment.YearGTE(*i.YearGTE))
+	}
+	if i.YearLT != nil {
+		predicates = append(predicates, tuitionpayment.YearLT(*i.YearLT))
+	}
+	if i.YearLTE != nil {
+		predicates = append(predicates, tuitionpayment.YearLTE(*i.YearLTE))
+	}
+	if i.YearContains != nil {
+		predicates = append(predicates, tuitionpayment.YearContains(*i.YearContains))
+	}
+	if i.YearHasPrefix != nil {
+		predicates = append(predicates, tuitionpayment.YearHasPrefix(*i.YearHasPrefix))
+	}
+	if i.YearHasSuffix != nil {
+		predicates = append(predicates, tuitionpayment.YearHasSuffix(*i.YearHasSuffix))
+	}
+	if i.YearEqualFold != nil {
+		predicates = append(predicates, tuitionpayment.YearEqualFold(*i.YearEqualFold))
+	}
+	if i.YearContainsFold != nil {
+		predicates = append(predicates, tuitionpayment.YearContainsFold(*i.YearContainsFold))
 	}
 	if i.PaidAmount != nil {
 		predicates = append(predicates, tuitionpayment.PaidAmountEQ(*i.PaidAmount))

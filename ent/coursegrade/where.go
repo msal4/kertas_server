@@ -551,6 +551,20 @@ func WrittenFirstLTE(v int) predicate.CourseGrade {
 	})
 }
 
+// WrittenFirstIsNil applies the IsNil predicate on the "written_first" field.
+func WrittenFirstIsNil() predicate.CourseGrade {
+	return predicate.CourseGrade(func(s *sql.Selector) {
+		s.Where(sql.IsNull(s.C(FieldWrittenFirst)))
+	})
+}
+
+// WrittenFirstNotNil applies the NotNil predicate on the "written_first" field.
+func WrittenFirstNotNil() predicate.CourseGrade {
+	return predicate.CourseGrade(func(s *sql.Selector) {
+		s.Where(sql.NotNull(s.C(FieldWrittenFirst)))
+	})
+}
+
 // WrittenSecondEQ applies the EQ predicate on the "written_second" field.
 func WrittenSecondEQ(v int) predicate.CourseGrade {
 	return predicate.CourseGrade(func(s *sql.Selector) {
@@ -627,6 +641,20 @@ func WrittenSecondLTE(v int) predicate.CourseGrade {
 	})
 }
 
+// WrittenSecondIsNil applies the IsNil predicate on the "written_second" field.
+func WrittenSecondIsNil() predicate.CourseGrade {
+	return predicate.CourseGrade(func(s *sql.Selector) {
+		s.Where(sql.IsNull(s.C(FieldWrittenSecond)))
+	})
+}
+
+// WrittenSecondNotNil applies the NotNil predicate on the "written_second" field.
+func WrittenSecondNotNil() predicate.CourseGrade {
+	return predicate.CourseGrade(func(s *sql.Selector) {
+		s.Where(sql.NotNull(s.C(FieldWrittenSecond)))
+	})
+}
+
 // CourseFinalEQ applies the EQ predicate on the "course_final" field.
 func CourseFinalEQ(v int) predicate.CourseGrade {
 	return predicate.CourseGrade(func(s *sql.Selector) {
@@ -700,6 +728,20 @@ func CourseFinalLT(v int) predicate.CourseGrade {
 func CourseFinalLTE(v int) predicate.CourseGrade {
 	return predicate.CourseGrade(func(s *sql.Selector) {
 		s.Where(sql.LTE(s.C(FieldCourseFinal), v))
+	})
+}
+
+// CourseFinalIsNil applies the IsNil predicate on the "course_final" field.
+func CourseFinalIsNil() predicate.CourseGrade {
+	return predicate.CourseGrade(func(s *sql.Selector) {
+		s.Where(sql.IsNull(s.C(FieldCourseFinal)))
+	})
+}
+
+// CourseFinalNotNil applies the NotNil predicate on the "course_final" field.
+func CourseFinalNotNil() predicate.CourseGrade {
+	return predicate.CourseGrade(func(s *sql.Selector) {
+		s.Where(sql.NotNull(s.C(FieldCourseFinal)))
 	})
 }
 

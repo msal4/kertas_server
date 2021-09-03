@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"flag"
 	"log"
 	"os"
 	"strings"
@@ -22,10 +21,6 @@ import (
 	"github.com/msal4/hassah_school_server/util/ptr"
 	"gopkg.in/yaml.v2"
 )
-
-func init() {
-	flag.Parse()
-}
 
 func main() {
 	f, err := os.Open("./config.yml")
@@ -243,7 +238,32 @@ func seed(ctx context.Context, s *service.Service) error {
 		AssignmentID: ass.ID,
 		Files:        []*graphql.Upload{{File: f, Filename: f.Name(), Size: stat.Size(), ContentType: "image/jpeg"}},
 	})
+	if err != nil {
+		return err
+	}
 	log.Printf("Created submission: %v\n\n", sub)
+
+	payment, err := s.AddTuitionPayment(ctx, model.AddTuitionPaymentInput{
+		StageID:    stg.ID,
+		StudentID:  stdt.ID,
+		PaidAmount: 100000,
+		Year:       "2020-2021",
+	})
+	if err != nil {
+		return err
+	}
+	log.Printf("Created payment: %v\n\n", payment)
+
+	payment, err = s.AddTuitionPayment(ctx, model.AddTuitionPaymentInput{
+		StageID:    stg.ID,
+		StudentID:  stdt.ID,
+		PaidAmount: 50000,
+		Year:       "2020-2021",
+	})
+	if err != nil {
+		return err
+	}
+	log.Printf("Created payment: %v\n\n", payment)
 
 	return nil
 }

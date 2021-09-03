@@ -51,6 +51,12 @@ func (tpc *TuitionPaymentCreate) SetNillableUpdatedAt(t *time.Time) *TuitionPaym
 	return tpc
 }
 
+// SetYear sets the "year" field.
+func (tpc *TuitionPaymentCreate) SetYear(s string) *TuitionPaymentCreate {
+	tpc.mutation.SetYear(s)
+	return tpc
+}
+
 // SetPaidAmount sets the "paid_amount" field.
 func (tpc *TuitionPaymentCreate) SetPaidAmount(i int) *TuitionPaymentCreate {
 	tpc.mutation.SetPaidAmount(i)
@@ -178,6 +184,14 @@ func (tpc *TuitionPaymentCreate) check() error {
 	if _, ok := tpc.mutation.UpdatedAt(); !ok {
 		return &ValidationError{Name: "updated_at", err: errors.New(`ent: missing required field "updated_at"`)}
 	}
+	if _, ok := tpc.mutation.Year(); !ok {
+		return &ValidationError{Name: "year", err: errors.New(`ent: missing required field "year"`)}
+	}
+	if v, ok := tpc.mutation.Year(); ok {
+		if err := tuitionpayment.YearValidator(v); err != nil {
+			return &ValidationError{Name: "year", err: fmt.Errorf(`ent: validator failed for field "year": %w`, err)}
+		}
+	}
 	if _, ok := tpc.mutation.PaidAmount(); !ok {
 		return &ValidationError{Name: "paid_amount", err: errors.New(`ent: missing required field "paid_amount"`)}
 	}
@@ -234,6 +248,14 @@ func (tpc *TuitionPaymentCreate) createSpec() (*TuitionPayment, *sqlgraph.Create
 			Column: tuitionpayment.FieldUpdatedAt,
 		})
 		_node.UpdatedAt = value
+	}
+	if value, ok := tpc.mutation.Year(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: tuitionpayment.FieldYear,
+		})
+		_node.Year = value
 	}
 	if value, ok := tpc.mutation.PaidAmount(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{

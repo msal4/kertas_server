@@ -92,9 +92,23 @@ func (cgu *CourseGradeUpdate) SetWrittenFirst(i int) *CourseGradeUpdate {
 	return cgu
 }
 
+// SetNillableWrittenFirst sets the "written_first" field if the given value is not nil.
+func (cgu *CourseGradeUpdate) SetNillableWrittenFirst(i *int) *CourseGradeUpdate {
+	if i != nil {
+		cgu.SetWrittenFirst(*i)
+	}
+	return cgu
+}
+
 // AddWrittenFirst adds i to the "written_first" field.
 func (cgu *CourseGradeUpdate) AddWrittenFirst(i int) *CourseGradeUpdate {
 	cgu.mutation.AddWrittenFirst(i)
+	return cgu
+}
+
+// ClearWrittenFirst clears the value of the "written_first" field.
+func (cgu *CourseGradeUpdate) ClearWrittenFirst() *CourseGradeUpdate {
+	cgu.mutation.ClearWrittenFirst()
 	return cgu
 }
 
@@ -105,9 +119,23 @@ func (cgu *CourseGradeUpdate) SetWrittenSecond(i int) *CourseGradeUpdate {
 	return cgu
 }
 
+// SetNillableWrittenSecond sets the "written_second" field if the given value is not nil.
+func (cgu *CourseGradeUpdate) SetNillableWrittenSecond(i *int) *CourseGradeUpdate {
+	if i != nil {
+		cgu.SetWrittenSecond(*i)
+	}
+	return cgu
+}
+
 // AddWrittenSecond adds i to the "written_second" field.
 func (cgu *CourseGradeUpdate) AddWrittenSecond(i int) *CourseGradeUpdate {
 	cgu.mutation.AddWrittenSecond(i)
+	return cgu
+}
+
+// ClearWrittenSecond clears the value of the "written_second" field.
+func (cgu *CourseGradeUpdate) ClearWrittenSecond() *CourseGradeUpdate {
+	cgu.mutation.ClearWrittenSecond()
 	return cgu
 }
 
@@ -118,9 +146,23 @@ func (cgu *CourseGradeUpdate) SetCourseFinal(i int) *CourseGradeUpdate {
 	return cgu
 }
 
+// SetNillableCourseFinal sets the "course_final" field if the given value is not nil.
+func (cgu *CourseGradeUpdate) SetNillableCourseFinal(i *int) *CourseGradeUpdate {
+	if i != nil {
+		cgu.SetCourseFinal(*i)
+	}
+	return cgu
+}
+
 // AddCourseFinal adds i to the "course_final" field.
 func (cgu *CourseGradeUpdate) AddCourseFinal(i int) *CourseGradeUpdate {
 	cgu.mutation.AddCourseFinal(i)
+	return cgu
+}
+
+// ClearCourseFinal clears the value of the "course_final" field.
+func (cgu *CourseGradeUpdate) ClearCourseFinal() *CourseGradeUpdate {
+	cgu.mutation.ClearCourseFinal()
 	return cgu
 }
 
@@ -367,6 +409,12 @@ func (cgu *CourseGradeUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Column: coursegrade.FieldWrittenFirst,
 		})
 	}
+	if cgu.mutation.WrittenFirstCleared() {
+		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
+			Type:   field.TypeInt,
+			Column: coursegrade.FieldWrittenFirst,
+		})
+	}
 	if value, ok := cgu.mutation.WrittenSecond(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeInt,
@@ -381,6 +429,12 @@ func (cgu *CourseGradeUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Column: coursegrade.FieldWrittenSecond,
 		})
 	}
+	if cgu.mutation.WrittenSecondCleared() {
+		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
+			Type:   field.TypeInt,
+			Column: coursegrade.FieldWrittenSecond,
+		})
+	}
 	if value, ok := cgu.mutation.CourseFinal(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeInt,
@@ -392,6 +446,12 @@ func (cgu *CourseGradeUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
 			Type:   field.TypeInt,
 			Value:  value,
+			Column: coursegrade.FieldCourseFinal,
+		})
+	}
+	if cgu.mutation.CourseFinalCleared() {
+		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
+			Type:   field.TypeInt,
 			Column: coursegrade.FieldCourseFinal,
 		})
 	}
@@ -580,9 +640,23 @@ func (cguo *CourseGradeUpdateOne) SetWrittenFirst(i int) *CourseGradeUpdateOne {
 	return cguo
 }
 
+// SetNillableWrittenFirst sets the "written_first" field if the given value is not nil.
+func (cguo *CourseGradeUpdateOne) SetNillableWrittenFirst(i *int) *CourseGradeUpdateOne {
+	if i != nil {
+		cguo.SetWrittenFirst(*i)
+	}
+	return cguo
+}
+
 // AddWrittenFirst adds i to the "written_first" field.
 func (cguo *CourseGradeUpdateOne) AddWrittenFirst(i int) *CourseGradeUpdateOne {
 	cguo.mutation.AddWrittenFirst(i)
+	return cguo
+}
+
+// ClearWrittenFirst clears the value of the "written_first" field.
+func (cguo *CourseGradeUpdateOne) ClearWrittenFirst() *CourseGradeUpdateOne {
+	cguo.mutation.ClearWrittenFirst()
 	return cguo
 }
 
@@ -593,9 +667,23 @@ func (cguo *CourseGradeUpdateOne) SetWrittenSecond(i int) *CourseGradeUpdateOne 
 	return cguo
 }
 
+// SetNillableWrittenSecond sets the "written_second" field if the given value is not nil.
+func (cguo *CourseGradeUpdateOne) SetNillableWrittenSecond(i *int) *CourseGradeUpdateOne {
+	if i != nil {
+		cguo.SetWrittenSecond(*i)
+	}
+	return cguo
+}
+
 // AddWrittenSecond adds i to the "written_second" field.
 func (cguo *CourseGradeUpdateOne) AddWrittenSecond(i int) *CourseGradeUpdateOne {
 	cguo.mutation.AddWrittenSecond(i)
+	return cguo
+}
+
+// ClearWrittenSecond clears the value of the "written_second" field.
+func (cguo *CourseGradeUpdateOne) ClearWrittenSecond() *CourseGradeUpdateOne {
+	cguo.mutation.ClearWrittenSecond()
 	return cguo
 }
 
@@ -606,9 +694,23 @@ func (cguo *CourseGradeUpdateOne) SetCourseFinal(i int) *CourseGradeUpdateOne {
 	return cguo
 }
 
+// SetNillableCourseFinal sets the "course_final" field if the given value is not nil.
+func (cguo *CourseGradeUpdateOne) SetNillableCourseFinal(i *int) *CourseGradeUpdateOne {
+	if i != nil {
+		cguo.SetCourseFinal(*i)
+	}
+	return cguo
+}
+
 // AddCourseFinal adds i to the "course_final" field.
 func (cguo *CourseGradeUpdateOne) AddCourseFinal(i int) *CourseGradeUpdateOne {
 	cguo.mutation.AddCourseFinal(i)
+	return cguo
+}
+
+// ClearCourseFinal clears the value of the "course_final" field.
+func (cguo *CourseGradeUpdateOne) ClearCourseFinal() *CourseGradeUpdateOne {
+	cguo.mutation.ClearCourseFinal()
 	return cguo
 }
 
@@ -879,6 +981,12 @@ func (cguo *CourseGradeUpdateOne) sqlSave(ctx context.Context) (_node *CourseGra
 			Column: coursegrade.FieldWrittenFirst,
 		})
 	}
+	if cguo.mutation.WrittenFirstCleared() {
+		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
+			Type:   field.TypeInt,
+			Column: coursegrade.FieldWrittenFirst,
+		})
+	}
 	if value, ok := cguo.mutation.WrittenSecond(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeInt,
@@ -893,6 +1001,12 @@ func (cguo *CourseGradeUpdateOne) sqlSave(ctx context.Context) (_node *CourseGra
 			Column: coursegrade.FieldWrittenSecond,
 		})
 	}
+	if cguo.mutation.WrittenSecondCleared() {
+		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
+			Type:   field.TypeInt,
+			Column: coursegrade.FieldWrittenSecond,
+		})
+	}
 	if value, ok := cguo.mutation.CourseFinal(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeInt,
@@ -904,6 +1018,12 @@ func (cguo *CourseGradeUpdateOne) sqlSave(ctx context.Context) (_node *CourseGra
 		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
 			Type:   field.TypeInt,
 			Value:  value,
+			Column: coursegrade.FieldCourseFinal,
+		})
+	}
+	if cguo.mutation.CourseFinalCleared() {
+		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
+			Type:   field.TypeInt,
 			Column: coursegrade.FieldCourseFinal,
 		})
 	}

@@ -86,15 +86,39 @@ func (cgc *CourseGradeCreate) SetWrittenFirst(i int) *CourseGradeCreate {
 	return cgc
 }
 
+// SetNillableWrittenFirst sets the "written_first" field if the given value is not nil.
+func (cgc *CourseGradeCreate) SetNillableWrittenFirst(i *int) *CourseGradeCreate {
+	if i != nil {
+		cgc.SetWrittenFirst(*i)
+	}
+	return cgc
+}
+
 // SetWrittenSecond sets the "written_second" field.
 func (cgc *CourseGradeCreate) SetWrittenSecond(i int) *CourseGradeCreate {
 	cgc.mutation.SetWrittenSecond(i)
 	return cgc
 }
 
+// SetNillableWrittenSecond sets the "written_second" field if the given value is not nil.
+func (cgc *CourseGradeCreate) SetNillableWrittenSecond(i *int) *CourseGradeCreate {
+	if i != nil {
+		cgc.SetWrittenSecond(*i)
+	}
+	return cgc
+}
+
 // SetCourseFinal sets the "course_final" field.
 func (cgc *CourseGradeCreate) SetCourseFinal(i int) *CourseGradeCreate {
 	cgc.mutation.SetCourseFinal(i)
+	return cgc
+}
+
+// SetNillableCourseFinal sets the "course_final" field if the given value is not nil.
+func (cgc *CourseGradeCreate) SetNillableCourseFinal(i *int) *CourseGradeCreate {
+	if i != nil {
+		cgc.SetCourseFinal(*i)
+	}
 	return cgc
 }
 
@@ -240,24 +264,15 @@ func (cgc *CourseGradeCreate) check() error {
 			return &ValidationError{Name: "activity_second", err: fmt.Errorf(`ent: validator failed for field "activity_second": %w`, err)}
 		}
 	}
-	if _, ok := cgc.mutation.WrittenFirst(); !ok {
-		return &ValidationError{Name: "written_first", err: errors.New(`ent: missing required field "written_first"`)}
-	}
 	if v, ok := cgc.mutation.WrittenFirst(); ok {
 		if err := coursegrade.WrittenFirstValidator(v); err != nil {
 			return &ValidationError{Name: "written_first", err: fmt.Errorf(`ent: validator failed for field "written_first": %w`, err)}
 		}
 	}
-	if _, ok := cgc.mutation.WrittenSecond(); !ok {
-		return &ValidationError{Name: "written_second", err: errors.New(`ent: missing required field "written_second"`)}
-	}
 	if v, ok := cgc.mutation.WrittenSecond(); ok {
 		if err := coursegrade.WrittenSecondValidator(v); err != nil {
 			return &ValidationError{Name: "written_second", err: fmt.Errorf(`ent: validator failed for field "written_second": %w`, err)}
 		}
-	}
-	if _, ok := cgc.mutation.CourseFinal(); !ok {
-		return &ValidationError{Name: "course_final", err: errors.New(`ent: missing required field "course_final"`)}
 	}
 	if v, ok := cgc.mutation.CourseFinal(); ok {
 		if err := coursegrade.CourseFinalValidator(v); err != nil {
@@ -327,7 +342,7 @@ func (cgc *CourseGradeCreate) createSpec() (*CourseGrade, *sqlgraph.CreateSpec) 
 			Value:  value,
 			Column: coursegrade.FieldActivityFirst,
 		})
-		_node.ActivityFirst = value
+		_node.ActivityFirst = &value
 	}
 	if value, ok := cgc.mutation.ActivitySecond(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
@@ -335,7 +350,7 @@ func (cgc *CourseGradeCreate) createSpec() (*CourseGrade, *sqlgraph.CreateSpec) 
 			Value:  value,
 			Column: coursegrade.FieldActivitySecond,
 		})
-		_node.ActivitySecond = value
+		_node.ActivitySecond = &value
 	}
 	if value, ok := cgc.mutation.WrittenFirst(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
@@ -343,7 +358,7 @@ func (cgc *CourseGradeCreate) createSpec() (*CourseGrade, *sqlgraph.CreateSpec) 
 			Value:  value,
 			Column: coursegrade.FieldWrittenFirst,
 		})
-		_node.WrittenFirst = value
+		_node.WrittenFirst = &value
 	}
 	if value, ok := cgc.mutation.WrittenSecond(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
@@ -351,7 +366,7 @@ func (cgc *CourseGradeCreate) createSpec() (*CourseGrade, *sqlgraph.CreateSpec) 
 			Value:  value,
 			Column: coursegrade.FieldWrittenSecond,
 		})
-		_node.WrittenSecond = value
+		_node.WrittenSecond = &value
 	}
 	if value, ok := cgc.mutation.CourseFinal(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
@@ -359,7 +374,7 @@ func (cgc *CourseGradeCreate) createSpec() (*CourseGrade, *sqlgraph.CreateSpec) 
 			Value:  value,
 			Column: coursegrade.FieldCourseFinal,
 		})
-		_node.CourseFinal = value
+		_node.CourseFinal = &value
 	}
 	if nodes := cgc.mutation.StudentIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{

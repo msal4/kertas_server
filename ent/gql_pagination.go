@@ -3877,6 +3877,16 @@ var (
 			}
 		},
 	}
+	// TuitionPaymentOrderFieldYear orders TuitionPayment by year.
+	TuitionPaymentOrderFieldYear = &TuitionPaymentOrderField{
+		field: tuitionpayment.FieldYear,
+		toCursor: func(tp *TuitionPayment) Cursor {
+			return Cursor{
+				ID:    tp.ID,
+				Value: tp.Year,
+			}
+		},
+	}
 	// TuitionPaymentOrderFieldPaidAmount orders TuitionPayment by paid_amount.
 	TuitionPaymentOrderFieldPaidAmount = &TuitionPaymentOrderField{
 		field: tuitionpayment.FieldPaidAmount,
@@ -3897,6 +3907,8 @@ func (f TuitionPaymentOrderField) String() string {
 		str = "CREATED_AT"
 	case tuitionpayment.FieldUpdatedAt:
 		str = "UPDATED_AT"
+	case tuitionpayment.FieldYear:
+		str = "YEAR"
 	case tuitionpayment.FieldPaidAmount:
 		str = "PAID_AMOUNT"
 	}
@@ -3919,6 +3931,8 @@ func (f *TuitionPaymentOrderField) UnmarshalGQL(v interface{}) error {
 		*f = *TuitionPaymentOrderFieldCreatedAt
 	case "UPDATED_AT":
 		*f = *TuitionPaymentOrderFieldUpdatedAt
+	case "YEAR":
+		*f = *TuitionPaymentOrderFieldYear
 	case "PAID_AMOUNT":
 		*f = *TuitionPaymentOrderFieldPaidAmount
 	default:

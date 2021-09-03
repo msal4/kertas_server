@@ -10,6 +10,7 @@ import (
 
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/google/uuid"
+	"github.com/msal4/hassah_school_server/ent/attendance"
 	"github.com/msal4/hassah_school_server/ent/user"
 )
 
@@ -27,6 +28,13 @@ type AddAssignmentSubmissionInput struct {
 	AssignmentID uuid.UUID         `json:"assignmentID"`
 	Files        []*graphql.Upload `json:"files"`
 	SubmittedAt  *time.Time        `json:"submittedAt"`
+}
+
+type AddAttendanceInput struct {
+	Date      time.Time        `json:"date"`
+	State     attendance.State `json:"state"`
+	ClassID   uuid.UUID        `json:"classID"`
+	StudentID uuid.UUID        `json:"studentID"`
 }
 
 type AddClassInput struct {
@@ -73,6 +81,13 @@ type AddStageInput struct {
 	SchoolID      uuid.UUID `json:"schoolID"`
 }
 
+type AddTuitionPaymentInput struct {
+	StageID    uuid.UUID `json:"stageID"`
+	StudentID  uuid.UUID `json:"studentID"`
+	Year       string    `json:"year"`
+	PaidAmount int       `json:"paidAmount"`
+}
+
 type AddUserInput struct {
 	Name     string          `json:"name"`
 	Username string          `json:"username"`
@@ -114,6 +129,11 @@ type UpdateAssignmentSubmissionInput struct {
 	SubmittedAt *time.Time        `json:"submittedAt"`
 }
 
+type UpdateAttendanceInput struct {
+	Date  *time.Time        `json:"date"`
+	State *attendance.State `json:"state"`
+}
+
 type UpdateClassInput struct {
 	Name      *string    `json:"name"`
 	Active    *bool      `json:"active"`
@@ -149,6 +169,11 @@ type UpdateStageInput struct {
 	Name          *string `json:"name"`
 	Active        *bool   `json:"active"`
 	TuitionAmount *int    `json:"tuitionAmount"`
+}
+
+type UpdateTuitionPaymentInput struct {
+	Year       *string `json:"year"`
+	PaidAmount *int    `json:"paidAmount"`
 }
 
 type UpdateUserInput struct {

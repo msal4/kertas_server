@@ -978,7 +978,7 @@ func (tp *TuitionPayment) Node(ctx context.Context) (node *Node, err error) {
 	node = &Node{
 		ID:     tp.ID,
 		Type:   "TuitionPayment",
-		Fields: make([]*Field, 3),
+		Fields: make([]*Field, 4),
 		Edges:  make([]*Edge, 2),
 	}
 	var buf []byte
@@ -998,10 +998,18 @@ func (tp *TuitionPayment) Node(ctx context.Context) (node *Node, err error) {
 		Name:  "updated_at",
 		Value: string(buf),
 	}
-	if buf, err = json.Marshal(tp.PaidAmount); err != nil {
+	if buf, err = json.Marshal(tp.Year); err != nil {
 		return nil, err
 	}
 	node.Fields[2] = &Field{
+		Type:  "string",
+		Name:  "year",
+		Value: string(buf),
+	}
+	if buf, err = json.Marshal(tp.PaidAmount); err != nil {
+		return nil, err
+	}
+	node.Fields[3] = &Field{
 		Type:  "int",
 		Name:  "paid_amount",
 		Value: string(buf),

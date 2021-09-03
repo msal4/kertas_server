@@ -185,9 +185,9 @@ var (
 		{Name: "updated_at", Type: field.TypeTime},
 		{Name: "activity_first", Type: field.TypeInt, Nullable: true},
 		{Name: "activity_second", Type: field.TypeInt, Nullable: true},
-		{Name: "written_first", Type: field.TypeInt},
-		{Name: "written_second", Type: field.TypeInt},
-		{Name: "course_final", Type: field.TypeInt},
+		{Name: "written_first", Type: field.TypeInt, Nullable: true},
+		{Name: "written_second", Type: field.TypeInt, Nullable: true},
+		{Name: "course_final", Type: field.TypeInt, Nullable: true},
 		{Name: "class_course_grades", Type: field.TypeUUID, Nullable: true},
 		{Name: "stage_course_grades", Type: field.TypeUUID, Nullable: true},
 		{Name: "user_course_grades", Type: field.TypeUUID, Nullable: true},
@@ -467,6 +467,7 @@ var (
 		{Name: "id", Type: field.TypeUUID},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "year", Type: field.TypeString},
 		{Name: "paid_amount", Type: field.TypeInt},
 		{Name: "stage_payments", Type: field.TypeUUID, Nullable: true},
 		{Name: "user_payments", Type: field.TypeUUID, Nullable: true},
@@ -479,13 +480,13 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "tuition_payments_stages_payments",
-				Columns:    []*schema.Column{TuitionPaymentsColumns[4]},
+				Columns:    []*schema.Column{TuitionPaymentsColumns[5]},
 				RefColumns: []*schema.Column{StagesColumns[0]},
 				OnDelete:   schema.Cascade,
 			},
 			{
 				Symbol:     "tuition_payments_users_payments",
-				Columns:    []*schema.Column{TuitionPaymentsColumns[5]},
+				Columns:    []*schema.Column{TuitionPaymentsColumns[6]},
 				RefColumns: []*schema.Column{UsersColumns[0]},
 				OnDelete:   schema.Cascade,
 			},
@@ -494,12 +495,12 @@ var (
 			{
 				Name:    "tuitionpayment_user_payments",
 				Unique:  false,
-				Columns: []*schema.Column{TuitionPaymentsColumns[5]},
+				Columns: []*schema.Column{TuitionPaymentsColumns[6]},
 			},
 			{
 				Name:    "tuitionpayment_stage_payments",
 				Unique:  false,
-				Columns: []*schema.Column{TuitionPaymentsColumns[4]},
+				Columns: []*schema.Column{TuitionPaymentsColumns[5]},
 			},
 		},
 	}

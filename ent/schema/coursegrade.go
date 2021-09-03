@@ -17,11 +17,11 @@ type CourseGrade struct {
 func (CourseGrade) Fields() []ent.Field {
 	return []ent.Field{
 		field.UUID("id", uuid.UUID{}).Default(uuid.New),
-		field.Int("activity_first").Positive().Optional().Annotations(entgql.OrderField("ACTIVITY_FIRST")),
-		field.Int("activity_second").Positive().Optional().Annotations(entgql.OrderField("ACTIVITY_SECOND")),
-		field.Int("written_first").Positive().Annotations(entgql.OrderField("WRITTEN_FIRST")),
-		field.Int("written_second").Positive().Annotations(entgql.OrderField("WRITTEN_SECOND")),
-		field.Int("course_final").Positive().Annotations(entgql.OrderField("COURSE_FINAL")),
+		field.Int("activity_first").Positive().Optional().Nillable().Annotations(entgql.OrderField("ACTIVITY_FIRST")),
+		field.Int("activity_second").Positive().Optional().Nillable().Annotations(entgql.OrderField("ACTIVITY_SECOND")),
+		field.Int("written_first").Positive().Optional().Nillable().Annotations(entgql.OrderField("WRITTEN_FIRST")),
+		field.Int("written_second").Positive().Optional().Nillable().Annotations(entgql.OrderField("WRITTEN_SECOND")),
+		field.Int("course_final").Positive().Optional().Nillable().Annotations(entgql.OrderField("COURSE_FINAL")),
 	}
 }
 

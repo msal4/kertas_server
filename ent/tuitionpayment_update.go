@@ -30,6 +30,12 @@ func (tpu *TuitionPaymentUpdate) Where(ps ...predicate.TuitionPayment) *TuitionP
 	return tpu
 }
 
+// SetYear sets the "year" field.
+func (tpu *TuitionPaymentUpdate) SetYear(s string) *TuitionPaymentUpdate {
+	tpu.mutation.SetYear(s)
+	return tpu
+}
+
 // SetPaidAmount sets the "paid_amount" field.
 func (tpu *TuitionPaymentUpdate) SetPaidAmount(i int) *TuitionPaymentUpdate {
 	tpu.mutation.ResetPaidAmount()
@@ -153,6 +159,11 @@ func (tpu *TuitionPaymentUpdate) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (tpu *TuitionPaymentUpdate) check() error {
+	if v, ok := tpu.mutation.Year(); ok {
+		if err := tuitionpayment.YearValidator(v); err != nil {
+			return &ValidationError{Name: "year", err: fmt.Errorf("ent: validator failed for field \"year\": %w", err)}
+		}
+	}
 	if _, ok := tpu.mutation.StudentID(); tpu.mutation.StudentCleared() && !ok {
 		return errors.New("ent: clearing a required unique edge \"student\"")
 	}
@@ -185,6 +196,13 @@ func (tpu *TuitionPaymentUpdate) sqlSave(ctx context.Context) (n int, err error)
 			Type:   field.TypeTime,
 			Value:  value,
 			Column: tuitionpayment.FieldUpdatedAt,
+		})
+	}
+	if value, ok := tpu.mutation.Year(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: tuitionpayment.FieldYear,
 		})
 	}
 	if value, ok := tpu.mutation.PaidAmount(); ok {
@@ -288,6 +306,12 @@ type TuitionPaymentUpdateOne struct {
 	fields   []string
 	hooks    []Hook
 	mutation *TuitionPaymentMutation
+}
+
+// SetYear sets the "year" field.
+func (tpuo *TuitionPaymentUpdateOne) SetYear(s string) *TuitionPaymentUpdateOne {
+	tpuo.mutation.SetYear(s)
+	return tpuo
 }
 
 // SetPaidAmount sets the "paid_amount" field.
@@ -420,6 +444,11 @@ func (tpuo *TuitionPaymentUpdateOne) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (tpuo *TuitionPaymentUpdateOne) check() error {
+	if v, ok := tpuo.mutation.Year(); ok {
+		if err := tuitionpayment.YearValidator(v); err != nil {
+			return &ValidationError{Name: "year", err: fmt.Errorf("ent: validator failed for field \"year\": %w", err)}
+		}
+	}
 	if _, ok := tpuo.mutation.StudentID(); tpuo.mutation.StudentCleared() && !ok {
 		return errors.New("ent: clearing a required unique edge \"student\"")
 	}
@@ -469,6 +498,13 @@ func (tpuo *TuitionPaymentUpdateOne) sqlSave(ctx context.Context) (_node *Tuitio
 			Type:   field.TypeTime,
 			Value:  value,
 			Column: tuitionpayment.FieldUpdatedAt,
+		})
+	}
+	if value, ok := tpuo.mutation.Year(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: tuitionpayment.FieldYear,
 		})
 	}
 	if value, ok := tpuo.mutation.PaidAmount(); ok {

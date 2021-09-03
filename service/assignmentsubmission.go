@@ -23,7 +23,6 @@ type AssignmentSubmissionsOptions struct {
 }
 
 func (s *Service) AssignmentSubmissions(ctx context.Context, assignmentID uuid.UUID, opts AssignmentSubmissionsOptions) (*ent.AssignmentSubmissionConnection, error) {
-
 	return s.EC.Assignment.Query().Where(assignment.ID(assignmentID)).QuerySubmissions().
 		Paginate(ctx, opts.After, opts.First, opts.Before, opts.Last,
 			ent.WithAssignmentSubmissionOrder(opts.OrderBy), ent.WithAssignmentSubmissionFilter(opts.Where.Filter))

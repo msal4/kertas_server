@@ -47,19 +47,13 @@ type Config struct {
 
 type ResolverRoot interface {
 	Assignment() AssignmentResolver
-	AssignmentSubmission() AssignmentSubmissionResolver
-	Attendance() AttendanceResolver
 	Class() ClassResolver
-	CourseGrade() CourseGradeResolver
 	Group() GroupResolver
-	Message() MessageResolver
 	Mutation() MutationResolver
 	Query() QueryResolver
-	Schedule() ScheduleResolver
 	School() SchoolResolver
 	Stage() StageResolver
 	Subscription() SubscriptionResolver
-	TuitionPayment() TuitionPaymentResolver
 	User() UserResolver
 }
 
@@ -237,16 +231,19 @@ type ComplexityRoot struct {
 	Mutation struct {
 		AddAssignment                  func(childComplexity int, input model.AddAssignmentInput) int
 		AddAssignmentSubmission        func(childComplexity int, input model.AddAssignmentSubmissionInput) int
+		AddAttendance                  func(childComplexity int, input model.AddAttendanceInput) int
 		AddClass                       func(childComplexity int, input model.AddClassInput) int
 		AddCourseGrade                 func(childComplexity int, input model.AddCourseGradeInput) int
 		AddGroup                       func(childComplexity int, input model.AddGroupInput) int
 		AddSchedule                    func(childComplexity int, input model.AddScheduleInput) int
 		AddSchool                      func(childComplexity int, input model.AddSchoolInput) int
 		AddStage                       func(childComplexity int, input model.AddStageInput) int
+		AddTuitionPayment              func(childComplexity int, input model.AddTuitionPaymentInput) int
 		AddUser                        func(childComplexity int, input model.AddUserInput) int
 		DeleteAssignment               func(childComplexity int, id uuid.UUID) int
 		DeleteAssignmentSubmission     func(childComplexity int, id uuid.UUID) int
 		DeleteAssignmentSubmissionFile func(childComplexity int, id uuid.UUID, index int) int
+		DeleteAttendance               func(childComplexity int, id uuid.UUID) int
 		DeleteClass                    func(childComplexity int, id uuid.UUID) int
 		DeleteCourseGrade              func(childComplexity int, id uuid.UUID) int
 		DeleteGroup                    func(childComplexity int, id uuid.UUID) int
@@ -255,6 +252,7 @@ type ComplexityRoot struct {
 		DeleteSchoolPermanently        func(childComplexity int, id uuid.UUID) int
 		DeleteStage                    func(childComplexity int, id uuid.UUID) int
 		DeleteStagePermanently         func(childComplexity int, id uuid.UUID) int
+		DeleteTuitionPayment           func(childComplexity int, id uuid.UUID) int
 		DeleteUser                     func(childComplexity int, id uuid.UUID) int
 		DeleteUserPermanently          func(childComplexity int, id uuid.UUID) int
 		LoginAdmin                     func(childComplexity int, input model.LoginInput) int
@@ -263,12 +261,14 @@ type ComplexityRoot struct {
 		RefreshTokens                  func(childComplexity int, token string) int
 		UpdateAssignment               func(childComplexity int, id uuid.UUID, input model.UpdateAssignmentInput) int
 		UpdateAssignmentSubmission     func(childComplexity int, id uuid.UUID, input model.UpdateAssignmentSubmissionInput) int
+		UpdateAttendance               func(childComplexity int, id uuid.UUID, input model.UpdateAttendanceInput) int
 		UpdateClass                    func(childComplexity int, id uuid.UUID, input model.UpdateClassInput) int
 		UpdateCourseGrade              func(childComplexity int, id uuid.UUID, input model.UpdateCourseGradeInput) int
 		UpdateGroup                    func(childComplexity int, id uuid.UUID, input model.UpdateGroupInput) int
 		UpdateSchedule                 func(childComplexity int, id uuid.UUID, input model.UpdateScheduleInput) int
 		UpdateSchool                   func(childComplexity int, id uuid.UUID, input model.UpdateSchoolInput) int
 		UpdateStage                    func(childComplexity int, id uuid.UUID, input model.UpdateStageInput) int
+		UpdateTuitionPayment           func(childComplexity int, id uuid.UUID, input model.UpdateTuitionPaymentInput) int
 		UpdateUser                     func(childComplexity int, id uuid.UUID, input model.UpdateUserInput) int
 	}
 
@@ -283,6 +283,7 @@ type ComplexityRoot struct {
 		Assignment            func(childComplexity int, id uuid.UUID) int
 		AssignmentSubmissions func(childComplexity int, assignmentID *uuid.UUID, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.AssignmentSubmissionOrder, where *ent.AssignmentSubmissionWhereInput) int
 		Assignments           func(childComplexity int, userID *uuid.UUID, stageID *uuid.UUID, schoolID *uuid.UUID, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.AssignmentOrder, where *ent.AssignmentWhereInput) int
+		Attendances           func(childComplexity int, studentID *uuid.UUID, classID *uuid.UUID, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.AttendanceOrder, where *ent.AttendanceWhereInput) int
 		Class                 func(childComplexity int, id uuid.UUID) int
 		Classes               func(childComplexity int, userID *uuid.UUID, stageID *uuid.UUID, schoolID *uuid.UUID, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.ClassOrder, where *ent.ClassWhereInput) int
 		CourseGrades          func(childComplexity int, studentID *uuid.UUID, stageID *uuid.UUID, classID *uuid.UUID, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.CourseGradeOrder, where *ent.CourseGradeWhereInput) int
@@ -295,6 +296,7 @@ type ComplexityRoot struct {
 		Schools               func(childComplexity int, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.SchoolOrder, where *ent.SchoolWhereInput) int
 		Stage                 func(childComplexity int, id uuid.UUID) int
 		Stages                func(childComplexity int, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.StageOrder, where *ent.StageWhereInput) int
+		TuitionPayments       func(childComplexity int, studentID *uuid.UUID, stageID *uuid.UUID, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.TuitionPaymentOrder, where *ent.TuitionPaymentWhereInput) int
 		User                  func(childComplexity int, id uuid.UUID) int
 		Users                 func(childComplexity int, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.UserOrder, where *ent.UserWhereInput) int
 	}
@@ -376,6 +378,7 @@ type ComplexityRoot struct {
 		Stage      func(childComplexity int) int
 		Student    func(childComplexity int) int
 		UpdatedAt  func(childComplexity int) int
+		Year       func(childComplexity int) int
 	}
 
 	TuitionPaymentConnection struct {
@@ -400,6 +403,7 @@ type ComplexityRoot struct {
 		Image                 func(childComplexity int) int
 		Messages              func(childComplexity int, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.MessageOrder, where *ent.MessageWhereInput) int
 		Name                  func(childComplexity int) int
+		Payments              func(childComplexity int, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.TuitionPaymentOrder, where *ent.TuitionPaymentWhereInput) int
 		Phone                 func(childComplexity int) int
 		Role                  func(childComplexity int) int
 		School                func(childComplexity int) int
@@ -421,39 +425,16 @@ type ComplexityRoot struct {
 }
 
 type AssignmentResolver interface {
-	Class(ctx context.Context, obj *ent.Assignment) (*ent.Class, error)
 	Submissions(ctx context.Context, obj *ent.Assignment, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.AssignmentSubmissionOrder, where *ent.AssignmentSubmissionWhereInput) (*ent.AssignmentSubmissionConnection, error)
 }
-type AssignmentSubmissionResolver interface {
-	Student(ctx context.Context, obj *ent.AssignmentSubmission) (*ent.User, error)
-	Assignment(ctx context.Context, obj *ent.AssignmentSubmission) (*ent.Assignment, error)
-}
-type AttendanceResolver interface {
-	Class(ctx context.Context, obj *ent.Attendance) (*ent.Class, error)
-	Student(ctx context.Context, obj *ent.Attendance) (*ent.User, error)
-}
 type ClassResolver interface {
-	Stage(ctx context.Context, obj *ent.Class) (*ent.Stage, error)
-	Teacher(ctx context.Context, obj *ent.Class) (*ent.User, error)
-	Group(ctx context.Context, obj *ent.Class) (*ent.Group, error)
 	Assignments(ctx context.Context, obj *ent.Class, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.AssignmentOrder, where *ent.AssignmentWhereInput) (*ent.AssignmentConnection, error)
 	Attendances(ctx context.Context, obj *ent.Class, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.AttendanceOrder, where *ent.AttendanceWhereInput) (*ent.AttendanceConnection, error)
 	Schedules(ctx context.Context, obj *ent.Class, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.ScheduleOrder, where *ent.ScheduleWhereInput) (*ent.ScheduleConnection, error)
 	CourseGrades(ctx context.Context, obj *ent.Class, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.CourseGradeOrder, where *ent.CourseGradeWhereInput) (*ent.CourseGradeConnection, error)
 }
-type CourseGradeResolver interface {
-	Student(ctx context.Context, obj *ent.CourseGrade) (*ent.User, error)
-	Class(ctx context.Context, obj *ent.CourseGrade) (*ent.Class, error)
-	Stage(ctx context.Context, obj *ent.CourseGrade) (*ent.Stage, error)
-}
 type GroupResolver interface {
-	Class(ctx context.Context, obj *ent.Group) (*ent.Class, error)
-	Users(ctx context.Context, obj *ent.Group) ([]*ent.User, error)
 	Messages(ctx context.Context, obj *ent.Group, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.MessageOrder, where *ent.MessageWhereInput) (*ent.MessageConnection, error)
-}
-type MessageResolver interface {
-	Group(ctx context.Context, obj *ent.Message) (*ent.Group, error)
-	Owner(ctx context.Context, obj *ent.Message) (*ent.User, error)
 }
 type MutationResolver interface {
 	AddSchool(ctx context.Context, input model.AddSchoolInput) (*ent.School, error)
@@ -491,6 +472,12 @@ type MutationResolver interface {
 	AddCourseGrade(ctx context.Context, input model.AddCourseGradeInput) (*ent.CourseGrade, error)
 	UpdateCourseGrade(ctx context.Context, id uuid.UUID, input model.UpdateCourseGradeInput) (*ent.CourseGrade, error)
 	DeleteCourseGrade(ctx context.Context, id uuid.UUID) (bool, error)
+	AddTuitionPayment(ctx context.Context, input model.AddTuitionPaymentInput) (*ent.TuitionPayment, error)
+	UpdateTuitionPayment(ctx context.Context, id uuid.UUID, input model.UpdateTuitionPaymentInput) (*ent.TuitionPayment, error)
+	DeleteTuitionPayment(ctx context.Context, id uuid.UUID) (bool, error)
+	AddAttendance(ctx context.Context, input model.AddAttendanceInput) (*ent.Attendance, error)
+	UpdateAttendance(ctx context.Context, id uuid.UUID, input model.UpdateAttendanceInput) (*ent.Attendance, error)
+	DeleteAttendance(ctx context.Context, id uuid.UUID) (bool, error)
 }
 type QueryResolver interface {
 	Me(ctx context.Context) (*ent.User, error)
@@ -510,36 +497,27 @@ type QueryResolver interface {
 	AssignmentSubmissions(ctx context.Context, assignmentID *uuid.UUID, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.AssignmentSubmissionOrder, where *ent.AssignmentSubmissionWhereInput) (*ent.AssignmentSubmissionConnection, error)
 	Schedule(ctx context.Context, stageID *uuid.UUID, weekday *time.Weekday) ([]*ent.Schedule, error)
 	CourseGrades(ctx context.Context, studentID *uuid.UUID, stageID *uuid.UUID, classID *uuid.UUID, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.CourseGradeOrder, where *ent.CourseGradeWhereInput) (*ent.CourseGradeConnection, error)
-}
-type ScheduleResolver interface {
-	Class(ctx context.Context, obj *ent.Schedule) (*ent.Class, error)
+	TuitionPayments(ctx context.Context, studentID *uuid.UUID, stageID *uuid.UUID, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.TuitionPaymentOrder, where *ent.TuitionPaymentWhereInput) (*ent.TuitionPaymentConnection, error)
+	Attendances(ctx context.Context, studentID *uuid.UUID, classID *uuid.UUID, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.AttendanceOrder, where *ent.AttendanceWhereInput) (*ent.AttendanceConnection, error)
 }
 type SchoolResolver interface {
 	Users(ctx context.Context, obj *ent.School, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.UserOrder, where *ent.UserWhereInput) (*ent.UserConnection, error)
 	Stages(ctx context.Context, obj *ent.School, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.StageOrder, where *ent.StageWhereInput) (*ent.StageConnection, error)
 }
 type StageResolver interface {
-	School(ctx context.Context, obj *ent.Stage) (*ent.School, error)
 	Classes(ctx context.Context, obj *ent.Stage, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.ClassOrder, where *ent.ClassWhereInput) (*ent.ClassConnection, error)
 	Payments(ctx context.Context, obj *ent.Stage, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.TuitionPaymentOrder, where *ent.TuitionPaymentWhereInput) (*ent.TuitionPaymentConnection, error)
 	Students(ctx context.Context, obj *ent.Stage, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.UserOrder, where *ent.UserWhereInput) (*ent.UserConnection, error)
-	CourseGrades(ctx context.Context, obj *ent.Stage) ([]*ent.CourseGrade, error)
 }
 type SubscriptionResolver interface {
 	MessagePosted(ctx context.Context, groupID uuid.UUID) (<-chan *ent.Message, error)
 }
-type TuitionPaymentResolver interface {
-	Student(ctx context.Context, obj *ent.TuitionPayment) (*ent.User, error)
-	Stage(ctx context.Context, obj *ent.TuitionPayment) (*ent.Stage, error)
-}
 type UserResolver interface {
-	Stage(ctx context.Context, obj *ent.User) (*ent.Stage, error)
-	School(ctx context.Context, obj *ent.User) (*ent.School, error)
 	Messages(ctx context.Context, obj *ent.User, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.MessageOrder, where *ent.MessageWhereInput) (*ent.MessageConnection, error)
 	Groups(ctx context.Context, obj *ent.User, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.GroupOrder, where *ent.GroupWhereInput) (*ent.GroupConnection, error)
 	Classes(ctx context.Context, obj *ent.User, stageID *uuid.UUID, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.ClassOrder, where *ent.ClassWhereInput) (*ent.ClassConnection, error)
 	AssignmentSubmissions(ctx context.Context, obj *ent.User, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.AssignmentSubmissionOrder, where *ent.AssignmentSubmissionWhereInput) (*ent.AssignmentSubmissionConnection, error)
-	CourseGrades(ctx context.Context, obj *ent.User) ([]*ent.CourseGrade, error)
+	Payments(ctx context.Context, obj *ent.User, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.TuitionPaymentOrder, where *ent.TuitionPaymentWhereInput) (*ent.TuitionPaymentConnection, error)
 }
 
 type executableSchema struct {
@@ -1318,6 +1296,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.AddAssignmentSubmission(childComplexity, args["input"].(model.AddAssignmentSubmissionInput)), true
 
+	case "Mutation.addAttendance":
+		if e.complexity.Mutation.AddAttendance == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_addAttendance_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.AddAttendance(childComplexity, args["input"].(model.AddAttendanceInput)), true
+
 	case "Mutation.addClass":
 		if e.complexity.Mutation.AddClass == nil {
 			break
@@ -1390,6 +1380,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.AddStage(childComplexity, args["input"].(model.AddStageInput)), true
 
+	case "Mutation.addTuitionPayment":
+		if e.complexity.Mutation.AddTuitionPayment == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_addTuitionPayment_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.AddTuitionPayment(childComplexity, args["input"].(model.AddTuitionPaymentInput)), true
+
 	case "Mutation.addUser":
 		if e.complexity.Mutation.AddUser == nil {
 			break
@@ -1437,6 +1439,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.DeleteAssignmentSubmissionFile(childComplexity, args["id"].(uuid.UUID), args["index"].(int)), true
+
+	case "Mutation.deleteAttendance":
+		if e.complexity.Mutation.DeleteAttendance == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_deleteAttendance_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.DeleteAttendance(childComplexity, args["id"].(uuid.UUID)), true
 
 	case "Mutation.deleteClass":
 		if e.complexity.Mutation.DeleteClass == nil {
@@ -1534,6 +1548,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.DeleteStagePermanently(childComplexity, args["id"].(uuid.UUID)), true
 
+	case "Mutation.deleteTuitionPayment":
+		if e.complexity.Mutation.DeleteTuitionPayment == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_deleteTuitionPayment_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.DeleteTuitionPayment(childComplexity, args["id"].(uuid.UUID)), true
+
 	case "Mutation.deleteUser":
 		if e.complexity.Mutation.DeleteUser == nil {
 			break
@@ -1630,6 +1656,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.UpdateAssignmentSubmission(childComplexity, args["id"].(uuid.UUID), args["input"].(model.UpdateAssignmentSubmissionInput)), true
 
+	case "Mutation.updateAttendance":
+		if e.complexity.Mutation.UpdateAttendance == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_updateAttendance_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UpdateAttendance(childComplexity, args["id"].(uuid.UUID), args["input"].(model.UpdateAttendanceInput)), true
+
 	case "Mutation.updateClass":
 		if e.complexity.Mutation.UpdateClass == nil {
 			break
@@ -1701,6 +1739,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.UpdateStage(childComplexity, args["id"].(uuid.UUID), args["input"].(model.UpdateStageInput)), true
+
+	case "Mutation.updateTuitionPayment":
+		if e.complexity.Mutation.UpdateTuitionPayment == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_updateTuitionPayment_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UpdateTuitionPayment(childComplexity, args["id"].(uuid.UUID), args["input"].(model.UpdateTuitionPaymentInput)), true
 
 	case "Mutation.updateUser":
 		if e.complexity.Mutation.UpdateUser == nil {
@@ -1777,6 +1827,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Query.Assignments(childComplexity, args["userID"].(*uuid.UUID), args["stageID"].(*uuid.UUID), args["schoolID"].(*uuid.UUID), args["after"].(*ent.Cursor), args["first"].(*int), args["before"].(*ent.Cursor), args["last"].(*int), args["orderBy"].(*ent.AssignmentOrder), args["where"].(*ent.AssignmentWhereInput)), true
+
+	case "Query.attendances":
+		if e.complexity.Query.Attendances == nil {
+			break
+		}
+
+		args, err := ec.field_Query_attendances_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.Attendances(childComplexity, args["studentID"].(*uuid.UUID), args["classID"].(*uuid.UUID), args["after"].(*ent.Cursor), args["first"].(*int), args["before"].(*ent.Cursor), args["last"].(*int), args["orderBy"].(*ent.AttendanceOrder), args["where"].(*ent.AttendanceWhereInput)), true
 
 	case "Query.class":
 		if e.complexity.Query.Class == nil {
@@ -1916,6 +1978,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Query.Stages(childComplexity, args["after"].(*ent.Cursor), args["first"].(*int), args["before"].(*ent.Cursor), args["last"].(*int), args["orderBy"].(*ent.StageOrder), args["where"].(*ent.StageWhereInput)), true
+
+	case "Query.tuitionPayments":
+		if e.complexity.Query.TuitionPayments == nil {
+			break
+		}
+
+		args, err := ec.field_Query_tuitionPayments_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.TuitionPayments(childComplexity, args["studentID"].(*uuid.UUID), args["stageID"].(*uuid.UUID), args["after"].(*ent.Cursor), args["first"].(*int), args["before"].(*ent.Cursor), args["last"].(*int), args["orderBy"].(*ent.TuitionPaymentOrder), args["where"].(*ent.TuitionPaymentWhereInput)), true
 
 	case "Query.user":
 		if e.complexity.Query.User == nil {
@@ -2293,6 +2367,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.TuitionPayment.UpdatedAt(childComplexity), true
 
+	case "TuitionPayment.year":
+		if e.complexity.TuitionPayment.Year == nil {
+			break
+		}
+
+		return e.complexity.TuitionPayment.Year(childComplexity), true
+
 	case "TuitionPaymentConnection.edges":
 		if e.complexity.TuitionPaymentConnection.Edges == nil {
 			break
@@ -2417,6 +2498,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.User.Name(childComplexity), true
+
+	case "User.payments":
+		if e.complexity.User.Payments == nil {
+			break
+		}
+
+		args, err := ec.field_User_payments_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.User.Payments(childComplexity, args["after"].(*ent.Cursor), args["first"].(*int), args["before"].(*ent.Cursor), args["last"].(*int), args["orderBy"].(*ent.TuitionPaymentOrder), args["where"].(*ent.TuitionPaymentWhereInput)), true
 
 	case "User.phone":
 		if e.complexity.User.Phone == nil {
@@ -2691,15 +2784,15 @@ type User implements Node {
   createdAt: Time!
   updatedAt: Time!
 
-  stage: Stage! @goField(forceResolver: true)
-  school: School! @goField(forceResolver: true)
-
+  stage: Stage
+  school: School
 
   messages(after: Cursor, first: Int, before: Cursor, last: Int, orderBy: MessageOrder, where: MessageWhereInput): MessageConnection @goField(forceResolver: true)
   groups(after: Cursor, first: Int, before: Cursor, last: Int, orderBy: GroupOrder, where: GroupWhereInput): GroupConnection @goField(forceResolver: true)
   classes(stageID: ID, after: Cursor, first: Int, before: Cursor, last: Int, orderBy: ClassOrder, where: ClassWhereInput): ClassConnection @goField(forceResolver: true)
   assignmentSubmissions(after: Cursor, first: Int, before: Cursor, last: Int, orderBy: AssignmentSubmissionOrder, where: AssignmentSubmissionWhereInput): AssignmentSubmissionConnection @goField(forceResolver: true)
-  courseGrades: [CourseGrade!]! @goField(forceResolver: true)
+  payments(after: Cursor, first: Int, before: Cursor, last: Int, orderBy: TuitionPaymentOrder, where: TuitionPaymentWhereInput): TuitionPaymentConnection @goField(forceResolver: true)
+  courseGrades: [CourseGrade!]!
 }
 
 type UserEdge {
@@ -2743,12 +2836,12 @@ type Stage implements Node {
   createdAt: Time!
   updatedAt: Time!
 
-  school: School! @goField(forceResolver: true)
+  school: School!
 
   classes(after: Cursor, first: Int, before: Cursor, last: Int, orderBy: ClassOrder, where: ClassWhereInput): ClassConnection @goField(forceResolver: true)
   payments(after: Cursor, first: Int, before: Cursor, last: Int, orderBy: TuitionPaymentOrder, where: TuitionPaymentWhereInput): TuitionPaymentConnection @goField(forceResolver: true)
   students(after: Cursor, first: Int, before: Cursor, last: Int, orderBy: UserOrder, where: UserWhereInput): UserConnection @goField(forceResolver: true)
-  courseGrades: [CourseGrade!] @goField(forceResolver: true)
+  courseGrades: [CourseGrade!]
 }
 
 enum StageOrderField {
@@ -2804,8 +2897,8 @@ type Group implements Node {
   createdAt: Time!
   updatedAt: Time!
 
-  class: Class! @goField(forceResolver: true)
-  users: [User!] @goField(forceResolver: true)
+  class: Class
+  users: [User!]
 
   messages(after: Cursor, first: Int, before: Cursor, last: Int, orderBy: MessageOrder, where: MessageWhereInput): MessageConnection @goField(forceResolver: true)
 }
@@ -2851,9 +2944,9 @@ type Class implements Node {
   createdAt: Time!
   updatedAt: Time!
 
-  stage: Stage! @goField(forceResolver: true)
-  teacher: User! @goField(forceResolver: true)
-  group: Group! @goField(forceResolver: true)
+  stage: Stage!
+  teacher: User!
+  group: Group!
 
   assignments(after: Cursor, first: Int, before: Cursor, last: Int, orderBy: AssignmentOrder, where: AssignmentWhereInput): AssignmentConnection @goField(forceResolver: true)
   attendances(after: Cursor, first: Int, before: Cursor, last: Int, orderBy: AttendanceOrder, where: AttendanceWhereInput): AttendanceConnection @goField(forceResolver: true)
@@ -2904,8 +2997,8 @@ type Message implements Node {
   createdAt: Time!
   updatedAt: Time!
 
-  group: Group! @goField(forceResolver: true)
-  owner: User! @goField(forceResolver: true)
+  group: Group!
+  owner: User!
 }
 
 enum MessageOrderField {
@@ -2946,7 +3039,7 @@ type Assignment implements Node {
   createdAt: Time!
   updatedAt: Time!
 
-  class: Class! @goField(forceResolver: true)
+  class: Class!
 
   submissions(after: Cursor, first: Int, before: Cursor, last: Int, orderBy: AssignmentSubmissionOrder, where: AssignmentSubmissionWhereInput): AssignmentSubmissionConnection @goField(forceResolver: true)
 }
@@ -3000,7 +3093,7 @@ type Schedule implements Node {
   duration: Duration!
   startsAt: Time!
 
-  class: Class! @goField(forceResolver: true)
+  class: Class!
 }
 
 enum ScheduleOrderField {
@@ -3042,17 +3135,17 @@ input UpdateScheduleInput {
 
 type CourseGrade implements Node {
   id: ID!
-  activityFirst: Int!
-  activitySecond: Int!
-  writtenFirst: Int!
-  writtenSecond: Int!
-  courseFinal: Int!
+  activityFirst: Int
+  activitySecond: Int
+  writtenFirst: Int
+  writtenSecond: Int
+  courseFinal: Int
   createdAt: Time!
   updatedAt: Time!
 
-  student: User! @goField(forceResolver: true)
-  class: Class! @goField(forceResolver: true)
-  stage: Stage! @goField(forceResolver: true)
+  student: User!
+  class: Class!
+  stage: Stage!
 }
 
 enum CourseGradeOrderField {
@@ -3107,8 +3200,8 @@ type AssignmentSubmission implements Node {
   createdAt: Time!
   updatedAt: Time!
 
-  student: User! @goField(forceResolver: true)
-  assignment: Assignment! @goField(forceResolver: true)
+  student: User!
+  assignment: Assignment!
 }
 
 enum AssignmentSubmissionOrderField {
@@ -3158,8 +3251,8 @@ type Attendance implements Node {
   createdAt: Time!
   updatedAt: Time!
 
-  class: Class! @goField(forceResolver: true)
-  student: User! @goField(forceResolver: true)
+  class: Class!
+  student: User!
 }
 
 enum AttendanceOrderField {
@@ -3184,18 +3277,33 @@ type AttendanceConnection {
   edges: [AttendanceEdge]
 }
 
+input AddAttendanceInput {
+  date: Time!
+  state: AttendanceState!
+
+  classID: ID!
+  studentID: ID!
+}
+
+input UpdateAttendanceInput {
+  date: Time
+  state: AttendanceState
+}
+
 type TuitionPayment implements Node {
   id: ID!
+  year: String!
   paidAmount: Int!
   createdAt: Time!
   updatedAt: Time!
 
-  student: User! @goField(forceResolver: true)
-  stage: Stage! @goField(forceResolver: true)
+  student: User!
+  stage: Stage!
 }
 
 enum TuitionPaymentOrderField {
   PAID_AMOUNT
+  YEAR
   CREATED_AT
   UPDATED_AT
 }
@@ -3214,6 +3322,18 @@ type TuitionPaymentConnection {
   totalCount: Int!
   pageInfo: PageInfo!
   edges: [TuitionPaymentEdge]
+}
+
+input AddTuitionPaymentInput {
+  stageID: ID!
+  studentID: ID!
+  year: String!
+  paidAmount: Int!
+}
+
+input UpdateTuitionPaymentInput {
+  year: String
+  paidAmount: Int
 }
 
 type Query {
@@ -3243,6 +3363,10 @@ type Query {
   schedule(stageID: ID, weekday: Weekday): [Schedule!]!
 
   courseGrades(studentID: ID, stageID: ID, classID: ID, after: Cursor, first: Int, before: Cursor, last: Int, orderBy: CourseGradeOrder, where: CourseGradeWhereInput): CourseGradeConnection!
+
+  tuitionPayments(studentID: ID, stageID: ID, after: Cursor, first: Int, before: Cursor, last: Int, orderBy: TuitionPaymentOrder, where: TuitionPaymentWhereInput): TuitionPaymentConnection!
+
+  attendances(studentID: ID, classID: ID, after: Cursor, first: Int, before: Cursor, last: Int, orderBy: AttendanceOrder, where: AttendanceWhereInput): AttendanceConnection!
 }
 
 type Mutation {
@@ -3291,6 +3415,14 @@ type Mutation {
   addCourseGrade(input: AddCourseGradeInput!): CourseGrade!
   updateCourseGrade(id: ID!, input: UpdateCourseGradeInput!): CourseGrade!
   deleteCourseGrade(id: ID!): Boolean!
+
+  addTuitionPayment(input: AddTuitionPaymentInput!): TuitionPayment!
+  updateTuitionPayment(id: ID!, input: UpdateTuitionPaymentInput!): TuitionPayment!
+  deleteTuitionPayment(id: ID!): Boolean!
+
+  addAttendance(input: AddAttendanceInput!): Attendance!
+  updateAttendance(id: ID!, input: UpdateAttendanceInput!): Attendance!
+  deleteAttendance(id: ID!): Boolean!
 }
 
 type Subscription {
@@ -3738,6 +3870,21 @@ input TuitionPaymentWhereInput {
   updatedAtGTE: Time
   updatedAtLT: Time
   updatedAtLTE: Time
+  
+  """year field predicates"""
+  year: String
+  yearNEQ: String
+  yearIn: [String!]
+  yearNotIn: [String!]
+  yearGT: String
+  yearGTE: String
+  yearLT: String
+  yearLTE: String
+  yearContains: String
+  yearHasPrefix: String
+  yearHasSuffix: String
+  yearEqualFold: String
+  yearContainsFold: String
   
   """paid_amount field predicates"""
   paidAmount: Int
@@ -4490,6 +4637,8 @@ input CourseGradeWhereInput {
   writtenFirstGTE: Int
   writtenFirstLT: Int
   writtenFirstLTE: Int
+  writtenFirstIsNil: Boolean
+  writtenFirstNotNil: Boolean
   
   """written_second field predicates"""
   writtenSecond: Int
@@ -4500,6 +4649,8 @@ input CourseGradeWhereInput {
   writtenSecondGTE: Int
   writtenSecondLT: Int
   writtenSecondLTE: Int
+  writtenSecondIsNil: Boolean
+  writtenSecondNotNil: Boolean
   
   """course_final field predicates"""
   courseFinal: Int
@@ -4510,6 +4661,8 @@ input CourseGradeWhereInput {
   courseFinalGTE: Int
   courseFinalLT: Int
   courseFinalLTE: Int
+  courseFinalIsNil: Boolean
+  courseFinalNotNil: Boolean
   
   """id field predicates"""
   id: ID
@@ -4931,6 +5084,21 @@ func (ec *executionContext) field_Mutation_addAssignment_args(ctx context.Contex
 	return args, nil
 }
 
+func (ec *executionContext) field_Mutation_addAttendance_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 model.AddAttendanceInput
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg0, err = ec.unmarshalNAddAttendanceInput2githubᚗcomᚋmsal4ᚋhassah_school_serverᚋserverᚋmodelᚐAddAttendanceInput(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
 func (ec *executionContext) field_Mutation_addClass_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -5021,6 +5189,21 @@ func (ec *executionContext) field_Mutation_addStage_args(ctx context.Context, ra
 	return args, nil
 }
 
+func (ec *executionContext) field_Mutation_addTuitionPayment_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 model.AddTuitionPaymentInput
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg0, err = ec.unmarshalNAddTuitionPaymentInput2githubᚗcomᚋmsal4ᚋhassah_school_serverᚋserverᚋmodelᚐAddTuitionPaymentInput(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
 func (ec *executionContext) field_Mutation_addUser_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -5076,6 +5259,21 @@ func (ec *executionContext) field_Mutation_deleteAssignmentSubmission_args(ctx c
 }
 
 func (ec *executionContext) field_Mutation_deleteAssignment_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 uuid.UUID
+	if tmp, ok := rawArgs["id"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+		arg0, err = ec.unmarshalNID2githubᚗcomᚋgoogleᚋuuidᚐUUID(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["id"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_deleteAttendance_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
 	var arg0 uuid.UUID
@@ -5196,6 +5394,21 @@ func (ec *executionContext) field_Mutation_deleteStagePermanently_args(ctx conte
 }
 
 func (ec *executionContext) field_Mutation_deleteStage_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 uuid.UUID
+	if tmp, ok := rawArgs["id"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+		arg0, err = ec.unmarshalNID2githubᚗcomᚋgoogleᚋuuidᚐUUID(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["id"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_deleteTuitionPayment_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
 	var arg0 uuid.UUID
@@ -5348,6 +5561,30 @@ func (ec *executionContext) field_Mutation_updateAssignment_args(ctx context.Con
 	return args, nil
 }
 
+func (ec *executionContext) field_Mutation_updateAttendance_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 uuid.UUID
+	if tmp, ok := rawArgs["id"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+		arg0, err = ec.unmarshalNID2githubᚗcomᚋgoogleᚋuuidᚐUUID(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["id"] = arg0
+	var arg1 model.UpdateAttendanceInput
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg1, err = ec.unmarshalNUpdateAttendanceInput2githubᚗcomᚋmsal4ᚋhassah_school_serverᚋserverᚋmodelᚐUpdateAttendanceInput(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg1
+	return args, nil
+}
+
 func (ec *executionContext) field_Mutation_updateClass_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -5484,6 +5721,30 @@ func (ec *executionContext) field_Mutation_updateStage_args(ctx context.Context,
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
 		arg1, err = ec.unmarshalNUpdateStageInput2githubᚗcomᚋmsal4ᚋhassah_school_serverᚋserverᚋmodelᚐUpdateStageInput(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg1
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_updateTuitionPayment_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 uuid.UUID
+	if tmp, ok := rawArgs["id"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+		arg0, err = ec.unmarshalNID2githubᚗcomᚋgoogleᚋuuidᚐUUID(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["id"] = arg0
+	var arg1 model.UpdateTuitionPaymentInput
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg1, err = ec.unmarshalNUpdateTuitionPaymentInput2githubᚗcomᚋmsal4ᚋhassah_school_serverᚋserverᚋmodelᚐUpdateTuitionPaymentInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -5699,6 +5960,84 @@ func (ec *executionContext) field_Query_assignments_args(ctx context.Context, ra
 		}
 	}
 	args["where"] = arg8
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_attendances_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *uuid.UUID
+	if tmp, ok := rawArgs["studentID"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("studentID"))
+		arg0, err = ec.unmarshalOID2ᚖgithubᚗcomᚋgoogleᚋuuidᚐUUID(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["studentID"] = arg0
+	var arg1 *uuid.UUID
+	if tmp, ok := rawArgs["classID"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("classID"))
+		arg1, err = ec.unmarshalOID2ᚖgithubᚗcomᚋgoogleᚋuuidᚐUUID(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["classID"] = arg1
+	var arg2 *ent.Cursor
+	if tmp, ok := rawArgs["after"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("after"))
+		arg2, err = ec.unmarshalOCursor2ᚖgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚐCursor(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["after"] = arg2
+	var arg3 *int
+	if tmp, ok := rawArgs["first"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("first"))
+		arg3, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["first"] = arg3
+	var arg4 *ent.Cursor
+	if tmp, ok := rawArgs["before"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("before"))
+		arg4, err = ec.unmarshalOCursor2ᚖgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚐCursor(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["before"] = arg4
+	var arg5 *int
+	if tmp, ok := rawArgs["last"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("last"))
+		arg5, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["last"] = arg5
+	var arg6 *ent.AttendanceOrder
+	if tmp, ok := rawArgs["orderBy"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("orderBy"))
+		arg6, err = ec.unmarshalOAttendanceOrder2ᚖgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚐAttendanceOrder(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["orderBy"] = arg6
+	var arg7 *ent.AttendanceWhereInput
+	if tmp, ok := rawArgs["where"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("where"))
+		arg7, err = ec.unmarshalOAttendanceWhereInput2ᚖgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚐAttendanceWhereInput(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["where"] = arg7
 	return args, nil
 }
 
@@ -6215,6 +6554,84 @@ func (ec *executionContext) field_Query_stages_args(ctx context.Context, rawArgs
 		}
 	}
 	args["where"] = arg5
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_tuitionPayments_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *uuid.UUID
+	if tmp, ok := rawArgs["studentID"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("studentID"))
+		arg0, err = ec.unmarshalOID2ᚖgithubᚗcomᚋgoogleᚋuuidᚐUUID(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["studentID"] = arg0
+	var arg1 *uuid.UUID
+	if tmp, ok := rawArgs["stageID"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("stageID"))
+		arg1, err = ec.unmarshalOID2ᚖgithubᚗcomᚋgoogleᚋuuidᚐUUID(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["stageID"] = arg1
+	var arg2 *ent.Cursor
+	if tmp, ok := rawArgs["after"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("after"))
+		arg2, err = ec.unmarshalOCursor2ᚖgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚐCursor(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["after"] = arg2
+	var arg3 *int
+	if tmp, ok := rawArgs["first"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("first"))
+		arg3, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["first"] = arg3
+	var arg4 *ent.Cursor
+	if tmp, ok := rawArgs["before"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("before"))
+		arg4, err = ec.unmarshalOCursor2ᚖgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚐCursor(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["before"] = arg4
+	var arg5 *int
+	if tmp, ok := rawArgs["last"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("last"))
+		arg5, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["last"] = arg5
+	var arg6 *ent.TuitionPaymentOrder
+	if tmp, ok := rawArgs["orderBy"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("orderBy"))
+		arg6, err = ec.unmarshalOTuitionPaymentOrder2ᚖgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚐTuitionPaymentOrder(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["orderBy"] = arg6
+	var arg7 *ent.TuitionPaymentWhereInput
+	if tmp, ok := rawArgs["where"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("where"))
+		arg7, err = ec.unmarshalOTuitionPaymentWhereInput2ᚖgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚐTuitionPaymentWhereInput(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["where"] = arg7
 	return args, nil
 }
 
@@ -6857,6 +7274,66 @@ func (ec *executionContext) field_User_messages_args(ctx context.Context, rawArg
 	return args, nil
 }
 
+func (ec *executionContext) field_User_payments_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *ent.Cursor
+	if tmp, ok := rawArgs["after"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("after"))
+		arg0, err = ec.unmarshalOCursor2ᚖgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚐCursor(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["after"] = arg0
+	var arg1 *int
+	if tmp, ok := rawArgs["first"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("first"))
+		arg1, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["first"] = arg1
+	var arg2 *ent.Cursor
+	if tmp, ok := rawArgs["before"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("before"))
+		arg2, err = ec.unmarshalOCursor2ᚖgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚐCursor(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["before"] = arg2
+	var arg3 *int
+	if tmp, ok := rawArgs["last"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("last"))
+		arg3, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["last"] = arg3
+	var arg4 *ent.TuitionPaymentOrder
+	if tmp, ok := rawArgs["orderBy"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("orderBy"))
+		arg4, err = ec.unmarshalOTuitionPaymentOrder2ᚖgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚐTuitionPaymentOrder(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["orderBy"] = arg4
+	var arg5 *ent.TuitionPaymentWhereInput
+	if tmp, ok := rawArgs["where"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("where"))
+		arg5, err = ec.unmarshalOTuitionPaymentWhereInput2ᚖgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚐTuitionPaymentWhereInput(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["where"] = arg5
+	return args, nil
+}
+
 func (ec *executionContext) field___Type_enumValues_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -7213,13 +7690,13 @@ func (ec *executionContext) _Assignment_class(ctx context.Context, field graphql
 		Field:      field,
 		Args:       nil,
 		IsMethod:   true,
-		IsResolver: true,
+		IsResolver: false,
 	}
 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Assignment().Class(rctx, obj)
+		return obj.Class(ctx)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -7628,13 +8105,13 @@ func (ec *executionContext) _AssignmentSubmission_student(ctx context.Context, f
 		Field:      field,
 		Args:       nil,
 		IsMethod:   true,
-		IsResolver: true,
+		IsResolver: false,
 	}
 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.AssignmentSubmission().Student(rctx, obj)
+		return obj.Student(ctx)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -7663,13 +8140,13 @@ func (ec *executionContext) _AssignmentSubmission_assignment(ctx context.Context
 		Field:      field,
 		Args:       nil,
 		IsMethod:   true,
-		IsResolver: true,
+		IsResolver: false,
 	}
 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.AssignmentSubmission().Assignment(rctx, obj)
+		return obj.Assignment(ctx)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -8042,13 +8519,13 @@ func (ec *executionContext) _Attendance_class(ctx context.Context, field graphql
 		Field:      field,
 		Args:       nil,
 		IsMethod:   true,
-		IsResolver: true,
+		IsResolver: false,
 	}
 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Attendance().Class(rctx, obj)
+		return obj.Class(ctx)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -8077,13 +8554,13 @@ func (ec *executionContext) _Attendance_student(ctx context.Context, field graph
 		Field:      field,
 		Args:       nil,
 		IsMethod:   true,
-		IsResolver: true,
+		IsResolver: false,
 	}
 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Attendance().Student(rctx, obj)
+		return obj.Student(ctx)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -8526,13 +9003,13 @@ func (ec *executionContext) _Class_stage(ctx context.Context, field graphql.Coll
 		Field:      field,
 		Args:       nil,
 		IsMethod:   true,
-		IsResolver: true,
+		IsResolver: false,
 	}
 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Class().Stage(rctx, obj)
+		return obj.Stage(ctx)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -8561,13 +9038,13 @@ func (ec *executionContext) _Class_teacher(ctx context.Context, field graphql.Co
 		Field:      field,
 		Args:       nil,
 		IsMethod:   true,
-		IsResolver: true,
+		IsResolver: false,
 	}
 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Class().Teacher(rctx, obj)
+		return obj.Teacher(ctx)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -8596,13 +9073,13 @@ func (ec *executionContext) _Class_group(ctx context.Context, field graphql.Coll
 		Field:      field,
 		Args:       nil,
 		IsMethod:   true,
-		IsResolver: true,
+		IsResolver: false,
 	}
 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Class().Group(rctx, obj)
+		return obj.Group(ctx)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -9004,14 +9481,11 @@ func (ec *executionContext) _CourseGrade_activityFirst(ctx context.Context, fiel
 		return graphql.Null
 	}
 	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
 		return graphql.Null
 	}
-	res := resTmp.(int)
+	res := resTmp.(*int)
 	fc.Result = res
-	return ec.marshalNInt2int(ctx, field.Selections, res)
+	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _CourseGrade_activitySecond(ctx context.Context, field graphql.CollectedField, obj *ent.CourseGrade) (ret graphql.Marshaler) {
@@ -9039,14 +9513,11 @@ func (ec *executionContext) _CourseGrade_activitySecond(ctx context.Context, fie
 		return graphql.Null
 	}
 	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
 		return graphql.Null
 	}
-	res := resTmp.(int)
+	res := resTmp.(*int)
 	fc.Result = res
-	return ec.marshalNInt2int(ctx, field.Selections, res)
+	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _CourseGrade_writtenFirst(ctx context.Context, field graphql.CollectedField, obj *ent.CourseGrade) (ret graphql.Marshaler) {
@@ -9074,14 +9545,11 @@ func (ec *executionContext) _CourseGrade_writtenFirst(ctx context.Context, field
 		return graphql.Null
 	}
 	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
 		return graphql.Null
 	}
-	res := resTmp.(int)
+	res := resTmp.(*int)
 	fc.Result = res
-	return ec.marshalNInt2int(ctx, field.Selections, res)
+	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _CourseGrade_writtenSecond(ctx context.Context, field graphql.CollectedField, obj *ent.CourseGrade) (ret graphql.Marshaler) {
@@ -9109,14 +9577,11 @@ func (ec *executionContext) _CourseGrade_writtenSecond(ctx context.Context, fiel
 		return graphql.Null
 	}
 	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
 		return graphql.Null
 	}
-	res := resTmp.(int)
+	res := resTmp.(*int)
 	fc.Result = res
-	return ec.marshalNInt2int(ctx, field.Selections, res)
+	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _CourseGrade_courseFinal(ctx context.Context, field graphql.CollectedField, obj *ent.CourseGrade) (ret graphql.Marshaler) {
@@ -9144,14 +9609,11 @@ func (ec *executionContext) _CourseGrade_courseFinal(ctx context.Context, field 
 		return graphql.Null
 	}
 	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
 		return graphql.Null
 	}
-	res := resTmp.(int)
+	res := resTmp.(*int)
 	fc.Result = res
-	return ec.marshalNInt2int(ctx, field.Selections, res)
+	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _CourseGrade_createdAt(ctx context.Context, field graphql.CollectedField, obj *ent.CourseGrade) (ret graphql.Marshaler) {
@@ -9236,13 +9698,13 @@ func (ec *executionContext) _CourseGrade_student(ctx context.Context, field grap
 		Field:      field,
 		Args:       nil,
 		IsMethod:   true,
-		IsResolver: true,
+		IsResolver: false,
 	}
 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.CourseGrade().Student(rctx, obj)
+		return obj.Student(ctx)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -9271,13 +9733,13 @@ func (ec *executionContext) _CourseGrade_class(ctx context.Context, field graphq
 		Field:      field,
 		Args:       nil,
 		IsMethod:   true,
-		IsResolver: true,
+		IsResolver: false,
 	}
 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.CourseGrade().Class(rctx, obj)
+		return obj.Class(ctx)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -9306,13 +9768,13 @@ func (ec *executionContext) _CourseGrade_stage(ctx context.Context, field graphq
 		Field:      field,
 		Args:       nil,
 		IsMethod:   true,
-		IsResolver: true,
+		IsResolver: false,
 	}
 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.CourseGrade().Stage(rctx, obj)
+		return obj.Stage(ctx)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -9720,27 +10182,24 @@ func (ec *executionContext) _Group_class(ctx context.Context, field graphql.Coll
 		Field:      field,
 		Args:       nil,
 		IsMethod:   true,
-		IsResolver: true,
+		IsResolver: false,
 	}
 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Group().Class(rctx, obj)
+		return obj.Class(ctx)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
 		return graphql.Null
 	}
 	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
 		return graphql.Null
 	}
 	res := resTmp.(*ent.Class)
 	fc.Result = res
-	return ec.marshalNClass2ᚖgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚐClass(ctx, field.Selections, res)
+	return ec.marshalOClass2ᚖgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚐClass(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Group_users(ctx context.Context, field graphql.CollectedField, obj *ent.Group) (ret graphql.Marshaler) {
@@ -9755,13 +10214,13 @@ func (ec *executionContext) _Group_users(ctx context.Context, field graphql.Coll
 		Field:      field,
 		Args:       nil,
 		IsMethod:   true,
-		IsResolver: true,
+		IsResolver: false,
 	}
 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Group().Users(rctx, obj)
+		return obj.Users(ctx)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -10170,13 +10629,13 @@ func (ec *executionContext) _Message_group(ctx context.Context, field graphql.Co
 		Field:      field,
 		Args:       nil,
 		IsMethod:   true,
-		IsResolver: true,
+		IsResolver: false,
 	}
 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Message().Group(rctx, obj)
+		return obj.Group(ctx)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -10205,13 +10664,13 @@ func (ec *executionContext) _Message_owner(ctx context.Context, field graphql.Co
 		Field:      field,
 		Args:       nil,
 		IsMethod:   true,
-		IsResolver: true,
+		IsResolver: false,
 	}
 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Message().Owner(rctx, obj)
+		return obj.Owner(ctx)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -11867,6 +12326,258 @@ func (ec *executionContext) _Mutation_deleteCourseGrade(ctx context.Context, fie
 	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _Mutation_addTuitionPayment(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_addTuitionPayment_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().AddTuitionPayment(rctx, args["input"].(model.AddTuitionPaymentInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*ent.TuitionPayment)
+	fc.Result = res
+	return ec.marshalNTuitionPayment2ᚖgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚐTuitionPayment(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_updateTuitionPayment(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_updateTuitionPayment_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().UpdateTuitionPayment(rctx, args["id"].(uuid.UUID), args["input"].(model.UpdateTuitionPaymentInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*ent.TuitionPayment)
+	fc.Result = res
+	return ec.marshalNTuitionPayment2ᚖgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚐTuitionPayment(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_deleteTuitionPayment(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_deleteTuitionPayment_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().DeleteTuitionPayment(rctx, args["id"].(uuid.UUID))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_addAttendance(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_addAttendance_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().AddAttendance(rctx, args["input"].(model.AddAttendanceInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*ent.Attendance)
+	fc.Result = res
+	return ec.marshalNAttendance2ᚖgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚐAttendance(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_updateAttendance(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_updateAttendance_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().UpdateAttendance(rctx, args["id"].(uuid.UUID), args["input"].(model.UpdateAttendanceInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*ent.Attendance)
+	fc.Result = res
+	return ec.marshalNAttendance2ᚖgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚐAttendance(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_deleteAttendance(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_deleteAttendance_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().DeleteAttendance(rctx, args["id"].(uuid.UUID))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _PageInfo_hasNextPage(ctx context.Context, field graphql.CollectedField, obj *ent.PageInfo) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -12708,6 +13419,90 @@ func (ec *executionContext) _Query_courseGrades(ctx context.Context, field graph
 	return ec.marshalNCourseGradeConnection2ᚖgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚐCourseGradeConnection(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _Query_tuitionPayments(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Query_tuitionPayments_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().TuitionPayments(rctx, args["studentID"].(*uuid.UUID), args["stageID"].(*uuid.UUID), args["after"].(*ent.Cursor), args["first"].(*int), args["before"].(*ent.Cursor), args["last"].(*int), args["orderBy"].(*ent.TuitionPaymentOrder), args["where"].(*ent.TuitionPaymentWhereInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*ent.TuitionPaymentConnection)
+	fc.Result = res
+	return ec.marshalNTuitionPaymentConnection2ᚖgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚐTuitionPaymentConnection(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Query_attendances(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Query_attendances_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().Attendances(rctx, args["studentID"].(*uuid.UUID), args["classID"].(*uuid.UUID), args["after"].(*ent.Cursor), args["first"].(*int), args["before"].(*ent.Cursor), args["last"].(*int), args["orderBy"].(*ent.AttendanceOrder), args["where"].(*ent.AttendanceWhereInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*ent.AttendanceConnection)
+	fc.Result = res
+	return ec.marshalNAttendanceConnection2ᚖgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚐAttendanceConnection(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _Query___type(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -12931,13 +13726,13 @@ func (ec *executionContext) _Schedule_class(ctx context.Context, field graphql.C
 		Field:      field,
 		Args:       nil,
 		IsMethod:   true,
-		IsResolver: true,
+		IsResolver: false,
 	}
 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Schedule().Class(rctx, obj)
+		return obj.Class(ctx)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -13799,13 +14594,13 @@ func (ec *executionContext) _Stage_school(ctx context.Context, field graphql.Col
 		Field:      field,
 		Args:       nil,
 		IsMethod:   true,
-		IsResolver: true,
+		IsResolver: false,
 	}
 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Stage().School(rctx, obj)
+		return obj.School(ctx)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -13951,13 +14746,13 @@ func (ec *executionContext) _Stage_courseGrades(ctx context.Context, field graph
 		Field:      field,
 		Args:       nil,
 		IsMethod:   true,
-		IsResolver: true,
+		IsResolver: false,
 	}
 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Stage().CourseGrades(rctx, obj)
+		return obj.CourseGrades(ctx)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -14227,6 +15022,41 @@ func (ec *executionContext) _TuitionPayment_id(ctx context.Context, field graphq
 	return ec.marshalNID2githubᚗcomᚋgoogleᚋuuidᚐUUID(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _TuitionPayment_year(ctx context.Context, field graphql.CollectedField, obj *ent.TuitionPayment) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "TuitionPayment",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Year, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _TuitionPayment_paidAmount(ctx context.Context, field graphql.CollectedField, obj *ent.TuitionPayment) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -14344,13 +15174,13 @@ func (ec *executionContext) _TuitionPayment_student(ctx context.Context, field g
 		Field:      field,
 		Args:       nil,
 		IsMethod:   true,
-		IsResolver: true,
+		IsResolver: false,
 	}
 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.TuitionPayment().Student(rctx, obj)
+		return obj.Student(ctx)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -14379,13 +15209,13 @@ func (ec *executionContext) _TuitionPayment_stage(ctx context.Context, field gra
 		Field:      field,
 		Args:       nil,
 		IsMethod:   true,
-		IsResolver: true,
+		IsResolver: false,
 	}
 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.TuitionPayment().Stage(rctx, obj)
+		return obj.Stage(ctx)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -14898,27 +15728,24 @@ func (ec *executionContext) _User_stage(ctx context.Context, field graphql.Colle
 		Field:      field,
 		Args:       nil,
 		IsMethod:   true,
-		IsResolver: true,
+		IsResolver: false,
 	}
 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.User().Stage(rctx, obj)
+		return obj.Stage(ctx)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
 		return graphql.Null
 	}
 	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
 		return graphql.Null
 	}
 	res := resTmp.(*ent.Stage)
 	fc.Result = res
-	return ec.marshalNStage2ᚖgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚐStage(ctx, field.Selections, res)
+	return ec.marshalOStage2ᚖgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚐStage(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _User_school(ctx context.Context, field graphql.CollectedField, obj *ent.User) (ret graphql.Marshaler) {
@@ -14933,27 +15760,24 @@ func (ec *executionContext) _User_school(ctx context.Context, field graphql.Coll
 		Field:      field,
 		Args:       nil,
 		IsMethod:   true,
-		IsResolver: true,
+		IsResolver: false,
 	}
 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.User().School(rctx, obj)
+		return obj.School(ctx)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
 		return graphql.Null
 	}
 	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
 		return graphql.Null
 	}
 	res := resTmp.(*ent.School)
 	fc.Result = res
-	return ec.marshalNSchool2ᚖgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚐSchool(ctx, field.Selections, res)
+	return ec.marshalOSchool2ᚖgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚐSchool(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _User_messages(ctx context.Context, field graphql.CollectedField, obj *ent.User) (ret graphql.Marshaler) {
@@ -15112,7 +15936,7 @@ func (ec *executionContext) _User_assignmentSubmissions(ctx context.Context, fie
 	return ec.marshalOAssignmentSubmissionConnection2ᚖgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚐAssignmentSubmissionConnection(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _User_courseGrades(ctx context.Context, field graphql.CollectedField, obj *ent.User) (ret graphql.Marshaler) {
+func (ec *executionContext) _User_payments(ctx context.Context, field graphql.CollectedField, obj *ent.User) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -15128,9 +15952,48 @@ func (ec *executionContext) _User_courseGrades(ctx context.Context, field graphq
 	}
 
 	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_User_payments_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.User().CourseGrades(rctx, obj)
+		return ec.resolvers.User().Payments(rctx, obj, args["after"].(*ent.Cursor), args["first"].(*int), args["before"].(*ent.Cursor), args["last"].(*int), args["orderBy"].(*ent.TuitionPaymentOrder), args["where"].(*ent.TuitionPaymentWhereInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*ent.TuitionPaymentConnection)
+	fc.Result = res
+	return ec.marshalOTuitionPaymentConnection2ᚖgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚐTuitionPaymentConnection(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _User_courseGrades(ctx context.Context, field graphql.CollectedField, obj *ent.User) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "User",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CourseGrades(ctx)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -16507,6 +17370,50 @@ func (ec *executionContext) unmarshalInputAddAssignmentSubmissionInput(ctx conte
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputAddAttendanceInput(ctx context.Context, obj interface{}) (model.AddAttendanceInput, error) {
+	var it model.AddAttendanceInput
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "date":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("date"))
+			it.Date, err = ec.unmarshalNTime2timeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "state":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("state"))
+			it.State, err = ec.unmarshalNAttendanceState2githubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚋattendanceᚐState(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "classID":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("classID"))
+			it.ClassID, err = ec.unmarshalNID2githubᚗcomᚋgoogleᚋuuidᚐUUID(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "studentID":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("studentID"))
+			it.StudentID, err = ec.unmarshalNID2githubᚗcomᚋgoogleᚋuuidᚐUUID(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputAddClassInput(ctx context.Context, obj interface{}) (model.AddClassInput, error) {
 	var it model.AddClassInput
 	var asMap = obj.(map[string]interface{})
@@ -16794,6 +17701,50 @@ func (ec *executionContext) unmarshalInputAddStageInput(ctx context.Context, obj
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("schoolID"))
 			it.SchoolID, err = ec.unmarshalNID2githubᚗcomᚋgoogleᚋuuidᚐUUID(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputAddTuitionPaymentInput(ctx context.Context, obj interface{}) (model.AddTuitionPaymentInput, error) {
+	var it model.AddTuitionPaymentInput
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "stageID":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("stageID"))
+			it.StageID, err = ec.unmarshalNID2githubᚗcomᚋgoogleᚋuuidᚐUUID(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "studentID":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("studentID"))
+			it.StudentID, err = ec.unmarshalNID2githubᚗcomᚋgoogleᚋuuidᚐUUID(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "year":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("year"))
+			it.Year, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "paidAmount":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("paidAmount"))
+			it.PaidAmount, err = ec.unmarshalNInt2int(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -19512,6 +20463,22 @@ func (ec *executionContext) unmarshalInputCourseGradeWhereInput(ctx context.Cont
 			if err != nil {
 				return it, err
 			}
+		case "writtenFirstIsNil":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("writtenFirstIsNil"))
+			it.WrittenFirstIsNil, err = ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "writtenFirstNotNil":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("writtenFirstNotNil"))
+			it.WrittenFirstNotNil, err = ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "writtenSecond":
 			var err error
 
@@ -19576,6 +20543,22 @@ func (ec *executionContext) unmarshalInputCourseGradeWhereInput(ctx context.Cont
 			if err != nil {
 				return it, err
 			}
+		case "writtenSecondIsNil":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("writtenSecondIsNil"))
+			it.WrittenSecondIsNil, err = ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "writtenSecondNotNil":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("writtenSecondNotNil"))
+			it.WrittenSecondNotNil, err = ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "courseFinal":
 			var err error
 
@@ -19637,6 +20620,22 @@ func (ec *executionContext) unmarshalInputCourseGradeWhereInput(ctx context.Cont
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("courseFinalLTE"))
 			it.CourseFinalLTE, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "courseFinalIsNil":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("courseFinalIsNil"))
+			it.CourseFinalIsNil, err = ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "courseFinalNotNil":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("courseFinalNotNil"))
+			it.CourseFinalNotNil, err = ec.unmarshalOBoolean2bool(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -23228,6 +24227,110 @@ func (ec *executionContext) unmarshalInputTuitionPaymentWhereInput(ctx context.C
 			if err != nil {
 				return it, err
 			}
+		case "year":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("year"))
+			it.Year, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "yearNEQ":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("yearNEQ"))
+			it.YearNEQ, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "yearIn":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("yearIn"))
+			it.YearIn, err = ec.unmarshalOString2ᚕstringᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "yearNotIn":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("yearNotIn"))
+			it.YearNotIn, err = ec.unmarshalOString2ᚕstringᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "yearGT":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("yearGT"))
+			it.YearGT, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "yearGTE":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("yearGTE"))
+			it.YearGTE, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "yearLT":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("yearLT"))
+			it.YearLT, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "yearLTE":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("yearLTE"))
+			it.YearLTE, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "yearContains":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("yearContains"))
+			it.YearContains, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "yearHasPrefix":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("yearHasPrefix"))
+			it.YearHasPrefix, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "yearHasSuffix":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("yearHasSuffix"))
+			it.YearHasSuffix, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "yearEqualFold":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("yearEqualFold"))
+			it.YearEqualFold, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "yearContainsFold":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("yearContainsFold"))
+			it.YearContainsFold, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "paidAmount":
 			var err error
 
@@ -23474,6 +24577,34 @@ func (ec *executionContext) unmarshalInputUpdateAssignmentSubmissionInput(ctx co
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputUpdateAttendanceInput(ctx context.Context, obj interface{}) (model.UpdateAttendanceInput, error) {
+	var it model.UpdateAttendanceInput
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "date":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("date"))
+			it.Date, err = ec.unmarshalOTime2ᚖtimeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "state":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("state"))
+			it.State, err = ec.unmarshalOAttendanceState2ᚖgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚋattendanceᚐState(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputUpdateClassInput(ctx context.Context, obj interface{}) (model.UpdateClassInput, error) {
 	var it model.UpdateClassInput
 	var asMap = obj.(map[string]interface{})
@@ -23689,6 +24820,34 @@ func (ec *executionContext) unmarshalInputUpdateStageInput(ctx context.Context, 
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tuitionAmount"))
 			it.TuitionAmount, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputUpdateTuitionPaymentInput(ctx context.Context, obj interface{}) (model.UpdateTuitionPaymentInput, error) {
+	var it model.UpdateTuitionPaymentInput
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "year":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("year"))
+			it.Year, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "paidAmount":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("paidAmount"))
+			it.PaidAmount, err = ec.unmarshalOInt2ᚖint(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -25652,29 +26811,14 @@ func (ec *executionContext) _CourseGrade(ctx context.Context, sel ast.SelectionS
 			}
 		case "activityFirst":
 			out.Values[i] = ec._CourseGrade_activityFirst(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
-			}
 		case "activitySecond":
 			out.Values[i] = ec._CourseGrade_activitySecond(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
-			}
 		case "writtenFirst":
 			out.Values[i] = ec._CourseGrade_writtenFirst(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
-			}
 		case "writtenSecond":
 			out.Values[i] = ec._CourseGrade_writtenSecond(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
-			}
 		case "courseFinal":
 			out.Values[i] = ec._CourseGrade_courseFinal(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
-			}
 		case "createdAt":
 			out.Values[i] = ec._CourseGrade_createdAt(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -25851,9 +26995,6 @@ func (ec *executionContext) _Group(ctx context.Context, sel ast.SelectionSet, ob
 					}
 				}()
 				res = ec._Group_class(ctx, field, obj)
-				if res == graphql.Null {
-					atomic.AddUint32(&invalids, 1)
-				}
 				return res
 			})
 		case "users":
@@ -26280,6 +27421,36 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		case "addTuitionPayment":
+			out.Values[i] = ec._Mutation_addTuitionPayment(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "updateTuitionPayment":
+			out.Values[i] = ec._Mutation_updateTuitionPayment(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "deleteTuitionPayment":
+			out.Values[i] = ec._Mutation_deleteTuitionPayment(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "addAttendance":
+			out.Values[i] = ec._Mutation_addAttendance(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "updateAttendance":
+			out.Values[i] = ec._Mutation_updateAttendance(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "deleteAttendance":
+			out.Values[i] = ec._Mutation_deleteAttendance(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -26575,6 +27746,34 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_courseGrades(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
+		case "tuitionPayments":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_tuitionPayments(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
+		case "attendances":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_attendances(ctx, field)
 				if res == graphql.Null {
 					atomic.AddUint32(&invalids, 1)
 				}
@@ -27057,6 +28256,11 @@ func (ec *executionContext) _TuitionPayment(ctx context.Context, sel ast.Selecti
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
+		case "year":
+			out.Values[i] = ec._TuitionPayment_year(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
 		case "paidAmount":
 			out.Values[i] = ec._TuitionPayment_paidAmount(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -27239,9 +28443,6 @@ func (ec *executionContext) _User(ctx context.Context, sel ast.SelectionSet, obj
 					}
 				}()
 				res = ec._User_stage(ctx, field, obj)
-				if res == graphql.Null {
-					atomic.AddUint32(&invalids, 1)
-				}
 				return res
 			})
 		case "school":
@@ -27253,9 +28454,6 @@ func (ec *executionContext) _User(ctx context.Context, sel ast.SelectionSet, obj
 					}
 				}()
 				res = ec._User_school(ctx, field, obj)
-				if res == graphql.Null {
-					atomic.AddUint32(&invalids, 1)
-				}
 				return res
 			})
 		case "messages":
@@ -27300,6 +28498,17 @@ func (ec *executionContext) _User(ctx context.Context, sel ast.SelectionSet, obj
 					}
 				}()
 				res = ec._User_assignmentSubmissions(ctx, field, obj)
+				return res
+			})
+		case "payments":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._User_payments(ctx, field, obj)
 				return res
 			})
 		case "courseGrades":
@@ -27645,6 +28854,11 @@ func (ec *executionContext) unmarshalNAddAssignmentSubmissionInput2githubᚗcom�
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
+func (ec *executionContext) unmarshalNAddAttendanceInput2githubᚗcomᚋmsal4ᚋhassah_school_serverᚋserverᚋmodelᚐAddAttendanceInput(ctx context.Context, v interface{}) (model.AddAttendanceInput, error) {
+	res, err := ec.unmarshalInputAddAttendanceInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
 func (ec *executionContext) unmarshalNAddClassInput2githubᚗcomᚋmsal4ᚋhassah_school_serverᚋserverᚋmodelᚐAddClassInput(ctx context.Context, v interface{}) (model.AddClassInput, error) {
 	res, err := ec.unmarshalInputAddClassInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -27672,6 +28886,11 @@ func (ec *executionContext) unmarshalNAddSchoolInput2githubᚗcomᚋmsal4ᚋhass
 
 func (ec *executionContext) unmarshalNAddStageInput2githubᚗcomᚋmsal4ᚋhassah_school_serverᚋserverᚋmodelᚐAddStageInput(ctx context.Context, v interface{}) (model.AddStageInput, error) {
 	res, err := ec.unmarshalInputAddStageInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNAddTuitionPaymentInput2githubᚗcomᚋmsal4ᚋhassah_school_serverᚋserverᚋmodelᚐAddTuitionPaymentInput(ctx context.Context, v interface{}) (model.AddTuitionPaymentInput, error) {
+	res, err := ec.unmarshalInputAddTuitionPaymentInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
@@ -27744,6 +28963,34 @@ func (ec *executionContext) unmarshalNAssignmentSubmissionWhereInput2ᚖgithub�
 func (ec *executionContext) unmarshalNAssignmentWhereInput2ᚖgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚐAssignmentWhereInput(ctx context.Context, v interface{}) (*ent.AssignmentWhereInput, error) {
 	res, err := ec.unmarshalInputAssignmentWhereInput(ctx, v)
 	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNAttendance2githubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚐAttendance(ctx context.Context, sel ast.SelectionSet, v ent.Attendance) graphql.Marshaler {
+	return ec._Attendance(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNAttendance2ᚖgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚐAttendance(ctx context.Context, sel ast.SelectionSet, v *ent.Attendance) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._Attendance(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNAttendanceConnection2githubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚐAttendanceConnection(ctx context.Context, sel ast.SelectionSet, v ent.AttendanceConnection) graphql.Marshaler {
+	return ec._AttendanceConnection(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNAttendanceConnection2ᚖgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚐAttendanceConnection(ctx context.Context, sel ast.SelectionSet, v *ent.AttendanceConnection) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._AttendanceConnection(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalNAttendanceState2githubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚋattendanceᚐState(ctx context.Context, v interface{}) (attendance.State, error) {
@@ -28245,6 +29492,34 @@ func (ec *executionContext) marshalNTime2timeᚐTime(ctx context.Context, sel as
 	return res
 }
 
+func (ec *executionContext) marshalNTuitionPayment2githubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚐTuitionPayment(ctx context.Context, sel ast.SelectionSet, v ent.TuitionPayment) graphql.Marshaler {
+	return ec._TuitionPayment(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNTuitionPayment2ᚖgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚐTuitionPayment(ctx context.Context, sel ast.SelectionSet, v *ent.TuitionPayment) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._TuitionPayment(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNTuitionPaymentConnection2githubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚐTuitionPaymentConnection(ctx context.Context, sel ast.SelectionSet, v ent.TuitionPaymentConnection) graphql.Marshaler {
+	return ec._TuitionPaymentConnection(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNTuitionPaymentConnection2ᚖgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚐTuitionPaymentConnection(ctx context.Context, sel ast.SelectionSet, v *ent.TuitionPaymentConnection) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._TuitionPaymentConnection(ctx, sel, v)
+}
+
 func (ec *executionContext) unmarshalNTuitionPaymentWhereInput2ᚖgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚐTuitionPaymentWhereInput(ctx context.Context, v interface{}) (*ent.TuitionPaymentWhereInput, error) {
 	res, err := ec.unmarshalInputTuitionPaymentWhereInput(ctx, v)
 	return &res, graphql.ErrorOnPath(ctx, err)
@@ -28257,6 +29532,11 @@ func (ec *executionContext) unmarshalNUpdateAssignmentInput2githubᚗcomᚋmsal4
 
 func (ec *executionContext) unmarshalNUpdateAssignmentSubmissionInput2githubᚗcomᚋmsal4ᚋhassah_school_serverᚋserverᚋmodelᚐUpdateAssignmentSubmissionInput(ctx context.Context, v interface{}) (model.UpdateAssignmentSubmissionInput, error) {
 	res, err := ec.unmarshalInputUpdateAssignmentSubmissionInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNUpdateAttendanceInput2githubᚗcomᚋmsal4ᚋhassah_school_serverᚋserverᚋmodelᚐUpdateAttendanceInput(ctx context.Context, v interface{}) (model.UpdateAttendanceInput, error) {
+	res, err := ec.unmarshalInputUpdateAttendanceInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
@@ -28287,6 +29567,11 @@ func (ec *executionContext) unmarshalNUpdateSchoolInput2githubᚗcomᚋmsal4ᚋh
 
 func (ec *executionContext) unmarshalNUpdateStageInput2githubᚗcomᚋmsal4ᚋhassah_school_serverᚋserverᚋmodelᚐUpdateStageInput(ctx context.Context, v interface{}) (model.UpdateStageInput, error) {
 	res, err := ec.unmarshalInputUpdateStageInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNUpdateTuitionPaymentInput2githubᚗcomᚋmsal4ᚋhassah_school_serverᚋserverᚋmodelᚐUpdateTuitionPaymentInput(ctx context.Context, v interface{}) (model.UpdateTuitionPaymentInput, error) {
+	res, err := ec.unmarshalInputUpdateTuitionPaymentInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 

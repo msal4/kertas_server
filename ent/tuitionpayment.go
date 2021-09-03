@@ -23,6 +23,8 @@ type TuitionPayment struct {
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// UpdatedAt holds the value of the "updated_at" field.
 	UpdatedAt time.Time `json:"updated_at,omitempty"`
+	// Year holds the value of the "year" field.
+	Year string `json:"year,omitempty"`
 	// PaidAmount holds the value of the "paid_amount" field.
 	PaidAmount int `json:"paid_amount,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
@@ -78,6 +80,8 @@ func (*TuitionPayment) scanValues(columns []string) ([]interface{}, error) {
 		switch columns[i] {
 		case tuitionpayment.FieldPaidAmount:
 			values[i] = new(sql.NullInt64)
+		case tuitionpayment.FieldYear:
+			values[i] = new(sql.NullString)
 		case tuitionpayment.FieldCreatedAt, tuitionpayment.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
 		case tuitionpayment.FieldID:
@@ -118,6 +122,12 @@ func (tp *TuitionPayment) assignValues(columns []string, values []interface{}) e
 				return fmt.Errorf("unexpected type %T for field updated_at", values[i])
 			} else if value.Valid {
 				tp.UpdatedAt = value.Time
+			}
+		case tuitionpayment.FieldYear:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field year", values[i])
+			} else if value.Valid {
+				tp.Year = value.String
 			}
 		case tuitionpayment.FieldPaidAmount:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
@@ -181,6 +191,8 @@ func (tp *TuitionPayment) String() string {
 	builder.WriteString(tp.CreatedAt.Format(time.ANSIC))
 	builder.WriteString(", updated_at=")
 	builder.WriteString(tp.UpdatedAt.Format(time.ANSIC))
+	builder.WriteString(", year=")
+	builder.WriteString(tp.Year)
 	builder.WriteString(", paid_amount=")
 	builder.WriteString(fmt.Sprintf("%v", tp.PaidAmount))
 	builder.WriteByte(')')

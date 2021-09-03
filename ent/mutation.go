@@ -3590,7 +3590,7 @@ func (m *CourseGradeMutation) ActivityFirst() (r int, exists bool) {
 // OldActivityFirst returns the old "activity_first" field's value of the CourseGrade entity.
 // If the CourseGrade object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *CourseGradeMutation) OldActivityFirst(ctx context.Context) (v int, err error) {
+func (m *CourseGradeMutation) OldActivityFirst(ctx context.Context) (v *int, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, fmt.Errorf("OldActivityFirst is only allowed on UpdateOne operations")
 	}
@@ -3660,7 +3660,7 @@ func (m *CourseGradeMutation) ActivitySecond() (r int, exists bool) {
 // OldActivitySecond returns the old "activity_second" field's value of the CourseGrade entity.
 // If the CourseGrade object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *CourseGradeMutation) OldActivitySecond(ctx context.Context) (v int, err error) {
+func (m *CourseGradeMutation) OldActivitySecond(ctx context.Context) (v *int, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, fmt.Errorf("OldActivitySecond is only allowed on UpdateOne operations")
 	}
@@ -3730,7 +3730,7 @@ func (m *CourseGradeMutation) WrittenFirst() (r int, exists bool) {
 // OldWrittenFirst returns the old "written_first" field's value of the CourseGrade entity.
 // If the CourseGrade object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *CourseGradeMutation) OldWrittenFirst(ctx context.Context) (v int, err error) {
+func (m *CourseGradeMutation) OldWrittenFirst(ctx context.Context) (v *int, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, fmt.Errorf("OldWrittenFirst is only allowed on UpdateOne operations")
 	}
@@ -3762,10 +3762,24 @@ func (m *CourseGradeMutation) AddedWrittenFirst() (r int, exists bool) {
 	return *v, true
 }
 
+// ClearWrittenFirst clears the value of the "written_first" field.
+func (m *CourseGradeMutation) ClearWrittenFirst() {
+	m.written_first = nil
+	m.addwritten_first = nil
+	m.clearedFields[coursegrade.FieldWrittenFirst] = struct{}{}
+}
+
+// WrittenFirstCleared returns if the "written_first" field was cleared in this mutation.
+func (m *CourseGradeMutation) WrittenFirstCleared() bool {
+	_, ok := m.clearedFields[coursegrade.FieldWrittenFirst]
+	return ok
+}
+
 // ResetWrittenFirst resets all changes to the "written_first" field.
 func (m *CourseGradeMutation) ResetWrittenFirst() {
 	m.written_first = nil
 	m.addwritten_first = nil
+	delete(m.clearedFields, coursegrade.FieldWrittenFirst)
 }
 
 // SetWrittenSecond sets the "written_second" field.
@@ -3786,7 +3800,7 @@ func (m *CourseGradeMutation) WrittenSecond() (r int, exists bool) {
 // OldWrittenSecond returns the old "written_second" field's value of the CourseGrade entity.
 // If the CourseGrade object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *CourseGradeMutation) OldWrittenSecond(ctx context.Context) (v int, err error) {
+func (m *CourseGradeMutation) OldWrittenSecond(ctx context.Context) (v *int, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, fmt.Errorf("OldWrittenSecond is only allowed on UpdateOne operations")
 	}
@@ -3818,10 +3832,24 @@ func (m *CourseGradeMutation) AddedWrittenSecond() (r int, exists bool) {
 	return *v, true
 }
 
+// ClearWrittenSecond clears the value of the "written_second" field.
+func (m *CourseGradeMutation) ClearWrittenSecond() {
+	m.written_second = nil
+	m.addwritten_second = nil
+	m.clearedFields[coursegrade.FieldWrittenSecond] = struct{}{}
+}
+
+// WrittenSecondCleared returns if the "written_second" field was cleared in this mutation.
+func (m *CourseGradeMutation) WrittenSecondCleared() bool {
+	_, ok := m.clearedFields[coursegrade.FieldWrittenSecond]
+	return ok
+}
+
 // ResetWrittenSecond resets all changes to the "written_second" field.
 func (m *CourseGradeMutation) ResetWrittenSecond() {
 	m.written_second = nil
 	m.addwritten_second = nil
+	delete(m.clearedFields, coursegrade.FieldWrittenSecond)
 }
 
 // SetCourseFinal sets the "course_final" field.
@@ -3842,7 +3870,7 @@ func (m *CourseGradeMutation) CourseFinal() (r int, exists bool) {
 // OldCourseFinal returns the old "course_final" field's value of the CourseGrade entity.
 // If the CourseGrade object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *CourseGradeMutation) OldCourseFinal(ctx context.Context) (v int, err error) {
+func (m *CourseGradeMutation) OldCourseFinal(ctx context.Context) (v *int, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, fmt.Errorf("OldCourseFinal is only allowed on UpdateOne operations")
 	}
@@ -3874,10 +3902,24 @@ func (m *CourseGradeMutation) AddedCourseFinal() (r int, exists bool) {
 	return *v, true
 }
 
+// ClearCourseFinal clears the value of the "course_final" field.
+func (m *CourseGradeMutation) ClearCourseFinal() {
+	m.course_final = nil
+	m.addcourse_final = nil
+	m.clearedFields[coursegrade.FieldCourseFinal] = struct{}{}
+}
+
+// CourseFinalCleared returns if the "course_final" field was cleared in this mutation.
+func (m *CourseGradeMutation) CourseFinalCleared() bool {
+	_, ok := m.clearedFields[coursegrade.FieldCourseFinal]
+	return ok
+}
+
 // ResetCourseFinal resets all changes to the "course_final" field.
 func (m *CourseGradeMutation) ResetCourseFinal() {
 	m.course_final = nil
 	m.addcourse_final = nil
+	delete(m.clearedFields, coursegrade.FieldCourseFinal)
 }
 
 // SetStudentID sets the "student" edge to the User entity by id.
@@ -4240,6 +4282,15 @@ func (m *CourseGradeMutation) ClearedFields() []string {
 	if m.FieldCleared(coursegrade.FieldActivitySecond) {
 		fields = append(fields, coursegrade.FieldActivitySecond)
 	}
+	if m.FieldCleared(coursegrade.FieldWrittenFirst) {
+		fields = append(fields, coursegrade.FieldWrittenFirst)
+	}
+	if m.FieldCleared(coursegrade.FieldWrittenSecond) {
+		fields = append(fields, coursegrade.FieldWrittenSecond)
+	}
+	if m.FieldCleared(coursegrade.FieldCourseFinal) {
+		fields = append(fields, coursegrade.FieldCourseFinal)
+	}
 	return fields
 }
 
@@ -4259,6 +4310,15 @@ func (m *CourseGradeMutation) ClearField(name string) error {
 		return nil
 	case coursegrade.FieldActivitySecond:
 		m.ClearActivitySecond()
+		return nil
+	case coursegrade.FieldWrittenFirst:
+		m.ClearWrittenFirst()
+		return nil
+	case coursegrade.FieldWrittenSecond:
+		m.ClearWrittenSecond()
+		return nil
+	case coursegrade.FieldCourseFinal:
+		m.ClearCourseFinal()
 		return nil
 	}
 	return fmt.Errorf("unknown CourseGrade nullable field %s", name)
@@ -8974,6 +9034,7 @@ type TuitionPaymentMutation struct {
 	id             *uuid.UUID
 	created_at     *time.Time
 	updated_at     *time.Time
+	year           *string
 	paid_amount    *int
 	addpaid_amount *int
 	clearedFields  map[string]struct{}
@@ -9143,6 +9204,42 @@ func (m *TuitionPaymentMutation) ResetUpdatedAt() {
 	m.updated_at = nil
 }
 
+// SetYear sets the "year" field.
+func (m *TuitionPaymentMutation) SetYear(s string) {
+	m.year = &s
+}
+
+// Year returns the value of the "year" field in the mutation.
+func (m *TuitionPaymentMutation) Year() (r string, exists bool) {
+	v := m.year
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldYear returns the old "year" field's value of the TuitionPayment entity.
+// If the TuitionPayment object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *TuitionPaymentMutation) OldYear(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldYear is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldYear requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldYear: %w", err)
+	}
+	return oldValue.Year, nil
+}
+
+// ResetYear resets all changes to the "year" field.
+func (m *TuitionPaymentMutation) ResetYear() {
+	m.year = nil
+}
+
 // SetPaidAmount sets the "paid_amount" field.
 func (m *TuitionPaymentMutation) SetPaidAmount(i int) {
 	m.paid_amount = &i
@@ -9296,12 +9393,15 @@ func (m *TuitionPaymentMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *TuitionPaymentMutation) Fields() []string {
-	fields := make([]string, 0, 3)
+	fields := make([]string, 0, 4)
 	if m.created_at != nil {
 		fields = append(fields, tuitionpayment.FieldCreatedAt)
 	}
 	if m.updated_at != nil {
 		fields = append(fields, tuitionpayment.FieldUpdatedAt)
+	}
+	if m.year != nil {
+		fields = append(fields, tuitionpayment.FieldYear)
 	}
 	if m.paid_amount != nil {
 		fields = append(fields, tuitionpayment.FieldPaidAmount)
@@ -9318,6 +9418,8 @@ func (m *TuitionPaymentMutation) Field(name string) (ent.Value, bool) {
 		return m.CreatedAt()
 	case tuitionpayment.FieldUpdatedAt:
 		return m.UpdatedAt()
+	case tuitionpayment.FieldYear:
+		return m.Year()
 	case tuitionpayment.FieldPaidAmount:
 		return m.PaidAmount()
 	}
@@ -9333,6 +9435,8 @@ func (m *TuitionPaymentMutation) OldField(ctx context.Context, name string) (ent
 		return m.OldCreatedAt(ctx)
 	case tuitionpayment.FieldUpdatedAt:
 		return m.OldUpdatedAt(ctx)
+	case tuitionpayment.FieldYear:
+		return m.OldYear(ctx)
 	case tuitionpayment.FieldPaidAmount:
 		return m.OldPaidAmount(ctx)
 	}
@@ -9357,6 +9461,13 @@ func (m *TuitionPaymentMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetUpdatedAt(v)
+		return nil
+	case tuitionpayment.FieldYear:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetYear(v)
 		return nil
 	case tuitionpayment.FieldPaidAmount:
 		v, ok := value.(int)
@@ -9434,6 +9545,9 @@ func (m *TuitionPaymentMutation) ResetField(name string) error {
 		return nil
 	case tuitionpayment.FieldUpdatedAt:
 		m.ResetUpdatedAt()
+		return nil
+	case tuitionpayment.FieldYear:
+		m.ResetYear()
 		return nil
 	case tuitionpayment.FieldPaidAmount:
 		m.ResetPaidAmount()
