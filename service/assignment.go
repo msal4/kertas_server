@@ -53,7 +53,7 @@ func (s *Service) Assignments(ctx context.Context, opts AssignmentsOptions) (*en
 		b = bCls.QueryAssignments()
 	}
 
-	return b.Paginate(ctx, opts.After, opts.First, opts.Before, opts.Last,
+	return b.Where(assignment.DeletedAtIsNil()).Paginate(ctx, opts.After, opts.First, opts.Before, opts.Last,
 		ent.WithAssignmentOrder(opts.OrderBy), ent.WithAssignmentFilter(opts.Where.Filter))
 }
 

@@ -21,7 +21,7 @@ type SchoolsOptions struct {
 }
 
 func (s *Service) Schools(ctx context.Context, opts SchoolsOptions) (*ent.SchoolConnection, error) {
-	return s.EC.School.Query().Paginate(ctx, opts.After, opts.First, opts.Before, opts.Last, ent.WithSchoolOrder(opts.OrderBy),
+	return s.EC.School.Query().Where(school.DeletedAtIsNil()).Paginate(ctx, opts.After, opts.First, opts.Before, opts.Last, ent.WithSchoolOrder(opts.OrderBy),
 		ent.WithSchoolFilter(opts.Where.Filter))
 }
 

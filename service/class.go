@@ -6,6 +6,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/msal4/hassah_school_server/ent"
+	"github.com/msal4/hassah_school_server/ent/class"
 	"github.com/msal4/hassah_school_server/ent/group"
 	"github.com/msal4/hassah_school_server/ent/user"
 	"github.com/msal4/hassah_school_server/server/model"
@@ -57,7 +58,7 @@ func (s *Service) Classes(ctx context.Context, opts ClassesOptions) (*ent.ClassC
 		b = sch.QueryStages().QueryClasses()
 	}
 
-	return b.Paginate(ctx, opts.After, opts.First, opts.Before, opts.Last,
+	return b.Where(class.DeletedAtIsNil()).Paginate(ctx, opts.After, opts.First, opts.Before, opts.Last,
 		ent.WithClassOrder(opts.OrderBy), ent.WithClassFilter(opts.Where.Filter))
 }
 

@@ -9,6 +9,7 @@ import (
 	"github.com/minio/minio-go/v7"
 	"github.com/msal4/hassah_school_server/ent"
 	"github.com/msal4/hassah_school_server/ent/group"
+	"github.com/msal4/hassah_school_server/ent/message"
 	"github.com/msal4/hassah_school_server/ent/user"
 	"github.com/msal4/hassah_school_server/server/model"
 	"github.com/segmentio/ksuid"
@@ -29,7 +30,7 @@ func (s *Service) Messages(ctx context.Context, groupID uuid.UUID, opts Messages
 		return nil, err
 	}
 
-	return grp.QueryMessages().
+	return grp.QueryMessages().Where(message.DeletedAtIsNil()).
 		Paginate(ctx, opts.After, opts.First, opts.Before, opts.Last, ent.WithMessageOrder(opts.OrderBy), ent.WithMessageFilter(opts.Where.Filter))
 }
 

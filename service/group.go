@@ -70,7 +70,7 @@ func (s *Service) Groups(ctx context.Context, opts GroupsOptions) (*ent.GroupCon
 		}
 	}
 
-	return b.Paginate(ctx, opts.After, opts.First, opts.Before,
+	return b.Where(group.DeletedAtIsNil()).Paginate(ctx, opts.After, opts.First, opts.Before,
 		opts.Last, ent.WithGroupOrder(opts.OrderBy), ent.WithGroupFilter(opts.Where.Filter))
 }
 

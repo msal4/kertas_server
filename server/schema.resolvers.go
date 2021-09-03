@@ -11,6 +11,11 @@ import (
 	"github.com/google/uuid"
 	"github.com/msal4/hassah_school_server/auth"
 	"github.com/msal4/hassah_school_server/ent"
+	"github.com/msal4/hassah_school_server/ent/assignment"
+	"github.com/msal4/hassah_school_server/ent/class"
+	"github.com/msal4/hassah_school_server/ent/group"
+	"github.com/msal4/hassah_school_server/ent/message"
+	"github.com/msal4/hassah_school_server/ent/stage"
 	"github.com/msal4/hassah_school_server/ent/user"
 	"github.com/msal4/hassah_school_server/server/generated"
 	"github.com/msal4/hassah_school_server/server/model"
@@ -23,7 +28,7 @@ func (r *assignmentResolver) Submissions(ctx context.Context, obj *ent.Assignmen
 }
 
 func (r *classResolver) Assignments(ctx context.Context, obj *ent.Class, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.AssignmentOrder, where *ent.AssignmentWhereInput) (*ent.AssignmentConnection, error) {
-	return obj.QueryAssignments().Paginate(ctx, after, first, before, last, ent.WithAssignmentOrder(orderBy), ent.WithAssignmentFilter(where.Filter))
+	return obj.QueryAssignments().Where(assignment.DeletedAtIsNil()).Paginate(ctx, after, first, before, last, ent.WithAssignmentOrder(orderBy), ent.WithAssignmentFilter(where.Filter))
 }
 
 func (r *classResolver) Attendances(ctx context.Context, obj *ent.Class, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.AttendanceOrder, where *ent.AttendanceWhereInput) (*ent.AttendanceConnection, error) {
@@ -39,7 +44,7 @@ func (r *classResolver) CourseGrades(ctx context.Context, obj *ent.Class, after 
 }
 
 func (r *groupResolver) Messages(ctx context.Context, obj *ent.Group, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.MessageOrder, where *ent.MessageWhereInput) (*ent.MessageConnection, error) {
-	return obj.QueryMessages().Paginate(ctx, after, first, before, last, ent.WithMessageOrder(orderBy), ent.WithMessageFilter(where.Filter))
+	return obj.QueryMessages().Where(message.DeletedAtIsNil()).Paginate(ctx, after, first, before, last, ent.WithMessageOrder(orderBy), ent.WithMessageFilter(where.Filter))
 }
 
 func (r *mutationResolver) AddSchool(ctx context.Context, input model.AddSchoolInput) (*ent.School, error) {
@@ -608,15 +613,15 @@ func (r *queryResolver) Attendances(ctx context.Context, studentID *uuid.UUID, c
 }
 
 func (r *schoolResolver) Users(ctx context.Context, obj *ent.School, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.UserOrder, where *ent.UserWhereInput) (*ent.UserConnection, error) {
-	return obj.QueryUsers().Paginate(ctx, after, first, before, last, ent.WithUserOrder(orderBy), ent.WithUserFilter(where.Filter))
+	return obj.QueryUsers().Where(user.DeletedAtIsNil()).Paginate(ctx, after, first, before, last, ent.WithUserOrder(orderBy), ent.WithUserFilter(where.Filter))
 }
 
 func (r *schoolResolver) Stages(ctx context.Context, obj *ent.School, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.StageOrder, where *ent.StageWhereInput) (*ent.StageConnection, error) {
-	return obj.QueryStages().Paginate(ctx, after, first, before, last, ent.WithStageOrder(orderBy), ent.WithStageFilter(where.Filter))
+	return obj.QueryStages().Where(stage.DeletedAtIsNil()).Paginate(ctx, after, first, before, last, ent.WithStageOrder(orderBy), ent.WithStageFilter(where.Filter))
 }
 
 func (r *stageResolver) Classes(ctx context.Context, obj *ent.Stage, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.ClassOrder, where *ent.ClassWhereInput) (*ent.ClassConnection, error) {
-	return obj.QueryClasses().Paginate(ctx, after, first, before, last,
+	return obj.QueryClasses().Where(class.DeletedAtIsNil()).Paginate(ctx, after, first, before, last,
 		ent.WithClassOrder(orderBy), ent.WithClassFilter(where.Filter))
 }
 
@@ -626,7 +631,7 @@ func (r *stageResolver) Payments(ctx context.Context, obj *ent.Stage, after *ent
 }
 
 func (r *stageResolver) Students(ctx context.Context, obj *ent.Stage, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.UserOrder, where *ent.UserWhereInput) (*ent.UserConnection, error) {
-	return obj.QueryStudents().Paginate(ctx, after, first, before, last,
+	return obj.QueryStudents().Where(user.DeletedAtIsNil()).Paginate(ctx, after, first, before, last,
 		ent.WithUserOrder(orderBy), ent.WithUserFilter(where.Filter))
 }
 
@@ -640,15 +645,15 @@ func (r *subscriptionResolver) MessagePosted(ctx context.Context, groupID uuid.U
 }
 
 func (r *userResolver) Messages(ctx context.Context, obj *ent.User, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.MessageOrder, where *ent.MessageWhereInput) (*ent.MessageConnection, error) {
-	return obj.QueryMessages().Paginate(ctx, after, first, before, last, ent.WithMessageOrder(orderBy), ent.WithMessageFilter(where.Filter))
+	return obj.QueryMessages().Where(message.DeletedAtIsNil()).Paginate(ctx, after, first, before, last, ent.WithMessageOrder(orderBy), ent.WithMessageFilter(where.Filter))
 }
 
 func (r *userResolver) Groups(ctx context.Context, obj *ent.User, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.GroupOrder, where *ent.GroupWhereInput) (*ent.GroupConnection, error) {
-	return obj.QueryGroups().Paginate(ctx, after, first, before, last, ent.WithGroupOrder(orderBy), ent.WithGroupFilter(where.Filter))
+	return obj.QueryGroups().Where(group.DeletedAtIsNil()).Paginate(ctx, after, first, before, last, ent.WithGroupOrder(orderBy), ent.WithGroupFilter(where.Filter))
 }
 
 func (r *userResolver) Classes(ctx context.Context, obj *ent.User, stageID *uuid.UUID, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.ClassOrder, where *ent.ClassWhereInput) (*ent.ClassConnection, error) {
-	return obj.QueryClasses().Paginate(ctx, after, first, before, last, ent.WithClassOrder(orderBy), ent.WithClassFilter(where.Filter))
+	return obj.QueryClasses().Where(class.DeletedAtIsNil()).Paginate(ctx, after, first, before, last, ent.WithClassOrder(orderBy), ent.WithClassFilter(where.Filter))
 }
 
 func (r *userResolver) AssignmentSubmissions(ctx context.Context, obj *ent.User, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.AssignmentSubmissionOrder, where *ent.AssignmentSubmissionWhereInput) (*ent.AssignmentSubmissionConnection, error) {

@@ -22,7 +22,7 @@ type StagesOptions struct {
 }
 
 func (s *Service) Stages(ctx context.Context, opts StagesOptions) (*ent.StageConnection, error) {
-	return s.EC.Stage.Query().Paginate(ctx, opts.After, opts.First, opts.Before, opts.Last, ent.WithStageOrder(opts.OrderBy),
+	return s.EC.Stage.Query().Where(stage.DeletedAtIsNil()).Paginate(ctx, opts.After, opts.First, opts.Before, opts.Last, ent.WithStageOrder(opts.OrderBy),
 		ent.WithStageFilter(opts.Where.Filter))
 }
 

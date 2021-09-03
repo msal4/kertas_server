@@ -28,7 +28,7 @@ type UsersOptions struct {
 }
 
 func (s *Service) Users(ctx context.Context, opts UsersOptions) (*ent.UserConnection, error) {
-	return s.EC.User.Query().Paginate(ctx, opts.After, opts.First, opts.Before, opts.Last,
+	return s.EC.User.Query().Where(user.DeletedAtIsNil()).Paginate(ctx, opts.After, opts.First, opts.Before, opts.Last,
 		ent.WithUserOrder(opts.OrderBy), ent.WithUserFilter(opts.Where.Filter))
 }
 
