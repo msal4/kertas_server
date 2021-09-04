@@ -8,6 +8,7 @@ import (
 	"errors"
 	"time"
 
+	"github.com/99designs/gqlgen/graphql"
 	"github.com/google/uuid"
 	"github.com/msal4/hassah_school_server/auth"
 	"github.com/msal4/hassah_school_server/ent"
@@ -20,6 +21,7 @@ import (
 	"github.com/msal4/hassah_school_server/server/generated"
 	"github.com/msal4/hassah_school_server/server/model"
 	"github.com/msal4/hassah_school_server/service"
+	"github.com/vektah/gqlparser/v2/gqlerror"
 )
 
 func (r *assignmentResolver) Submissions(ctx context.Context, obj *ent.Assignment, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.AssignmentSubmissionOrder, where *ent.AssignmentSubmissionWhereInput) (*ent.AssignmentSubmissionConnection, error) {
@@ -152,7 +154,18 @@ func (r *mutationResolver) LoginUser(ctx context.Context, input model.LoginInput
 }
 
 func (r *mutationResolver) RefreshTokens(ctx context.Context, token string) (*model.AuthData, error) {
-	return r.s.RefreshTokens(ctx, token)
+	data, err := r.s.RefreshTokens(ctx, token)
+	if err != nil {
+		return nil, &gqlerror.Error{
+			Message: err.Error(),
+			Path:    graphql.GetPath(ctx),
+			Extensions: map[string]interface{}{
+				"code": "INVALID_TOKEN",
+			},
+		}
+	}
+
+	return data, nil
 }
 
 func (r *mutationResolver) PostMessage(ctx context.Context, input model.PostMessageInput) (*ent.Message, error) {
