@@ -159,7 +159,7 @@ func seed(ctx context.Context, s *service.Service) error {
 	}
 
 	cls3, err := s.AddClass(ctx, model.AddClassInput{
-		Name:      "Intermediate English",
+		Name:      "English",
 		Active:    true,
 		StageID:   stg.ID,
 		TeacherID: tchr.ID,
