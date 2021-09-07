@@ -147,6 +147,11 @@ func seed(ctx context.Context, s *service.Service) error {
 		return err
 	}
 
+	grp, err := cls.Group(ctx)
+	if err != nil {
+		return err
+	}
+
 	cls2, err := s.AddClass(ctx, model.AddClassInput{
 		Name:      "الفيزياء",
 		Active:    true,
@@ -218,6 +223,15 @@ func seed(ctx context.Context, s *service.Service) error {
 		return err
 	}
 	log.Printf("Created student: %v\n\n", stdt)
+
+	s.EC.Message.Create().SetContent("gibberish content 1").SetGroup(grp).SetOwner(stdt).Exec(ctx)
+	s.EC.Message.Create().SetContent("gibberish content 2").SetGroup(grp).SetOwner(stdt).Exec(ctx)
+	s.EC.Message.Create().SetContent("gibberish content 3").SetGroup(grp).SetOwner(stdt).Exec(ctx)
+	s.EC.Message.Create().SetContent("gibberish content 4").SetGroup(grp).SetOwner(stdt).Exec(ctx)
+	s.EC.Message.Create().SetContent("gibberish content 5").SetGroup(grp).SetOwner(stdt).Exec(ctx)
+	s.EC.Message.Create().SetContent("gibberish content 6").SetGroup(grp).SetOwner(stdt).Exec(ctx)
+	s.EC.Message.Create().SetContent("gibberish content 7").SetGroup(grp).SetOwner(stdt).Exec(ctx)
+	s.EC.Message.Create().SetContent("gibberish content 8").SetGroup(grp).SetOwner(stdt).Exec(ctx)
 
 	f.Seek(0, 0)
 

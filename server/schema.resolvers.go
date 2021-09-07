@@ -388,7 +388,16 @@ func (r *queryResolver) Me(ctx context.Context) (*ent.User, error) {
 		return nil, auth.UnauthorizedErr
 	}
 
-	return r.s.EC.User.Get(ctx, u.ID)
+	me, err := r.s.EC.User.Get(ctx, u.ID)
+	if err != nil && ent.IsNotFound(err) {
+		return nil, &gqlerror.Error{
+			Path:    graphql.GetPath(ctx),
+			Message: err.Error(), Extensions: map[string]interface{}{
+				"code": "NOT_FOUND",
+			}}
+	}
+
+	return me, err
 }
 
 func (r *queryResolver) School(ctx context.Context, id uuid.UUID) (*ent.School, error) {
