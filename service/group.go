@@ -96,7 +96,8 @@ func (s *Service) AddGroup(ctx context.Context, input AddGroupInput) (*ent.Group
 		return nil, errors.New("a group must have at least two users")
 	}
 
-	return s.EC.Group.Create().SetName(input.Name).SetActive(input.Active).AddUserIDs(ids...).Save(ctx)
+	return s.EC.Group.Create().SetName(input.Name).SetActive(input.Active).SetGroupType(group.GroupTypePrivate).
+		AddUserIDs(ids...).Save(ctx)
 }
 
 func (s *Service) UpdateGroup(ctx context.Context, id uuid.UUID, input model.UpdateGroupInput) (*ent.Group, error) {

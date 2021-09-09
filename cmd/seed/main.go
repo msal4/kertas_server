@@ -211,6 +211,7 @@ func seed(ctx context.Context, s *service.Service) error {
 	}
 	log.Printf("Created schedule: %v\n\n", scd)
 
+	f.Seek(0, 0)
 	stdt, err := s.AddUser(ctx, model.AddUserInput{
 		Name:     "John Doe",
 		Username: "student01",
@@ -219,14 +220,20 @@ func seed(ctx context.Context, s *service.Service) error {
 		Role:     user.RoleStudent,
 		StageID:  &stg.ID,
 		Active:   true,
+		Image: &graphql.Upload{
+			File:        f,
+			Filename:    f.Name(),
+			Size:        stat.Size(),
+			ContentType: "image/jpeg",
+		},
 	})
 	if err != nil {
 		return err
 	}
 	log.Printf("Created student: %v\n\n", stdt)
 
-	s.AddGroup(ctx, service.AddGroupInput{UserIDs: []uuid.UUID{stdt.ID, tchr.ID}})
-	s.AddGroup(ctx, service.AddGroupInput{UserIDs: []uuid.UUID{stdt.ID, tchr2.ID}})
+	s.AddGroup(ctx, service.AddGroupInput{UserIDs: []uuid.UUID{stdt.ID, tchr.ID}, Active: true})
+	s.AddGroup(ctx, service.AddGroupInput{UserIDs: []uuid.UUID{stdt.ID, tchr2.ID}, Active: true})
 
 	s.EC.Message.Create().SetContent("gibberish content 1").SetGroup(grp).SetOwner(stdt).Exec(ctx)
 	s.EC.Message.Create().SetContent("gibberish content 2").SetGroup(grp).SetOwner(stdt).Exec(ctx)
