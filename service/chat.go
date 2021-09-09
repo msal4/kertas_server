@@ -66,6 +66,8 @@ func (s *Service) PostMessage(ctx context.Context, senderID uuid.UUID, input mod
 
 	s.notifyObservers(input.GroupID, msg)
 
+	s.UpdateGroup(ctx, input.GroupID, model.UpdateGroupInput{})
+
 	return msg, nil
 }
 

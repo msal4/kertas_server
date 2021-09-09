@@ -9,6 +9,7 @@ import (
 
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/Netflix/go-env"
+	"github.com/google/uuid"
 	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
 	"github.com/minio/minio-go/v7"
@@ -223,6 +224,9 @@ func seed(ctx context.Context, s *service.Service) error {
 		return err
 	}
 	log.Printf("Created student: %v\n\n", stdt)
+
+	s.AddGroup(ctx, service.AddGroupInput{UserIDs: []uuid.UUID{stdt.ID, tchr.ID}})
+	s.AddGroup(ctx, service.AddGroupInput{UserIDs: []uuid.UUID{stdt.ID, tchr2.ID}})
 
 	s.EC.Message.Create().SetContent("gibberish content 1").SetGroup(grp).SetOwner(stdt).Exec(ctx)
 	s.EC.Message.Create().SetContent("gibberish content 2").SetGroup(grp).SetOwner(stdt).Exec(ctx)
