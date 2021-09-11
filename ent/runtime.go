@@ -379,7 +379,7 @@ func init() {
 	// user.DefaultTokenVersion holds the default value on creation for the token_version field.
 	user.DefaultTokenVersion = userDescTokenVersion.Default.(int)
 	// userDescActive is the schema descriptor for active field.
-	userDescActive := userFields[9].Descriptor()
+	userDescActive := userFields[10].Descriptor()
 	// user.DefaultActive holds the default value on creation for the active field.
 	user.DefaultActive = userDescActive.Default.(bool)
 	// userDescID is the schema descriptor for id field.

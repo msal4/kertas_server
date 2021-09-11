@@ -34,6 +34,8 @@ const (
 	FieldDirectory = "directory"
 	// FieldTokenVersion holds the string denoting the token_version field in the database.
 	FieldTokenVersion = "token_version"
+	// FieldPushTokens holds the string denoting the push_tokens field in the database.
+	FieldPushTokens = "push_tokens"
 	// FieldRole holds the string denoting the role field in the database.
 	FieldRole = "role"
 	// FieldActive holds the string denoting the active field in the database.
@@ -144,6 +146,7 @@ var Columns = []string{
 	FieldImage,
 	FieldDirectory,
 	FieldTokenVersion,
+	FieldPushTokens,
 	FieldRole,
 	FieldActive,
 	FieldDeletedAt,

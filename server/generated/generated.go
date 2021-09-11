@@ -2890,6 +2890,7 @@ input UpdateStageInput {
 input LoginInput {
   username: String!
   password: String!
+  pushToken: String
 }
 
 type AuthData {
@@ -21825,6 +21826,14 @@ func (ec *executionContext) unmarshalInputLoginInput(ctx context.Context, obj in
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("password"))
 			it.Password, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "pushToken":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("pushToken"))
+			it.PushToken, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}

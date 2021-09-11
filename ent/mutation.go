@@ -9720,6 +9720,7 @@ type UserMutation struct {
 	directory            *string
 	token_version        *int
 	addtoken_version     *int
+	push_tokens          *[]string
 	role                 *user.Role
 	active               *bool
 	deleted_at           *time.Time
@@ -10197,6 +10198,55 @@ func (m *UserMutation) AddedTokenVersion() (r int, exists bool) {
 func (m *UserMutation) ResetTokenVersion() {
 	m.token_version = nil
 	m.addtoken_version = nil
+}
+
+// SetPushTokens sets the "push_tokens" field.
+func (m *UserMutation) SetPushTokens(s []string) {
+	m.push_tokens = &s
+}
+
+// PushTokens returns the value of the "push_tokens" field in the mutation.
+func (m *UserMutation) PushTokens() (r []string, exists bool) {
+	v := m.push_tokens
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldPushTokens returns the old "push_tokens" field's value of the User entity.
+// If the User object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *UserMutation) OldPushTokens(ctx context.Context) (v []string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldPushTokens is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldPushTokens requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldPushTokens: %w", err)
+	}
+	return oldValue.PushTokens, nil
+}
+
+// ClearPushTokens clears the value of the "push_tokens" field.
+func (m *UserMutation) ClearPushTokens() {
+	m.push_tokens = nil
+	m.clearedFields[user.FieldPushTokens] = struct{}{}
+}
+
+// PushTokensCleared returns if the "push_tokens" field was cleared in this mutation.
+func (m *UserMutation) PushTokensCleared() bool {
+	_, ok := m.clearedFields[user.FieldPushTokens]
+	return ok
+}
+
+// ResetPushTokens resets all changes to the "push_tokens" field.
+func (m *UserMutation) ResetPushTokens() {
+	m.push_tokens = nil
+	delete(m.clearedFields, user.FieldPushTokens)
 }
 
 // SetRole sets the "role" field.
@@ -10849,7 +10899,7 @@ func (m *UserMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *UserMutation) Fields() []string {
-	fields := make([]string, 0, 12)
+	fields := make([]string, 0, 13)
 	if m.created_at != nil {
 		fields = append(fields, user.FieldCreatedAt)
 	}
@@ -10876,6 +10926,9 @@ func (m *UserMutation) Fields() []string {
 	}
 	if m.token_version != nil {
 		fields = append(fields, user.FieldTokenVersion)
+	}
+	if m.push_tokens != nil {
+		fields = append(fields, user.FieldPushTokens)
 	}
 	if m.role != nil {
 		fields = append(fields, user.FieldRole)
@@ -10912,6 +10965,8 @@ func (m *UserMutation) Field(name string) (ent.Value, bool) {
 		return m.Directory()
 	case user.FieldTokenVersion:
 		return m.TokenVersion()
+	case user.FieldPushTokens:
+		return m.PushTokens()
 	case user.FieldRole:
 		return m.Role()
 	case user.FieldActive:
@@ -10945,6 +11000,8 @@ func (m *UserMutation) OldField(ctx context.Context, name string) (ent.Value, er
 		return m.OldDirectory(ctx)
 	case user.FieldTokenVersion:
 		return m.OldTokenVersion(ctx)
+	case user.FieldPushTokens:
+		return m.OldPushTokens(ctx)
 	case user.FieldRole:
 		return m.OldRole(ctx)
 	case user.FieldActive:
@@ -11023,6 +11080,13 @@ func (m *UserMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetTokenVersion(v)
 		return nil
+	case user.FieldPushTokens:
+		v, ok := value.([]string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetPushTokens(v)
+		return nil
 	case user.FieldRole:
 		v, ok := value.(user.Role)
 		if !ok {
@@ -11092,6 +11156,9 @@ func (m *UserMutation) ClearedFields() []string {
 	if m.FieldCleared(user.FieldImage) {
 		fields = append(fields, user.FieldImage)
 	}
+	if m.FieldCleared(user.FieldPushTokens) {
+		fields = append(fields, user.FieldPushTokens)
+	}
 	if m.FieldCleared(user.FieldDeletedAt) {
 		fields = append(fields, user.FieldDeletedAt)
 	}
@@ -11111,6 +11178,9 @@ func (m *UserMutation) ClearField(name string) error {
 	switch name {
 	case user.FieldImage:
 		m.ClearImage()
+		return nil
+	case user.FieldPushTokens:
+		m.ClearPushTokens()
 		return nil
 	case user.FieldDeletedAt:
 		m.ClearDeletedAt()
@@ -11149,6 +11219,9 @@ func (m *UserMutation) ResetField(name string) error {
 		return nil
 	case user.FieldTokenVersion:
 		m.ResetTokenVersion()
+		return nil
+	case user.FieldPushTokens:
+		m.ResetPushTokens()
 		return nil
 	case user.FieldRole:
 		m.ResetRole()

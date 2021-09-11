@@ -3,6 +3,7 @@
 package ent
 
 import (
+	"encoding/json"
 	"fmt"
 	"strings"
 	"time"
@@ -37,6 +38,8 @@ type User struct {
 	Directory string `json:"directory,omitempty"`
 	// TokenVersion holds the value of the "token_version" field.
 	TokenVersion int `json:"token_version,omitempty"`
+	// PushTokens holds the value of the "push_tokens" field.
+	PushTokens []string `json:"push_tokens,omitempty"`
 	// Role holds the value of the "role" field.
 	Role user.Role `json:"role,omitempty"`
 	// Active holds the value of the "active" field.
@@ -182,6 +185,8 @@ func (*User) scanValues(columns []string) ([]interface{}, error) {
 	values := make([]interface{}, len(columns))
 	for i := range columns {
 		switch columns[i] {
+		case user.FieldPushTokens:
+			values[i] = new([]byte)
 		case user.FieldActive:
 			values[i] = new(sql.NullBool)
 		case user.FieldTokenVersion:
@@ -270,6 +275,14 @@ func (u *User) assignValues(columns []string, values []interface{}) error {
 				return fmt.Errorf("unexpected type %T for field token_version", values[i])
 			} else if value.Valid {
 				u.TokenVersion = int(value.Int64)
+			}
+		case user.FieldPushTokens:
+			if value, ok := values[i].(*[]byte); !ok {
+				return fmt.Errorf("unexpected type %T for field push_tokens", values[i])
+			} else if value != nil && len(*value) > 0 {
+				if err := json.Unmarshal(*value, &u.PushTokens); err != nil {
+					return fmt.Errorf("unmarshal field push_tokens: %w", err)
+				}
 			}
 		case user.FieldRole:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -399,6 +412,8 @@ func (u *User) String() string {
 	builder.WriteString(u.Directory)
 	builder.WriteString(", token_version=")
 	builder.WriteString(fmt.Sprintf("%v", u.TokenVersion))
+	builder.WriteString(", push_tokens=")
+	builder.WriteString(fmt.Sprintf("%v", u.PushTokens))
 	builder.WriteString(", role=")
 	builder.WriteString(fmt.Sprintf("%v", u.Role))
 	builder.WriteString(", active=")

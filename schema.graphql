@@ -211,6 +211,7 @@ input UpdateStageInput {
 input LoginInput {
   username: String!
   password: String!
+  pushToken: String
 }
 
 type AuthData {

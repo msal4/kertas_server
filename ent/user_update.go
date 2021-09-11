@@ -109,6 +109,18 @@ func (uu *UserUpdate) AddTokenVersion(i int) *UserUpdate {
 	return uu
 }
 
+// SetPushTokens sets the "push_tokens" field.
+func (uu *UserUpdate) SetPushTokens(s []string) *UserUpdate {
+	uu.mutation.SetPushTokens(s)
+	return uu
+}
+
+// ClearPushTokens clears the value of the "push_tokens" field.
+func (uu *UserUpdate) ClearPushTokens() *UserUpdate {
+	uu.mutation.ClearPushTokens()
+	return uu
+}
+
 // SetRole sets the "role" field.
 func (uu *UserUpdate) SetRole(u user.Role) *UserUpdate {
 	uu.mutation.SetRole(u)
@@ -689,6 +701,19 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Type:   field.TypeInt,
 			Value:  value,
 			Column: user.FieldTokenVersion,
+		})
+	}
+	if value, ok := uu.mutation.PushTokens(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeJSON,
+			Value:  value,
+			Column: user.FieldPushTokens,
+		})
+	}
+	if uu.mutation.PushTokensCleared() {
+		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
+			Type:   field.TypeJSON,
+			Column: user.FieldPushTokens,
 		})
 	}
 	if value, ok := uu.mutation.Role(); ok {
@@ -1310,6 +1335,18 @@ func (uuo *UserUpdateOne) AddTokenVersion(i int) *UserUpdateOne {
 	return uuo
 }
 
+// SetPushTokens sets the "push_tokens" field.
+func (uuo *UserUpdateOne) SetPushTokens(s []string) *UserUpdateOne {
+	uuo.mutation.SetPushTokens(s)
+	return uuo
+}
+
+// ClearPushTokens clears the value of the "push_tokens" field.
+func (uuo *UserUpdateOne) ClearPushTokens() *UserUpdateOne {
+	uuo.mutation.ClearPushTokens()
+	return uuo
+}
+
 // SetRole sets the "role" field.
 func (uuo *UserUpdateOne) SetRole(u user.Role) *UserUpdateOne {
 	uuo.mutation.SetRole(u)
@@ -1914,6 +1951,19 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 			Type:   field.TypeInt,
 			Value:  value,
 			Column: user.FieldTokenVersion,
+		})
+	}
+	if value, ok := uuo.mutation.PushTokens(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeJSON,
+			Value:  value,
+			Column: user.FieldPushTokens,
+		})
+	}
+	if uuo.mutation.PushTokensCleared() {
+		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
+			Type:   field.TypeJSON,
+			Column: user.FieldPushTokens,
 		})
 	}
 	if value, ok := uuo.mutation.Role(); ok {

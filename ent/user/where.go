@@ -1079,6 +1079,20 @@ func TokenVersionLTE(v int) predicate.User {
 	})
 }
 
+// PushTokensIsNil applies the IsNil predicate on the "push_tokens" field.
+func PushTokensIsNil() predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		s.Where(sql.IsNull(s.C(FieldPushTokens)))
+	})
+}
+
+// PushTokensNotNil applies the NotNil predicate on the "push_tokens" field.
+func PushTokensNotNil() predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		s.Where(sql.NotNull(s.C(FieldPushTokens)))
+	})
+}
+
 // RoleEQ applies the EQ predicate on the "role" field.
 func RoleEQ(v Role) predicate.User {
 	return predicate.User(func(s *sql.Selector) {

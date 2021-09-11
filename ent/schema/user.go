@@ -30,6 +30,7 @@ func (User) Fields() []ent.Field {
 		field.String("image").Optional(),
 		field.String("directory").NotEmpty(),
 		field.Int("token_version").Default(0),
+		field.Strings("push_tokens").Optional().Annotations(entgql.Skip()),
 		field.Enum("role").NamedValues(
 			"SuperAdmin", "SUPER_ADMIN",
 			"SchoolAdmin", "SCHOOL_ADMIN",
