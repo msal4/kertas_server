@@ -12,6 +12,7 @@ import (
 	"github.com/minio/minio-go/v7"
 	"github.com/msal4/hassah_school_server/auth"
 	"github.com/msal4/hassah_school_server/ent"
+	expo "github.com/oliveroneill/exponent-server-sdk-golang/sdk"
 	"github.com/segmentio/ksuid"
 )
 
@@ -61,8 +62,13 @@ type Config struct {
 	auth.AuthConfig `yaml:"auth"`
 }
 
+type observer struct {
+	userID uuid.UUID
+	ch     chan *ent.Message
+}
+
 type chatObservers struct {
-	observers map[uuid.UUID]map[ksuid.KSUID]chan *ent.Message
+	observers map[uuid.UUID]map[ksuid.KSUID]observer
 	sync.Mutex
 }
 
@@ -72,6 +78,9 @@ type Service struct {
 
 	// MC is the minio client used to interact with the s3 compatible store.
 	MC *minio.Client
+
+	// NC is the expo notification client.
+	NC *expo.PushClient
 
 	// Config is all of the server configuration.
 	Config *Config
@@ -101,7 +110,8 @@ func New(ec *ent.Client, mc *minio.Client, cfg *Config) (*Service, error) {
 		EC:            ec,
 		MC:            mc,
 		Config:        cfg,
-		chatObservers: chatObservers{observers: make(map[uuid.UUID]map[ksuid.KSUID]chan *ent.Message)},
+		NC:            expo.NewPushClient(nil),
+		chatObservers: chatObservers{observers: make(map[uuid.UUID]map[ksuid.KSUID]observer)},
 	}, nil
 }
 

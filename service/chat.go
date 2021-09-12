@@ -12,6 +12,7 @@ import (
 	"github.com/msal4/hassah_school_server/ent/message"
 	"github.com/msal4/hassah_school_server/ent/user"
 	"github.com/msal4/hassah_school_server/server/model"
+	expo "github.com/oliveroneill/exponent-server-sdk-golang/sdk"
 	"github.com/segmentio/ksuid"
 )
 
@@ -40,10 +41,14 @@ func (s *Service) PostMessage(ctx context.Context, senderID uuid.UUID, input mod
 		return nil, err
 	}
 
+	u, err := s.EC.User.Get(ctx, senderID)
+	if err != nil {
+		return nil, err
+	}
+
 	b := s.EC.Message.Create().SetContent(input.Content).SetOwnerID(senderID).SetGroupID(input.GroupID)
 
 	if input.Attachment != nil {
-		u := s.EC.User.GetX(ctx, senderID)
 		info, err := s.MC.PutObject(
 			ctx,
 			s.Config.RootBucket,
@@ -64,30 +69,87 @@ func (s *Service) PostMessage(ctx context.Context, senderID uuid.UUID, input mod
 		return nil, err
 	}
 
-	s.notifyObservers(input.GroupID, msg)
+	if err := s.notifyObservers(input.GroupID, msg); err != nil {
+		return nil, err
+	}
+
+	grp, err := s.EC.Group.Get(ctx, input.GroupID)
+	if err != nil {
+		return nil, err
+	}
+
+	s.notifyParticipants(ctx, u, grp, msg)
 
 	s.UpdateGroup(ctx, input.GroupID, model.UpdateGroupInput{})
 
 	return msg, nil
 }
 
-func (s *Service) notifyObservers(groupID uuid.UUID, msg *ent.Message) {
+// notifyParticipants sends push notification to all participants.
+func (s *Service) notifyParticipants(ctx context.Context, sender *ent.User, grp *ent.Group, msg *ent.Message) {
+	var receivers []*ent.User
+
+	var err error
+	if grp.GroupType == group.GroupTypePrivate {
+		receivers, err = grp.QueryUsers().Select(user.FieldPushTokens).All(ctx)
+	} else {
+		receivers, err = grp.QueryClass().QueryStage().QueryStudents().Select(user.FieldID, user.FieldPushTokens).All(ctx)
+	}
+	if err != nil {
+		return
+	}
+
+	var tokens []expo.ExponentPushToken
+	for _, r := range receivers {
+		if r.ID == sender.ID {
+			continue
+		}
+
+		for _, t := range r.PushTokens {
+			tokens = append(tokens, expo.ExponentPushToken(t))
+		}
+	}
+
+	pushMsg := expo.PushMessage{
+		To:       tokens,
+		Title:    sender.Name,
+		Body:     msg.Content,
+		Data:     map[string]string{"route": fmt.Sprintf("chat/%s", grp.ID)},
+		Sound:    "default",
+		Priority: expo.DefaultPriority,
+	}
+	if grp.GroupType == group.GroupTypeShared {
+		pushMsg.Title = grp.Name
+		pushMsg.Body = fmt.Sprintf("%s: %s", sender.Name, pushMsg.Body)
+	}
+	s.NC.Publish(&pushMsg)
+}
+
+// notifyObservers sends a message to listeners.
+func (s *Service) notifyObservers(groupID uuid.UUID, msg *ent.Message) error {
 	s.Lock()
 	if observers, ok := s.observers[groupID]; ok {
 		for _, observer := range observers {
-			observer <- msg
+			observer.ch <- msg
 		}
 	}
 	s.Unlock()
+
+	return nil
 }
 
 // RegisterGroupObserver registers a user to receive events for new messages on the specified group.
-func (s *Service) RegisterGroupObserver(ctx context.Context, groupID uuid.UUID, userID uuid.UUID) (<-chan *ent.Message, error) {
-	if err := s.CheckAllowedToParticipateInChat(ctx, groupID, userID); err != nil {
+func (s *Service) RegisterGroupObserver(ctx context.Context, groupID uuid.UUID, observerID uuid.UUID) (<-chan *ent.Message, error) {
+	if err := s.CheckAllowedToParticipateInChat(ctx, groupID, observerID); err != nil {
 		return nil, err
 	}
 
-	return s.observeGroup(ctx, groupID), nil
+	u, err := s.EC.User.Get(ctx, observerID)
+	if err != nil {
+		return nil, err
+	}
+
+	return s.observeGroup(ctx, groupID, u.ID), nil
 }
 
 func (s *Service) CheckAllowedToParticipateInChat(ctx context.Context, groupID uuid.UUID, participatorID uuid.UUID) error {
@@ -129,15 +191,15 @@ func (s *Service) CheckAllowedToParticipateInChat(ctx context.Context, groupID u
 	return nil
 }
 
-func (s *Service) observeGroup(ctx context.Context, groupID uuid.UUID) <-chan *ent.Message {
+func (s *Service) observeGroup(ctx context.Context, groupID, userID uuid.UUID) <-chan *ent.Message {
 	ch := make(chan *ent.Message, 1)
 
 	s.Lock()
 	if _, ok := s.observers[groupID]; !ok {
-		s.observers[groupID] = make(map[ksuid.KSUID]chan *ent.Message)
+		s.observers[groupID] = make(map[ksuid.KSUID]observer)
 	}
 	id := ksuid.New()
-	s.observers[groupID][id] = ch
+	s.observers[groupID][id] = observer{ch: ch, userID: userID}
 	s.Unlock()
 
 	go func() {
