@@ -302,6 +302,54 @@ func UpdatedAtLTE(v time.Time) predicate.CourseGrade {
 	})
 }
 
+// CourseEQ applies the EQ predicate on the "course" field.
+func CourseEQ(v Course) predicate.CourseGrade {
+	return predicate.CourseGrade(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldCourse), v))
+	})
+}
+
+// CourseNEQ applies the NEQ predicate on the "course" field.
+func CourseNEQ(v Course) predicate.CourseGrade {
+	return predicate.CourseGrade(func(s *sql.Selector) {
+		s.Where(sql.NEQ(s.C(FieldCourse), v))
+	})
+}
+
+// CourseIn applies the In predicate on the "course" field.
+func CourseIn(vs ...Course) predicate.CourseGrade {
+	v := make([]interface{}, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.CourseGrade(func(s *sql.Selector) {
+		// if not arguments were provided, append the FALSE constants,
+		// since we can't apply "IN ()". This will make this predicate falsy.
+		if len(v) == 0 {
+			s.Where(sql.False())
+			return
+		}
+		s.Where(sql.In(s.C(FieldCourse), v...))
+	})
+}
+
+// CourseNotIn applies the NotIn predicate on the "course" field.
+func CourseNotIn(vs ...Course) predicate.CourseGrade {
+	v := make([]interface{}, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.CourseGrade(func(s *sql.Selector) {
+		// if not arguments were provided, append the FALSE constants,
+		// since we can't apply "IN ()". This will make this predicate falsy.
+		if len(v) == 0 {
+			s.Where(sql.False())
+			return
+		}
+		s.Where(sql.NotIn(s.C(FieldCourse), v...))
+	})
+}
+
 // ActivityFirstEQ applies the EQ predicate on the "activity_first" field.
 func ActivityFirstEQ(v int) predicate.CourseGrade {
 	return predicate.CourseGrade(func(s *sql.Selector) {

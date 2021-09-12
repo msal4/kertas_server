@@ -3,6 +3,9 @@
 package coursegrade
 
 import (
+	"fmt"
+	"io"
+	"strconv"
 	"time"
 
 	"github.com/google/uuid"
@@ -17,6 +20,8 @@ const (
 	FieldCreatedAt = "created_at"
 	// FieldUpdatedAt holds the string denoting the updated_at field in the database.
 	FieldUpdatedAt = "updated_at"
+	// FieldCourse holds the string denoting the course field in the database.
+	FieldCourse = "course"
 	// FieldActivityFirst holds the string denoting the activity_first field in the database.
 	FieldActivityFirst = "activity_first"
 	// FieldActivitySecond holds the string denoting the activity_second field in the database.
@@ -65,6 +70,7 @@ var Columns = []string{
 	FieldID,
 	FieldCreatedAt,
 	FieldUpdatedAt,
+	FieldCourse,
 	FieldActivityFirst,
 	FieldActivitySecond,
 	FieldWrittenFirst,
@@ -118,3 +124,44 @@ var (
 	// DefaultID holds the default value on creation for the "id" field.
 	DefaultID func() uuid.UUID
 )
+
+// Course defines the type for the "course" enum field.
+type Course string
+
+// Course values.
+const (
+	CourseFirst  Course = "FIRST"
+	CourseSecond Course = "SECOND"
+)
+
+func (c Course) String() string {
+	return string(c)
+}
+
+// CourseValidator is a validator for the "course" field enum values. It is called by the builders before save.
+func CourseValidator(c Course) error {
+	switch c {
+	case CourseFirst, CourseSecond:
+		return nil
+	default:
+		return fmt.Errorf("coursegrade: invalid enum value for course field: %q", c)
+	}
+}
+
+// MarshalGQL implements graphql.Marshaler interface.
+func (c Course) MarshalGQL(w io.Writer) {
+	io.WriteString(w, strconv.Quote(c.String()))
+}
+
+// UnmarshalGQL implements graphql.Unmarshaler interface.
+func (c *Course) UnmarshalGQL(val interface{}) error {
+	str, ok := val.(string)
+	if !ok {
+		return fmt.Errorf("enum %T must be a string", val)
+	}
+	*c = Course(str)
+	if err := CourseValidator(*c); err != nil {
+		return fmt.Errorf("%s is not a valid Course", str)
+	}
+	return nil
+}

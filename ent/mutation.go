@@ -3393,6 +3393,7 @@ type CourseGradeMutation struct {
 	id                 *uuid.UUID
 	created_at         *time.Time
 	updated_at         *time.Time
+	course             *coursegrade.Course
 	activity_first     *int
 	addactivity_first  *int
 	activity_second    *int
@@ -3571,6 +3572,42 @@ func (m *CourseGradeMutation) OldUpdatedAt(ctx context.Context) (v time.Time, er
 // ResetUpdatedAt resets all changes to the "updated_at" field.
 func (m *CourseGradeMutation) ResetUpdatedAt() {
 	m.updated_at = nil
+}
+
+// SetCourse sets the "course" field.
+func (m *CourseGradeMutation) SetCourse(c coursegrade.Course) {
+	m.course = &c
+}
+
+// Course returns the value of the "course" field in the mutation.
+func (m *CourseGradeMutation) Course() (r coursegrade.Course, exists bool) {
+	v := m.course
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCourse returns the old "course" field's value of the CourseGrade entity.
+// If the CourseGrade object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *CourseGradeMutation) OldCourse(ctx context.Context) (v coursegrade.Course, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldCourse is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldCourse requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCourse: %w", err)
+	}
+	return oldValue.Course, nil
+}
+
+// ResetCourse resets all changes to the "course" field.
+func (m *CourseGradeMutation) ResetCourse() {
+	m.course = nil
 }
 
 // SetActivityFirst sets the "activity_first" field.
@@ -4095,12 +4132,15 @@ func (m *CourseGradeMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *CourseGradeMutation) Fields() []string {
-	fields := make([]string, 0, 8)
+	fields := make([]string, 0, 9)
 	if m.created_at != nil {
 		fields = append(fields, coursegrade.FieldCreatedAt)
 	}
 	if m.updated_at != nil {
 		fields = append(fields, coursegrade.FieldUpdatedAt)
+	}
+	if m.course != nil {
+		fields = append(fields, coursegrade.FieldCourse)
 	}
 	if m.activity_first != nil {
 		fields = append(fields, coursegrade.FieldActivityFirst)
@@ -4132,6 +4172,8 @@ func (m *CourseGradeMutation) Field(name string) (ent.Value, bool) {
 		return m.CreatedAt()
 	case coursegrade.FieldUpdatedAt:
 		return m.UpdatedAt()
+	case coursegrade.FieldCourse:
+		return m.Course()
 	case coursegrade.FieldActivityFirst:
 		return m.ActivityFirst()
 	case coursegrade.FieldActivitySecond:
@@ -4157,6 +4199,8 @@ func (m *CourseGradeMutation) OldField(ctx context.Context, name string) (ent.Va
 		return m.OldCreatedAt(ctx)
 	case coursegrade.FieldUpdatedAt:
 		return m.OldUpdatedAt(ctx)
+	case coursegrade.FieldCourse:
+		return m.OldCourse(ctx)
 	case coursegrade.FieldActivityFirst:
 		return m.OldActivityFirst(ctx)
 	case coursegrade.FieldActivitySecond:
@@ -4191,6 +4235,13 @@ func (m *CourseGradeMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetUpdatedAt(v)
+		return nil
+	case coursegrade.FieldCourse:
+		v, ok := value.(coursegrade.Course)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCourse(v)
 		return nil
 	case coursegrade.FieldActivityFirst:
 		v, ok := value.(int)
@@ -4384,6 +4435,9 @@ func (m *CourseGradeMutation) ResetField(name string) error {
 		return nil
 	case coursegrade.FieldUpdatedAt:
 		m.ResetUpdatedAt()
+		return nil
+	case coursegrade.FieldCourse:
+		m.ResetCourse()
 		return nil
 	case coursegrade.FieldActivityFirst:
 		m.ResetActivityFirst()

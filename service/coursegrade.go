@@ -45,7 +45,8 @@ func (s *Service) CourseGrades(ctx context.Context, opts CourseGradesOptions) (*
 }
 
 func (s *Service) AddCourseGrade(ctx context.Context, input model.AddCourseGradeInput) (*ent.CourseGrade, error) {
-	b := s.EC.CourseGrade.Create().SetClassID(input.ClassID).SetStageID(input.StageID).SetStudentID(input.StudentID).SetYear(input.Year)
+	b := s.EC.CourseGrade.Create().SetClassID(input.ClassID).SetStageID(input.StageID).SetStudentID(input.StudentID).
+		SetYear(input.Year).SetCourse(input.Course)
 
 	if input.ActivityFirst != nil {
 		b.SetActivityFirst(*input.ActivityFirst)

@@ -1589,6 +1589,12 @@ type CourseGradeWhereInput struct {
 	UpdatedAtLT    *time.Time  `json:"updatedAtLT,omitempty"`
 	UpdatedAtLTE   *time.Time  `json:"updatedAtLTE,omitempty"`
 
+	// "course" field predicates.
+	Course      *coursegrade.Course  `json:"course,omitempty"`
+	CourseNEQ   *coursegrade.Course  `json:"courseNEQ,omitempty"`
+	CourseIn    []coursegrade.Course `json:"courseIn,omitempty"`
+	CourseNotIn []coursegrade.Course `json:"courseNotIn,omitempty"`
+
 	// "activity_first" field predicates.
 	ActivityFirst       *int  `json:"activityFirst,omitempty"`
 	ActivityFirstNEQ    *int  `json:"activityFirstNEQ,omitempty"`
@@ -1807,6 +1813,18 @@ func (i *CourseGradeWhereInput) P() (predicate.CourseGrade, error) {
 	}
 	if i.UpdatedAtLTE != nil {
 		predicates = append(predicates, coursegrade.UpdatedAtLTE(*i.UpdatedAtLTE))
+	}
+	if i.Course != nil {
+		predicates = append(predicates, coursegrade.CourseEQ(*i.Course))
+	}
+	if i.CourseNEQ != nil {
+		predicates = append(predicates, coursegrade.CourseNEQ(*i.CourseNEQ))
+	}
+	if len(i.CourseIn) > 0 {
+		predicates = append(predicates, coursegrade.CourseIn(i.CourseIn...))
+	}
+	if len(i.CourseNotIn) > 0 {
+		predicates = append(predicates, coursegrade.CourseNotIn(i.CourseNotIn...))
 	}
 	if i.ActivityFirst != nil {
 		predicates = append(predicates, coursegrade.ActivityFirstEQ(*i.ActivityFirst))

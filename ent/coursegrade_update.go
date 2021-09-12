@@ -31,6 +31,12 @@ func (cgu *CourseGradeUpdate) Where(ps ...predicate.CourseGrade) *CourseGradeUpd
 	return cgu
 }
 
+// SetCourse sets the "course" field.
+func (cgu *CourseGradeUpdate) SetCourse(c coursegrade.Course) *CourseGradeUpdate {
+	cgu.mutation.SetCourse(c)
+	return cgu
+}
+
 // SetActivityFirst sets the "activity_first" field.
 func (cgu *CourseGradeUpdate) SetActivityFirst(i int) *CourseGradeUpdate {
 	cgu.mutation.ResetActivityFirst()
@@ -299,6 +305,11 @@ func (cgu *CourseGradeUpdate) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (cgu *CourseGradeUpdate) check() error {
+	if v, ok := cgu.mutation.Course(); ok {
+		if err := coursegrade.CourseValidator(v); err != nil {
+			return &ValidationError{Name: "course", err: fmt.Errorf("ent: validator failed for field \"course\": %w", err)}
+		}
+	}
 	if v, ok := cgu.mutation.ActivityFirst(); ok {
 		if err := coursegrade.ActivityFirstValidator(v); err != nil {
 			return &ValidationError{Name: "activity_first", err: fmt.Errorf("ent: validator failed for field \"activity_first\": %w", err)}
@@ -364,6 +375,13 @@ func (cgu *CourseGradeUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Type:   field.TypeTime,
 			Value:  value,
 			Column: coursegrade.FieldUpdatedAt,
+		})
+	}
+	if value, ok := cgu.mutation.Course(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeEnum,
+			Value:  value,
+			Column: coursegrade.FieldCourse,
 		})
 	}
 	if value, ok := cgu.mutation.ActivityFirst(); ok {
@@ -595,6 +613,12 @@ type CourseGradeUpdateOne struct {
 	fields   []string
 	hooks    []Hook
 	mutation *CourseGradeMutation
+}
+
+// SetCourse sets the "course" field.
+func (cguo *CourseGradeUpdateOne) SetCourse(c coursegrade.Course) *CourseGradeUpdateOne {
+	cguo.mutation.SetCourse(c)
+	return cguo
 }
 
 // SetActivityFirst sets the "activity_first" field.
@@ -872,6 +896,11 @@ func (cguo *CourseGradeUpdateOne) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (cguo *CourseGradeUpdateOne) check() error {
+	if v, ok := cguo.mutation.Course(); ok {
+		if err := coursegrade.CourseValidator(v); err != nil {
+			return &ValidationError{Name: "course", err: fmt.Errorf("ent: validator failed for field \"course\": %w", err)}
+		}
+	}
 	if v, ok := cguo.mutation.ActivityFirst(); ok {
 		if err := coursegrade.ActivityFirstValidator(v); err != nil {
 			return &ValidationError{Name: "activity_first", err: fmt.Errorf("ent: validator failed for field \"activity_first\": %w", err)}
@@ -954,6 +983,13 @@ func (cguo *CourseGradeUpdateOne) sqlSave(ctx context.Context) (_node *CourseGra
 			Type:   field.TypeTime,
 			Value:  value,
 			Column: coursegrade.FieldUpdatedAt,
+		})
+	}
+	if value, ok := cguo.mutation.Course(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeEnum,
+			Value:  value,
+			Column: coursegrade.FieldCourse,
 		})
 	}
 	if value, ok := cguo.mutation.ActivityFirst(); ok {

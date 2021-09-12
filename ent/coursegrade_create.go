@@ -52,6 +52,12 @@ func (cgc *CourseGradeCreate) SetNillableUpdatedAt(t *time.Time) *CourseGradeCre
 	return cgc
 }
 
+// SetCourse sets the "course" field.
+func (cgc *CourseGradeCreate) SetCourse(c coursegrade.Course) *CourseGradeCreate {
+	cgc.mutation.SetCourse(c)
+	return cgc
+}
+
 // SetActivityFirst sets the "activity_first" field.
 func (cgc *CourseGradeCreate) SetActivityFirst(i int) *CourseGradeCreate {
 	cgc.mutation.SetActivityFirst(i)
@@ -260,6 +266,14 @@ func (cgc *CourseGradeCreate) check() error {
 	if _, ok := cgc.mutation.UpdatedAt(); !ok {
 		return &ValidationError{Name: "updated_at", err: errors.New(`ent: missing required field "updated_at"`)}
 	}
+	if _, ok := cgc.mutation.Course(); !ok {
+		return &ValidationError{Name: "course", err: errors.New(`ent: missing required field "course"`)}
+	}
+	if v, ok := cgc.mutation.Course(); ok {
+		if err := coursegrade.CourseValidator(v); err != nil {
+			return &ValidationError{Name: "course", err: fmt.Errorf(`ent: validator failed for field "course": %w`, err)}
+		}
+	}
 	if v, ok := cgc.mutation.ActivityFirst(); ok {
 		if err := coursegrade.ActivityFirstValidator(v); err != nil {
 			return &ValidationError{Name: "activity_first", err: fmt.Errorf(`ent: validator failed for field "activity_first": %w`, err)}
@@ -349,6 +363,14 @@ func (cgc *CourseGradeCreate) createSpec() (*CourseGrade, *sqlgraph.CreateSpec) 
 			Column: coursegrade.FieldUpdatedAt,
 		})
 		_node.UpdatedAt = value
+	}
+	if value, ok := cgc.mutation.Course(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeEnum,
+			Value:  value,
+			Column: coursegrade.FieldCourse,
+		})
+		_node.Course = value
 	}
 	if value, ok := cgc.mutation.ActivityFirst(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{

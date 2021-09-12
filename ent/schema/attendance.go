@@ -25,7 +25,7 @@ func (Attendance) Fields() []ent.Field {
 			"Absent", "ABSENT",
 			"ExcusedAbsence", "EXCUSED_ABSENCE",
 			"Sick", "SICK",
-		).Default("PRESENT").Annotations(entgql.OrderField("STATE")),
+		).Default("PRESENT").Annotations(entgql.OrderField("STATE"), entgql.Type("AttendanceState")),
 	}
 }
 

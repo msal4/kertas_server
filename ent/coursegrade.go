@@ -24,6 +24,8 @@ type CourseGrade struct {
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// UpdatedAt holds the value of the "updated_at" field.
 	UpdatedAt time.Time `json:"updated_at,omitempty"`
+	// Course holds the value of the "course" field.
+	Course coursegrade.Course `json:"course,omitempty"`
 	// ActivityFirst holds the value of the "activity_first" field.
 	ActivityFirst *int `json:"activity_first,omitempty"`
 	// ActivitySecond holds the value of the "activity_second" field.
@@ -106,7 +108,7 @@ func (*CourseGrade) scanValues(columns []string) ([]interface{}, error) {
 		switch columns[i] {
 		case coursegrade.FieldActivityFirst, coursegrade.FieldActivitySecond, coursegrade.FieldWrittenFirst, coursegrade.FieldWrittenSecond, coursegrade.FieldCourseFinal:
 			values[i] = new(sql.NullInt64)
-		case coursegrade.FieldYear:
+		case coursegrade.FieldCourse, coursegrade.FieldYear:
 			values[i] = new(sql.NullString)
 		case coursegrade.FieldCreatedAt, coursegrade.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
@@ -150,6 +152,12 @@ func (cg *CourseGrade) assignValues(columns []string, values []interface{}) erro
 				return fmt.Errorf("unexpected type %T for field updated_at", values[i])
 			} else if value.Valid {
 				cg.UpdatedAt = value.Time
+			}
+		case coursegrade.FieldCourse:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field course", values[i])
+			} else if value.Valid {
+				cg.Course = coursegrade.Course(value.String)
 			}
 		case coursegrade.FieldActivityFirst:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
@@ -260,6 +268,8 @@ func (cg *CourseGrade) String() string {
 	builder.WriteString(cg.CreatedAt.Format(time.ANSIC))
 	builder.WriteString(", updated_at=")
 	builder.WriteString(cg.UpdatedAt.Format(time.ANSIC))
+	builder.WriteString(", course=")
+	builder.WriteString(fmt.Sprintf("%v", cg.Course))
 	if v := cg.ActivityFirst; v != nil {
 		builder.WriteString(", activity_first=")
 		builder.WriteString(fmt.Sprintf("%v", *v))

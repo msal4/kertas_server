@@ -41,3 +41,6 @@ models:
   GroupType:
     model:
       - github.com/msal4/hassah_school_server/ent/group.GroupType
+  Course:
+    model:
+      - github.com/msal4/hassah_school_server/ent/coursegrade.Course
