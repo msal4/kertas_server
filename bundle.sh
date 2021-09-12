@@ -28,8 +28,9 @@ echo copied config.yml and testfiles to ./build
 
 zip -r kertas.zip ./build
 
-echo bundled in $(pwd)/kertas.zip
+KERTAS_PATH=$(pwd)/kertas.zip
+echo bundled in $KERTAS_PATH
 
 if [[ $OSTYPE == 'darwin'* ]]; then
-  open -a finder .
+  open -R $KERTAS_PATH
 fi

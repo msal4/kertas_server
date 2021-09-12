@@ -221,9 +221,9 @@ var (
 		},
 		Indexes: []*schema.Index{
 			{
-				Name:    "coursegrade_course_user_course_grades_class_course_grades_stage_course_grades",
+				Name:    "coursegrade_course_year_user_course_grades_class_course_grades_stage_course_grades",
 				Unique:  true,
-				Columns: []*schema.Column{CourseGradesColumns[3], CourseGradesColumns[12], CourseGradesColumns[10], CourseGradesColumns[11]},
+				Columns: []*schema.Column{CourseGradesColumns[3], CourseGradesColumns[9], CourseGradesColumns[12], CourseGradesColumns[10], CourseGradesColumns[11]},
 			},
 		},
 	}

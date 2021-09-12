@@ -15,6 +15,7 @@ import (
 	"github.com/minio/minio-go/v7"
 	"github.com/minio/minio-go/v7/pkg/credentials"
 	"github.com/msal4/hassah_school_server/ent"
+	"github.com/msal4/hassah_school_server/ent/coursegrade"
 	"github.com/msal4/hassah_school_server/ent/user"
 	"github.com/msal4/hassah_school_server/server"
 	"github.com/msal4/hassah_school_server/server/model"
@@ -231,6 +232,52 @@ func seed(ctx context.Context, s *service.Service) error {
 		return err
 	}
 	log.Printf("Created student: %v\n\n", stdt)
+
+	_, err = s.AddCourseGrade(ctx, model.AddCourseGradeInput{
+		Course:         coursegrade.CourseFirst,
+		StudentID:      stdt.ID,
+		StageID:        stg.ID,
+		ClassID:        cls.ID,
+		ActivityFirst:  ptr.Int(10),
+		ActivitySecond: ptr.Int(20),
+		WrittenFirst:   ptr.Int(16),
+		WrittenSecond:  ptr.Int(17),
+		CourseFinal:    ptr.Int(30),
+		Year:           "2020-2021",
+	})
+	if err != nil {
+		return err
+	}
+	_, err = s.AddCourseGrade(ctx, model.AddCourseGradeInput{
+		Course:         coursegrade.CourseFirst,
+		StudentID:      stdt.ID,
+		StageID:        stg.ID,
+		ClassID:        cls.ID,
+		ActivityFirst:  ptr.Int(14),
+		ActivitySecond: ptr.Int(22),
+		WrittenFirst:   ptr.Int(12),
+		WrittenSecond:  ptr.Int(19),
+		CourseFinal:    ptr.Int(31),
+		Year:           "2019-2020",
+	})
+	if err != nil {
+		return err
+	}
+	_, err = s.AddCourseGrade(ctx, model.AddCourseGradeInput{
+		Course:         coursegrade.CourseSecond,
+		StudentID:      stdt.ID,
+		StageID:        stg.ID,
+		ClassID:        cls.ID,
+		ActivityFirst:  ptr.Int(10),
+		ActivitySecond: ptr.Int(13),
+		WrittenFirst:   ptr.Int(19),
+		WrittenSecond:  ptr.Int(13),
+		CourseFinal:    ptr.Int(38),
+		Year:           "2020-2021",
+	})
+	if err != nil {
+		return err
+	}
 
 	s.AddGroup(ctx, service.AddGroupInput{UserIDs: []uuid.UUID{stdt.ID, tchr.ID}, Active: true})
 	s.AddGroup(ctx, service.AddGroupInput{UserIDs: []uuid.UUID{stdt.ID, tchr2.ID}, Active: true})
