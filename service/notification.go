@@ -9,7 +9,9 @@ import (
 	"github.com/msal4/hassah_school_server/ent/notification"
 	"github.com/msal4/hassah_school_server/ent/school"
 	"github.com/msal4/hassah_school_server/ent/stage"
+	"github.com/msal4/hassah_school_server/ent/user"
 	"github.com/msal4/hassah_school_server/server/model"
+	expo "github.com/oliveroneill/exponent-server-sdk-golang/sdk"
 )
 
 type NotificationsOptions struct {
@@ -57,7 +59,35 @@ func (s *Service) AddNotification(ctx context.Context, input model.AddNotificati
 		b.SetImage(info.Key)
 	}
 
-	return b.Save(ctx)
+	n, err := b.Save(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	receivers, err := stg.QueryStudents().Select(user.FieldID, user.FieldPushTokens).All(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	var tokens []expo.ExponentPushToken
+	for _, r := range receivers {
+		for _, t := range r.PushTokens {
+			tokens = append(tokens, expo.ExponentPushToken(t))
+		}
+	}
+
+	pushMsg := expo.PushMessage{
+		To:       tokens,
+		Title:    n.Title,
+		Body:     n.Body,
+		Data:     map[string]string{"route": n.Route, "color": n.Color, "image": n.Image},
+		Sound:    "default",
+		Priority: expo.DefaultPriority,
+	}
+
+	s.NC.Publish(&pushMsg)
+
+	return n, nil
 }
 
 func (s *Service) DeleteNotification(ctx context.Context, id uuid.UUID) error {
