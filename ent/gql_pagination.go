@@ -23,6 +23,7 @@ import (
 	"github.com/msal4/hassah_school_server/ent/grade"
 	"github.com/msal4/hassah_school_server/ent/group"
 	"github.com/msal4/hassah_school_server/ent/message"
+	"github.com/msal4/hassah_school_server/ent/notification"
 	"github.com/msal4/hassah_school_server/ent/schedule"
 	"github.com/msal4/hassah_school_server/ent/school"
 	"github.com/msal4/hassah_school_server/ent/stage"
@@ -2766,6 +2767,318 @@ func (m *Message) ToEdge(order *MessageOrder) *MessageEdge {
 	return &MessageEdge{
 		Node:   m,
 		Cursor: order.Field.toCursor(m),
+	}
+}
+
+// NotificationEdge is the edge representation of Notification.
+type NotificationEdge struct {
+	Node   *Notification `json:"node"`
+	Cursor Cursor        `json:"cursor"`
+}
+
+// NotificationConnection is the connection containing edges to Notification.
+type NotificationConnection struct {
+	Edges      []*NotificationEdge `json:"edges"`
+	PageInfo   PageInfo            `json:"pageInfo"`
+	TotalCount int                 `json:"totalCount"`
+}
+
+// NotificationPaginateOption enables pagination customization.
+type NotificationPaginateOption func(*notificationPager) error
+
+// WithNotificationOrder configures pagination ordering.
+func WithNotificationOrder(order *NotificationOrder) NotificationPaginateOption {
+	if order == nil {
+		order = DefaultNotificationOrder
+	}
+	o := *order
+	return func(pager *notificationPager) error {
+		if err := o.Direction.Validate(); err != nil {
+			return err
+		}
+		if o.Field == nil {
+			o.Field = DefaultNotificationOrder.Field
+		}
+		pager.order = &o
+		return nil
+	}
+}
+
+// WithNotificationFilter configures pagination filter.
+func WithNotificationFilter(filter func(*NotificationQuery) (*NotificationQuery, error)) NotificationPaginateOption {
+	return func(pager *notificationPager) error {
+		if filter == nil {
+			return errors.New("NotificationQuery filter cannot be nil")
+		}
+		pager.filter = filter
+		return nil
+	}
+}
+
+type notificationPager struct {
+	order  *NotificationOrder
+	filter func(*NotificationQuery) (*NotificationQuery, error)
+}
+
+func newNotificationPager(opts []NotificationPaginateOption) (*notificationPager, error) {
+	pager := &notificationPager{}
+	for _, opt := range opts {
+		if err := opt(pager); err != nil {
+			return nil, err
+		}
+	}
+	if pager.order == nil {
+		pager.order = DefaultNotificationOrder
+	}
+	return pager, nil
+}
+
+func (p *notificationPager) applyFilter(query *NotificationQuery) (*NotificationQuery, error) {
+	if p.filter != nil {
+		return p.filter(query)
+	}
+	return query, nil
+}
+
+func (p *notificationPager) toCursor(n *Notification) Cursor {
+	return p.order.Field.toCursor(n)
+}
+
+func (p *notificationPager) applyCursors(query *NotificationQuery, after, before *Cursor) *NotificationQuery {
+	for _, predicate := range cursorsToPredicates(
+		p.order.Direction, after, before,
+		p.order.Field.field, DefaultNotificationOrder.Field.field,
+	) {
+		query = query.Where(predicate)
+	}
+	return query
+}
+
+func (p *notificationPager) applyOrder(query *NotificationQuery, reverse bool) *NotificationQuery {
+	direction := p.order.Direction
+	if reverse {
+		direction = direction.reverse()
+	}
+	query = query.Order(direction.orderFunc(p.order.Field.field))
+	if p.order.Field != DefaultNotificationOrder.Field {
+		query = query.Order(direction.orderFunc(DefaultNotificationOrder.Field.field))
+	}
+	return query
+}
+
+// Paginate executes the query and returns a relay based cursor connection to Notification.
+func (n *NotificationQuery) Paginate(
+	ctx context.Context, after *Cursor, first *int,
+	before *Cursor, last *int, opts ...NotificationPaginateOption,
+) (*NotificationConnection, error) {
+	if err := validateFirstLast(first, last); err != nil {
+		return nil, err
+	}
+	pager, err := newNotificationPager(opts)
+	if err != nil {
+		return nil, err
+	}
+
+	if n, err = pager.applyFilter(n); err != nil {
+		return nil, err
+	}
+
+	conn := &NotificationConnection{Edges: []*NotificationEdge{}}
+	if !hasCollectedField(ctx, edgesField) || first != nil && *first == 0 || last != nil && *last == 0 {
+		if hasCollectedField(ctx, totalCountField) ||
+			hasCollectedField(ctx, pageInfoField) {
+			count, err := n.Count(ctx)
+			if err != nil {
+				return nil, err
+			}
+			conn.TotalCount = count
+			conn.PageInfo.HasNextPage = first != nil && count > 0
+			conn.PageInfo.HasPreviousPage = last != nil && count > 0
+		}
+		return conn, nil
+	}
+
+	if (after != nil || first != nil || before != nil || last != nil) && hasCollectedField(ctx, totalCountField) {
+		count, err := n.Clone().Count(ctx)
+		if err != nil {
+			return nil, err
+		}
+		conn.TotalCount = count
+	}
+
+	n = pager.applyCursors(n, after, before)
+	n = pager.applyOrder(n, last != nil)
+	var limit int
+	if first != nil {
+		limit = *first + 1
+	} else if last != nil {
+		limit = *last + 1
+	}
+	if limit > 0 {
+		n = n.Limit(limit)
+	}
+
+	if field := getCollectedField(ctx, edgesField, nodeField); field != nil {
+		n = n.collectField(graphql.GetOperationContext(ctx), *field)
+	}
+
+	nodes, err := n.All(ctx)
+	if err != nil || len(nodes) == 0 {
+		return conn, err
+	}
+
+	if len(nodes) == limit {
+		conn.PageInfo.HasNextPage = first != nil
+		conn.PageInfo.HasPreviousPage = last != nil
+		nodes = nodes[:len(nodes)-1]
+	}
+
+	var nodeAt func(int) *Notification
+	if last != nil {
+		n := len(nodes) - 1
+		nodeAt = func(i int) *Notification {
+			return nodes[n-i]
+		}
+	} else {
+		nodeAt = func(i int) *Notification {
+			return nodes[i]
+		}
+	}
+
+	conn.Edges = make([]*NotificationEdge, len(nodes))
+	for i := range nodes {
+		node := nodeAt(i)
+		conn.Edges[i] = &NotificationEdge{
+			Node:   node,
+			Cursor: pager.toCursor(node),
+		}
+	}
+
+	conn.PageInfo.StartCursor = &conn.Edges[0].Cursor
+	conn.PageInfo.EndCursor = &conn.Edges[len(conn.Edges)-1].Cursor
+	if conn.TotalCount == 0 {
+		conn.TotalCount = len(nodes)
+	}
+
+	return conn, nil
+}
+
+var (
+	// NotificationOrderFieldCreatedAt orders Notification by created_at.
+	NotificationOrderFieldCreatedAt = &NotificationOrderField{
+		field: notification.FieldCreatedAt,
+		toCursor: func(n *Notification) Cursor {
+			return Cursor{
+				ID:    n.ID,
+				Value: n.CreatedAt,
+			}
+		},
+	}
+	// NotificationOrderFieldUpdatedAt orders Notification by updated_at.
+	NotificationOrderFieldUpdatedAt = &NotificationOrderField{
+		field: notification.FieldUpdatedAt,
+		toCursor: func(n *Notification) Cursor {
+			return Cursor{
+				ID:    n.ID,
+				Value: n.UpdatedAt,
+			}
+		},
+	}
+	// NotificationOrderFieldTitle orders Notification by title.
+	NotificationOrderFieldTitle = &NotificationOrderField{
+		field: notification.FieldTitle,
+		toCursor: func(n *Notification) Cursor {
+			return Cursor{
+				ID:    n.ID,
+				Value: n.Title,
+			}
+		},
+	}
+	// NotificationOrderFieldBody orders Notification by body.
+	NotificationOrderFieldBody = &NotificationOrderField{
+		field: notification.FieldBody,
+		toCursor: func(n *Notification) Cursor {
+			return Cursor{
+				ID:    n.ID,
+				Value: n.Body,
+			}
+		},
+	}
+)
+
+// String implement fmt.Stringer interface.
+func (f NotificationOrderField) String() string {
+	var str string
+	switch f.field {
+	case notification.FieldCreatedAt:
+		str = "CREATED_AT"
+	case notification.FieldUpdatedAt:
+		str = "UPDATED_AT"
+	case notification.FieldTitle:
+		str = "TITLE"
+	case notification.FieldBody:
+		str = "BODY"
+	}
+	return str
+}
+
+// MarshalGQL implements graphql.Marshaler interface.
+func (f NotificationOrderField) MarshalGQL(w io.Writer) {
+	io.WriteString(w, strconv.Quote(f.String()))
+}
+
+// UnmarshalGQL implements graphql.Unmarshaler interface.
+func (f *NotificationOrderField) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("NotificationOrderField %T must be a string", v)
+	}
+	switch str {
+	case "CREATED_AT":
+		*f = *NotificationOrderFieldCreatedAt
+	case "UPDATED_AT":
+		*f = *NotificationOrderFieldUpdatedAt
+	case "TITLE":
+		*f = *NotificationOrderFieldTitle
+	case "BODY":
+		*f = *NotificationOrderFieldBody
+	default:
+		return fmt.Errorf("%s is not a valid NotificationOrderField", str)
+	}
+	return nil
+}
+
+// NotificationOrderField defines the ordering field of Notification.
+type NotificationOrderField struct {
+	field    string
+	toCursor func(*Notification) Cursor
+}
+
+// NotificationOrder defines the ordering of Notification.
+type NotificationOrder struct {
+	Direction OrderDirection          `json:"direction"`
+	Field     *NotificationOrderField `json:"field"`
+}
+
+// DefaultNotificationOrder is the default ordering of Notification.
+var DefaultNotificationOrder = &NotificationOrder{
+	Direction: OrderDirectionAsc,
+	Field: &NotificationOrderField{
+		field: notification.FieldID,
+		toCursor: func(n *Notification) Cursor {
+			return Cursor{ID: n.ID}
+		},
+	},
+}
+
+// ToEdge converts Notification into NotificationEdge.
+func (n *Notification) ToEdge(order *NotificationOrder) *NotificationEdge {
+	if order == nil {
+		order = DefaultNotificationOrder
+	}
+	return &NotificationEdge{
+		Node:   n,
+		Cursor: order.Field.toCursor(n),
 	}
 }
 

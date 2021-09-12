@@ -14,6 +14,7 @@ import (
 	"github.com/msal4/hassah_school_server/ent/grade"
 	"github.com/msal4/hassah_school_server/ent/group"
 	"github.com/msal4/hassah_school_server/ent/message"
+	"github.com/msal4/hassah_school_server/ent/notification"
 	"github.com/msal4/hassah_school_server/ent/schedule"
 	"github.com/msal4/hassah_school_server/ent/schema"
 	"github.com/msal4/hassah_school_server/ent/school"
@@ -226,6 +227,29 @@ func init() {
 	messageDescID := messageFields[0].Descriptor()
 	// message.DefaultID holds the default value on creation for the id field.
 	message.DefaultID = messageDescID.Default.(func() uuid.UUID)
+	notificationMixin := schema.Notification{}.Mixin()
+	notificationMixinFields0 := notificationMixin[0].Fields()
+	_ = notificationMixinFields0
+	notificationFields := schema.Notification{}.Fields()
+	_ = notificationFields
+	// notificationDescCreatedAt is the schema descriptor for created_at field.
+	notificationDescCreatedAt := notificationMixinFields0[0].Descriptor()
+	// notification.DefaultCreatedAt holds the default value on creation for the created_at field.
+	notification.DefaultCreatedAt = notificationDescCreatedAt.Default.(func() time.Time)
+	// notificationDescUpdatedAt is the schema descriptor for updated_at field.
+	notificationDescUpdatedAt := notificationMixinFields0[1].Descriptor()
+	// notification.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	notification.DefaultUpdatedAt = notificationDescUpdatedAt.Default.(func() time.Time)
+	// notification.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	notification.UpdateDefaultUpdatedAt = notificationDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// notificationDescRoute is the schema descriptor for route field.
+	notificationDescRoute := notificationFields[4].Descriptor()
+	// notification.RouteValidator is a validator for the "route" field. It is called by the builders before save.
+	notification.RouteValidator = notificationDescRoute.Validators[0].(func(string) error)
+	// notificationDescID is the schema descriptor for id field.
+	notificationDescID := notificationFields[0].Descriptor()
+	// notification.DefaultID holds the default value on creation for the id field.
+	notification.DefaultID = notificationDescID.Default.(func() uuid.UUID)
 	scheduleFields := schema.Schedule{}.Fields()
 	_ = scheduleFields
 	// scheduleDescWeekday is the schema descriptor for weekday field.

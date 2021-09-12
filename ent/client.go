@@ -18,6 +18,7 @@ import (
 	"github.com/msal4/hassah_school_server/ent/grade"
 	"github.com/msal4/hassah_school_server/ent/group"
 	"github.com/msal4/hassah_school_server/ent/message"
+	"github.com/msal4/hassah_school_server/ent/notification"
 	"github.com/msal4/hassah_school_server/ent/schedule"
 	"github.com/msal4/hassah_school_server/ent/school"
 	"github.com/msal4/hassah_school_server/ent/stage"
@@ -50,6 +51,8 @@ type Client struct {
 	Group *GroupClient
 	// Message is the client for interacting with the Message builders.
 	Message *MessageClient
+	// Notification is the client for interacting with the Notification builders.
+	Notification *NotificationClient
 	// Schedule is the client for interacting with the Schedule builders.
 	Schedule *ScheduleClient
 	// School is the client for interacting with the School builders.
@@ -81,6 +84,7 @@ func (c *Client) init() {
 	c.Grade = NewGradeClient(c.config)
 	c.Group = NewGroupClient(c.config)
 	c.Message = NewMessageClient(c.config)
+	c.Notification = NewNotificationClient(c.config)
 	c.Schedule = NewScheduleClient(c.config)
 	c.School = NewSchoolClient(c.config)
 	c.Stage = NewStageClient(c.config)
@@ -127,6 +131,7 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		Grade:                NewGradeClient(cfg),
 		Group:                NewGroupClient(cfg),
 		Message:              NewMessageClient(cfg),
+		Notification:         NewNotificationClient(cfg),
 		Schedule:             NewScheduleClient(cfg),
 		School:               NewSchoolClient(cfg),
 		Stage:                NewStageClient(cfg),
@@ -158,6 +163,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		Grade:                NewGradeClient(cfg),
 		Group:                NewGroupClient(cfg),
 		Message:              NewMessageClient(cfg),
+		Notification:         NewNotificationClient(cfg),
 		Schedule:             NewScheduleClient(cfg),
 		School:               NewSchoolClient(cfg),
 		Stage:                NewStageClient(cfg),
@@ -200,6 +206,7 @@ func (c *Client) Use(hooks ...Hook) {
 	c.Grade.Use(hooks...)
 	c.Group.Use(hooks...)
 	c.Message.Use(hooks...)
+	c.Notification.Use(hooks...)
 	c.Schedule.Use(hooks...)
 	c.School.Use(hooks...)
 	c.Stage.Use(hooks...)
@@ -1311,6 +1318,112 @@ func (c *MessageClient) Hooks() []Hook {
 	return c.hooks.Message
 }
 
+// NotificationClient is a client for the Notification schema.
+type NotificationClient struct {
+	config
+}
+
+// NewNotificationClient returns a client for the Notification from the given config.
+func NewNotificationClient(c config) *NotificationClient {
+	return &NotificationClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `notification.Hooks(f(g(h())))`.
+func (c *NotificationClient) Use(hooks ...Hook) {
+	c.hooks.Notification = append(c.hooks.Notification, hooks...)
+}
+
+// Create returns a create builder for Notification.
+func (c *NotificationClient) Create() *NotificationCreate {
+	mutation := newNotificationMutation(c.config, OpCreate)
+	return &NotificationCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of Notification entities.
+func (c *NotificationClient) CreateBulk(builders ...*NotificationCreate) *NotificationCreateBulk {
+	return &NotificationCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for Notification.
+func (c *NotificationClient) Update() *NotificationUpdate {
+	mutation := newNotificationMutation(c.config, OpUpdate)
+	return &NotificationUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *NotificationClient) UpdateOne(n *Notification) *NotificationUpdateOne {
+	mutation := newNotificationMutation(c.config, OpUpdateOne, withNotification(n))
+	return &NotificationUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *NotificationClient) UpdateOneID(id uuid.UUID) *NotificationUpdateOne {
+	mutation := newNotificationMutation(c.config, OpUpdateOne, withNotificationID(id))
+	return &NotificationUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for Notification.
+func (c *NotificationClient) Delete() *NotificationDelete {
+	mutation := newNotificationMutation(c.config, OpDelete)
+	return &NotificationDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a delete builder for the given entity.
+func (c *NotificationClient) DeleteOne(n *Notification) *NotificationDeleteOne {
+	return c.DeleteOneID(n.ID)
+}
+
+// DeleteOneID returns a delete builder for the given id.
+func (c *NotificationClient) DeleteOneID(id uuid.UUID) *NotificationDeleteOne {
+	builder := c.Delete().Where(notification.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &NotificationDeleteOne{builder}
+}
+
+// Query returns a query builder for Notification.
+func (c *NotificationClient) Query() *NotificationQuery {
+	return &NotificationQuery{
+		config: c.config,
+	}
+}
+
+// Get returns a Notification entity by its id.
+func (c *NotificationClient) Get(ctx context.Context, id uuid.UUID) (*Notification, error) {
+	return c.Query().Where(notification.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *NotificationClient) GetX(ctx context.Context, id uuid.UUID) *Notification {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryStage queries the stage edge of a Notification.
+func (c *NotificationClient) QueryStage(n *Notification) *StageQuery {
+	query := &StageQuery{config: c.config}
+	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+		id := n.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(notification.Table, notification.FieldID, id),
+			sqlgraph.To(stage.Table, stage.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, notification.StageTable, notification.StageColumn),
+		)
+		fromV = sqlgraph.Neighbors(n.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *NotificationClient) Hooks() []Hook {
+	return c.hooks.Notification
+}
+
 // ScheduleClient is a client for the Schedule schema.
 type ScheduleClient struct {
 	config
@@ -1697,6 +1810,22 @@ func (c *StageClient) QueryCourseGrades(s *Stage) *CourseGradeQuery {
 			sqlgraph.From(stage.Table, stage.FieldID, id),
 			sqlgraph.To(coursegrade.Table, coursegrade.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, stage.CourseGradesTable, stage.CourseGradesColumn),
+		)
+		fromV = sqlgraph.Neighbors(s.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryNotifications queries the notifications edge of a Stage.
+func (c *StageClient) QueryNotifications(s *Stage) *NotificationQuery {
+	query := &NotificationQuery{config: c.config}
+	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+		id := s.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(stage.Table, stage.FieldID, id),
+			sqlgraph.To(notification.Table, notification.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, stage.NotificationsTable, stage.NotificationsColumn),
 		)
 		fromV = sqlgraph.Neighbors(s.driver.Dialect(), step)
 		return fromV, nil

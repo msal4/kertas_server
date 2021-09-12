@@ -15,6 +15,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/msal4/hassah_school_server/ent/class"
 	"github.com/msal4/hassah_school_server/ent/coursegrade"
+	"github.com/msal4/hassah_school_server/ent/notification"
 	"github.com/msal4/hassah_school_server/ent/predicate"
 	"github.com/msal4/hassah_school_server/ent/school"
 	"github.com/msal4/hassah_school_server/ent/stage"
@@ -32,12 +33,13 @@ type StageQuery struct {
 	fields     []string
 	predicates []predicate.Stage
 	// eager-loading edges.
-	withSchool       *SchoolQuery
-	withClasses      *ClassQuery
-	withPayments     *TuitionPaymentQuery
-	withStudents     *UserQuery
-	withCourseGrades *CourseGradeQuery
-	withFKs          bool
+	withSchool        *SchoolQuery
+	withClasses       *ClassQuery
+	withPayments      *TuitionPaymentQuery
+	withStudents      *UserQuery
+	withCourseGrades  *CourseGradeQuery
+	withNotifications *NotificationQuery
+	withFKs           bool
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -177,6 +179,28 @@ func (sq *StageQuery) QueryCourseGrades() *CourseGradeQuery {
 			sqlgraph.From(stage.Table, stage.FieldID, selector),
 			sqlgraph.To(coursegrade.Table, coursegrade.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, stage.CourseGradesTable, stage.CourseGradesColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(sq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryNotifications chains the current query on the "notifications" edge.
+func (sq *StageQuery) QueryNotifications() *NotificationQuery {
+	query := &NotificationQuery{config: sq.config}
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := sq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := sq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(stage.Table, stage.FieldID, selector),
+			sqlgraph.To(notification.Table, notification.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, stage.NotificationsTable, stage.NotificationsColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(sq.driver.Dialect(), step)
 		return fromU, nil
@@ -360,16 +384,17 @@ func (sq *StageQuery) Clone() *StageQuery {
 		return nil
 	}
 	return &StageQuery{
-		config:           sq.config,
-		limit:            sq.limit,
-		offset:           sq.offset,
-		order:            append([]OrderFunc{}, sq.order...),
-		predicates:       append([]predicate.Stage{}, sq.predicates...),
-		withSchool:       sq.withSchool.Clone(),
-		withClasses:      sq.withClasses.Clone(),
-		withPayments:     sq.withPayments.Clone(),
-		withStudents:     sq.withStudents.Clone(),
-		withCourseGrades: sq.withCourseGrades.Clone(),
+		config:            sq.config,
+		limit:             sq.limit,
+		offset:            sq.offset,
+		order:             append([]OrderFunc{}, sq.order...),
+		predicates:        append([]predicate.Stage{}, sq.predicates...),
+		withSchool:        sq.withSchool.Clone(),
+		withClasses:       sq.withClasses.Clone(),
+		withPayments:      sq.withPayments.Clone(),
+		withStudents:      sq.withStudents.Clone(),
+		withCourseGrades:  sq.withCourseGrades.Clone(),
+		withNotifications: sq.withNotifications.Clone(),
 		// clone intermediate query.
 		sql:  sq.sql.Clone(),
 		path: sq.path,
@@ -428,6 +453,17 @@ func (sq *StageQuery) WithCourseGrades(opts ...func(*CourseGradeQuery)) *StageQu
 		opt(query)
 	}
 	sq.withCourseGrades = query
+	return sq
+}
+
+// WithNotifications tells the query-builder to eager-load the nodes that are connected to
+// the "notifications" edge. The optional arguments are used to configure the query builder of the edge.
+func (sq *StageQuery) WithNotifications(opts ...func(*NotificationQuery)) *StageQuery {
+	query := &NotificationQuery{config: sq.config}
+	for _, opt := range opts {
+		opt(query)
+	}
+	sq.withNotifications = query
 	return sq
 }
 
@@ -497,12 +533,13 @@ func (sq *StageQuery) sqlAll(ctx context.Context) ([]*Stage, error) {
 		nodes       = []*Stage{}
 		withFKs     = sq.withFKs
 		_spec       = sq.querySpec()
-		loadedTypes = [5]bool{
+		loadedTypes = [6]bool{
 			sq.withSchool != nil,
 			sq.withClasses != nil,
 			sq.withPayments != nil,
 			sq.withStudents != nil,
 			sq.withCourseGrades != nil,
+			sq.withNotifications != nil,
 		}
 	)
 	if sq.withSchool != nil {
@@ -673,6 +710,35 @@ func (sq *StageQuery) sqlAll(ctx context.Context) ([]*Stage, error) {
 				return nil, fmt.Errorf(`unexpected foreign-key "stage_course_grades" returned %v for node %v`, *fk, n.ID)
 			}
 			node.Edges.CourseGrades = append(node.Edges.CourseGrades, n)
+		}
+	}
+
+	if query := sq.withNotifications; query != nil {
+		fks := make([]driver.Value, 0, len(nodes))
+		nodeids := make(map[uuid.UUID]*Stage)
+		for i := range nodes {
+			fks = append(fks, nodes[i].ID)
+			nodeids[nodes[i].ID] = nodes[i]
+			nodes[i].Edges.Notifications = []*Notification{}
+		}
+		query.withFKs = true
+		query.Where(predicate.Notification(func(s *sql.Selector) {
+			s.Where(sql.InValues(stage.NotificationsColumn, fks...))
+		}))
+		neighbors, err := query.All(ctx)
+		if err != nil {
+			return nil, err
+		}
+		for _, n := range neighbors {
+			fk := n.stage_notifications
+			if fk == nil {
+				return nil, fmt.Errorf(`foreign-key "stage_notifications" is nil for node %v`, n.ID)
+			}
+			node, ok := nodeids[*fk]
+			if !ok {
+				return nil, fmt.Errorf(`unexpected foreign-key "stage_notifications" returned %v for node %v`, *fk, n.ID)
+			}
+			node.Edges.Notifications = append(node.Edges.Notifications, n)
 		}
 	}
 

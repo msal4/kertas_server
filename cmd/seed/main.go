@@ -290,5 +290,62 @@ func seed(ctx context.Context, s *service.Service) error {
 	}
 	log.Printf("Created payment: %v\n\n", payment)
 
+	f.Seek(0, 0)
+	notif, err := s.AddNotification(ctx, model.AddNotificationInput{
+		StageID: stg.ID,
+		Title:   "This is a notification",
+		Body:    "This here should be the body of the notification as you're used to.",
+		Image:   &graphql.Upload{File: f, Filename: f.Name(), Size: stat.Size(), ContentType: "image/jpeg"},
+		Color:   "#ff0000",
+	})
+	if err != nil {
+		return err
+	}
+	log.Printf("Created notification: %v\n\n", notif)
+
+	notif, err = s.AddNotification(ctx, model.AddNotificationInput{
+		StageID: stg.ID,
+		Title:   "This is a notification but not the first one",
+		Body:    "This here should be the body of the notification as you're 2 used to.",
+		Color:   "#00ff00",
+	})
+	if err != nil {
+		return err
+	}
+	log.Printf("Created notification: %v\n\n", notif)
+
+	notif, err = s.AddNotification(ctx, model.AddNotificationInput{
+		StageID: stg.ID,
+		Title:   "This is a notification as well",
+		Body:    "This here should be the body of ation as you're 2 used to.",
+		Color:   "#0000ff",
+	})
+	if err != nil {
+		return err
+	}
+	log.Printf("Created notification: %v\n\n", notif)
+
+	notif, err = s.AddNotification(ctx, model.AddNotificationInput{
+		StageID: stg.ID,
+		Title:   "This is a something something notification",
+		Body:    "This here should be the body of ation as you're 2 used to.",
+		Color:   "#0000ff",
+	})
+	if err != nil {
+		return err
+	}
+	log.Printf("Created notification: %v\n\n", notif)
+
+	notif, err = s.AddNotification(ctx, model.AddNotificationInput{
+		StageID: stg.ID,
+		Title:   "This is a wow something notification",
+		Body:    "This here should be the body of ation as you're 2 used to.",
+		Color:   "#000f0f",
+	})
+	if err != nil {
+		return err
+	}
+	log.Printf("Created notification: %v\n\n", notif)
+
 	return nil
 }

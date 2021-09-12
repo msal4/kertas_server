@@ -196,6 +196,14 @@ func (m *Message) Owner(ctx context.Context) (*User, error) {
 	return result, err
 }
 
+func (n *Notification) Stage(ctx context.Context) (*Stage, error) {
+	result, err := n.Edges.StageOrErr()
+	if IsNotLoaded(err) {
+		result, err = n.QueryStage().Only(ctx)
+	}
+	return result, err
+}
+
 func (s *Schedule) Class(ctx context.Context) (*Class, error) {
 	result, err := s.Edges.ClassOrErr()
 	if IsNotLoaded(err) {
@@ -256,6 +264,14 @@ func (s *Stage) CourseGrades(ctx context.Context) ([]*CourseGrade, error) {
 	result, err := s.Edges.CourseGradesOrErr()
 	if IsNotLoaded(err) {
 		result, err = s.QueryCourseGrades().All(ctx)
+	}
+	return result, err
+}
+
+func (s *Stage) Notifications(ctx context.Context) ([]*Notification, error) {
+	result, err := s.Edges.NotificationsOrErr()
+	if IsNotLoaded(err) {
+		result, err = s.QueryNotifications().All(ctx)
 	}
 	return result, err
 }

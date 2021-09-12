@@ -61,6 +61,15 @@ type AddGroupInput struct {
 	UserID uuid.UUID `json:"userID"`
 }
 
+type AddNotificationInput struct {
+	Title   string          `json:"title"`
+	Body    string          `json:"body"`
+	Image   *graphql.Upload `json:"image"`
+	Route   string          `json:"route"`
+	Color   string          `json:"color"`
+	StageID uuid.UUID       `json:"stageID"`
+}
+
 type AddScheduleInput struct {
 	Weekday  time.Weekday  `json:"weekday"`
 	Duration time.Duration `json:"duration"`

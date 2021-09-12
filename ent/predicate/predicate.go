@@ -30,6 +30,9 @@ type Group func(*sql.Selector)
 // Message is the predicate function for message builders.
 type Message func(*sql.Selector)
 
+// Notification is the predicate function for notification builders.
+type Notification func(*sql.Selector)
+
 // Schedule is the predicate function for schedule builders.
 type Schedule func(*sql.Selector)
 

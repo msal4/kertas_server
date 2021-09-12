@@ -13,6 +13,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/msal4/hassah_school_server/ent/class"
 	"github.com/msal4/hassah_school_server/ent/coursegrade"
+	"github.com/msal4/hassah_school_server/ent/notification"
 	"github.com/msal4/hassah_school_server/ent/school"
 	"github.com/msal4/hassah_school_server/ent/stage"
 	"github.com/msal4/hassah_school_server/ent/tuitionpayment"
@@ -175,6 +176,21 @@ func (sc *StageCreate) AddCourseGrades(c ...*CourseGrade) *StageCreate {
 		ids[i] = c[i].ID
 	}
 	return sc.AddCourseGradeIDs(ids...)
+}
+
+// AddNotificationIDs adds the "notifications" edge to the Notification entity by IDs.
+func (sc *StageCreate) AddNotificationIDs(ids ...uuid.UUID) *StageCreate {
+	sc.mutation.AddNotificationIDs(ids...)
+	return sc
+}
+
+// AddNotifications adds the "notifications" edges to the Notification entity.
+func (sc *StageCreate) AddNotifications(n ...*Notification) *StageCreate {
+	ids := make([]uuid.UUID, len(n))
+	for i := range n {
+		ids[i] = n[i].ID
+	}
+	return sc.AddNotificationIDs(ids...)
 }
 
 // Mutation returns the StageMutation object of the builder.
@@ -475,6 +491,25 @@ func (sc *StageCreate) createSpec() (*Stage, *sqlgraph.CreateSpec) {
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeUUID,
 					Column: coursegrade.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := sc.mutation.NotificationsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   stage.NotificationsTable,
+			Columns: []string{stage.NotificationsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: notification.FieldID,
 				},
 			},
 		}

@@ -15,6 +15,7 @@ import (
 	"github.com/msal4/hassah_school_server/ent/grade"
 	"github.com/msal4/hassah_school_server/ent/group"
 	"github.com/msal4/hassah_school_server/ent/message"
+	"github.com/msal4/hassah_school_server/ent/notification"
 	"github.com/msal4/hassah_school_server/ent/predicate"
 	"github.com/msal4/hassah_school_server/ent/schedule"
 	"github.com/msal4/hassah_school_server/ent/school"
@@ -3103,6 +3104,551 @@ func (i *MessageWhereInput) P() (predicate.Message, error) {
 	}
 }
 
+// NotificationWhereInput represents a where input for filtering Notification queries.
+type NotificationWhereInput struct {
+	Not *NotificationWhereInput   `json:"not,omitempty"`
+	Or  []*NotificationWhereInput `json:"or,omitempty"`
+	And []*NotificationWhereInput `json:"and,omitempty"`
+
+	// "id" field predicates.
+	ID      *uuid.UUID  `json:"id,omitempty"`
+	IDNEQ   *uuid.UUID  `json:"idNEQ,omitempty"`
+	IDIn    []uuid.UUID `json:"idIn,omitempty"`
+	IDNotIn []uuid.UUID `json:"idNotIn,omitempty"`
+	IDGT    *uuid.UUID  `json:"idGT,omitempty"`
+	IDGTE   *uuid.UUID  `json:"idGTE,omitempty"`
+	IDLT    *uuid.UUID  `json:"idLT,omitempty"`
+	IDLTE   *uuid.UUID  `json:"idLTE,omitempty"`
+
+	// "created_at" field predicates.
+	CreatedAt      *time.Time  `json:"createdAt,omitempty"`
+	CreatedAtNEQ   *time.Time  `json:"createdAtNEQ,omitempty"`
+	CreatedAtIn    []time.Time `json:"createdAtIn,omitempty"`
+	CreatedAtNotIn []time.Time `json:"createdAtNotIn,omitempty"`
+	CreatedAtGT    *time.Time  `json:"createdAtGT,omitempty"`
+	CreatedAtGTE   *time.Time  `json:"createdAtGTE,omitempty"`
+	CreatedAtLT    *time.Time  `json:"createdAtLT,omitempty"`
+	CreatedAtLTE   *time.Time  `json:"createdAtLTE,omitempty"`
+
+	// "updated_at" field predicates.
+	UpdatedAt      *time.Time  `json:"updatedAt,omitempty"`
+	UpdatedAtNEQ   *time.Time  `json:"updatedAtNEQ,omitempty"`
+	UpdatedAtIn    []time.Time `json:"updatedAtIn,omitempty"`
+	UpdatedAtNotIn []time.Time `json:"updatedAtNotIn,omitempty"`
+	UpdatedAtGT    *time.Time  `json:"updatedAtGT,omitempty"`
+	UpdatedAtGTE   *time.Time  `json:"updatedAtGTE,omitempty"`
+	UpdatedAtLT    *time.Time  `json:"updatedAtLT,omitempty"`
+	UpdatedAtLTE   *time.Time  `json:"updatedAtLTE,omitempty"`
+
+	// "title" field predicates.
+	Title             *string  `json:"title,omitempty"`
+	TitleNEQ          *string  `json:"titleNEQ,omitempty"`
+	TitleIn           []string `json:"titleIn,omitempty"`
+	TitleNotIn        []string `json:"titleNotIn,omitempty"`
+	TitleGT           *string  `json:"titleGT,omitempty"`
+	TitleGTE          *string  `json:"titleGTE,omitempty"`
+	TitleLT           *string  `json:"titleLT,omitempty"`
+	TitleLTE          *string  `json:"titleLTE,omitempty"`
+	TitleContains     *string  `json:"titleContains,omitempty"`
+	TitleHasPrefix    *string  `json:"titleHasPrefix,omitempty"`
+	TitleHasSuffix    *string  `json:"titleHasSuffix,omitempty"`
+	TitleEqualFold    *string  `json:"titleEqualFold,omitempty"`
+	TitleContainsFold *string  `json:"titleContainsFold,omitempty"`
+
+	// "body" field predicates.
+	Body             *string  `json:"body,omitempty"`
+	BodyNEQ          *string  `json:"bodyNEQ,omitempty"`
+	BodyIn           []string `json:"bodyIn,omitempty"`
+	BodyNotIn        []string `json:"bodyNotIn,omitempty"`
+	BodyGT           *string  `json:"bodyGT,omitempty"`
+	BodyGTE          *string  `json:"bodyGTE,omitempty"`
+	BodyLT           *string  `json:"bodyLT,omitempty"`
+	BodyLTE          *string  `json:"bodyLTE,omitempty"`
+	BodyContains     *string  `json:"bodyContains,omitempty"`
+	BodyHasPrefix    *string  `json:"bodyHasPrefix,omitempty"`
+	BodyHasSuffix    *string  `json:"bodyHasSuffix,omitempty"`
+	BodyIsNil        bool     `json:"bodyIsNil,omitempty"`
+	BodyNotNil       bool     `json:"bodyNotNil,omitempty"`
+	BodyEqualFold    *string  `json:"bodyEqualFold,omitempty"`
+	BodyContainsFold *string  `json:"bodyContainsFold,omitempty"`
+
+	// "image" field predicates.
+	Image             *string  `json:"image,omitempty"`
+	ImageNEQ          *string  `json:"imageNEQ,omitempty"`
+	ImageIn           []string `json:"imageIn,omitempty"`
+	ImageNotIn        []string `json:"imageNotIn,omitempty"`
+	ImageGT           *string  `json:"imageGT,omitempty"`
+	ImageGTE          *string  `json:"imageGTE,omitempty"`
+	ImageLT           *string  `json:"imageLT,omitempty"`
+	ImageLTE          *string  `json:"imageLTE,omitempty"`
+	ImageContains     *string  `json:"imageContains,omitempty"`
+	ImageHasPrefix    *string  `json:"imageHasPrefix,omitempty"`
+	ImageHasSuffix    *string  `json:"imageHasSuffix,omitempty"`
+	ImageIsNil        bool     `json:"imageIsNil,omitempty"`
+	ImageNotNil       bool     `json:"imageNotNil,omitempty"`
+	ImageEqualFold    *string  `json:"imageEqualFold,omitempty"`
+	ImageContainsFold *string  `json:"imageContainsFold,omitempty"`
+
+	// "route" field predicates.
+	Route             *string  `json:"route,omitempty"`
+	RouteNEQ          *string  `json:"routeNEQ,omitempty"`
+	RouteIn           []string `json:"routeIn,omitempty"`
+	RouteNotIn        []string `json:"routeNotIn,omitempty"`
+	RouteGT           *string  `json:"routeGT,omitempty"`
+	RouteGTE          *string  `json:"routeGTE,omitempty"`
+	RouteLT           *string  `json:"routeLT,omitempty"`
+	RouteLTE          *string  `json:"routeLTE,omitempty"`
+	RouteContains     *string  `json:"routeContains,omitempty"`
+	RouteHasPrefix    *string  `json:"routeHasPrefix,omitempty"`
+	RouteHasSuffix    *string  `json:"routeHasSuffix,omitempty"`
+	RouteIsNil        bool     `json:"routeIsNil,omitempty"`
+	RouteNotNil       bool     `json:"routeNotNil,omitempty"`
+	RouteEqualFold    *string  `json:"routeEqualFold,omitempty"`
+	RouteContainsFold *string  `json:"routeContainsFold,omitempty"`
+
+	// "color" field predicates.
+	Color             *string  `json:"color,omitempty"`
+	ColorNEQ          *string  `json:"colorNEQ,omitempty"`
+	ColorIn           []string `json:"colorIn,omitempty"`
+	ColorNotIn        []string `json:"colorNotIn,omitempty"`
+	ColorGT           *string  `json:"colorGT,omitempty"`
+	ColorGTE          *string  `json:"colorGTE,omitempty"`
+	ColorLT           *string  `json:"colorLT,omitempty"`
+	ColorLTE          *string  `json:"colorLTE,omitempty"`
+	ColorContains     *string  `json:"colorContains,omitempty"`
+	ColorHasPrefix    *string  `json:"colorHasPrefix,omitempty"`
+	ColorHasSuffix    *string  `json:"colorHasSuffix,omitempty"`
+	ColorIsNil        bool     `json:"colorIsNil,omitempty"`
+	ColorNotNil       bool     `json:"colorNotNil,omitempty"`
+	ColorEqualFold    *string  `json:"colorEqualFold,omitempty"`
+	ColorContainsFold *string  `json:"colorContainsFold,omitempty"`
+
+	// "deleted_at" field predicates.
+	DeletedAt       *time.Time  `json:"deletedAt,omitempty"`
+	DeletedAtNEQ    *time.Time  `json:"deletedAtNEQ,omitempty"`
+	DeletedAtIn     []time.Time `json:"deletedAtIn,omitempty"`
+	DeletedAtNotIn  []time.Time `json:"deletedAtNotIn,omitempty"`
+	DeletedAtGT     *time.Time  `json:"deletedAtGT,omitempty"`
+	DeletedAtGTE    *time.Time  `json:"deletedAtGTE,omitempty"`
+	DeletedAtLT     *time.Time  `json:"deletedAtLT,omitempty"`
+	DeletedAtLTE    *time.Time  `json:"deletedAtLTE,omitempty"`
+	DeletedAtIsNil  bool        `json:"deletedAtIsNil,omitempty"`
+	DeletedAtNotNil bool        `json:"deletedAtNotNil,omitempty"`
+
+	// "stage" edge predicates.
+	HasStage     *bool              `json:"hasStage,omitempty"`
+	HasStageWith []*StageWhereInput `json:"hasStageWith,omitempty"`
+}
+
+// Filter applies the NotificationWhereInput filter on the NotificationQuery builder.
+func (i *NotificationWhereInput) Filter(q *NotificationQuery) (*NotificationQuery, error) {
+	if i == nil {
+		return q, nil
+	}
+	p, err := i.P()
+	if err != nil {
+		return nil, err
+	}
+	return q.Where(p), nil
+}
+
+// P returns a predicate for filtering notifications.
+// An error is returned if the input is empty or invalid.
+func (i *NotificationWhereInput) P() (predicate.Notification, error) {
+	var predicates []predicate.Notification
+	if i.Not != nil {
+		p, err := i.Not.P()
+		if err != nil {
+			return nil, err
+		}
+		predicates = append(predicates, notification.Not(p))
+	}
+	switch n := len(i.Or); {
+	case n == 1:
+		p, err := i.Or[0].P()
+		if err != nil {
+			return nil, err
+		}
+		predicates = append(predicates, p)
+	case n > 1:
+		or := make([]predicate.Notification, 0, n)
+		for _, w := range i.Or {
+			p, err := w.P()
+			if err != nil {
+				return nil, err
+			}
+			or = append(or, p)
+		}
+		predicates = append(predicates, notification.Or(or...))
+	}
+	switch n := len(i.And); {
+	case n == 1:
+		p, err := i.And[0].P()
+		if err != nil {
+			return nil, err
+		}
+		predicates = append(predicates, p)
+	case n > 1:
+		and := make([]predicate.Notification, 0, n)
+		for _, w := range i.And {
+			p, err := w.P()
+			if err != nil {
+				return nil, err
+			}
+			and = append(and, p)
+		}
+		predicates = append(predicates, notification.And(and...))
+	}
+	if i.ID != nil {
+		predicates = append(predicates, notification.IDEQ(*i.ID))
+	}
+	if i.IDNEQ != nil {
+		predicates = append(predicates, notification.IDNEQ(*i.IDNEQ))
+	}
+	if len(i.IDIn) > 0 {
+		predicates = append(predicates, notification.IDIn(i.IDIn...))
+	}
+	if len(i.IDNotIn) > 0 {
+		predicates = append(predicates, notification.IDNotIn(i.IDNotIn...))
+	}
+	if i.IDGT != nil {
+		predicates = append(predicates, notification.IDGT(*i.IDGT))
+	}
+	if i.IDGTE != nil {
+		predicates = append(predicates, notification.IDGTE(*i.IDGTE))
+	}
+	if i.IDLT != nil {
+		predicates = append(predicates, notification.IDLT(*i.IDLT))
+	}
+	if i.IDLTE != nil {
+		predicates = append(predicates, notification.IDLTE(*i.IDLTE))
+	}
+	if i.CreatedAt != nil {
+		predicates = append(predicates, notification.CreatedAtEQ(*i.CreatedAt))
+	}
+	if i.CreatedAtNEQ != nil {
+		predicates = append(predicates, notification.CreatedAtNEQ(*i.CreatedAtNEQ))
+	}
+	if len(i.CreatedAtIn) > 0 {
+		predicates = append(predicates, notification.CreatedAtIn(i.CreatedAtIn...))
+	}
+	if len(i.CreatedAtNotIn) > 0 {
+		predicates = append(predicates, notification.CreatedAtNotIn(i.CreatedAtNotIn...))
+	}
+	if i.CreatedAtGT != nil {
+		predicates = append(predicates, notification.CreatedAtGT(*i.CreatedAtGT))
+	}
+	if i.CreatedAtGTE != nil {
+		predicates = append(predicates, notification.CreatedAtGTE(*i.CreatedAtGTE))
+	}
+	if i.CreatedAtLT != nil {
+		predicates = append(predicates, notification.CreatedAtLT(*i.CreatedAtLT))
+	}
+	if i.CreatedAtLTE != nil {
+		predicates = append(predicates, notification.CreatedAtLTE(*i.CreatedAtLTE))
+	}
+	if i.UpdatedAt != nil {
+		predicates = append(predicates, notification.UpdatedAtEQ(*i.UpdatedAt))
+	}
+	if i.UpdatedAtNEQ != nil {
+		predicates = append(predicates, notification.UpdatedAtNEQ(*i.UpdatedAtNEQ))
+	}
+	if len(i.UpdatedAtIn) > 0 {
+		predicates = append(predicates, notification.UpdatedAtIn(i.UpdatedAtIn...))
+	}
+	if len(i.UpdatedAtNotIn) > 0 {
+		predicates = append(predicates, notification.UpdatedAtNotIn(i.UpdatedAtNotIn...))
+	}
+	if i.UpdatedAtGT != nil {
+		predicates = append(predicates, notification.UpdatedAtGT(*i.UpdatedAtGT))
+	}
+	if i.UpdatedAtGTE != nil {
+		predicates = append(predicates, notification.UpdatedAtGTE(*i.UpdatedAtGTE))
+	}
+	if i.UpdatedAtLT != nil {
+		predicates = append(predicates, notification.UpdatedAtLT(*i.UpdatedAtLT))
+	}
+	if i.UpdatedAtLTE != nil {
+		predicates = append(predicates, notification.UpdatedAtLTE(*i.UpdatedAtLTE))
+	}
+	if i.Title != nil {
+		predicates = append(predicates, notification.TitleEQ(*i.Title))
+	}
+	if i.TitleNEQ != nil {
+		predicates = append(predicates, notification.TitleNEQ(*i.TitleNEQ))
+	}
+	if len(i.TitleIn) > 0 {
+		predicates = append(predicates, notification.TitleIn(i.TitleIn...))
+	}
+	if len(i.TitleNotIn) > 0 {
+		predicates = append(predicates, notification.TitleNotIn(i.TitleNotIn...))
+	}
+	if i.TitleGT != nil {
+		predicates = append(predicates, notification.TitleGT(*i.TitleGT))
+	}
+	if i.TitleGTE != nil {
+		predicates = append(predicates, notification.TitleGTE(*i.TitleGTE))
+	}
+	if i.TitleLT != nil {
+		predicates = append(predicates, notification.TitleLT(*i.TitleLT))
+	}
+	if i.TitleLTE != nil {
+		predicates = append(predicates, notification.TitleLTE(*i.TitleLTE))
+	}
+	if i.TitleContains != nil {
+		predicates = append(predicates, notification.TitleContains(*i.TitleContains))
+	}
+	if i.TitleHasPrefix != nil {
+		predicates = append(predicates, notification.TitleHasPrefix(*i.TitleHasPrefix))
+	}
+	if i.TitleHasSuffix != nil {
+		predicates = append(predicates, notification.TitleHasSuffix(*i.TitleHasSuffix))
+	}
+	if i.TitleEqualFold != nil {
+		predicates = append(predicates, notification.TitleEqualFold(*i.TitleEqualFold))
+	}
+	if i.TitleContainsFold != nil {
+		predicates = append(predicates, notification.TitleContainsFold(*i.TitleContainsFold))
+	}
+	if i.Body != nil {
+		predicates = append(predicates, notification.BodyEQ(*i.Body))
+	}
+	if i.BodyNEQ != nil {
+		predicates = append(predicates, notification.BodyNEQ(*i.BodyNEQ))
+	}
+	if len(i.BodyIn) > 0 {
+		predicates = append(predicates, notification.BodyIn(i.BodyIn...))
+	}
+	if len(i.BodyNotIn) > 0 {
+		predicates = append(predicates, notification.BodyNotIn(i.BodyNotIn...))
+	}
+	if i.BodyGT != nil {
+		predicates = append(predicates, notification.BodyGT(*i.BodyGT))
+	}
+	if i.BodyGTE != nil {
+		predicates = append(predicates, notification.BodyGTE(*i.BodyGTE))
+	}
+	if i.BodyLT != nil {
+		predicates = append(predicates, notification.BodyLT(*i.BodyLT))
+	}
+	if i.BodyLTE != nil {
+		predicates = append(predicates, notification.BodyLTE(*i.BodyLTE))
+	}
+	if i.BodyContains != nil {
+		predicates = append(predicates, notification.BodyContains(*i.BodyContains))
+	}
+	if i.BodyHasPrefix != nil {
+		predicates = append(predicates, notification.BodyHasPrefix(*i.BodyHasPrefix))
+	}
+	if i.BodyHasSuffix != nil {
+		predicates = append(predicates, notification.BodyHasSuffix(*i.BodyHasSuffix))
+	}
+	if i.BodyIsNil {
+		predicates = append(predicates, notification.BodyIsNil())
+	}
+	if i.BodyNotNil {
+		predicates = append(predicates, notification.BodyNotNil())
+	}
+	if i.BodyEqualFold != nil {
+		predicates = append(predicates, notification.BodyEqualFold(*i.BodyEqualFold))
+	}
+	if i.BodyContainsFold != nil {
+		predicates = append(predicates, notification.BodyContainsFold(*i.BodyContainsFold))
+	}
+	if i.Image != nil {
+		predicates = append(predicates, notification.ImageEQ(*i.Image))
+	}
+	if i.ImageNEQ != nil {
+		predicates = append(predicates, notification.ImageNEQ(*i.ImageNEQ))
+	}
+	if len(i.ImageIn) > 0 {
+		predicates = append(predicates, notification.ImageIn(i.ImageIn...))
+	}
+	if len(i.ImageNotIn) > 0 {
+		predicates = append(predicates, notification.ImageNotIn(i.ImageNotIn...))
+	}
+	if i.ImageGT != nil {
+		predicates = append(predicates, notification.ImageGT(*i.ImageGT))
+	}
+	if i.ImageGTE != nil {
+		predicates = append(predicates, notification.ImageGTE(*i.ImageGTE))
+	}
+	if i.ImageLT != nil {
+		predicates = append(predicates, notification.ImageLT(*i.ImageLT))
+	}
+	if i.ImageLTE != nil {
+		predicates = append(predicates, notification.ImageLTE(*i.ImageLTE))
+	}
+	if i.ImageContains != nil {
+		predicates = append(predicates, notification.ImageContains(*i.ImageContains))
+	}
+	if i.ImageHasPrefix != nil {
+		predicates = append(predicates, notification.ImageHasPrefix(*i.ImageHasPrefix))
+	}
+	if i.ImageHasSuffix != nil {
+		predicates = append(predicates, notification.ImageHasSuffix(*i.ImageHasSuffix))
+	}
+	if i.ImageIsNil {
+		predicates = append(predicates, notification.ImageIsNil())
+	}
+	if i.ImageNotNil {
+		predicates = append(predicates, notification.ImageNotNil())
+	}
+	if i.ImageEqualFold != nil {
+		predicates = append(predicates, notification.ImageEqualFold(*i.ImageEqualFold))
+	}
+	if i.ImageContainsFold != nil {
+		predicates = append(predicates, notification.ImageContainsFold(*i.ImageContainsFold))
+	}
+	if i.Route != nil {
+		predicates = append(predicates, notification.RouteEQ(*i.Route))
+	}
+	if i.RouteNEQ != nil {
+		predicates = append(predicates, notification.RouteNEQ(*i.RouteNEQ))
+	}
+	if len(i.RouteIn) > 0 {
+		predicates = append(predicates, notification.RouteIn(i.RouteIn...))
+	}
+	if len(i.RouteNotIn) > 0 {
+		predicates = append(predicates, notification.RouteNotIn(i.RouteNotIn...))
+	}
+	if i.RouteGT != nil {
+		predicates = append(predicates, notification.RouteGT(*i.RouteGT))
+	}
+	if i.RouteGTE != nil {
+		predicates = append(predicates, notification.RouteGTE(*i.RouteGTE))
+	}
+	if i.RouteLT != nil {
+		predicates = append(predicates, notification.RouteLT(*i.RouteLT))
+	}
+	if i.RouteLTE != nil {
+		predicates = append(predicates, notification.RouteLTE(*i.RouteLTE))
+	}
+	if i.RouteContains != nil {
+		predicates = append(predicates, notification.RouteContains(*i.RouteContains))
+	}
+	if i.RouteHasPrefix != nil {
+		predicates = append(predicates, notification.RouteHasPrefix(*i.RouteHasPrefix))
+	}
+	if i.RouteHasSuffix != nil {
+		predicates = append(predicates, notification.RouteHasSuffix(*i.RouteHasSuffix))
+	}
+	if i.RouteIsNil {
+		predicates = append(predicates, notification.RouteIsNil())
+	}
+	if i.RouteNotNil {
+		predicates = append(predicates, notification.RouteNotNil())
+	}
+	if i.RouteEqualFold != nil {
+		predicates = append(predicates, notification.RouteEqualFold(*i.RouteEqualFold))
+	}
+	if i.RouteContainsFold != nil {
+		predicates = append(predicates, notification.RouteContainsFold(*i.RouteContainsFold))
+	}
+	if i.Color != nil {
+		predicates = append(predicates, notification.ColorEQ(*i.Color))
+	}
+	if i.ColorNEQ != nil {
+		predicates = append(predicates, notification.ColorNEQ(*i.ColorNEQ))
+	}
+	if len(i.ColorIn) > 0 {
+		predicates = append(predicates, notification.ColorIn(i.ColorIn...))
+	}
+	if len(i.ColorNotIn) > 0 {
+		predicates = append(predicates, notification.ColorNotIn(i.ColorNotIn...))
+	}
+	if i.ColorGT != nil {
+		predicates = append(predicates, notification.ColorGT(*i.ColorGT))
+	}
+	if i.ColorGTE != nil {
+		predicates = append(predicates, notification.ColorGTE(*i.ColorGTE))
+	}
+	if i.ColorLT != nil {
+		predicates = append(predicates, notification.ColorLT(*i.ColorLT))
+	}
+	if i.ColorLTE != nil {
+		predicates = append(predicates, notification.ColorLTE(*i.ColorLTE))
+	}
+	if i.ColorContains != nil {
+		predicates = append(predicates, notification.ColorContains(*i.ColorContains))
+	}
+	if i.ColorHasPrefix != nil {
+		predicates = append(predicates, notification.ColorHasPrefix(*i.ColorHasPrefix))
+	}
+	if i.ColorHasSuffix != nil {
+		predicates = append(predicates, notification.ColorHasSuffix(*i.ColorHasSuffix))
+	}
+	if i.ColorIsNil {
+		predicates = append(predicates, notification.ColorIsNil())
+	}
+	if i.ColorNotNil {
+		predicates = append(predicates, notification.ColorNotNil())
+	}
+	if i.ColorEqualFold != nil {
+		predicates = append(predicates, notification.ColorEqualFold(*i.ColorEqualFold))
+	}
+	if i.ColorContainsFold != nil {
+		predicates = append(predicates, notification.ColorContainsFold(*i.ColorContainsFold))
+	}
+	if i.DeletedAt != nil {
+		predicates = append(predicates, notification.DeletedAtEQ(*i.DeletedAt))
+	}
+	if i.DeletedAtNEQ != nil {
+		predicates = append(predicates, notification.DeletedAtNEQ(*i.DeletedAtNEQ))
+	}
+	if len(i.DeletedAtIn) > 0 {
+		predicates = append(predicates, notification.DeletedAtIn(i.DeletedAtIn...))
+	}
+	if len(i.DeletedAtNotIn) > 0 {
+		predicates = append(predicates, notification.DeletedAtNotIn(i.DeletedAtNotIn...))
+	}
+	if i.DeletedAtGT != nil {
+		predicates = append(predicates, notification.DeletedAtGT(*i.DeletedAtGT))
+	}
+	if i.DeletedAtGTE != nil {
+		predicates = append(predicates, notification.DeletedAtGTE(*i.DeletedAtGTE))
+	}
+	if i.DeletedAtLT != nil {
+		predicates = append(predicates, notification.DeletedAtLT(*i.DeletedAtLT))
+	}
+	if i.DeletedAtLTE != nil {
+		predicates = append(predicates, notification.DeletedAtLTE(*i.DeletedAtLTE))
+	}
+	if i.DeletedAtIsNil {
+		predicates = append(predicates, notification.DeletedAtIsNil())
+	}
+	if i.DeletedAtNotNil {
+		predicates = append(predicates, notification.DeletedAtNotNil())
+	}
+
+	if i.HasStage != nil {
+		p := notification.HasStage()
+		if !*i.HasStage {
+			p = notification.Not(p)
+		}
+		predicates = append(predicates, p)
+	}
+	if len(i.HasStageWith) > 0 {
+		with := make([]predicate.Stage, 0, len(i.HasStageWith))
+		for _, w := range i.HasStageWith {
+			p, err := w.P()
+			if err != nil {
+				return nil, err
+			}
+			with = append(with, p)
+		}
+		predicates = append(predicates, notification.HasStageWith(with...))
+	}
+	switch len(predicates) {
+	case 0:
+		return nil, fmt.Errorf("github.com/msal4/hassah_school_server/ent: empty predicate NotificationWhereInput")
+	case 1:
+		return predicates[0], nil
+	default:
+		return notification.And(predicates...), nil
+	}
+}
+
 // ScheduleWhereInput represents a where input for filtering Schedule queries.
 type ScheduleWhereInput struct {
 	Not *ScheduleWhereInput   `json:"not,omitempty"`
@@ -3886,6 +4432,10 @@ type StageWhereInput struct {
 	// "course_grades" edge predicates.
 	HasCourseGrades     *bool                    `json:"hasCourseGrades,omitempty"`
 	HasCourseGradesWith []*CourseGradeWhereInput `json:"hasCourseGradesWith,omitempty"`
+
+	// "notifications" edge predicates.
+	HasNotifications     *bool                     `json:"hasNotifications,omitempty"`
+	HasNotificationsWith []*NotificationWhereInput `json:"hasNotificationsWith,omitempty"`
 }
 
 // Filter applies the StageWhereInput filter on the StageQuery builder.
@@ -4247,6 +4797,24 @@ func (i *StageWhereInput) P() (predicate.Stage, error) {
 			with = append(with, p)
 		}
 		predicates = append(predicates, stage.HasCourseGradesWith(with...))
+	}
+	if i.HasNotifications != nil {
+		p := stage.HasNotifications()
+		if !*i.HasNotifications {
+			p = stage.Not(p)
+		}
+		predicates = append(predicates, p)
+	}
+	if len(i.HasNotificationsWith) > 0 {
+		with := make([]predicate.Notification, 0, len(i.HasNotificationsWith))
+		for _, w := range i.HasNotificationsWith {
+			p, err := w.P()
+			if err != nil {
+				return nil, err
+			}
+			with = append(with, p)
+		}
+		predicates = append(predicates, stage.HasNotificationsWith(with...))
 	}
 	switch len(predicates) {
 	case 0:

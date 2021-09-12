@@ -105,6 +105,18 @@ func (m *MessageQuery) collectField(ctx *graphql.OperationContext, field graphql
 }
 
 // CollectFields tells the query-builder to eagerly load connected nodes by resolver context.
+func (n *NotificationQuery) CollectFields(ctx context.Context, satisfies ...string) *NotificationQuery {
+	if fc := graphql.GetFieldContext(ctx); fc != nil {
+		n = n.collectField(graphql.GetOperationContext(ctx), fc.Field, satisfies...)
+	}
+	return n
+}
+
+func (n *NotificationQuery) collectField(ctx *graphql.OperationContext, field graphql.CollectedField, satisfies ...string) *NotificationQuery {
+	return n
+}
+
+// CollectFields tells the query-builder to eagerly load connected nodes by resolver context.
 func (s *ScheduleQuery) CollectFields(ctx context.Context, satisfies ...string) *ScheduleQuery {
 	if fc := graphql.GetFieldContext(ctx); fc != nil {
 		s = s.collectField(graphql.GetOperationContext(ctx), fc.Field, satisfies...)
