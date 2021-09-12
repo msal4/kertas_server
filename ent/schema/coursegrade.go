@@ -17,6 +17,10 @@ type CourseGrade struct {
 func (CourseGrade) Fields() []ent.Field {
 	return []ent.Field{
 		field.UUID("id", uuid.UUID{}).Default(uuid.New),
+		field.Enum("course").NamedValues(
+			"First", "FIRST",
+			"Second", "SECOND",
+		),
 		field.Int("activity_first").Positive().Optional().Nillable().Annotations(entgql.OrderField("ACTIVITY_FIRST")),
 		field.Int("activity_second").Positive().Optional().Nillable().Annotations(entgql.OrderField("ACTIVITY_SECOND")),
 		field.Int("written_first").Positive().Optional().Nillable().Annotations(entgql.OrderField("WRITTEN_FIRST")),
@@ -42,6 +46,6 @@ func (CourseGrade) Edges() []ent.Edge {
 
 func (CourseGrade) Indexes() []ent.Index {
 	return []ent.Index{
-		index.Edges("student", "class", "stage").Unique(),
+		index.Edges("student", "class", "stage").Fields("course").Unique(),
 	}
 }

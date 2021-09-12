@@ -134,27 +134,27 @@ func init() {
 	// coursegrade.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
 	coursegrade.UpdateDefaultUpdatedAt = coursegradeDescUpdatedAt.UpdateDefault.(func() time.Time)
 	// coursegradeDescActivityFirst is the schema descriptor for activity_first field.
-	coursegradeDescActivityFirst := coursegradeFields[1].Descriptor()
+	coursegradeDescActivityFirst := coursegradeFields[2].Descriptor()
 	// coursegrade.ActivityFirstValidator is a validator for the "activity_first" field. It is called by the builders before save.
 	coursegrade.ActivityFirstValidator = coursegradeDescActivityFirst.Validators[0].(func(int) error)
 	// coursegradeDescActivitySecond is the schema descriptor for activity_second field.
-	coursegradeDescActivitySecond := coursegradeFields[2].Descriptor()
+	coursegradeDescActivitySecond := coursegradeFields[3].Descriptor()
 	// coursegrade.ActivitySecondValidator is a validator for the "activity_second" field. It is called by the builders before save.
 	coursegrade.ActivitySecondValidator = coursegradeDescActivitySecond.Validators[0].(func(int) error)
 	// coursegradeDescWrittenFirst is the schema descriptor for written_first field.
-	coursegradeDescWrittenFirst := coursegradeFields[3].Descriptor()
+	coursegradeDescWrittenFirst := coursegradeFields[4].Descriptor()
 	// coursegrade.WrittenFirstValidator is a validator for the "written_first" field. It is called by the builders before save.
 	coursegrade.WrittenFirstValidator = coursegradeDescWrittenFirst.Validators[0].(func(int) error)
 	// coursegradeDescWrittenSecond is the schema descriptor for written_second field.
-	coursegradeDescWrittenSecond := coursegradeFields[4].Descriptor()
+	coursegradeDescWrittenSecond := coursegradeFields[5].Descriptor()
 	// coursegrade.WrittenSecondValidator is a validator for the "written_second" field. It is called by the builders before save.
 	coursegrade.WrittenSecondValidator = coursegradeDescWrittenSecond.Validators[0].(func(int) error)
 	// coursegradeDescCourseFinal is the schema descriptor for course_final field.
-	coursegradeDescCourseFinal := coursegradeFields[5].Descriptor()
+	coursegradeDescCourseFinal := coursegradeFields[6].Descriptor()
 	// coursegrade.CourseFinalValidator is a validator for the "course_final" field. It is called by the builders before save.
 	coursegrade.CourseFinalValidator = coursegradeDescCourseFinal.Validators[0].(func(int) error)
 	// coursegradeDescYear is the schema descriptor for year field.
-	coursegradeDescYear := coursegradeFields[6].Descriptor()
+	coursegradeDescYear := coursegradeFields[7].Descriptor()
 	// coursegrade.YearValidator is a validator for the "year" field. It is called by the builders before save.
 	coursegrade.YearValidator = coursegradeDescYear.Validators[0].(func(string) error)
 	// coursegradeDescID is the schema descriptor for id field.

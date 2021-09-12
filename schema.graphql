@@ -18,13 +18,6 @@ type PageInfo {
   endCursor: Cursor
 }
 
-enum State {
-  PRESENT
-  ABSENT
-  EXCUSED_ABSENT
-  SICK
-}
-
 enum Role {
   SUPER_ADMIN
   SCHOOL_ADMIN
@@ -51,6 +44,11 @@ enum SchoolOrderField {
 input SchoolOrder {
   field: SchoolOrderField
   direction: OrderDirection!
+}
+
+enum Course {
+  FIRST
+  SECOND
 }
 
 type School implements Node {
@@ -465,6 +463,7 @@ input UpdateScheduleInput {
 
 type CourseGrade implements Node {
   id: ID!
+  course: Course!
   activityFirst: Int
   activitySecond: Int
   writtenFirst: Int
@@ -510,6 +509,7 @@ input AddCourseGradeInput {
   studentID: ID!
   stageID: ID!
   classID: ID!
+  course: Course!
   activityFirst: Int
   activitySecond: Int
   writtenFirst: Int

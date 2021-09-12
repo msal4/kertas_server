@@ -417,7 +417,7 @@ func (cg *CourseGrade) Node(ctx context.Context) (node *Node, err error) {
 	node = &Node{
 		ID:     cg.ID,
 		Type:   "CourseGrade",
-		Fields: make([]*Field, 8),
+		Fields: make([]*Field, 9),
 		Edges:  make([]*Edge, 3),
 	}
 	var buf []byte
@@ -437,10 +437,18 @@ func (cg *CourseGrade) Node(ctx context.Context) (node *Node, err error) {
 		Name:  "updated_at",
 		Value: string(buf),
 	}
-	if buf, err = json.Marshal(cg.ActivityFirst); err != nil {
+	if buf, err = json.Marshal(cg.Course); err != nil {
 		return nil, err
 	}
 	node.Fields[2] = &Field{
+		Type:  "coursegrade.Course",
+		Name:  "course",
+		Value: string(buf),
+	}
+	if buf, err = json.Marshal(cg.ActivityFirst); err != nil {
+		return nil, err
+	}
+	node.Fields[3] = &Field{
 		Type:  "int",
 		Name:  "activity_first",
 		Value: string(buf),
@@ -448,7 +456,7 @@ func (cg *CourseGrade) Node(ctx context.Context) (node *Node, err error) {
 	if buf, err = json.Marshal(cg.ActivitySecond); err != nil {
 		return nil, err
 	}
-	node.Fields[3] = &Field{
+	node.Fields[4] = &Field{
 		Type:  "int",
 		Name:  "activity_second",
 		Value: string(buf),
@@ -456,7 +464,7 @@ func (cg *CourseGrade) Node(ctx context.Context) (node *Node, err error) {
 	if buf, err = json.Marshal(cg.WrittenFirst); err != nil {
 		return nil, err
 	}
-	node.Fields[4] = &Field{
+	node.Fields[5] = &Field{
 		Type:  "int",
 		Name:  "written_first",
 		Value: string(buf),
@@ -464,7 +472,7 @@ func (cg *CourseGrade) Node(ctx context.Context) (node *Node, err error) {
 	if buf, err = json.Marshal(cg.WrittenSecond); err != nil {
 		return nil, err
 	}
-	node.Fields[5] = &Field{
+	node.Fields[6] = &Field{
 		Type:  "int",
 		Name:  "written_second",
 		Value: string(buf),
@@ -472,7 +480,7 @@ func (cg *CourseGrade) Node(ctx context.Context) (node *Node, err error) {
 	if buf, err = json.Marshal(cg.CourseFinal); err != nil {
 		return nil, err
 	}
-	node.Fields[6] = &Field{
+	node.Fields[7] = &Field{
 		Type:  "int",
 		Name:  "course_final",
 		Value: string(buf),
@@ -480,7 +488,7 @@ func (cg *CourseGrade) Node(ctx context.Context) (node *Node, err error) {
 	if buf, err = json.Marshal(cg.Year); err != nil {
 		return nil, err
 	}
-	node.Fields[7] = &Field{
+	node.Fields[8] = &Field{
 		Type:  "string",
 		Name:  "year",
 		Value: string(buf),

@@ -3,14 +3,12 @@
 package model
 
 import (
-	"fmt"
-	"io"
-	"strconv"
 	"time"
 
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/google/uuid"
 	"github.com/msal4/hassah_school_server/ent/attendance"
+	"github.com/msal4/hassah_school_server/ent/coursegrade"
 	"github.com/msal4/hassah_school_server/ent/user"
 )
 
@@ -45,15 +43,16 @@ type AddClassInput struct {
 }
 
 type AddCourseGradeInput struct {
-	StudentID      uuid.UUID `json:"studentID"`
-	StageID        uuid.UUID `json:"stageID"`
-	ClassID        uuid.UUID `json:"classID"`
-	ActivityFirst  *int      `json:"activityFirst"`
-	ActivitySecond *int      `json:"activitySecond"`
-	WrittenFirst   *int      `json:"writtenFirst"`
-	WrittenSecond  *int      `json:"writtenSecond"`
-	CourseFinal    *int      `json:"courseFinal"`
-	Year           string    `json:"year"`
+	StudentID      uuid.UUID          `json:"studentID"`
+	StageID        uuid.UUID          `json:"stageID"`
+	ClassID        uuid.UUID          `json:"classID"`
+	Course         coursegrade.Course `json:"course"`
+	ActivityFirst  *int               `json:"activityFirst"`
+	ActivitySecond *int               `json:"activitySecond"`
+	WrittenFirst   *int               `json:"writtenFirst"`
+	WrittenSecond  *int               `json:"writtenSecond"`
+	CourseFinal    *int               `json:"courseFinal"`
+	Year           string             `json:"year"`
 }
 
 type AddGroupInput struct {
@@ -186,49 +185,4 @@ type UpdateUserInput struct {
 	Image    *graphql.Upload `json:"image"`
 	Active   *bool           `json:"active"`
 	StageID  *uuid.UUID      `json:"stageID"`
-}
-
-type State string
-
-const (
-	StatePresent       State = "PRESENT"
-	StateAbsent        State = "ABSENT"
-	StateExcusedAbsent State = "EXCUSED_ABSENT"
-	StateSick          State = "SICK"
-)
-
-var AllState = []State{
-	StatePresent,
-	StateAbsent,
-	StateExcusedAbsent,
-	StateSick,
-}
-
-func (e State) IsValid() bool {
-	switch e {
-	case StatePresent, StateAbsent, StateExcusedAbsent, StateSick:
-		return true
-	}
-	return false
-}
-
-func (e State) String() string {
-	return string(e)
-}
-
-func (e *State) UnmarshalGQL(v interface{}) error {
-	str, ok := v.(string)
-	if !ok {
-		return fmt.Errorf("enums must be strings")
-	}
-
-	*e = State(str)
-	if !e.IsValid() {
-		return fmt.Errorf("%s is not a valid State", str)
-	}
-	return nil
-}
-
-func (e State) MarshalGQL(w io.Writer) {
-	fmt.Fprint(w, strconv.Quote(e.String()))
 }
