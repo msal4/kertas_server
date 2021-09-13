@@ -252,7 +252,25 @@ func (s *Service) LoginUser(ctx context.Context, input model.LoginInput) (*model
 		return nil, InvalidCredsErr
 	}
 
-	return s.verifyUser(ctx, *u)
+	authData, err := s.verifyUser(ctx, *u)
+	if err != nil {
+		return nil, err
+	}
+
+	if input.PushToken != nil && *input.PushToken != "" {
+		for _, t := range u.PushTokens {
+			if t == *input.PushToken {
+				return authData, nil
+			}
+		}
+
+		err := u.Update().SetPushTokens(append(u.PushTokens, *input.PushToken)).Exec(ctx)
+		if err != nil {
+			return nil, fmt.Errorf("failed to setup push token: %v", err)
+		}
+	}
+
+	return authData, nil
 }
 
 func (s *Service) RefreshTokens(ctx context.Context, refreshToken string) (*model.AuthData, error) {

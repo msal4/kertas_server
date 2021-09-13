@@ -117,6 +117,12 @@ func (uc *UserCreate) SetNillableTokenVersion(i *int) *UserCreate {
 	return uc
 }
 
+// SetPushTokens sets the "push_tokens" field.
+func (uc *UserCreate) SetPushTokens(s []string) *UserCreate {
+	uc.mutation.SetPushTokens(s)
+	return uc
+}
+
 // SetRole sets the "role" field.
 func (uc *UserCreate) SetRole(u user.Role) *UserCreate {
 	uc.mutation.SetRole(u)
@@ -585,6 +591,14 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 			Column: user.FieldTokenVersion,
 		})
 		_node.TokenVersion = value
+	}
+	if value, ok := uc.mutation.PushTokens(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeJSON,
+			Value:  value,
+			Column: user.FieldPushTokens,
+		})
+		_node.PushTokens = value
 	}
 	if value, ok := uc.mutation.Role(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{

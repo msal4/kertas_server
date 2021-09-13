@@ -382,6 +382,22 @@ func (r *mutationResolver) DeleteAttendance(ctx context.Context, id uuid.UUID) (
 	return true, r.s.DeleteAttendance(ctx, id)
 }
 
+func (r *mutationResolver) AddNotification(ctx context.Context, input model.AddNotificationInput) (*ent.Notification, error) {
+	if !auth.IsAuthorized(ctx, user.RoleSuperAdmin, user.RoleSchoolAdmin, user.RoleTeacher) {
+		return nil, auth.UnauthorizedErr
+	}
+
+	return r.s.AddNotification(ctx, input)
+}
+
+func (r *mutationResolver) DeleteNotification(ctx context.Context, id uuid.UUID) (bool, error) {
+	if !auth.IsAuthorized(ctx, user.RoleSuperAdmin, user.RoleSchoolAdmin, user.RoleTeacher) {
+		return false, auth.UnauthorizedErr
+	}
+
+	return true, r.s.DeleteNotification(ctx, id)
+}
+
 func (r *queryResolver) Me(ctx context.Context) (*ent.User, error) {
 	u, ok := auth.UserForContext(ctx)
 	if !ok {
@@ -632,6 +648,38 @@ func (r *queryResolver) Attendances(ctx context.Context, studentID *uuid.UUID, c
 		StudentID: studentID,
 		ClassID:   classID,
 	})
+}
+
+func (r *queryResolver) Notifications(ctx context.Context, stageID *uuid.UUID, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.NotificationOrder, where *ent.NotificationWhereInput) (*ent.NotificationConnection, error) {
+	u, ok := auth.UserForContext(ctx)
+	if !ok {
+		return nil, auth.UnauthorizedErr
+	}
+
+	usr, err := r.s.EC.User.Query().Where(user.ID(u.ID)).WithStage().WithSchool().Only(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	opts := service.NotificationsOptions{
+		After:   after,
+		First:   first,
+		Before:  before,
+		Last:    last,
+		OrderBy: orderBy,
+		Where:   where,
+		StageID: stageID,
+	}
+
+	if usr.Role == user.RoleStudent {
+		opts.StageID = &usr.Edges.Stage.ID
+	}
+
+	if usr.Role == user.RoleTeacher || usr.Role == user.RoleSchoolAdmin {
+		opts.SchoolID = &usr.Edges.School.ID
+	}
+
+	return r.s.Notifications(ctx, opts)
 }
 
 func (r *schoolResolver) Users(ctx context.Context, obj *ent.School, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.UserOrder, where *ent.UserWhereInput) (*ent.UserConnection, error) {

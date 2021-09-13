@@ -50,9 +50,11 @@ type StageEdges struct {
 	Students []*User `json:"students,omitempty"`
 	// CourseGrades holds the value of the course_grades edge.
 	CourseGrades []*CourseGrade `json:"course_grades,omitempty"`
+	// Notifications holds the value of the notifications edge.
+	Notifications []*Notification `json:"notifications,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [5]bool
+	loadedTypes [6]bool
 }
 
 // SchoolOrErr returns the School value or an error if the edge
@@ -103,6 +105,15 @@ func (e StageEdges) CourseGradesOrErr() ([]*CourseGrade, error) {
 		return e.CourseGrades, nil
 	}
 	return nil, &NotLoadedError{edge: "course_grades"}
+}
+
+// NotificationsOrErr returns the Notifications value or an error if the edge
+// was not loaded in eager-loading.
+func (e StageEdges) NotificationsOrErr() ([]*Notification, error) {
+	if e.loadedTypes[5] {
+		return e.Notifications, nil
+	}
+	return nil, &NotLoadedError{edge: "notifications"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -221,6 +232,11 @@ func (s *Stage) QueryStudents() *UserQuery {
 // QueryCourseGrades queries the "course_grades" edge of the Stage entity.
 func (s *Stage) QueryCourseGrades() *CourseGradeQuery {
 	return (&StageClient{config: s.config}).QueryCourseGrades(s)
+}
+
+// QueryNotifications queries the "notifications" edge of the Stage entity.
+func (s *Stage) QueryNotifications() *NotificationQuery {
+	return (&StageClient{config: s.config}).QueryNotifications(s)
 }
 
 // Update returns a builder for updating this Stage.

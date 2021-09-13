@@ -209,6 +209,7 @@ input UpdateStageInput {
 input LoginInput {
   username: String!
   password: String!
+  pushToken: String
 }
 
 type AuthData {
@@ -668,6 +669,51 @@ input UpdateTuitionPaymentInput {
   paidAmount: Int
 }
 
+type Notification implements Node {
+  id: ID!
+  title: String!
+  body: String!
+  image: String!
+  route: String!
+  color: String!
+  createdAt: Time!
+  updatedAt: Time!
+
+  stage: Stage!
+}
+
+enum NotificationOrderField {
+  TITLE
+  BODY
+  CREATED_AT
+  UPDATED_AT
+}
+
+input NotificationOrder {
+  field: NotificationOrderField
+  direction: OrderDirection!
+}
+
+type NotificationEdge {
+  node: Notification
+  cursor: Cursor!
+}
+
+type NotificationConnection {
+  totalCount: Int!
+  pageInfo: PageInfo!
+  edges: [NotificationEdge]
+}
+
+input AddNotificationInput {
+  title: String!
+  body: String! = ""
+  image: Upload
+  route: String! = ""
+  color: String! = ""
+  stageID: ID!
+}
+
 type Query {
   me: User!
 
@@ -699,6 +745,8 @@ type Query {
   tuitionPayments(studentID: ID, stageID: ID, after: Cursor, first: Int, before: Cursor, last: Int, orderBy: TuitionPaymentOrder, where: TuitionPaymentWhereInput): TuitionPaymentConnection!
 
   attendances(studentID: ID, classID: ID, after: Cursor, first: Int, before: Cursor, last: Int, orderBy: AttendanceOrder, where: AttendanceWhereInput): AttendanceConnection!
+
+  notifications(stageID: ID, after: Cursor, first: Int, before: Cursor, last: Int, orderBy: NotificationOrder, where: NotificationWhereInput): NotificationConnection!
 }
 
 type Mutation {
@@ -755,6 +803,9 @@ type Mutation {
   addAttendance(input: AddAttendanceInput!): Attendance!
   updateAttendance(id: ID!, input: UpdateAttendanceInput!): Attendance!
   deleteAttendance(id: ID!): Boolean!
+
+  addNotification(input: AddNotificationInput!): Notification!
+  deleteNotification(id: ID!): Boolean!
 }
 
 type Subscription {

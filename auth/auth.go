@@ -116,8 +116,6 @@ func Middleware(h http.Handler, accessKey string) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ctx, err := ParseAuth(r.Context(), r.Header.Get("authorization"), accessKey)
 
-		fmt.Println("from auth:", err)
-
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusUnauthorized)
 			return

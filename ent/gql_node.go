@@ -19,6 +19,7 @@ import (
 	"github.com/msal4/hassah_school_server/ent/grade"
 	"github.com/msal4/hassah_school_server/ent/group"
 	"github.com/msal4/hassah_school_server/ent/message"
+	"github.com/msal4/hassah_school_server/ent/notification"
 	"github.com/msal4/hassah_school_server/ent/schedule"
 	"github.com/msal4/hassah_school_server/ent/school"
 	"github.com/msal4/hassah_school_server/ent/stage"
@@ -741,6 +742,91 @@ func (m *Message) Node(ctx context.Context) (node *Node, err error) {
 	return node, nil
 }
 
+func (n *Notification) Node(ctx context.Context) (node *Node, err error) {
+	node = &Node{
+		ID:     n.ID,
+		Type:   "Notification",
+		Fields: make([]*Field, 8),
+		Edges:  make([]*Edge, 1),
+	}
+	var buf []byte
+	if buf, err = json.Marshal(n.CreatedAt); err != nil {
+		return nil, err
+	}
+	node.Fields[0] = &Field{
+		Type:  "time.Time",
+		Name:  "created_at",
+		Value: string(buf),
+	}
+	if buf, err = json.Marshal(n.UpdatedAt); err != nil {
+		return nil, err
+	}
+	node.Fields[1] = &Field{
+		Type:  "time.Time",
+		Name:  "updated_at",
+		Value: string(buf),
+	}
+	if buf, err = json.Marshal(n.Title); err != nil {
+		return nil, err
+	}
+	node.Fields[2] = &Field{
+		Type:  "string",
+		Name:  "title",
+		Value: string(buf),
+	}
+	if buf, err = json.Marshal(n.Body); err != nil {
+		return nil, err
+	}
+	node.Fields[3] = &Field{
+		Type:  "string",
+		Name:  "body",
+		Value: string(buf),
+	}
+	if buf, err = json.Marshal(n.Image); err != nil {
+		return nil, err
+	}
+	node.Fields[4] = &Field{
+		Type:  "string",
+		Name:  "image",
+		Value: string(buf),
+	}
+	if buf, err = json.Marshal(n.Route); err != nil {
+		return nil, err
+	}
+	node.Fields[5] = &Field{
+		Type:  "string",
+		Name:  "route",
+		Value: string(buf),
+	}
+	if buf, err = json.Marshal(n.Color); err != nil {
+		return nil, err
+	}
+	node.Fields[6] = &Field{
+		Type:  "string",
+		Name:  "color",
+		Value: string(buf),
+	}
+	if buf, err = json.Marshal(n.DeletedAt); err != nil {
+		return nil, err
+	}
+	node.Fields[7] = &Field{
+		Type:  "time.Time",
+		Name:  "deleted_at",
+		Value: string(buf),
+	}
+	node.Edges[0] = &Edge{
+		Type: "Stage",
+		Name: "stage",
+	}
+	err = n.QueryStage().
+		Select(stage.FieldID).
+		Scan(ctx, &node.Edges[0].IDs)
+	if err != nil {
+		return nil, err
+	}
+	return node, nil
+}
+
 func (s *Schedule) Node(ctx context.Context) (node *Node, err error) {
 	node = &Node{
 		ID:     s.ID,
@@ -878,7 +964,7 @@ func (s *Stage) Node(ctx context.Context) (node *Node, err error) {
 		ID:     s.ID,
 		Type:   "Stage",
 		Fields: make([]*Field, 7),
-		Edges:  make([]*Edge, 5),
+		Edges:  make([]*Edge, 6),
 	}
 	var buf []byte
 	if buf, err = json.Marshal(s.CreatedAt); err != nil {
@@ -987,6 +1073,16 @@ func (s *Stage) Node(ctx context.Context) (node *Node, err error) {
 	if err != nil {
 		return nil, err
 	}
+	node.Edges[5] = &Edge{
+		Type: "Notification",
+		Name: "notifications",
+	}
+	err = s.QueryNotifications().
+		Select(notification.FieldID).
+		Scan(ctx, &node.Edges[5].IDs)
+	if err != nil {
+		return nil, err
+	}
 	return node, nil
 }
 
@@ -1057,7 +1153,7 @@ func (u *User) Node(ctx context.Context) (node *Node, err error) {
 	node = &Node{
 		ID:     u.ID,
 		Type:   "User",
-		Fields: make([]*Field, 12),
+		Fields: make([]*Field, 13),
 		Edges:  make([]*Edge, 10),
 	}
 	var buf []byte
@@ -1383,6 +1479,14 @@ func (c *Client) noder(ctx context.Context, table string, id uuid.UUID) (Noder, 
 			return nil, err
 		}
 		return n, nil
+	case notification.Table:
+		n, err := c.Notification.Query().
+			Where(notification.ID(id)).
+			Only(ctx)
+		if err != nil {
+			return nil, err
+		}
+		return n, nil
 	case schedule.Table:
 		n, err := c.Schedule.Query().
 			Where(schedule.ID(id)).
@@ -1583,6 +1687,18 @@ func (c *Client) noders(ctx context.Context, table string, ids []uuid.UUID) ([]N
 	case message.Table:
 		nodes, err := c.Message.Query().
 			Where(message.IDIn(ids...)).
+			All(ctx)
+		if err != nil {
+			return nil, err
+		}
+		for _, node := range nodes {
+			for _, noder := range idmap[node.ID] {
+				*noder = node
+			}
+		}
+	case notification.Table:
+		nodes, err := c.Notification.Query().
+			Where(notification.IDIn(ids...)).
 			All(ctx)
 		if err != nil {
 			return nil, err

@@ -14,6 +14,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/msal4/hassah_school_server/ent/class"
 	"github.com/msal4/hassah_school_server/ent/coursegrade"
+	"github.com/msal4/hassah_school_server/ent/notification"
 	"github.com/msal4/hassah_school_server/ent/predicate"
 	"github.com/msal4/hassah_school_server/ent/school"
 	"github.com/msal4/hassah_school_server/ent/stage"
@@ -164,6 +165,21 @@ func (su *StageUpdate) AddCourseGrades(c ...*CourseGrade) *StageUpdate {
 	return su.AddCourseGradeIDs(ids...)
 }
 
+// AddNotificationIDs adds the "notifications" edge to the Notification entity by IDs.
+func (su *StageUpdate) AddNotificationIDs(ids ...uuid.UUID) *StageUpdate {
+	su.mutation.AddNotificationIDs(ids...)
+	return su
+}
+
+// AddNotifications adds the "notifications" edges to the Notification entity.
+func (su *StageUpdate) AddNotifications(n ...*Notification) *StageUpdate {
+	ids := make([]uuid.UUID, len(n))
+	for i := range n {
+		ids[i] = n[i].ID
+	}
+	return su.AddNotificationIDs(ids...)
+}
+
 // Mutation returns the StageMutation object of the builder.
 func (su *StageUpdate) Mutation() *StageMutation {
 	return su.mutation
@@ -257,6 +273,27 @@ func (su *StageUpdate) RemoveCourseGrades(c ...*CourseGrade) *StageUpdate {
 		ids[i] = c[i].ID
 	}
 	return su.RemoveCourseGradeIDs(ids...)
+}
+
+// ClearNotifications clears all "notifications" edges to the Notification entity.
+func (su *StageUpdate) ClearNotifications() *StageUpdate {
+	su.mutation.ClearNotifications()
+	return su
+}
+
+// RemoveNotificationIDs removes the "notifications" edge to Notification entities by IDs.
+func (su *StageUpdate) RemoveNotificationIDs(ids ...uuid.UUID) *StageUpdate {
+	su.mutation.RemoveNotificationIDs(ids...)
+	return su
+}
+
+// RemoveNotifications removes "notifications" edges to Notification entities.
+func (su *StageUpdate) RemoveNotifications(n ...*Notification) *StageUpdate {
+	ids := make([]uuid.UUID, len(n))
+	for i := range n {
+		ids[i] = n[i].ID
+	}
+	return su.RemoveNotificationIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -670,6 +707,60 @@ func (su *StageUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	if su.mutation.NotificationsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   stage.NotificationsTable,
+			Columns: []string{stage.NotificationsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: notification.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := su.mutation.RemovedNotificationsIDs(); len(nodes) > 0 && !su.mutation.NotificationsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   stage.NotificationsTable,
+			Columns: []string{stage.NotificationsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: notification.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := su.mutation.NotificationsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   stage.NotificationsTable,
+			Columns: []string{stage.NotificationsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: notification.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if n, err = sqlgraph.UpdateNodes(ctx, su.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{stage.Label}
@@ -819,6 +910,21 @@ func (suo *StageUpdateOne) AddCourseGrades(c ...*CourseGrade) *StageUpdateOne {
 	return suo.AddCourseGradeIDs(ids...)
 }
 
+// AddNotificationIDs adds the "notifications" edge to the Notification entity by IDs.
+func (suo *StageUpdateOne) AddNotificationIDs(ids ...uuid.UUID) *StageUpdateOne {
+	suo.mutation.AddNotificationIDs(ids...)
+	return suo
+}
+
+// AddNotifications adds the "notifications" edges to the Notification entity.
+func (suo *StageUpdateOne) AddNotifications(n ...*Notification) *StageUpdateOne {
+	ids := make([]uuid.UUID, len(n))
+	for i := range n {
+		ids[i] = n[i].ID
+	}
+	return suo.AddNotificationIDs(ids...)
+}
+
 // Mutation returns the StageMutation object of the builder.
 func (suo *StageUpdateOne) Mutation() *StageMutation {
 	return suo.mutation
@@ -912,6 +1018,27 @@ func (suo *StageUpdateOne) RemoveCourseGrades(c ...*CourseGrade) *StageUpdateOne
 		ids[i] = c[i].ID
 	}
 	return suo.RemoveCourseGradeIDs(ids...)
+}
+
+// ClearNotifications clears all "notifications" edges to the Notification entity.
+func (suo *StageUpdateOne) ClearNotifications() *StageUpdateOne {
+	suo.mutation.ClearNotifications()
+	return suo
+}
+
+// RemoveNotificationIDs removes the "notifications" edge to Notification entities by IDs.
+func (suo *StageUpdateOne) RemoveNotificationIDs(ids ...uuid.UUID) *StageUpdateOne {
+	suo.mutation.RemoveNotificationIDs(ids...)
+	return suo
+}
+
+// RemoveNotifications removes "notifications" edges to Notification entities.
+func (suo *StageUpdateOne) RemoveNotifications(n ...*Notification) *StageUpdateOne {
+	ids := make([]uuid.UUID, len(n))
+	for i := range n {
+		ids[i] = n[i].ID
+	}
+	return suo.RemoveNotificationIDs(ids...)
 }
 
 // Select allows selecting one or more fields (columns) of the returned entity.
@@ -1341,6 +1468,60 @@ func (suo *StageUpdateOne) sqlSave(ctx context.Context) (_node *Stage, err error
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeUUID,
 					Column: coursegrade.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if suo.mutation.NotificationsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   stage.NotificationsTable,
+			Columns: []string{stage.NotificationsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: notification.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := suo.mutation.RemovedNotificationsIDs(); len(nodes) > 0 && !suo.mutation.NotificationsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   stage.NotificationsTable,
+			Columns: []string{stage.NotificationsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: notification.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := suo.mutation.NotificationsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   stage.NotificationsTable,
+			Columns: []string{stage.NotificationsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: notification.FieldID,
 				},
 			},
 		}

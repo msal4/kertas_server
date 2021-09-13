@@ -358,6 +358,45 @@ var (
 			},
 		},
 	}
+	// NotificationsColumns holds the columns for the "notifications" table.
+	NotificationsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeUUID},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "title", Type: field.TypeString},
+		{Name: "body", Type: field.TypeString, Nullable: true},
+		{Name: "image", Type: field.TypeString, Nullable: true},
+		{Name: "route", Type: field.TypeString, Nullable: true, Size: 9},
+		{Name: "color", Type: field.TypeString, Nullable: true},
+		{Name: "deleted_at", Type: field.TypeTime, Nullable: true},
+		{Name: "stage_notifications", Type: field.TypeUUID, Nullable: true},
+	}
+	// NotificationsTable holds the schema information for the "notifications" table.
+	NotificationsTable = &schema.Table{
+		Name:       "notifications",
+		Columns:    NotificationsColumns,
+		PrimaryKey: []*schema.Column{NotificationsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "notifications_stages_notifications",
+				Columns:    []*schema.Column{NotificationsColumns[9]},
+				RefColumns: []*schema.Column{StagesColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+		},
+		Indexes: []*schema.Index{
+			{
+				Name:    "notification_stage_notifications",
+				Unique:  false,
+				Columns: []*schema.Column{NotificationsColumns[9]},
+			},
+			{
+				Name:    "notification_deleted_at",
+				Unique:  false,
+				Columns: []*schema.Column{NotificationsColumns[8]},
+			},
+		},
+	}
 	// SchedulesColumns holds the columns for the "schedules" table.
 	SchedulesColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeUUID},
@@ -518,6 +557,7 @@ var (
 		{Name: "image", Type: field.TypeString, Nullable: true},
 		{Name: "directory", Type: field.TypeString},
 		{Name: "token_version", Type: field.TypeInt, Default: 0},
+		{Name: "push_tokens", Type: field.TypeJSON, Nullable: true},
 		{Name: "role", Type: field.TypeEnum, Enums: []string{"SUPER_ADMIN", "SCHOOL_ADMIN", "TEACHER", "STUDENT"}, Default: "STUDENT"},
 		{Name: "active", Type: field.TypeBool, Default: true},
 		{Name: "deleted_at", Type: field.TypeTime, Nullable: true},
@@ -532,13 +572,13 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "users_schools_users",
-				Columns:    []*schema.Column{UsersColumns[13]},
+				Columns:    []*schema.Column{UsersColumns[14]},
 				RefColumns: []*schema.Column{SchoolsColumns[0]},
 				OnDelete:   schema.Cascade,
 			},
 			{
 				Symbol:     "users_stages_students",
-				Columns:    []*schema.Column{UsersColumns[14]},
+				Columns:    []*schema.Column{UsersColumns[15]},
 				RefColumns: []*schema.Column{StagesColumns[0]},
 				OnDelete:   schema.Cascade,
 			},
@@ -547,27 +587,27 @@ var (
 			{
 				Name:    "user_stage_students",
 				Unique:  false,
-				Columns: []*schema.Column{UsersColumns[14]},
+				Columns: []*schema.Column{UsersColumns[15]},
 			},
 			{
 				Name:    "user_school_users",
 				Unique:  false,
-				Columns: []*schema.Column{UsersColumns[13]},
+				Columns: []*schema.Column{UsersColumns[14]},
 			},
 			{
 				Name:    "user_active",
 				Unique:  false,
-				Columns: []*schema.Column{UsersColumns[11]},
+				Columns: []*schema.Column{UsersColumns[12]},
 			},
 			{
 				Name:    "user_role",
 				Unique:  false,
-				Columns: []*schema.Column{UsersColumns[10]},
+				Columns: []*schema.Column{UsersColumns[11]},
 			},
 			{
 				Name:    "user_deleted_at",
 				Unique:  false,
-				Columns: []*schema.Column{UsersColumns[12]},
+				Columns: []*schema.Column{UsersColumns[13]},
 			},
 		},
 	}
@@ -606,6 +646,7 @@ var (
 		GradesTable,
 		GroupsTable,
 		MessagesTable,
+		NotificationsTable,
 		SchedulesTable,
 		SchoolsTable,
 		StagesTable,
@@ -631,6 +672,7 @@ func init() {
 	GroupsTable.ForeignKeys[0].RefTable = ClassesTable
 	MessagesTable.ForeignKeys[0].RefTable = GroupsTable
 	MessagesTable.ForeignKeys[1].RefTable = UsersTable
+	NotificationsTable.ForeignKeys[0].RefTable = StagesTable
 	SchedulesTable.ForeignKeys[0].RefTable = ClassesTable
 	StagesTable.ForeignKeys[0].RefTable = SchoolsTable
 	TuitionPaymentsTable.ForeignKeys[0].RefTable = StagesTable

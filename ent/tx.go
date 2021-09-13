@@ -28,6 +28,8 @@ type Tx struct {
 	Group *GroupClient
 	// Message is the client for interacting with the Message builders.
 	Message *MessageClient
+	// Notification is the client for interacting with the Notification builders.
+	Notification *NotificationClient
 	// Schedule is the client for interacting with the Schedule builders.
 	Schedule *ScheduleClient
 	// School is the client for interacting with the School builders.
@@ -181,6 +183,7 @@ func (tx *Tx) init() {
 	tx.Grade = NewGradeClient(tx.config)
 	tx.Group = NewGroupClient(tx.config)
 	tx.Message = NewMessageClient(tx.config)
+	tx.Notification = NewNotificationClient(tx.config)
 	tx.Schedule = NewScheduleClient(tx.config)
 	tx.School = NewSchoolClient(tx.config)
 	tx.Stage = NewStageClient(tx.config)

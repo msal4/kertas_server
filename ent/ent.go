@@ -16,6 +16,7 @@ import (
 	"github.com/msal4/hassah_school_server/ent/grade"
 	"github.com/msal4/hassah_school_server/ent/group"
 	"github.com/msal4/hassah_school_server/ent/message"
+	"github.com/msal4/hassah_school_server/ent/notification"
 	"github.com/msal4/hassah_school_server/ent/schedule"
 	"github.com/msal4/hassah_school_server/ent/school"
 	"github.com/msal4/hassah_school_server/ent/stage"
@@ -49,6 +50,7 @@ func columnChecker(table string) func(string) error {
 		grade.Table:                grade.ValidColumn,
 		group.Table:                group.ValidColumn,
 		message.Table:              message.ValidColumn,
+		notification.Table:         notification.ValidColumn,
 		schedule.Table:             schedule.ValidColumn,
 		school.Table:               school.ValidColumn,
 		stage.Table:                stage.ValidColumn,

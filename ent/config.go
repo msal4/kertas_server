@@ -32,6 +32,7 @@ type hooks struct {
 	Grade                []ent.Hook
 	Group                []ent.Hook
 	Message              []ent.Hook
+	Notification         []ent.Hook
 	Schedule             []ent.Hook
 	School               []ent.Hook
 	Stage                []ent.Hook
