@@ -22,7 +22,12 @@ func init() {
 }
 
 func loadConfig() server.Config {
-	f, err := os.Open("./config.yml")
+	var cfgPath = os.Getenv("SCHOOL_CONFIG")
+	if cfgPath == "" {
+		cfgPath = "./config.yml"
+	}
+
+	f, err := os.Open(cfgPath)
 	if err != nil {
 		log.Fatal(err)
 	}
