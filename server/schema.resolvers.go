@@ -650,7 +650,7 @@ func (r *queryResolver) Attendances(ctx context.Context, studentID *uuid.UUID, c
 	})
 }
 
-func (r *queryResolver) Notificaitons(ctx context.Context, stageID *uuid.UUID, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.NotificationOrder, where *ent.NotificationWhereInput) (*ent.NotificationConnection, error) {
+func (r *queryResolver) Notifications(ctx context.Context, stageID *uuid.UUID, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.NotificationOrder, where *ent.NotificationWhereInput) (*ent.NotificationConnection, error) {
 	u, ok := auth.UserForContext(ctx)
 	if !ok {
 		return nil, auth.UnauthorizedErr

@@ -746,7 +746,7 @@ type Query {
 
   attendances(studentID: ID, classID: ID, after: Cursor, first: Int, before: Cursor, last: Int, orderBy: AttendanceOrder, where: AttendanceWhereInput): AttendanceConnection!
 
-  notificaitons(stageID: ID, after: Cursor, first: Int, before: Cursor, last: Int, orderBy: NotificationOrder, where: NotificationWhereInput): NotificationConnection!
+  notifications(stageID: ID, after: Cursor, first: Int, before: Cursor, last: Int, orderBy: NotificationOrder, where: NotificationWhereInput): NotificationConnection!
 }
 
 type Mutation {

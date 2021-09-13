@@ -319,7 +319,7 @@ type ComplexityRoot struct {
 		Groups                func(childComplexity int, userID *uuid.UUID, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.GroupOrder, where *ent.GroupWhereInput) int
 		Me                    func(childComplexity int) int
 		Messages              func(childComplexity int, groupID uuid.UUID, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.MessageOrder, where *ent.MessageWhereInput) int
-		Notificaitons         func(childComplexity int, stageID *uuid.UUID, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.NotificationOrder, where *ent.NotificationWhereInput) int
+		Notifications         func(childComplexity int, stageID *uuid.UUID, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.NotificationOrder, where *ent.NotificationWhereInput) int
 		Schedule              func(childComplexity int, stageID *uuid.UUID, weekday *time.Weekday) int
 		School                func(childComplexity int, id uuid.UUID) int
 		Schools               func(childComplexity int, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.SchoolOrder, where *ent.SchoolWhereInput) int
@@ -530,7 +530,7 @@ type QueryResolver interface {
 	CourseGrades(ctx context.Context, studentID *uuid.UUID, stageID *uuid.UUID, classID *uuid.UUID, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.CourseGradeOrder, where *ent.CourseGradeWhereInput) (*ent.CourseGradeConnection, error)
 	TuitionPayments(ctx context.Context, studentID *uuid.UUID, stageID *uuid.UUID, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.TuitionPaymentOrder, where *ent.TuitionPaymentWhereInput) (*ent.TuitionPaymentConnection, error)
 	Attendances(ctx context.Context, studentID *uuid.UUID, classID *uuid.UUID, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.AttendanceOrder, where *ent.AttendanceWhereInput) (*ent.AttendanceConnection, error)
-	Notificaitons(ctx context.Context, stageID *uuid.UUID, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.NotificationOrder, where *ent.NotificationWhereInput) (*ent.NotificationConnection, error)
+	Notifications(ctx context.Context, stageID *uuid.UUID, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.NotificationOrder, where *ent.NotificationWhereInput) (*ent.NotificationConnection, error)
 }
 type SchoolResolver interface {
 	Users(ctx context.Context, obj *ent.School, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.UserOrder, where *ent.UserWhereInput) (*ent.UserConnection, error)
@@ -2087,17 +2087,17 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Query.Messages(childComplexity, args["groupID"].(uuid.UUID), args["after"].(*ent.Cursor), args["first"].(*int), args["before"].(*ent.Cursor), args["last"].(*int), args["orderBy"].(*ent.MessageOrder), args["where"].(*ent.MessageWhereInput)), true
 
-	case "Query.notificaitons":
-		if e.complexity.Query.Notificaitons == nil {
+	case "Query.notifications":
+		if e.complexity.Query.Notifications == nil {
 			break
 		}
 
-		args, err := ec.field_Query_notificaitons_args(context.TODO(), rawArgs)
+		args, err := ec.field_Query_notifications_args(context.TODO(), rawArgs)
 		if err != nil {
 			return 0, false
 		}
 
-		return e.complexity.Query.Notificaitons(childComplexity, args["stageID"].(*uuid.UUID), args["after"].(*ent.Cursor), args["first"].(*int), args["before"].(*ent.Cursor), args["last"].(*int), args["orderBy"].(*ent.NotificationOrder), args["where"].(*ent.NotificationWhereInput)), true
+		return e.complexity.Query.Notifications(childComplexity, args["stageID"].(*uuid.UUID), args["after"].(*ent.Cursor), args["first"].(*int), args["before"].(*ent.Cursor), args["last"].(*int), args["orderBy"].(*ent.NotificationOrder), args["where"].(*ent.NotificationWhereInput)), true
 
 	case "Query.schedule":
 		if e.complexity.Query.Schedule == nil {
@@ -3597,7 +3597,7 @@ type Query {
 
   attendances(studentID: ID, classID: ID, after: Cursor, first: Int, before: Cursor, last: Int, orderBy: AttendanceOrder, where: AttendanceWhereInput): AttendanceConnection!
 
-  notificaitons(stageID: ID, after: Cursor, first: Int, before: Cursor, last: Int, orderBy: NotificationOrder, where: NotificationWhereInput): NotificationConnection!
+  notifications(stageID: ID, after: Cursor, first: Int, before: Cursor, last: Int, orderBy: NotificationOrder, where: NotificationWhereInput): NotificationConnection!
 }
 
 type Mutation {
@@ -6811,7 +6811,7 @@ func (ec *executionContext) field_Query_messages_args(ctx context.Context, rawAr
 	return args, nil
 }
 
-func (ec *executionContext) field_Query_notificaitons_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_Query_notifications_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
 	var arg0 *uuid.UUID
@@ -14638,7 +14638,7 @@ func (ec *executionContext) _Query_attendances(ctx context.Context, field graphq
 	return ec.marshalNAttendanceConnection2ᚖgithubᚗcomᚋmsal4ᚋhassah_school_serverᚋentᚐAttendanceConnection(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Query_notificaitons(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+func (ec *executionContext) _Query_notifications(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -14655,7 +14655,7 @@ func (ec *executionContext) _Query_notificaitons(ctx context.Context, field grap
 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	rawArgs := field.ArgumentMap(ec.Variables)
-	args, err := ec.field_Query_notificaitons_args(ctx, rawArgs)
+	args, err := ec.field_Query_notifications_args(ctx, rawArgs)
 	if err != nil {
 		ec.Error(ctx, err)
 		return graphql.Null
@@ -14663,7 +14663,7 @@ func (ec *executionContext) _Query_notificaitons(ctx context.Context, field grap
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Notificaitons(rctx, args["stageID"].(*uuid.UUID), args["after"].(*ent.Cursor), args["first"].(*int), args["before"].(*ent.Cursor), args["last"].(*int), args["orderBy"].(*ent.NotificationOrder), args["where"].(*ent.NotificationWhereInput))
+		return ec.resolvers.Query().Notifications(rctx, args["stageID"].(*uuid.UUID), args["after"].(*ent.Cursor), args["first"].(*int), args["before"].(*ent.Cursor), args["last"].(*int), args["orderBy"].(*ent.NotificationOrder), args["where"].(*ent.NotificationWhereInput))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -30292,7 +30292,7 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 				}
 				return res
 			})
-		case "notificaitons":
+		case "notifications":
 			field := field
 			out.Concurrently(i, func() (res graphql.Marshaler) {
 				defer func() {
@@ -30300,7 +30300,7 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Query_notificaitons(ctx, field)
+				res = ec._Query_notifications(ctx, field)
 				if res == graphql.Null {
 					atomic.AddUint32(&invalids, 1)
 				}
