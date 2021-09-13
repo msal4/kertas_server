@@ -118,7 +118,6 @@ func New(ec *ent.Client, mc *minio.Client, cfg *Config) (*Service, error) {
 // Config defaults.
 const (
 	defaultFilenameTimeFormat   = "02-01-06_15-04"
-	defaultRootBucket           = "root"
 	defaultMaxFilenameLen       = 6
 	defaultRandStringLen        = 6
 	defaultThumbnailSize        = 200
@@ -136,10 +135,6 @@ func getConfig(cfg *Config) *Config {
 
 	if cfg.RS == nil {
 		cfg.RS = rand.NewSource(time.Now().Unix())
-	}
-
-	if cfg.RootBucket == "" {
-		cfg.RootBucket = defaultRootBucket
 	}
 
 	if cfg.FilenameTimeFormat == "" {
