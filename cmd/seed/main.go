@@ -280,10 +280,22 @@ func seed(ctx context.Context, s *service.Service) error {
 
 	ass, err := s.AddAssignment(ctx, model.AddAssignmentInput{
 		ClassID:     cls3.ID,
-		Name:        "new assign",
-		Description: ptr.Str("descsdfksdkfj s"),
+		Name:        "Create a binary tree",
+		Description: ptr.Str("This exercise is just for testing purposes from scratch using the std lib only"),
 		File:        &graphql.Upload{File: f, Filename: f.Name(), Size: stat.Size(), ContentType: "image/jpeg"},
 		DueDate:     time.Now().Add(time.Hour * 100),
+	})
+	if err != nil {
+		return err
+	}
+	log.Printf("Created assignment: %v\n\n", ass)
+
+	ass, err = s.AddAssignment(ctx, model.AddAssignmentInput{
+		ClassID:     cls3.ID,
+		Name:        "Create a linked list",
+		Description: ptr.Str("This exercise is just for testing purposes from scratch using the std lib only"),
+		File:        &graphql.Upload{File: f, Filename: f.Name(), Size: stat.Size(), ContentType: "image/jpeg"},
+		DueDate:     time.Now().Add(time.Hour * 190),
 	})
 	if err != nil {
 		return err
