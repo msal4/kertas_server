@@ -120,6 +120,7 @@ const (
 	defaultFilenameTimeFormat   = "02-01-06_15-04"
 	defaultMaxFilenameLen       = 6
 	defaultRandStringLen        = 6
+	defaultRootBucket           = "root"
 	defaultThumbnailSize        = 200
 	defaultHQImageSize          = 1000
 	defaultAccessKey            = "dontusethedefaultaccesskey"
@@ -147,6 +148,10 @@ func getConfig(cfg *Config) *Config {
 
 	if cfg.MaxFilenameLen <= 0 {
 		cfg.MaxFilenameLen = defaultMaxFilenameLen
+	}
+
+	if cfg.RootBucket == "" {
+		cfg.RootBucket = defaultRootBucket
 	}
 
 	if cfg.ThumbnailSize.Width == 0 {
