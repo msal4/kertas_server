@@ -125,7 +125,7 @@ func (s *Service) UpdateAssignment(ctx context.Context, id uuid.UUID, input mode
 }
 
 func (s *Service) putFile(ctx context.Context, name string, f *graphql.Upload) (minio.UploadInfo, error) {
-	return s.MC.PutObject(ctx, s.Config.RootBucket, name, f.File, f.Size, minio.PutObjectOptions{})
+	return s.MC.PutObject(ctx, s.Config.RootBucket, name, f.File, f.Size, minio.PutObjectOptions{UserMetadata: defaultMetadata})
 }
 
 func (s *Service) DeleteAssignment(ctx context.Context, id uuid.UUID) error {

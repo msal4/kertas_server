@@ -54,6 +54,8 @@ const (
 	jpgExt          = ".jpg"
 )
 
+var defaultMetadata = map[string]string{"x-amz-acl": "public-read"}
+
 func (s *Service) PutImage(ctx context.Context, opts PutImageOptions) (minio.UploadInfo, error) {
 	if opts.Upload.File == nil {
 		return minio.UploadInfo{}, errors.New("image file is required")
@@ -83,7 +85,7 @@ func (s *Service) PutImage(ctx context.Context, opts PutImageOptions) (minio.Upl
 	ext := opts.Filename[strings.LastIndex(opts.Filename, "."):]
 
 	thumbInfo, err := s.MC.PutObject(ctx, s.Config.RootBucket, strings.Replace(opts.Filename, ext, jpgExt, 1),
-		&thumbBuf, int64(thumbBuf.Len()), minio.PutObjectOptions{ContentType: "image/jpeg"})
+		&thumbBuf, int64(thumbBuf.Len()), minio.PutObjectOptions{ContentType: "image/jpeg", UserMetadata: defaultMetadata})
 	if err != nil {
 		return thumbInfo, err
 	}
@@ -95,7 +97,7 @@ func (s *Service) PutImage(ctx context.Context, opts PutImageOptions) (minio.Upl
 	}
 
 	info, err := s.MC.PutObject(ctx, s.Config.RootBucket, strings.Replace(opts.Filename, thumbnailSuffix+ext, hqSuffix+jpgExt, 1),
-		&imgBuf, int64(imgBuf.Len()), minio.PutObjectOptions{ContentType: "image/jpeg"})
+		&imgBuf, int64(imgBuf.Len()), minio.PutObjectOptions{ContentType: "image/jpeg", UserMetadata: defaultMetadata})
 	if err != nil {
 		return info, err
 	}

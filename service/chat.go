@@ -55,7 +55,7 @@ func (s *Service) PostMessage(ctx context.Context, senderID uuid.UUID, input mod
 			path.Join(u.Directory, s.FormatFilename(input.Attachment.Filename, "")),
 			input.Attachment.File,
 			input.Attachment.Size,
-			minio.PutObjectOptions{},
+			minio.PutObjectOptions{UserMetadata: defaultMetadata},
 		)
 		if err != nil {
 			return nil, fmt.Errorf("uploading attachment: %v", err)

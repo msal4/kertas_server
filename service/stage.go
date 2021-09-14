@@ -29,7 +29,7 @@ func (s *Service) Stages(ctx context.Context, opts StagesOptions) (*ent.StageCon
 func (s *Service) AddStage(ctx context.Context, input model.AddStageInput) (*ent.Stage, error) {
 	dir := s.FormatFilename(input.Name, "") + "/"
 
-	_, err := s.MC.PutObject(ctx, s.Config.RootBucket, dir, bytes.NewBuffer([]byte{}), 0, minio.PutObjectOptions{})
+	_, err := s.MC.PutObject(ctx, s.Config.RootBucket, dir, bytes.NewBuffer([]byte{}), 0, minio.PutObjectOptions{UserMetadata: defaultMetadata})
 	if err != nil {
 		return nil, err
 	}
