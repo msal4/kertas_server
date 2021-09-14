@@ -145,12 +145,37 @@ func (r *mutationResolver) DeleteStagePermanently(ctx context.Context, id uuid.U
 	return true, r.s.DeleteStagePermanently(ctx, id)
 }
 
+func getLoginErrs(ctx context.Context, err error) error {
+	if err == nil {
+		return nil
+	}
+
+	exts := map[string]interface{}{}
+
+	switch err {
+	case service.NotFoundErr:
+		exts["code"] = "NOT_FOUND"
+	case service.InvalidCredsErr:
+		exts["code"] = "INVALID_CREDS"
+	case service.NotAllowedErr:
+		exts["code"] = "NOT_ALLOWED"
+	}
+
+	return &gqlerror.Error{
+		Message:    err.Error(),
+		Path:       graphql.GetPath(ctx),
+		Extensions: exts,
+	}
+}
+
 func (r *mutationResolver) LoginAdmin(ctx context.Context, input model.LoginInput) (*model.AuthData, error) {
-	return r.s.LoginAdmin(ctx, input)
+	data, err := r.s.LoginAdmin(ctx, input)
+	return data, getLoginErrs(ctx, err)
 }
 
 func (r *mutationResolver) LoginUser(ctx context.Context, input model.LoginInput) (*model.AuthData, error) {
-	return r.s.LoginUser(ctx, input)
+	data, err := r.s.LoginUser(ctx, input)
+	return data, getLoginErrs(ctx, err)
 }
 
 func (r *mutationResolver) RefreshTokens(ctx context.Context, token string) (*model.AuthData, error) {
