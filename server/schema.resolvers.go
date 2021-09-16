@@ -672,6 +672,8 @@ func (r *queryResolver) Attendances(ctx context.Context, studentID *uuid.UUID, c
 		Last:      last,
 		StudentID: studentID,
 		ClassID:   classID,
+		OrderBy:   orderBy,
+		Where:     where,
 	})
 }
 

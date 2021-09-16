@@ -15,6 +15,7 @@ import (
 	"github.com/minio/minio-go/v7"
 	"github.com/minio/minio-go/v7/pkg/credentials"
 	"github.com/msal4/hassah_school_server/ent"
+	"github.com/msal4/hassah_school_server/ent/attendance"
 	"github.com/msal4/hassah_school_server/ent/coursegrade"
 	"github.com/msal4/hassah_school_server/ent/user"
 	"github.com/msal4/hassah_school_server/server"
@@ -232,6 +233,42 @@ func seed(ctx context.Context, s *service.Service) error {
 		return err
 	}
 	log.Printf("Created student: %v\n\n", stdt)
+
+	s.AddAttendance(ctx, model.AddAttendanceInput{Date: time.Now().Add(-time.Hour * 24), State: attendance.StateAbsent, ClassID: cls.ID, StudentID: stdt.ID})
+	s.AddAttendance(ctx, model.AddAttendanceInput{Date: time.Now().Add(-time.Hour * 24 * 2), State: attendance.StatePresent, ClassID: cls.ID, StudentID: stdt.ID})
+	s.AddAttendance(ctx, model.AddAttendanceInput{Date: time.Now().Add(-time.Hour * 24 * 2), State: attendance.StateExcusedAbsence, ClassID: cls2.ID, StudentID: stdt.ID})
+	s.AddAttendance(ctx, model.AddAttendanceInput{Date: time.Now().Add(-time.Hour * 24 * 2), State: attendance.StateSick, ClassID: cls3.ID, StudentID: stdt.ID})
+	s.AddAttendance(ctx, model.AddAttendanceInput{Date: time.Now().Add(-time.Hour * 24), State: attendance.StateAbsent, ClassID: cls.ID, StudentID: stdt.ID})
+	s.AddAttendance(ctx, model.AddAttendanceInput{Date: time.Now().Add(-time.Hour * 24), State: attendance.StateAbsent, ClassID: cls.ID, StudentID: stdt.ID})
+	s.AddAttendance(ctx, model.AddAttendanceInput{Date: time.Now().Add(-time.Hour * 24), State: attendance.StateAbsent, ClassID: cls.ID, StudentID: stdt.ID})
+	s.AddAttendance(ctx, model.AddAttendanceInput{Date: time.Now().Add(-time.Hour * 24), State: attendance.StateAbsent, ClassID: cls.ID, StudentID: stdt.ID})
+	s.AddAttendance(ctx, model.AddAttendanceInput{Date: time.Now().Add(-time.Hour * 24), State: attendance.StateAbsent, ClassID: cls.ID, StudentID: stdt.ID})
+	s.AddAttendance(ctx, model.AddAttendanceInput{Date: time.Now().Add(-time.Hour * 24), State: attendance.StateAbsent, ClassID: cls.ID, StudentID: stdt.ID})
+	s.AddAttendance(ctx, model.AddAttendanceInput{Date: time.Now().Add(-time.Hour * 24), State: attendance.StateAbsent, ClassID: cls.ID, StudentID: stdt.ID})
+	s.AddAttendance(ctx, model.AddAttendanceInput{Date: time.Now().Add(-time.Hour * 24), State: attendance.StateAbsent, ClassID: cls.ID, StudentID: stdt.ID})
+	s.AddAttendance(ctx, model.AddAttendanceInput{Date: time.Now().Add(-time.Hour * 24), State: attendance.StateAbsent, ClassID: cls.ID, StudentID: stdt.ID})
+	s.AddAttendance(ctx, model.AddAttendanceInput{Date: time.Now().Add(-time.Hour * 24), State: attendance.StateAbsent, ClassID: cls.ID, StudentID: stdt.ID})
+	s.AddAttendance(ctx, model.AddAttendanceInput{Date: time.Now().Add(-time.Hour * 24), State: attendance.StateAbsent, ClassID: cls.ID, StudentID: stdt.ID})
+	s.AddAttendance(ctx, model.AddAttendanceInput{Date: time.Now().Add(-time.Hour * 24), State: attendance.StateAbsent, ClassID: cls.ID, StudentID: stdt.ID})
+	s.AddAttendance(ctx, model.AddAttendanceInput{Date: time.Now().Add(-time.Hour * 24), State: attendance.StateAbsent, ClassID: cls.ID, StudentID: stdt.ID})
+	s.AddAttendance(ctx, model.AddAttendanceInput{Date: time.Now().Add(-time.Hour * 24), State: attendance.StateAbsent, ClassID: cls.ID, StudentID: stdt.ID})
+	s.AddAttendance(ctx, model.AddAttendanceInput{Date: time.Now().Add(-time.Hour * 24), State: attendance.StateAbsent, ClassID: cls.ID, StudentID: stdt.ID})
+	s.AddAttendance(ctx, model.AddAttendanceInput{Date: time.Now().Add(-time.Hour * 24), State: attendance.StateAbsent, ClassID: cls.ID, StudentID: stdt.ID})
+	s.AddAttendance(ctx, model.AddAttendanceInput{Date: time.Now().Add(-time.Hour * 24), State: attendance.StateAbsent, ClassID: cls.ID, StudentID: stdt.ID})
+	s.AddAttendance(ctx, model.AddAttendanceInput{Date: time.Now().Add(-time.Hour * 24), State: attendance.StateAbsent, ClassID: cls.ID, StudentID: stdt.ID})
+	s.AddAttendance(ctx, model.AddAttendanceInput{Date: time.Now().Add(-time.Hour * 24), State: attendance.StateAbsent, ClassID: cls.ID, StudentID: stdt.ID})
+	s.AddAttendance(ctx, model.AddAttendanceInput{Date: time.Now().Add(-time.Hour * 24), State: attendance.StateAbsent, ClassID: cls.ID, StudentID: stdt.ID})
+	s.AddAttendance(ctx, model.AddAttendanceInput{Date: time.Now().Add(-time.Hour * 24), State: attendance.StateAbsent, ClassID: cls.ID, StudentID: stdt.ID})
+	s.AddAttendance(ctx, model.AddAttendanceInput{Date: time.Now().Add(-time.Hour * 24), State: attendance.StateAbsent, ClassID: cls.ID, StudentID: stdt.ID})
+	s.AddAttendance(ctx, model.AddAttendanceInput{Date: time.Now().Add(-time.Hour * 24), State: attendance.StateAbsent, ClassID: cls.ID, StudentID: stdt.ID})
+	s.AddAttendance(ctx, model.AddAttendanceInput{Date: time.Now().Add(-time.Hour * 24), State: attendance.StateAbsent, ClassID: cls.ID, StudentID: stdt.ID})
+	s.AddAttendance(ctx, model.AddAttendanceInput{Date: time.Now().Add(-time.Hour * 24), State: attendance.StateAbsent, ClassID: cls.ID, StudentID: stdt.ID})
+	s.AddAttendance(ctx, model.AddAttendanceInput{Date: time.Now().Add(-time.Hour * 24), State: attendance.StateAbsent, ClassID: cls.ID, StudentID: stdt.ID})
+	s.AddAttendance(ctx, model.AddAttendanceInput{Date: time.Now().Add(-time.Hour * 24), State: attendance.StateAbsent, ClassID: cls.ID, StudentID: stdt.ID})
+	s.AddAttendance(ctx, model.AddAttendanceInput{Date: time.Now().Add(-time.Hour * 24), State: attendance.StateAbsent, ClassID: cls.ID, StudentID: stdt.ID})
+	s.AddAttendance(ctx, model.AddAttendanceInput{Date: time.Now().Add(-time.Hour * 24), State: attendance.StateAbsent, ClassID: cls.ID, StudentID: stdt.ID})
+	s.AddAttendance(ctx, model.AddAttendanceInput{Date: time.Now().Add(-time.Hour * 24), State: attendance.StateAbsent, ClassID: cls.ID, StudentID: stdt.ID})
+	s.AddAttendance(ctx, model.AddAttendanceInput{Date: time.Now().Add(-time.Hour * 24), State: attendance.StateAbsent, ClassID: cls.ID, StudentID: stdt.ID})
 
 	_, err = s.AddCourseGrade(ctx, model.AddCourseGradeInput{
 		Course:         coursegrade.CourseFirst,
