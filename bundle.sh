@@ -1,24 +1,24 @@
 #!/bin/bash
 
 if rm -r ./build; then
-    echo removed ./build directory
+  echo removed ./build directory
 fi
 
 if ! go build -o build/migrate cmd/migrate-schema/main.go; then
-    echo failed to build migrate tool
-    exit
+  echo failed to build migrate tool
+  exit
 fi
 echo built migrate cmd in build/migrate
 
 if ! go build -o build/seed cmd/seed/main.go; then
-    echo failed to build seed tool
-    exit
+  echo failed to build seed tool
+  exit
 fi
 echo built seed cmd in build/seed
 
 if ! go build -o build/server cmd/server/main.go; then
-    echo failed to build server
-    exit
+  echo failed to build server
+  exit
 fi
 echo built server cmd in build/server
 
