@@ -19,7 +19,16 @@ type ScheduleOptions struct {
 }
 
 func (s *Service) Schedule(ctx context.Context, opts ScheduleOptions) ([]*ent.Schedule, error) {
-	b := s.EC.User.Query().Where(user.ID(opts.UserID)).QueryStage().QueryClasses().QuerySchedules()
+	u, err := s.EC.User.Get(ctx, opts.UserID)
+	if err != nil {
+		return nil, err
+	}
+
+	b := u.QueryStage().QueryClasses().QuerySchedules()
+	if u.Role == user.RoleTeacher {
+		b = u.QueryClasses().QuerySchedules()
+	}
+
 	if opts.StageID != nil {
 		b = s.EC.Stage.Query().Where(stage.ID(*opts.StageID)).QueryClasses().QuerySchedules()
 	}
