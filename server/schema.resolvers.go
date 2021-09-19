@@ -465,18 +465,29 @@ func (r *queryResolver) User(ctx context.Context, id uuid.UUID) (*ent.User, erro
 }
 
 func (r *queryResolver) Users(ctx context.Context, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.UserOrder, where *ent.UserWhereInput) (*ent.UserConnection, error) {
-	if !auth.IsSuperAdmin(ctx) {
+	u, ok := auth.UserForContext(ctx)
+	if !ok || (u.Role != user.RoleSuperAdmin && u.Role != user.RoleSchoolAdmin) {
 		return nil, auth.UnauthorizedErr
 	}
 
-	return r.s.Users(ctx, service.UsersOptions{
+	opts := service.UsersOptions{
 		After:   after,
 		First:   first,
 		Before:  before,
 		Last:    last,
 		OrderBy: orderBy,
 		Where:   where,
-	})
+	}
+
+	if u.Role == user.RoleSchoolAdmin {
+		schID, err := r.s.EC.User.Query().Where(user.ID(u.ID)).QuerySchool().OnlyID(ctx)
+		if err != nil {
+			return nil, err
+		}
+		opts.SchoolID = &schID
+	}
+
+	return r.s.Users(ctx, opts)
 }
 
 func (r *queryResolver) Stage(ctx context.Context, id uuid.UUID) (*ent.Stage, error) {

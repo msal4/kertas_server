@@ -13,22 +13,30 @@ import (
 	"github.com/minio/minio-go/v7"
 	"github.com/msal4/hassah_school_server/auth"
 	"github.com/msal4/hassah_school_server/ent"
+	"github.com/msal4/hassah_school_server/ent/school"
 	"github.com/msal4/hassah_school_server/ent/stage"
 	"github.com/msal4/hassah_school_server/ent/user"
 	"github.com/msal4/hassah_school_server/server/model"
 )
 
 type UsersOptions struct {
-	After   *ent.Cursor
-	First   *int
-	Before  *ent.Cursor
-	Last    *int
-	OrderBy *ent.UserOrder
-	Where   *ent.UserWhereInput
+	After    *ent.Cursor
+	First    *int
+	Before   *ent.Cursor
+	Last     *int
+	OrderBy  *ent.UserOrder
+	Where    *ent.UserWhereInput
+	SchoolID *uuid.UUID
 }
 
 func (s *Service) Users(ctx context.Context, opts UsersOptions) (*ent.UserConnection, error) {
-	return s.EC.User.Query().Where(user.DeletedAtIsNil()).Paginate(ctx, opts.After, opts.First, opts.Before, opts.Last,
+	b := s.EC.User.Query().Where(user.DeletedAtIsNil())
+
+	if opts.SchoolID != nil {
+		b = b.Where(user.HasSchoolWith(school.ID(*opts.SchoolID)))
+	}
+
+	return b.Paginate(ctx, opts.After, opts.First, opts.Before, opts.Last,
 		ent.WithUserOrder(opts.OrderBy), ent.WithUserFilter(opts.Where.Filter))
 }
 
