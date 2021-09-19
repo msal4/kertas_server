@@ -43,7 +43,7 @@ func TestUsers(t *testing.T) {
 		want *string
 	}{
 		{"super admin is authorized", suAdmin, nil},
-		{"school admin is not authorized", schAdmin, ptr.Str(auth.UnauthorizedErr.Error())},
+		{"school admin is not authorized", schAdmin, nil},
 		{"teacher is not authorized", teacher, ptr.Str(auth.UnauthorizedErr.Error())},
 		{"student is not authorized", student, ptr.Str(auth.UnauthorizedErr.Error())},
 	}
