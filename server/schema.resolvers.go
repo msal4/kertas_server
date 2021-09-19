@@ -145,29 +145,6 @@ func (r *mutationResolver) DeleteStagePermanently(ctx context.Context, id uuid.U
 	return true, r.s.DeleteStagePermanently(ctx, id)
 }
 
-func getLoginErrs(ctx context.Context, err error) error {
-	if err == nil {
-		return nil
-	}
-
-	exts := map[string]interface{}{}
-
-	switch err {
-	case service.NotFoundErr:
-		exts["code"] = "NOT_FOUND"
-	case service.InvalidCredsErr:
-		exts["code"] = "INVALID_CREDS"
-	case service.NotAllowedErr:
-		exts["code"] = "NOT_ALLOWED"
-	}
-
-	return &gqlerror.Error{
-		Message:    err.Error(),
-		Path:       graphql.GetPath(ctx),
-		Extensions: exts,
-	}
-}
-
 func (r *mutationResolver) LoginAdmin(ctx context.Context, input model.LoginInput) (*model.AuthData, error) {
 	data, err := r.s.LoginAdmin(ctx, input)
 	return data, getLoginErrs(ctx, err)
@@ -464,19 +441,20 @@ func (r *queryResolver) User(ctx context.Context, id uuid.UUID) (*ent.User, erro
 	return r.s.EC.User.Get(ctx, id)
 }
 
-func (r *queryResolver) Users(ctx context.Context, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.UserOrder, where *ent.UserWhereInput) (*ent.UserConnection, error) {
+func (r *queryResolver) Users(ctx context.Context, schoolID *uuid.UUID, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.UserOrder, where *ent.UserWhereInput) (*ent.UserConnection, error) {
 	u, ok := auth.UserForContext(ctx)
 	if !ok || (u.Role != user.RoleSuperAdmin && u.Role != user.RoleSchoolAdmin) {
 		return nil, auth.UnauthorizedErr
 	}
 
 	opts := service.UsersOptions{
-		After:   after,
-		First:   first,
-		Before:  before,
-		Last:    last,
-		OrderBy: orderBy,
-		Where:   where,
+		After:    after,
+		First:    first,
+		Before:   before,
+		Last:     last,
+		OrderBy:  orderBy,
+		Where:    where,
+		SchoolID: schoolID,
 	}
 
 	if u.Role == user.RoleSchoolAdmin {
@@ -809,3 +787,32 @@ type schoolResolver struct{ *Resolver }
 type stageResolver struct{ *Resolver }
 type subscriptionResolver struct{ *Resolver }
 type userResolver struct{ *Resolver }
+
+// !!! WARNING !!!
+// The code below was going to be deleted when updating resolvers. It has been copied here so you have
+// one last chance to move it out of harms way if you want. There are two reasons this happens:
+//  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
+//    it when you're done.
+//  - You have helper methods in this file. Move them out to keep these resolver files clean.
+func getLoginErrs(ctx context.Context, err error) error {
+	if err == nil {
+		return nil
+	}
+
+	exts := map[string]interface{}{}
+
+	switch err {
+	case service.NotFoundErr:
+		exts["code"] = "NOT_FOUND"
+	case service.InvalidCredsErr:
+		exts["code"] = "INVALID_CREDS"
+	case service.NotAllowedErr:
+		exts["code"] = "NOT_ALLOWED"
+	}
+
+	return &gqlerror.Error{
+		Message:    err.Error(),
+		Path:       graphql.GetPath(ctx),
+		Extensions: exts,
+	}
+}

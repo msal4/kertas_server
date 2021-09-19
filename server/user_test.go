@@ -31,21 +31,18 @@ func TestUsers(t *testing.T) {
 	ctx := context.Background()
 
 	suAdmin := createSuperAdmin(ctx, s, "hello23super")
-	schAdmin := *suAdmin
-	schAdmin.Role = user.RoleSchoolAdmin
-	teacher := schAdmin
-	teacher.Role = user.RoleTeacher
-	student := schAdmin
-	student.Role = user.RoleStudent
+	schAdmin := createSchoolAdmin(ctx, s, "hellosdjflksdjflsdj")
+	teacher := createTeacher(ctx, s, "jsjdflks4444")
+	student := createStudent(ctx, s, "jflksjdflksdjfklsjd")
 
 	operations := `{ users { totalCount pageInfo { hasNextPage hasPreviousPage startCursor endCursor } edges { node { id } cursor } } }`
 
 	cases := []struct {
 		desc string
-		user ent.User
+		user *ent.User
 		want *string
 	}{
-		{"super admin is authorized", *suAdmin, nil},
+		{"super admin is authorized", suAdmin, nil},
 		{"school admin is not authorized", schAdmin, ptr.Str(auth.UnauthorizedErr.Error())},
 		{"teacher is not authorized", teacher, ptr.Str(auth.UnauthorizedErr.Error())},
 		{"student is not authorized", student, ptr.Str(auth.UnauthorizedErr.Error())},
@@ -58,7 +55,7 @@ func TestUsers(t *testing.T) {
 			r := createRequest(t, operations, "{}")
 			w := httptest.NewRecorder()
 
-			data := genTokens(t, &c.user, s)
+			data := genTokens(t, c.user, s)
 
 			setAuth(r, data.AccessToken)
 
