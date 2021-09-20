@@ -16,8 +16,9 @@ require (
 	github.com/mattn/go-sqlite3 v1.14.8
 	github.com/minio/minio-go/v7 v7.0.12
 	github.com/nfnt/resize v0.0.0-20180221191011-83c6a9932646
-	github.com/oliveroneill/exponent-server-sdk-golang v0.0.0-20210823140141-d050598be512 // indirect
+	github.com/oliveroneill/exponent-server-sdk-golang v0.0.0-20210823140141-d050598be512
 	github.com/pkg/errors v0.9.1 // indirect
+	github.com/rs/cors v1.6.0
 	github.com/segmentio/ksuid v1.0.4
 	github.com/stretchr/testify v1.7.0
 	github.com/vektah/gqlparser/v2 v2.1.0

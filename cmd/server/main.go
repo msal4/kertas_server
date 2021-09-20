@@ -11,6 +11,7 @@ import (
 	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
 	"github.com/msal4/hassah_school_server/server"
+	"github.com/rs/cors"
 	"gopkg.in/yaml.v2"
 )
 
@@ -65,5 +66,5 @@ func main() {
 	}
 
 	log.Printf("listening on :%d", cfg.Port)
-	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%d", cfg.Port), srv))
+	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%d", cfg.Port), cors.Default().Handler(srv)))
 }
