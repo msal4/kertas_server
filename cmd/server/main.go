@@ -66,5 +66,5 @@ func main() {
 	}
 
 	log.Printf("listening on :%d", cfg.Port)
-	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%d", cfg.Port), cors.Default().Handler(srv)))
+	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%d", cfg.Port), cors.AllowAll().Handler(srv)))
 }
