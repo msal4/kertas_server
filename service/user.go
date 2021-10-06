@@ -45,11 +45,11 @@ func (s *Service) AddUser(ctx context.Context, input model.AddUserInput) (*ent.U
 		SetActive(input.Active).SetRole(input.Role).SetPassword(input.Password).SetPhone(input.Phone)
 
 	if input.StageID == nil && input.Role == user.RoleStudent {
-		return nil, fmt.Errorf("stage is required for %q role", input.Role)
+		return nil, fmt.Errorf("stageID is required for %q role", input.Role)
 	}
 
 	if input.SchoolID == nil && (input.Role == user.RoleTeacher || input.Role == user.RoleSchoolAdmin) {
-		return nil, fmt.Errorf("stage is required for %q role", input.Role)
+		return nil, fmt.Errorf("schoolID is required for %q role", input.Role)
 	}
 
 	var dir string
