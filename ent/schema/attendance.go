@@ -45,7 +45,7 @@ func (Attendance) Edges() []ent.Edge {
 
 func (Attendance) Indexes() []ent.Index {
 	return []ent.Index{
-		index.Edges("class", "student").Fields("date"),
+		index.Edges("class", "student").Fields("date").Unique(),
 		index.Fields("state"),
 		index.Fields("date"),
 	}

@@ -110,7 +110,7 @@ var (
 		Indexes: []*schema.Index{
 			{
 				Name:    "attendance_date_class_attendances_user_attendances",
-				Unique:  false,
+				Unique:  true,
 				Columns: []*schema.Column{AttendancesColumns[3], AttendancesColumns[5], AttendancesColumns[6]},
 			},
 			{
