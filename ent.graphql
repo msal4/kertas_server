@@ -735,10 +735,6 @@ input CourseGradeWhereInput {
   """class edge predicates"""
   hasClass: Boolean
   hasClassWith: [ClassWhereInput!]
-  
-  """stage edge predicates"""
-  hasStage: Boolean
-  hasStageWith: [StageWhereInput!]
 }
 
 """
@@ -909,10 +905,6 @@ input StageWhereInput {
   """students edge predicates"""
   hasStudents: Boolean
   hasStudentsWith: [UserWhereInput!]
-  
-  """course_grades edge predicates"""
-  hasCourseGrades: Boolean
-  hasCourseGradesWith: [CourseGradeWhereInput!]
   
   """notifications edge predicates"""
   hasNotifications: Boolean

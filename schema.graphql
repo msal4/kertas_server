@@ -475,7 +475,6 @@ type CourseGrade implements Node {
 
   student: User!
   class: Class!
-  stage: Stage!
 }
 
 enum CourseGradeOrderField {
@@ -507,7 +506,6 @@ type CourseGradeConnection {
 
 input AddCourseGradeInput {
   studentID: ID!
-  stageID: ID!
   classID: ID!
   course: Course!
   activityFirst: Int
@@ -573,7 +571,7 @@ input UpdateAssignmentSubmissionInput {
 enum AttendanceState {
   PRESENT
   ABSENT
-  EXCUSED_ABSENT
+  EXCUSED_ABSENCE
   SICK
 }
 
@@ -740,7 +738,7 @@ type Query {
 
   schedule(stageID: ID, weekday: Weekday): [Schedule!]!
 
-  courseGrades(studentID: ID, stageID: ID, classID: ID, after: Cursor, first: Int, before: Cursor, last: Int, orderBy: CourseGradeOrder, where: CourseGradeWhereInput): CourseGradeConnection!
+  courseGrades(studentID: ID, classID: ID, after: Cursor, first: Int, before: Cursor, last: Int, orderBy: CourseGradeOrder, where: CourseGradeWhereInput): CourseGradeConnection!
 
   tuitionPayments(studentID: ID, stageID: ID, after: Cursor, first: Int, before: Cursor, last: Int, orderBy: TuitionPaymentOrder, where: TuitionPaymentWhereInput): TuitionPaymentConnection!
 

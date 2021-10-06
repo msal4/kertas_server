@@ -191,7 +191,6 @@ var (
 		{Name: "course_final", Type: field.TypeInt, Nullable: true},
 		{Name: "year", Type: field.TypeString},
 		{Name: "class_course_grades", Type: field.TypeUUID, Nullable: true},
-		{Name: "stage_course_grades", Type: field.TypeUUID, Nullable: true},
 		{Name: "user_course_grades", Type: field.TypeUUID, Nullable: true},
 	}
 	// CourseGradesTable holds the schema information for the "course_grades" table.
@@ -207,23 +206,17 @@ var (
 				OnDelete:   schema.Cascade,
 			},
 			{
-				Symbol:     "course_grades_stages_course_grades",
-				Columns:    []*schema.Column{CourseGradesColumns[11]},
-				RefColumns: []*schema.Column{StagesColumns[0]},
-				OnDelete:   schema.Cascade,
-			},
-			{
 				Symbol:     "course_grades_users_course_grades",
-				Columns:    []*schema.Column{CourseGradesColumns[12]},
+				Columns:    []*schema.Column{CourseGradesColumns[11]},
 				RefColumns: []*schema.Column{UsersColumns[0]},
 				OnDelete:   schema.Cascade,
 			},
 		},
 		Indexes: []*schema.Index{
 			{
-				Name:    "coursegrade_course_year_user_course_grades_class_course_grades_stage_course_grades",
+				Name:    "coursegrade_course_year_user_course_grades_class_course_grades",
 				Unique:  true,
-				Columns: []*schema.Column{CourseGradesColumns[3], CourseGradesColumns[9], CourseGradesColumns[12], CourseGradesColumns[10], CourseGradesColumns[11]},
+				Columns: []*schema.Column{CourseGradesColumns[3], CourseGradesColumns[9], CourseGradesColumns[11], CourseGradesColumns[10]},
 			},
 		},
 	}
@@ -665,8 +658,7 @@ func init() {
 	ClassesTable.ForeignKeys[0].RefTable = StagesTable
 	ClassesTable.ForeignKeys[1].RefTable = UsersTable
 	CourseGradesTable.ForeignKeys[0].RefTable = ClassesTable
-	CourseGradesTable.ForeignKeys[1].RefTable = StagesTable
-	CourseGradesTable.ForeignKeys[2].RefTable = UsersTable
+	CourseGradesTable.ForeignKeys[1].RefTable = UsersTable
 	GradesTable.ForeignKeys[0].RefTable = AssignmentsTable
 	GradesTable.ForeignKeys[1].RefTable = UsersTable
 	GroupsTable.ForeignKeys[0].RefTable = ClassesTable

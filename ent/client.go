@@ -915,22 +915,6 @@ func (c *CourseGradeClient) QueryClass(cg *CourseGrade) *ClassQuery {
 	return query
 }
 
-// QueryStage queries the stage edge of a CourseGrade.
-func (c *CourseGradeClient) QueryStage(cg *CourseGrade) *StageQuery {
-	query := &StageQuery{config: c.config}
-	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
-		id := cg.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(coursegrade.Table, coursegrade.FieldID, id),
-			sqlgraph.To(stage.Table, stage.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, coursegrade.StageTable, coursegrade.StageColumn),
-		)
-		fromV = sqlgraph.Neighbors(cg.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
 // Hooks returns the client hooks.
 func (c *CourseGradeClient) Hooks() []Hook {
 	return c.hooks.CourseGrade
@@ -1794,22 +1778,6 @@ func (c *StageClient) QueryStudents(s *Stage) *UserQuery {
 			sqlgraph.From(stage.Table, stage.FieldID, id),
 			sqlgraph.To(user.Table, user.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, stage.StudentsTable, stage.StudentsColumn),
-		)
-		fromV = sqlgraph.Neighbors(s.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
-// QueryCourseGrades queries the course_grades edge of a Stage.
-func (c *StageClient) QueryCourseGrades(s *Stage) *CourseGradeQuery {
-	query := &CourseGradeQuery{config: c.config}
-	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
-		id := s.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(stage.Table, stage.FieldID, id),
-			sqlgraph.To(coursegrade.Table, coursegrade.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, stage.CourseGradesTable, stage.CourseGradesColumn),
 		)
 		fromV = sqlgraph.Neighbors(s.driver.Dialect(), step)
 		return fromV, nil

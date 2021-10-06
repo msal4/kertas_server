@@ -132,14 +132,6 @@ func (cg *CourseGrade) Class(ctx context.Context) (*Class, error) {
 	return result, err
 }
 
-func (cg *CourseGrade) Stage(ctx context.Context) (*Stage, error) {
-	result, err := cg.Edges.StageOrErr()
-	if IsNotLoaded(err) {
-		result, err = cg.QueryStage().Only(ctx)
-	}
-	return result, err
-}
-
 func (gr *Grade) Student(ctx context.Context) (*User, error) {
 	result, err := gr.Edges.StudentOrErr()
 	if IsNotLoaded(err) {
@@ -256,14 +248,6 @@ func (s *Stage) Students(ctx context.Context) ([]*User, error) {
 	result, err := s.Edges.StudentsOrErr()
 	if IsNotLoaded(err) {
 		result, err = s.QueryStudents().All(ctx)
-	}
-	return result, err
-}
-
-func (s *Stage) CourseGrades(ctx context.Context) ([]*CourseGrade, error) {
-	result, err := s.Edges.CourseGradesOrErr()
-	if IsNotLoaded(err) {
-		result, err = s.QueryCourseGrades().All(ctx)
 	}
 	return result, err
 }

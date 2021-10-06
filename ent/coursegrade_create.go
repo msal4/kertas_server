@@ -13,7 +13,6 @@ import (
 	"github.com/google/uuid"
 	"github.com/msal4/hassah_school_server/ent/class"
 	"github.com/msal4/hassah_school_server/ent/coursegrade"
-	"github.com/msal4/hassah_school_server/ent/stage"
 	"github.com/msal4/hassah_school_server/ent/user"
 )
 
@@ -162,17 +161,6 @@ func (cgc *CourseGradeCreate) SetClass(c *Class) *CourseGradeCreate {
 	return cgc.SetClassID(c.ID)
 }
 
-// SetStageID sets the "stage" edge to the Stage entity by ID.
-func (cgc *CourseGradeCreate) SetStageID(id uuid.UUID) *CourseGradeCreate {
-	cgc.mutation.SetStageID(id)
-	return cgc
-}
-
-// SetStage sets the "stage" edge to the Stage entity.
-func (cgc *CourseGradeCreate) SetStage(s *Stage) *CourseGradeCreate {
-	return cgc.SetStageID(s.ID)
-}
-
 // Mutation returns the CourseGradeMutation object of the builder.
 func (cgc *CourseGradeCreate) Mutation() *CourseGradeMutation {
 	return cgc.mutation
@@ -312,9 +300,6 @@ func (cgc *CourseGradeCreate) check() error {
 	}
 	if _, ok := cgc.mutation.ClassID(); !ok {
 		return &ValidationError{Name: "class", err: errors.New("ent: missing required edge \"class\"")}
-	}
-	if _, ok := cgc.mutation.StageID(); !ok {
-		return &ValidationError{Name: "stage", err: errors.New("ent: missing required edge \"stage\"")}
 	}
 	return nil
 }
@@ -458,26 +443,6 @@ func (cgc *CourseGradeCreate) createSpec() (*CourseGrade, *sqlgraph.CreateSpec) 
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_node.class_course_grades = &nodes[0]
-		_spec.Edges = append(_spec.Edges, edge)
-	}
-	if nodes := cgc.mutation.StageIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: true,
-			Table:   coursegrade.StageTable,
-			Columns: []string{coursegrade.StageColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: stage.FieldID,
-				},
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_node.stage_course_grades = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

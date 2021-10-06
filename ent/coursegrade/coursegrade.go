@@ -38,8 +38,6 @@ const (
 	EdgeStudent = "student"
 	// EdgeClass holds the string denoting the class edge name in mutations.
 	EdgeClass = "class"
-	// EdgeStage holds the string denoting the stage edge name in mutations.
-	EdgeStage = "stage"
 	// Table holds the table name of the coursegrade in the database.
 	Table = "course_grades"
 	// StudentTable is the table that holds the student relation/edge.
@@ -56,13 +54,6 @@ const (
 	ClassInverseTable = "classes"
 	// ClassColumn is the table column denoting the class relation/edge.
 	ClassColumn = "class_course_grades"
-	// StageTable is the table that holds the stage relation/edge.
-	StageTable = "course_grades"
-	// StageInverseTable is the table name for the Stage entity.
-	// It exists in this package in order to avoid circular dependency with the "stage" package.
-	StageInverseTable = "stages"
-	// StageColumn is the table column denoting the stage relation/edge.
-	StageColumn = "stage_course_grades"
 )
 
 // Columns holds all SQL columns for coursegrade fields.
@@ -83,7 +74,6 @@ var Columns = []string{
 // table and are not defined as standalone fields in the schema.
 var ForeignKeys = []string{
 	"class_course_grades",
-	"stage_course_grades",
 	"user_course_grades",
 }
 

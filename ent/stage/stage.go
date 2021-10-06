@@ -35,8 +35,6 @@ const (
 	EdgePayments = "payments"
 	// EdgeStudents holds the string denoting the students edge name in mutations.
 	EdgeStudents = "students"
-	// EdgeCourseGrades holds the string denoting the course_grades edge name in mutations.
-	EdgeCourseGrades = "course_grades"
 	// EdgeNotifications holds the string denoting the notifications edge name in mutations.
 	EdgeNotifications = "notifications"
 	// Table holds the table name of the stage in the database.
@@ -69,13 +67,6 @@ const (
 	StudentsInverseTable = "users"
 	// StudentsColumn is the table column denoting the students relation/edge.
 	StudentsColumn = "stage_students"
-	// CourseGradesTable is the table that holds the course_grades relation/edge.
-	CourseGradesTable = "course_grades"
-	// CourseGradesInverseTable is the table name for the CourseGrade entity.
-	// It exists in this package in order to avoid circular dependency with the "coursegrade" package.
-	CourseGradesInverseTable = "course_grades"
-	// CourseGradesColumn is the table column denoting the course_grades relation/edge.
-	CourseGradesColumn = "stage_course_grades"
 	// NotificationsTable is the table that holds the notifications relation/edge.
 	NotificationsTable = "notifications"
 	// NotificationsInverseTable is the table name for the Notification entity.

@@ -246,7 +246,6 @@ func seed(ctx context.Context, s *service.Service) error {
 	_, err = s.AddCourseGrade(ctx, model.AddCourseGradeInput{
 		Course:         coursegrade.CourseFirst,
 		StudentID:      stdt.ID,
-		StageID:        stg.ID,
 		ClassID:        cls.ID,
 		ActivityFirst:  ptr.Int(10),
 		ActivitySecond: ptr.Int(20),
@@ -261,7 +260,6 @@ func seed(ctx context.Context, s *service.Service) error {
 	_, err = s.AddCourseGrade(ctx, model.AddCourseGradeInput{
 		Course:         coursegrade.CourseSecond,
 		StudentID:      stdt.ID,
-		StageID:        stg.ID,
 		ClassID:        cls.ID,
 		ActivityFirst:  ptr.Int(10),
 		ActivitySecond: ptr.Int(13),

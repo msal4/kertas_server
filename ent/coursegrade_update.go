@@ -14,7 +14,6 @@ import (
 	"github.com/msal4/hassah_school_server/ent/class"
 	"github.com/msal4/hassah_school_server/ent/coursegrade"
 	"github.com/msal4/hassah_school_server/ent/predicate"
-	"github.com/msal4/hassah_school_server/ent/stage"
 	"github.com/msal4/hassah_school_server/ent/user"
 )
 
@@ -200,17 +199,6 @@ func (cgu *CourseGradeUpdate) SetClass(c *Class) *CourseGradeUpdate {
 	return cgu.SetClassID(c.ID)
 }
 
-// SetStageID sets the "stage" edge to the Stage entity by ID.
-func (cgu *CourseGradeUpdate) SetStageID(id uuid.UUID) *CourseGradeUpdate {
-	cgu.mutation.SetStageID(id)
-	return cgu
-}
-
-// SetStage sets the "stage" edge to the Stage entity.
-func (cgu *CourseGradeUpdate) SetStage(s *Stage) *CourseGradeUpdate {
-	return cgu.SetStageID(s.ID)
-}
-
 // Mutation returns the CourseGradeMutation object of the builder.
 func (cgu *CourseGradeUpdate) Mutation() *CourseGradeMutation {
 	return cgu.mutation
@@ -225,12 +213,6 @@ func (cgu *CourseGradeUpdate) ClearStudent() *CourseGradeUpdate {
 // ClearClass clears the "class" edge to the Class entity.
 func (cgu *CourseGradeUpdate) ClearClass() *CourseGradeUpdate {
 	cgu.mutation.ClearClass()
-	return cgu
-}
-
-// ClearStage clears the "stage" edge to the Stage entity.
-func (cgu *CourseGradeUpdate) ClearStage() *CourseGradeUpdate {
-	cgu.mutation.ClearStage()
 	return cgu
 }
 
@@ -345,9 +327,6 @@ func (cgu *CourseGradeUpdate) check() error {
 	}
 	if _, ok := cgu.mutation.ClassID(); cgu.mutation.ClassCleared() && !ok {
 		return errors.New("ent: clearing a required unique edge \"class\"")
-	}
-	if _, ok := cgu.mutation.StageID(); cgu.mutation.StageCleared() && !ok {
-		return errors.New("ent: clearing a required unique edge \"stage\"")
 	}
 	return nil
 }
@@ -561,41 +540,6 @@ func (cgu *CourseGradeUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if cgu.mutation.StageCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: true,
-			Table:   coursegrade.StageTable,
-			Columns: []string{coursegrade.StageColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: stage.FieldID,
-				},
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := cgu.mutation.StageIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: true,
-			Table:   coursegrade.StageTable,
-			Columns: []string{coursegrade.StageColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: stage.FieldID,
-				},
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
 	if n, err = sqlgraph.UpdateNodes(ctx, cgu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{coursegrade.Label}
@@ -784,17 +728,6 @@ func (cguo *CourseGradeUpdateOne) SetClass(c *Class) *CourseGradeUpdateOne {
 	return cguo.SetClassID(c.ID)
 }
 
-// SetStageID sets the "stage" edge to the Stage entity by ID.
-func (cguo *CourseGradeUpdateOne) SetStageID(id uuid.UUID) *CourseGradeUpdateOne {
-	cguo.mutation.SetStageID(id)
-	return cguo
-}
-
-// SetStage sets the "stage" edge to the Stage entity.
-func (cguo *CourseGradeUpdateOne) SetStage(s *Stage) *CourseGradeUpdateOne {
-	return cguo.SetStageID(s.ID)
-}
-
 // Mutation returns the CourseGradeMutation object of the builder.
 func (cguo *CourseGradeUpdateOne) Mutation() *CourseGradeMutation {
 	return cguo.mutation
@@ -809,12 +742,6 @@ func (cguo *CourseGradeUpdateOne) ClearStudent() *CourseGradeUpdateOne {
 // ClearClass clears the "class" edge to the Class entity.
 func (cguo *CourseGradeUpdateOne) ClearClass() *CourseGradeUpdateOne {
 	cguo.mutation.ClearClass()
-	return cguo
-}
-
-// ClearStage clears the "stage" edge to the Stage entity.
-func (cguo *CourseGradeUpdateOne) ClearStage() *CourseGradeUpdateOne {
-	cguo.mutation.ClearStage()
 	return cguo
 }
 
@@ -936,9 +863,6 @@ func (cguo *CourseGradeUpdateOne) check() error {
 	}
 	if _, ok := cguo.mutation.ClassID(); cguo.mutation.ClassCleared() && !ok {
 		return errors.New("ent: clearing a required unique edge \"class\"")
-	}
-	if _, ok := cguo.mutation.StageID(); cguo.mutation.StageCleared() && !ok {
-		return errors.New("ent: clearing a required unique edge \"stage\"")
 	}
 	return nil
 }
@@ -1161,41 +1085,6 @@ func (cguo *CourseGradeUpdateOne) sqlSave(ctx context.Context) (_node *CourseGra
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeUUID,
 					Column: class.FieldID,
-				},
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
-	if cguo.mutation.StageCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: true,
-			Table:   coursegrade.StageTable,
-			Columns: []string{coursegrade.StageColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: stage.FieldID,
-				},
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := cguo.mutation.StageIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: true,
-			Table:   coursegrade.StageTable,
-			Columns: []string{coursegrade.StageColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: stage.FieldID,
 				},
 			},
 		}

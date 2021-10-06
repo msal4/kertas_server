@@ -419,7 +419,7 @@ func (cg *CourseGrade) Node(ctx context.Context) (node *Node, err error) {
 		ID:     cg.ID,
 		Type:   "CourseGrade",
 		Fields: make([]*Field, 9),
-		Edges:  make([]*Edge, 3),
+		Edges:  make([]*Edge, 2),
 	}
 	var buf []byte
 	if buf, err = json.Marshal(cg.CreatedAt); err != nil {
@@ -511,16 +511,6 @@ func (cg *CourseGrade) Node(ctx context.Context) (node *Node, err error) {
 	err = cg.QueryClass().
 		Select(class.FieldID).
 		Scan(ctx, &node.Edges[1].IDs)
-	if err != nil {
-		return nil, err
-	}
-	node.Edges[2] = &Edge{
-		Type: "Stage",
-		Name: "stage",
-	}
-	err = cg.QueryStage().
-		Select(stage.FieldID).
-		Scan(ctx, &node.Edges[2].IDs)
 	if err != nil {
 		return nil, err
 	}
@@ -964,7 +954,7 @@ func (s *Stage) Node(ctx context.Context) (node *Node, err error) {
 		ID:     s.ID,
 		Type:   "Stage",
 		Fields: make([]*Field, 7),
-		Edges:  make([]*Edge, 6),
+		Edges:  make([]*Edge, 5),
 	}
 	var buf []byte
 	if buf, err = json.Marshal(s.CreatedAt); err != nil {
@@ -1064,22 +1054,12 @@ func (s *Stage) Node(ctx context.Context) (node *Node, err error) {
 		return nil, err
 	}
 	node.Edges[4] = &Edge{
-		Type: "CourseGrade",
-		Name: "course_grades",
-	}
-	err = s.QueryCourseGrades().
-		Select(coursegrade.FieldID).
-		Scan(ctx, &node.Edges[4].IDs)
-	if err != nil {
-		return nil, err
-	}
-	node.Edges[5] = &Edge{
 		Type: "Notification",
 		Name: "notifications",
 	}
 	err = s.QueryNotifications().
 		Select(notification.FieldID).
-		Scan(ctx, &node.Edges[5].IDs)
+		Scan(ctx, &node.Edges[4].IDs)
 	if err != nil {
 		return nil, err
 	}

@@ -11,7 +11,6 @@ import (
 	"github.com/google/uuid"
 	"github.com/msal4/hassah_school_server/ent/class"
 	"github.com/msal4/hassah_school_server/ent/coursegrade"
-	"github.com/msal4/hassah_school_server/ent/stage"
 	"github.com/msal4/hassah_school_server/ent/user"
 )
 
@@ -42,7 +41,6 @@ type CourseGrade struct {
 	// The values are being populated by the CourseGradeQuery when eager-loading is set.
 	Edges               CourseGradeEdges `json:"edges"`
 	class_course_grades *uuid.UUID
-	stage_course_grades *uuid.UUID
 	user_course_grades  *uuid.UUID
 }
 
@@ -52,11 +50,9 @@ type CourseGradeEdges struct {
 	Student *User `json:"student,omitempty"`
 	// Class holds the value of the class edge.
 	Class *Class `json:"class,omitempty"`
-	// Stage holds the value of the stage edge.
-	Stage *Stage `json:"stage,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [3]bool
+	loadedTypes [2]bool
 }
 
 // StudentOrErr returns the Student value or an error if the edge
@@ -87,20 +83,6 @@ func (e CourseGradeEdges) ClassOrErr() (*Class, error) {
 	return nil, &NotLoadedError{edge: "class"}
 }
 
-// StageOrErr returns the Stage value or an error if the edge
-// was not loaded in eager-loading, or loaded but was not found.
-func (e CourseGradeEdges) StageOrErr() (*Stage, error) {
-	if e.loadedTypes[2] {
-		if e.Stage == nil {
-			// The edge stage was loaded in eager-loading,
-			// but was not found.
-			return nil, &NotFoundError{label: stage.Label}
-		}
-		return e.Stage, nil
-	}
-	return nil, &NotLoadedError{edge: "stage"}
-}
-
 // scanValues returns the types for scanning values from sql.Rows.
 func (*CourseGrade) scanValues(columns []string) ([]interface{}, error) {
 	values := make([]interface{}, len(columns))
@@ -116,9 +98,7 @@ func (*CourseGrade) scanValues(columns []string) ([]interface{}, error) {
 			values[i] = new(uuid.UUID)
 		case coursegrade.ForeignKeys[0]: // class_course_grades
 			values[i] = &sql.NullScanner{S: new(uuid.UUID)}
-		case coursegrade.ForeignKeys[1]: // stage_course_grades
-			values[i] = &sql.NullScanner{S: new(uuid.UUID)}
-		case coursegrade.ForeignKeys[2]: // user_course_grades
+		case coursegrade.ForeignKeys[1]: // user_course_grades
 			values[i] = &sql.NullScanner{S: new(uuid.UUID)}
 		default:
 			return nil, fmt.Errorf("unexpected column %q for type CourseGrade", columns[i])
@@ -209,13 +189,6 @@ func (cg *CourseGrade) assignValues(columns []string, values []interface{}) erro
 			}
 		case coursegrade.ForeignKeys[1]:
 			if value, ok := values[i].(*sql.NullScanner); !ok {
-				return fmt.Errorf("unexpected type %T for field stage_course_grades", values[i])
-			} else if value.Valid {
-				cg.stage_course_grades = new(uuid.UUID)
-				*cg.stage_course_grades = *value.S.(*uuid.UUID)
-			}
-		case coursegrade.ForeignKeys[2]:
-			if value, ok := values[i].(*sql.NullScanner); !ok {
 				return fmt.Errorf("unexpected type %T for field user_course_grades", values[i])
 			} else if value.Valid {
 				cg.user_course_grades = new(uuid.UUID)
@@ -234,11 +207,6 @@ func (cg *CourseGrade) QueryStudent() *UserQuery {
 // QueryClass queries the "class" edge of the CourseGrade entity.
 func (cg *CourseGrade) QueryClass() *ClassQuery {
 	return (&CourseGradeClient{config: cg.config}).QueryClass(cg)
-}
-
-// QueryStage queries the "stage" edge of the CourseGrade entity.
-func (cg *CourseGrade) QueryStage() *StageQuery {
-	return (&CourseGradeClient{config: cg.config}).QueryStage(cg)
 }
 
 // Update returns a builder for updating this CourseGrade.

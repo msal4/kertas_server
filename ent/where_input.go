@@ -1678,10 +1678,6 @@ type CourseGradeWhereInput struct {
 	// "class" edge predicates.
 	HasClass     *bool              `json:"hasClass,omitempty"`
 	HasClassWith []*ClassWhereInput `json:"hasClassWith,omitempty"`
-
-	// "stage" edge predicates.
-	HasStage     *bool              `json:"hasStage,omitempty"`
-	HasStageWith []*StageWhereInput `json:"hasStageWith,omitempty"`
 }
 
 // Filter applies the CourseGradeWhereInput filter on the CourseGradeQuery builder.
@@ -2052,24 +2048,6 @@ func (i *CourseGradeWhereInput) P() (predicate.CourseGrade, error) {
 			with = append(with, p)
 		}
 		predicates = append(predicates, coursegrade.HasClassWith(with...))
-	}
-	if i.HasStage != nil {
-		p := coursegrade.HasStage()
-		if !*i.HasStage {
-			p = coursegrade.Not(p)
-		}
-		predicates = append(predicates, p)
-	}
-	if len(i.HasStageWith) > 0 {
-		with := make([]predicate.Stage, 0, len(i.HasStageWith))
-		for _, w := range i.HasStageWith {
-			p, err := w.P()
-			if err != nil {
-				return nil, err
-			}
-			with = append(with, p)
-		}
-		predicates = append(predicates, coursegrade.HasStageWith(with...))
 	}
 	switch len(predicates) {
 	case 0:
@@ -4429,10 +4407,6 @@ type StageWhereInput struct {
 	HasStudents     *bool             `json:"hasStudents,omitempty"`
 	HasStudentsWith []*UserWhereInput `json:"hasStudentsWith,omitempty"`
 
-	// "course_grades" edge predicates.
-	HasCourseGrades     *bool                    `json:"hasCourseGrades,omitempty"`
-	HasCourseGradesWith []*CourseGradeWhereInput `json:"hasCourseGradesWith,omitempty"`
-
 	// "notifications" edge predicates.
 	HasNotifications     *bool                     `json:"hasNotifications,omitempty"`
 	HasNotificationsWith []*NotificationWhereInput `json:"hasNotificationsWith,omitempty"`
@@ -4779,24 +4753,6 @@ func (i *StageWhereInput) P() (predicate.Stage, error) {
 			with = append(with, p)
 		}
 		predicates = append(predicates, stage.HasStudentsWith(with...))
-	}
-	if i.HasCourseGrades != nil {
-		p := stage.HasCourseGrades()
-		if !*i.HasCourseGrades {
-			p = stage.Not(p)
-		}
-		predicates = append(predicates, p)
-	}
-	if len(i.HasCourseGradesWith) > 0 {
-		with := make([]predicate.CourseGrade, 0, len(i.HasCourseGradesWith))
-		for _, w := range i.HasCourseGradesWith {
-			p, err := w.P()
-			if err != nil {
-				return nil, err
-			}
-			with = append(with, p)
-		}
-		predicates = append(predicates, stage.HasCourseGradesWith(with...))
 	}
 	if i.HasNotifications != nil {
 		p := stage.HasNotifications()

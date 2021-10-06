@@ -15,7 +15,6 @@ import (
 	"github.com/msal4/hassah_school_server/ent/class"
 	"github.com/msal4/hassah_school_server/ent/coursegrade"
 	"github.com/msal4/hassah_school_server/ent/predicate"
-	"github.com/msal4/hassah_school_server/ent/stage"
 	"github.com/msal4/hassah_school_server/ent/user"
 )
 
@@ -31,7 +30,6 @@ type CourseGradeQuery struct {
 	// eager-loading edges.
 	withStudent *UserQuery
 	withClass   *ClassQuery
-	withStage   *StageQuery
 	withFKs     bool
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
@@ -106,28 +104,6 @@ func (cgq *CourseGradeQuery) QueryClass() *ClassQuery {
 			sqlgraph.From(coursegrade.Table, coursegrade.FieldID, selector),
 			sqlgraph.To(class.Table, class.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, true, coursegrade.ClassTable, coursegrade.ClassColumn),
-		)
-		fromU = sqlgraph.SetNeighbors(cgq.driver.Dialect(), step)
-		return fromU, nil
-	}
-	return query
-}
-
-// QueryStage chains the current query on the "stage" edge.
-func (cgq *CourseGradeQuery) QueryStage() *StageQuery {
-	query := &StageQuery{config: cgq.config}
-	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := cgq.prepareQuery(ctx); err != nil {
-			return nil, err
-		}
-		selector := cgq.sqlQuery(ctx)
-		if err := selector.Err(); err != nil {
-			return nil, err
-		}
-		step := sqlgraph.NewStep(
-			sqlgraph.From(coursegrade.Table, coursegrade.FieldID, selector),
-			sqlgraph.To(stage.Table, stage.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, coursegrade.StageTable, coursegrade.StageColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(cgq.driver.Dialect(), step)
 		return fromU, nil
@@ -318,7 +294,6 @@ func (cgq *CourseGradeQuery) Clone() *CourseGradeQuery {
 		predicates:  append([]predicate.CourseGrade{}, cgq.predicates...),
 		withStudent: cgq.withStudent.Clone(),
 		withClass:   cgq.withClass.Clone(),
-		withStage:   cgq.withStage.Clone(),
 		// clone intermediate query.
 		sql:  cgq.sql.Clone(),
 		path: cgq.path,
@@ -344,17 +319,6 @@ func (cgq *CourseGradeQuery) WithClass(opts ...func(*ClassQuery)) *CourseGradeQu
 		opt(query)
 	}
 	cgq.withClass = query
-	return cgq
-}
-
-// WithStage tells the query-builder to eager-load the nodes that are connected to
-// the "stage" edge. The optional arguments are used to configure the query builder of the edge.
-func (cgq *CourseGradeQuery) WithStage(opts ...func(*StageQuery)) *CourseGradeQuery {
-	query := &StageQuery{config: cgq.config}
-	for _, opt := range opts {
-		opt(query)
-	}
-	cgq.withStage = query
 	return cgq
 }
 
@@ -424,13 +388,12 @@ func (cgq *CourseGradeQuery) sqlAll(ctx context.Context) ([]*CourseGrade, error)
 		nodes       = []*CourseGrade{}
 		withFKs     = cgq.withFKs
 		_spec       = cgq.querySpec()
-		loadedTypes = [3]bool{
+		loadedTypes = [2]bool{
 			cgq.withStudent != nil,
 			cgq.withClass != nil,
-			cgq.withStage != nil,
 		}
 	)
-	if cgq.withStudent != nil || cgq.withClass != nil || cgq.withStage != nil {
+	if cgq.withStudent != nil || cgq.withClass != nil {
 		withFKs = true
 	}
 	if withFKs {
@@ -510,35 +473,6 @@ func (cgq *CourseGradeQuery) sqlAll(ctx context.Context) ([]*CourseGrade, error)
 			}
 			for i := range nodes {
 				nodes[i].Edges.Class = n
-			}
-		}
-	}
-
-	if query := cgq.withStage; query != nil {
-		ids := make([]uuid.UUID, 0, len(nodes))
-		nodeids := make(map[uuid.UUID][]*CourseGrade)
-		for i := range nodes {
-			if nodes[i].stage_course_grades == nil {
-				continue
-			}
-			fk := *nodes[i].stage_course_grades
-			if _, ok := nodeids[fk]; !ok {
-				ids = append(ids, fk)
-			}
-			nodeids[fk] = append(nodeids[fk], nodes[i])
-		}
-		query.Where(stage.IDIn(ids...))
-		neighbors, err := query.All(ctx)
-		if err != nil {
-			return nil, err
-		}
-		for _, n := range neighbors {
-			nodes, ok := nodeids[n.ID]
-			if !ok {
-				return nil, fmt.Errorf(`unexpected foreign-key "stage_course_grades" returned %v`, n.ID)
-			}
-			for i := range nodes {
-				nodes[i].Edges.Stage = n
 			}
 		}
 	}

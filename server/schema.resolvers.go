@@ -6,6 +6,7 @@ package server
 import (
 	"context"
 	"errors"
+	"fmt"
 	"time"
 
 	"github.com/99designs/gqlgen/graphql"
@@ -607,8 +608,8 @@ func (r *queryResolver) Schedule(ctx context.Context, stageID *uuid.UUID, weekda
 	return r.s.Schedule(ctx, service.ScheduleOptions{StageID: stageID, Weekday: weekday, UserID: u.ID})
 }
 
-func (r *queryResolver) CourseGrades(ctx context.Context, studentID *uuid.UUID, stageID *uuid.UUID, classID *uuid.UUID, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.CourseGradeOrder, where *ent.CourseGradeWhereInput) (*ent.CourseGradeConnection, error) {
-	return r.s.CourseGrades(ctx, service.CourseGradesOptions{ClassID: classID, StudentID: studentID, StageID: stageID, After: after, First: first, Before: before, Last: last, OrderBy: orderBy, Where: where})
+func (r *queryResolver) CourseGrades(ctx context.Context, studentID *uuid.UUID, classID *uuid.UUID, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.CourseGradeOrder, where *ent.CourseGradeWhereInput) (*ent.CourseGradeConnection, error) {
+	return r.s.CourseGrades(ctx, service.CourseGradesOptions{ClassID: classID, StudentID: studentID, After: after, First: first, Before: before, Last: last, OrderBy: orderBy, Where: where})
 }
 
 func (r *queryResolver) TuitionPayments(ctx context.Context, studentID *uuid.UUID, stageID *uuid.UUID, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.TuitionPaymentOrder, where *ent.TuitionPaymentWhereInput) (*ent.TuitionPaymentConnection, error) {
@@ -719,6 +720,10 @@ func (r *stageResolver) Payments(ctx context.Context, obj *ent.Stage, after *ent
 func (r *stageResolver) Students(ctx context.Context, obj *ent.Stage, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.UserOrder, where *ent.UserWhereInput) (*ent.UserConnection, error) {
 	return obj.QueryStudents().Where(user.DeletedAtIsNil()).Paginate(ctx, after, first, before, last,
 		ent.WithUserOrder(orderBy), ent.WithUserFilter(where.Filter))
+}
+
+func (r *stageResolver) CourseGrades(ctx context.Context, obj *ent.Stage) ([]*ent.CourseGrade, error) {
+	panic(fmt.Errorf("not implemented"))
 }
 
 func (r *subscriptionResolver) MessagePosted(ctx context.Context, groupID uuid.UUID) (<-chan *ent.Message, error) {

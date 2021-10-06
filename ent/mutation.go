@@ -3412,8 +3412,6 @@ type CourseGradeMutation struct {
 	clearedstudent     bool
 	class              *uuid.UUID
 	clearedclass       bool
-	stage              *uuid.UUID
-	clearedstage       bool
 	done               bool
 	oldValue           func(context.Context) (*CourseGrade, error)
 	predicates         []predicate.CourseGrade
@@ -4076,45 +4074,6 @@ func (m *CourseGradeMutation) ResetClass() {
 	m.clearedclass = false
 }
 
-// SetStageID sets the "stage" edge to the Stage entity by id.
-func (m *CourseGradeMutation) SetStageID(id uuid.UUID) {
-	m.stage = &id
-}
-
-// ClearStage clears the "stage" edge to the Stage entity.
-func (m *CourseGradeMutation) ClearStage() {
-	m.clearedstage = true
-}
-
-// StageCleared reports if the "stage" edge to the Stage entity was cleared.
-func (m *CourseGradeMutation) StageCleared() bool {
-	return m.clearedstage
-}
-
-// StageID returns the "stage" edge ID in the mutation.
-func (m *CourseGradeMutation) StageID() (id uuid.UUID, exists bool) {
-	if m.stage != nil {
-		return *m.stage, true
-	}
-	return
-}
-
-// StageIDs returns the "stage" edge IDs in the mutation.
-// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
-// StageID instead. It exists only for internal usage by the builders.
-func (m *CourseGradeMutation) StageIDs() (ids []uuid.UUID) {
-	if id := m.stage; id != nil {
-		ids = append(ids, *id)
-	}
-	return
-}
-
-// ResetStage resets all changes to the "stage" edge.
-func (m *CourseGradeMutation) ResetStage() {
-	m.stage = nil
-	m.clearedstage = false
-}
-
 // Where appends a list predicates to the CourseGradeMutation builder.
 func (m *CourseGradeMutation) Where(ps ...predicate.CourseGrade) {
 	m.predicates = append(m.predicates, ps...)
@@ -4465,15 +4424,12 @@ func (m *CourseGradeMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *CourseGradeMutation) AddedEdges() []string {
-	edges := make([]string, 0, 3)
+	edges := make([]string, 0, 2)
 	if m.student != nil {
 		edges = append(edges, coursegrade.EdgeStudent)
 	}
 	if m.class != nil {
 		edges = append(edges, coursegrade.EdgeClass)
-	}
-	if m.stage != nil {
-		edges = append(edges, coursegrade.EdgeStage)
 	}
 	return edges
 }
@@ -4490,17 +4446,13 @@ func (m *CourseGradeMutation) AddedIDs(name string) []ent.Value {
 		if id := m.class; id != nil {
 			return []ent.Value{*id}
 		}
-	case coursegrade.EdgeStage:
-		if id := m.stage; id != nil {
-			return []ent.Value{*id}
-		}
 	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *CourseGradeMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 3)
+	edges := make([]string, 0, 2)
 	return edges
 }
 
@@ -4514,15 +4466,12 @@ func (m *CourseGradeMutation) RemovedIDs(name string) []ent.Value {
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *CourseGradeMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 3)
+	edges := make([]string, 0, 2)
 	if m.clearedstudent {
 		edges = append(edges, coursegrade.EdgeStudent)
 	}
 	if m.clearedclass {
 		edges = append(edges, coursegrade.EdgeClass)
-	}
-	if m.clearedstage {
-		edges = append(edges, coursegrade.EdgeStage)
 	}
 	return edges
 }
@@ -4535,8 +4484,6 @@ func (m *CourseGradeMutation) EdgeCleared(name string) bool {
 		return m.clearedstudent
 	case coursegrade.EdgeClass:
 		return m.clearedclass
-	case coursegrade.EdgeStage:
-		return m.clearedstage
 	}
 	return false
 }
@@ -4551,9 +4498,6 @@ func (m *CourseGradeMutation) ClearEdge(name string) error {
 	case coursegrade.EdgeClass:
 		m.ClearClass()
 		return nil
-	case coursegrade.EdgeStage:
-		m.ClearStage()
-		return nil
 	}
 	return fmt.Errorf("unknown CourseGrade unique edge %s", name)
 }
@@ -4567,9 +4511,6 @@ func (m *CourseGradeMutation) ResetEdge(name string) error {
 		return nil
 	case coursegrade.EdgeClass:
 		m.ResetClass()
-		return nil
-	case coursegrade.EdgeStage:
-		m.ResetStage()
 		return nil
 	}
 	return fmt.Errorf("unknown CourseGrade edge %s", name)
@@ -8924,9 +8865,6 @@ type StageMutation struct {
 	students             map[uuid.UUID]struct{}
 	removedstudents      map[uuid.UUID]struct{}
 	clearedstudents      bool
-	course_grades        map[uuid.UUID]struct{}
-	removedcourse_grades map[uuid.UUID]struct{}
-	clearedcourse_grades bool
 	notifications        map[uuid.UUID]struct{}
 	removednotifications map[uuid.UUID]struct{}
 	clearednotifications bool
@@ -9506,60 +9444,6 @@ func (m *StageMutation) ResetStudents() {
 	m.removedstudents = nil
 }
 
-// AddCourseGradeIDs adds the "course_grades" edge to the CourseGrade entity by ids.
-func (m *StageMutation) AddCourseGradeIDs(ids ...uuid.UUID) {
-	if m.course_grades == nil {
-		m.course_grades = make(map[uuid.UUID]struct{})
-	}
-	for i := range ids {
-		m.course_grades[ids[i]] = struct{}{}
-	}
-}
-
-// ClearCourseGrades clears the "course_grades" edge to the CourseGrade entity.
-func (m *StageMutation) ClearCourseGrades() {
-	m.clearedcourse_grades = true
-}
-
-// CourseGradesCleared reports if the "course_grades" edge to the CourseGrade entity was cleared.
-func (m *StageMutation) CourseGradesCleared() bool {
-	return m.clearedcourse_grades
-}
-
-// RemoveCourseGradeIDs removes the "course_grades" edge to the CourseGrade entity by IDs.
-func (m *StageMutation) RemoveCourseGradeIDs(ids ...uuid.UUID) {
-	if m.removedcourse_grades == nil {
-		m.removedcourse_grades = make(map[uuid.UUID]struct{})
-	}
-	for i := range ids {
-		delete(m.course_grades, ids[i])
-		m.removedcourse_grades[ids[i]] = struct{}{}
-	}
-}
-
-// RemovedCourseGrades returns the removed IDs of the "course_grades" edge to the CourseGrade entity.
-func (m *StageMutation) RemovedCourseGradesIDs() (ids []uuid.UUID) {
-	for id := range m.removedcourse_grades {
-		ids = append(ids, id)
-	}
-	return
-}
-
-// CourseGradesIDs returns the "course_grades" edge IDs in the mutation.
-func (m *StageMutation) CourseGradesIDs() (ids []uuid.UUID) {
-	for id := range m.course_grades {
-		ids = append(ids, id)
-	}
-	return
-}
-
-// ResetCourseGrades resets all changes to the "course_grades" edge.
-func (m *StageMutation) ResetCourseGrades() {
-	m.course_grades = nil
-	m.clearedcourse_grades = false
-	m.removedcourse_grades = nil
-}
-
 // AddNotificationIDs adds the "notifications" edge to the Notification entity by ids.
 func (m *StageMutation) AddNotificationIDs(ids ...uuid.UUID) {
 	if m.notifications == nil {
@@ -9858,7 +9742,7 @@ func (m *StageMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *StageMutation) AddedEdges() []string {
-	edges := make([]string, 0, 6)
+	edges := make([]string, 0, 5)
 	if m.school != nil {
 		edges = append(edges, stage.EdgeSchool)
 	}
@@ -9870,9 +9754,6 @@ func (m *StageMutation) AddedEdges() []string {
 	}
 	if m.students != nil {
 		edges = append(edges, stage.EdgeStudents)
-	}
-	if m.course_grades != nil {
-		edges = append(edges, stage.EdgeCourseGrades)
 	}
 	if m.notifications != nil {
 		edges = append(edges, stage.EdgeNotifications)
@@ -9906,12 +9787,6 @@ func (m *StageMutation) AddedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
-	case stage.EdgeCourseGrades:
-		ids := make([]ent.Value, 0, len(m.course_grades))
-		for id := range m.course_grades {
-			ids = append(ids, id)
-		}
-		return ids
 	case stage.EdgeNotifications:
 		ids := make([]ent.Value, 0, len(m.notifications))
 		for id := range m.notifications {
@@ -9924,7 +9799,7 @@ func (m *StageMutation) AddedIDs(name string) []ent.Value {
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *StageMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 6)
+	edges := make([]string, 0, 5)
 	if m.removedclasses != nil {
 		edges = append(edges, stage.EdgeClasses)
 	}
@@ -9933,9 +9808,6 @@ func (m *StageMutation) RemovedEdges() []string {
 	}
 	if m.removedstudents != nil {
 		edges = append(edges, stage.EdgeStudents)
-	}
-	if m.removedcourse_grades != nil {
-		edges = append(edges, stage.EdgeCourseGrades)
 	}
 	if m.removednotifications != nil {
 		edges = append(edges, stage.EdgeNotifications)
@@ -9965,12 +9837,6 @@ func (m *StageMutation) RemovedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
-	case stage.EdgeCourseGrades:
-		ids := make([]ent.Value, 0, len(m.removedcourse_grades))
-		for id := range m.removedcourse_grades {
-			ids = append(ids, id)
-		}
-		return ids
 	case stage.EdgeNotifications:
 		ids := make([]ent.Value, 0, len(m.removednotifications))
 		for id := range m.removednotifications {
@@ -9983,7 +9849,7 @@ func (m *StageMutation) RemovedIDs(name string) []ent.Value {
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *StageMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 6)
+	edges := make([]string, 0, 5)
 	if m.clearedschool {
 		edges = append(edges, stage.EdgeSchool)
 	}
@@ -9995,9 +9861,6 @@ func (m *StageMutation) ClearedEdges() []string {
 	}
 	if m.clearedstudents {
 		edges = append(edges, stage.EdgeStudents)
-	}
-	if m.clearedcourse_grades {
-		edges = append(edges, stage.EdgeCourseGrades)
 	}
 	if m.clearednotifications {
 		edges = append(edges, stage.EdgeNotifications)
@@ -10017,8 +9880,6 @@ func (m *StageMutation) EdgeCleared(name string) bool {
 		return m.clearedpayments
 	case stage.EdgeStudents:
 		return m.clearedstudents
-	case stage.EdgeCourseGrades:
-		return m.clearedcourse_grades
 	case stage.EdgeNotifications:
 		return m.clearednotifications
 	}
@@ -10051,9 +9912,6 @@ func (m *StageMutation) ResetEdge(name string) error {
 		return nil
 	case stage.EdgeStudents:
 		m.ResetStudents()
-		return nil
-	case stage.EdgeCourseGrades:
-		m.ResetCourseGrades()
 		return nil
 	case stage.EdgeNotifications:
 		m.ResetNotifications()

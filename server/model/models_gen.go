@@ -44,7 +44,6 @@ type AddClassInput struct {
 
 type AddCourseGradeInput struct {
 	StudentID      uuid.UUID          `json:"studentID"`
-	StageID        uuid.UUID          `json:"stageID"`
 	ClassID        uuid.UUID          `json:"classID"`
 	Course         coursegrade.Course `json:"course"`
 	ActivityFirst  *int               `json:"activityFirst"`

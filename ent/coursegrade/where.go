@@ -967,34 +967,6 @@ func HasClassWith(preds ...predicate.Class) predicate.CourseGrade {
 	})
 }
 
-// HasStage applies the HasEdge predicate on the "stage" edge.
-func HasStage() predicate.CourseGrade {
-	return predicate.CourseGrade(func(s *sql.Selector) {
-		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
-			sqlgraph.To(StageTable, FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, StageTable, StageColumn),
-		)
-		sqlgraph.HasNeighbors(s, step)
-	})
-}
-
-// HasStageWith applies the HasEdge predicate on the "stage" edge with a given conditions (other predicates).
-func HasStageWith(preds ...predicate.Stage) predicate.CourseGrade {
-	return predicate.CourseGrade(func(s *sql.Selector) {
-		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
-			sqlgraph.To(StageInverseTable, FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, StageTable, StageColumn),
-		)
-		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
-			for _, p := range preds {
-				p(s)
-			}
-		})
-	})
-}
-
 // And groups predicates with the AND operator between them.
 func And(predicates ...predicate.CourseGrade) predicate.CourseGrade {
 	return predicate.CourseGrade(func(s *sql.Selector) {

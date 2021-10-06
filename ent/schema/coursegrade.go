@@ -40,12 +40,11 @@ func (CourseGrade) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.From("student", User.Type).Ref("course_grades").Unique().Required(),
 		edge.From("class", Class.Type).Ref("course_grades").Unique().Required(),
-		edge.From("stage", Stage.Type).Ref("course_grades").Unique().Required(),
 	}
 }
 
 func (CourseGrade) Indexes() []ent.Index {
 	return []ent.Index{
-		index.Edges("student", "class", "stage").Fields("course", "year").Unique(),
+		index.Edges("student", "class").Fields("course", "year").Unique(),
 	}
 }
