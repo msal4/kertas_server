@@ -444,7 +444,7 @@ func (r *queryResolver) User(ctx context.Context, id uuid.UUID) (*ent.User, erro
 
 func (r *queryResolver) Users(ctx context.Context, schoolID *uuid.UUID, after *ent.Cursor, first *int, before *ent.Cursor, last *int, orderBy *ent.UserOrder, where *ent.UserWhereInput) (*ent.UserConnection, error) {
 	u, ok := auth.UserForContext(ctx)
-	if !ok || (u.Role != user.RoleSuperAdmin && u.Role != user.RoleSchoolAdmin) {
+	if !ok || u.Role == user.RoleStudent {
 		return nil, auth.UnauthorizedErr
 	}
 
@@ -458,7 +458,7 @@ func (r *queryResolver) Users(ctx context.Context, schoolID *uuid.UUID, after *e
 		SchoolID: schoolID,
 	}
 
-	if u.Role == user.RoleSchoolAdmin {
+	if u.Role == user.RoleSchoolAdmin || u.Role == user.RoleTeacher {
 		schID, err := r.s.EC.User.Query().Where(user.ID(u.ID)).QuerySchool().OnlyID(ctx)
 		if err != nil {
 			return nil, err

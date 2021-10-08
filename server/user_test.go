@@ -44,7 +44,7 @@ func TestUsers(t *testing.T) {
 	}{
 		{"super admin is authorized", suAdmin, nil},
 		{"school admin is not authorized", schAdmin, nil},
-		{"teacher is not authorized", teacher, ptr.Str(auth.UnauthorizedErr.Error())},
+		{"teacher is not authorized", teacher, nil},
 		{"student is not authorized", student, ptr.Str(auth.UnauthorizedErr.Error())},
 	}
 
