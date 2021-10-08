@@ -8,6 +8,8 @@ import (
 	"fmt"
 	"time"
 
+	"entgo.io/ent/dialect"
+	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/google/uuid"
@@ -21,6 +23,7 @@ type TuitionPaymentCreate struct {
 	config
 	mutation *TuitionPaymentMutation
 	hooks    []Hook
+	conflict []sql.ConflictOption
 }
 
 // SetCreatedAt sets the "created_at" field.
@@ -229,6 +232,7 @@ func (tpc *TuitionPaymentCreate) createSpec() (*TuitionPayment, *sqlgraph.Create
 			},
 		}
 	)
+	_spec.OnConflict = tpc.conflict
 	if id, ok := tpc.mutation.ID(); ok {
 		_node.ID = id
 		_spec.ID.Value = id
@@ -308,10 +312,254 @@ func (tpc *TuitionPaymentCreate) createSpec() (*TuitionPayment, *sqlgraph.Create
 	return _node, _spec
 }
 
+// OnConflict allows configuring the `ON CONFLICT` / `ON DUPLICATE KEY` clause
+// of the `INSERT` statement. For example:
+//
+//	client.TuitionPayment.Create().
+//		SetCreatedAt(v).
+//		OnConflict(
+//			// Update the row with the new values
+//			// the was proposed for insertion.
+//			sql.ResolveWithNewValues(),
+//		).
+//		// Override some of the fields with custom
+//		// update values.
+//		Update(func(u *ent.TuitionPaymentUpsert) {
+//			SetCreatedAt(v+v).
+//		}).
+//		Exec(ctx)
+//
+func (tpc *TuitionPaymentCreate) OnConflict(opts ...sql.ConflictOption) *TuitionPaymentUpsertOne {
+	tpc.conflict = opts
+	return &TuitionPaymentUpsertOne{
+		create: tpc,
+	}
+}
+
+// OnConflictColumns calls `OnConflict` and configures the columns
+// as conflict target. Using this option is equivalent to using:
+//
+//	client.TuitionPayment.Create().
+//		OnConflict(sql.ConflictColumns(columns...)).
+//		Exec(ctx)
+//
+func (tpc *TuitionPaymentCreate) OnConflictColumns(columns ...string) *TuitionPaymentUpsertOne {
+	tpc.conflict = append(tpc.conflict, sql.ConflictColumns(columns...))
+	return &TuitionPaymentUpsertOne{
+		create: tpc,
+	}
+}
+
+type (
+	// TuitionPaymentUpsertOne is the builder for "upsert"-ing
+	//  one TuitionPayment node.
+	TuitionPaymentUpsertOne struct {
+		create *TuitionPaymentCreate
+	}
+
+	// TuitionPaymentUpsert is the "OnConflict" setter.
+	TuitionPaymentUpsert struct {
+		*sql.UpdateSet
+	}
+)
+
+// SetCreatedAt sets the "created_at" field.
+func (u *TuitionPaymentUpsert) SetCreatedAt(v time.Time) *TuitionPaymentUpsert {
+	u.Set(tuitionpayment.FieldCreatedAt, v)
+	return u
+}
+
+// UpdateCreatedAt sets the "created_at" field to the value that was provided on create.
+func (u *TuitionPaymentUpsert) UpdateCreatedAt() *TuitionPaymentUpsert {
+	u.SetExcluded(tuitionpayment.FieldCreatedAt)
+	return u
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (u *TuitionPaymentUpsert) SetUpdatedAt(v time.Time) *TuitionPaymentUpsert {
+	u.Set(tuitionpayment.FieldUpdatedAt, v)
+	return u
+}
+
+// UpdateUpdatedAt sets the "updated_at" field to the value that was provided on create.
+func (u *TuitionPaymentUpsert) UpdateUpdatedAt() *TuitionPaymentUpsert {
+	u.SetExcluded(tuitionpayment.FieldUpdatedAt)
+	return u
+}
+
+// SetYear sets the "year" field.
+func (u *TuitionPaymentUpsert) SetYear(v string) *TuitionPaymentUpsert {
+	u.Set(tuitionpayment.FieldYear, v)
+	return u
+}
+
+// UpdateYear sets the "year" field to the value that was provided on create.
+func (u *TuitionPaymentUpsert) UpdateYear() *TuitionPaymentUpsert {
+	u.SetExcluded(tuitionpayment.FieldYear)
+	return u
+}
+
+// SetPaidAmount sets the "paid_amount" field.
+func (u *TuitionPaymentUpsert) SetPaidAmount(v int) *TuitionPaymentUpsert {
+	u.Set(tuitionpayment.FieldPaidAmount, v)
+	return u
+}
+
+// UpdatePaidAmount sets the "paid_amount" field to the value that was provided on create.
+func (u *TuitionPaymentUpsert) UpdatePaidAmount() *TuitionPaymentUpsert {
+	u.SetExcluded(tuitionpayment.FieldPaidAmount)
+	return u
+}
+
+// UpdateNewValues updates the fields using the new values that were set on create except the ID field.
+// Using this option is equivalent to using:
+//
+//	client.TuitionPayment.Create().
+//		OnConflict(
+//			sql.ResolveWithNewValues(),
+//			sql.ResolveWith(func(u *sql.UpdateSet) {
+//				u.SetIgnore(tuitionpayment.FieldID)
+//			}),
+//		).
+//		Exec(ctx)
+//
+func (u *TuitionPaymentUpsertOne) UpdateNewValues() *TuitionPaymentUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithNewValues())
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(s *sql.UpdateSet) {
+		if _, exists := u.create.mutation.ID(); exists {
+			s.SetIgnore(tuitionpayment.FieldID)
+		}
+	}))
+	return u
+}
+
+// Ignore sets each column to itself in case of conflict.
+// Using this option is equivalent to using:
+//
+//  client.TuitionPayment.Create().
+//      OnConflict(sql.ResolveWithIgnore()).
+//      Exec(ctx)
+//
+func (u *TuitionPaymentUpsertOne) Ignore() *TuitionPaymentUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithIgnore())
+	return u
+}
+
+// DoNothing configures the conflict_action to `DO NOTHING`.
+// Supported only by SQLite and PostgreSQL.
+func (u *TuitionPaymentUpsertOne) DoNothing() *TuitionPaymentUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.DoNothing())
+	return u
+}
+
+// Update allows overriding fields `UPDATE` values. See the TuitionPaymentCreate.OnConflict
+// documentation for more info.
+func (u *TuitionPaymentUpsertOne) Update(set func(*TuitionPaymentUpsert)) *TuitionPaymentUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(update *sql.UpdateSet) {
+		set(&TuitionPaymentUpsert{UpdateSet: update})
+	}))
+	return u
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (u *TuitionPaymentUpsertOne) SetCreatedAt(v time.Time) *TuitionPaymentUpsertOne {
+	return u.Update(func(s *TuitionPaymentUpsert) {
+		s.SetCreatedAt(v)
+	})
+}
+
+// UpdateCreatedAt sets the "created_at" field to the value that was provided on create.
+func (u *TuitionPaymentUpsertOne) UpdateCreatedAt() *TuitionPaymentUpsertOne {
+	return u.Update(func(s *TuitionPaymentUpsert) {
+		s.UpdateCreatedAt()
+	})
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (u *TuitionPaymentUpsertOne) SetUpdatedAt(v time.Time) *TuitionPaymentUpsertOne {
+	return u.Update(func(s *TuitionPaymentUpsert) {
+		s.SetUpdatedAt(v)
+	})
+}
+
+// UpdateUpdatedAt sets the "updated_at" field to the value that was provided on create.
+func (u *TuitionPaymentUpsertOne) UpdateUpdatedAt() *TuitionPaymentUpsertOne {
+	return u.Update(func(s *TuitionPaymentUpsert) {
+		s.UpdateUpdatedAt()
+	})
+}
+
+// SetYear sets the "year" field.
+func (u *TuitionPaymentUpsertOne) SetYear(v string) *TuitionPaymentUpsertOne {
+	return u.Update(func(s *TuitionPaymentUpsert) {
+		s.SetYear(v)
+	})
+}
+
+// UpdateYear sets the "year" field to the value that was provided on create.
+func (u *TuitionPaymentUpsertOne) UpdateYear() *TuitionPaymentUpsertOne {
+	return u.Update(func(s *TuitionPaymentUpsert) {
+		s.UpdateYear()
+	})
+}
+
+// SetPaidAmount sets the "paid_amount" field.
+func (u *TuitionPaymentUpsertOne) SetPaidAmount(v int) *TuitionPaymentUpsertOne {
+	return u.Update(func(s *TuitionPaymentUpsert) {
+		s.SetPaidAmount(v)
+	})
+}
+
+// UpdatePaidAmount sets the "paid_amount" field to the value that was provided on create.
+func (u *TuitionPaymentUpsertOne) UpdatePaidAmount() *TuitionPaymentUpsertOne {
+	return u.Update(func(s *TuitionPaymentUpsert) {
+		s.UpdatePaidAmount()
+	})
+}
+
+// Exec executes the query.
+func (u *TuitionPaymentUpsertOne) Exec(ctx context.Context) error {
+	if len(u.create.conflict) == 0 {
+		return errors.New("ent: missing options for TuitionPaymentCreate.OnConflict")
+	}
+	return u.create.Exec(ctx)
+}
+
+// ExecX is like Exec, but panics if an error occurs.
+func (u *TuitionPaymentUpsertOne) ExecX(ctx context.Context) {
+	if err := u.create.Exec(ctx); err != nil {
+		panic(err)
+	}
+}
+
+// Exec executes the UPSERT query and returns the inserted/updated ID.
+func (u *TuitionPaymentUpsertOne) ID(ctx context.Context) (id uuid.UUID, err error) {
+	if u.create.driver.Dialect() == dialect.MySQL {
+		// In case of "ON CONFLICT", there is no way to get back non-numeric ID
+		// fields from the database since MySQL does not support the RETURNING clause.
+		return id, errors.New("ent: TuitionPaymentUpsertOne.ID is not supported by MySQL driver. Use TuitionPaymentUpsertOne.Exec instead")
+	}
+	node, err := u.create.Save(ctx)
+	if err != nil {
+		return id, err
+	}
+	return node.ID, nil
+}
+
+// IDX is like ID, but panics if an error occurs.
+func (u *TuitionPaymentUpsertOne) IDX(ctx context.Context) uuid.UUID {
+	id, err := u.ID(ctx)
+	if err != nil {
+		panic(err)
+	}
+	return id
+}
+
 // TuitionPaymentCreateBulk is the builder for creating many TuitionPayment entities in bulk.
 type TuitionPaymentCreateBulk struct {
 	config
 	builders []*TuitionPaymentCreate
+	conflict []sql.ConflictOption
 }
 
 // Save creates the TuitionPayment entities in the database.
@@ -338,6 +586,7 @@ func (tpcb *TuitionPaymentCreateBulk) Save(ctx context.Context) ([]*TuitionPayme
 					_, err = mutators[i+1].Mutate(root, tpcb.builders[i+1].mutation)
 				} else {
 					spec := &sqlgraph.BatchCreateSpec{Nodes: specs}
+					spec.OnConflict = tpcb.conflict
 					// Invoke the actual operation on the latest mutation in the chain.
 					if err = sqlgraph.BatchCreate(ctx, tpcb.driver, spec); err != nil {
 						if sqlgraph.IsConstraintError(err) {
@@ -384,6 +633,178 @@ func (tpcb *TuitionPaymentCreateBulk) Exec(ctx context.Context) error {
 // ExecX is like Exec, but panics if an error occurs.
 func (tpcb *TuitionPaymentCreateBulk) ExecX(ctx context.Context) {
 	if err := tpcb.Exec(ctx); err != nil {
+		panic(err)
+	}
+}
+
+// OnConflict allows configuring the `ON CONFLICT` / `ON DUPLICATE KEY` clause
+// of the `INSERT` statement. For example:
+//
+//	client.TuitionPayment.CreateBulk(builders...).
+//		OnConflict(
+//			// Update the row with the new values
+//			// the was proposed for insertion.
+//			sql.ResolveWithNewValues(),
+//		).
+//		// Override some of the fields with custom
+//		// update values.
+//		Update(func(u *ent.TuitionPaymentUpsert) {
+//			SetCreatedAt(v+v).
+//		}).
+//		Exec(ctx)
+//
+func (tpcb *TuitionPaymentCreateBulk) OnConflict(opts ...sql.ConflictOption) *TuitionPaymentUpsertBulk {
+	tpcb.conflict = opts
+	return &TuitionPaymentUpsertBulk{
+		create: tpcb,
+	}
+}
+
+// OnConflictColumns calls `OnConflict` and configures the columns
+// as conflict target. Using this option is equivalent to using:
+//
+//	client.TuitionPayment.Create().
+//		OnConflict(sql.ConflictColumns(columns...)).
+//		Exec(ctx)
+//
+func (tpcb *TuitionPaymentCreateBulk) OnConflictColumns(columns ...string) *TuitionPaymentUpsertBulk {
+	tpcb.conflict = append(tpcb.conflict, sql.ConflictColumns(columns...))
+	return &TuitionPaymentUpsertBulk{
+		create: tpcb,
+	}
+}
+
+// TuitionPaymentUpsertBulk is the builder for "upsert"-ing
+// a bulk of TuitionPayment nodes.
+type TuitionPaymentUpsertBulk struct {
+	create *TuitionPaymentCreateBulk
+}
+
+// UpdateNewValues updates the fields using the new values that
+// were set on create. Using this option is equivalent to using:
+//
+//	client.TuitionPayment.Create().
+//		OnConflict(
+//			sql.ResolveWithNewValues(),
+//			sql.ResolveWith(func(u *sql.UpdateSet) {
+//				u.SetIgnore(tuitionpayment.FieldID)
+//			}),
+//		).
+//		Exec(ctx)
+//
+func (u *TuitionPaymentUpsertBulk) UpdateNewValues() *TuitionPaymentUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithNewValues())
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(s *sql.UpdateSet) {
+		for _, b := range u.create.builders {
+			if _, exists := b.mutation.ID(); exists {
+				s.SetIgnore(tuitionpayment.FieldID)
+				return
+			}
+		}
+	}))
+	return u
+}
+
+// Ignore sets each column to itself in case of conflict.
+// Using this option is equivalent to using:
+//
+//	client.TuitionPayment.Create().
+//		OnConflict(sql.ResolveWithIgnore()).
+//		Exec(ctx)
+//
+func (u *TuitionPaymentUpsertBulk) Ignore() *TuitionPaymentUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithIgnore())
+	return u
+}
+
+// DoNothing configures the conflict_action to `DO NOTHING`.
+// Supported only by SQLite and PostgreSQL.
+func (u *TuitionPaymentUpsertBulk) DoNothing() *TuitionPaymentUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.DoNothing())
+	return u
+}
+
+// Update allows overriding fields `UPDATE` values. See the TuitionPaymentCreateBulk.OnConflict
+// documentation for more info.
+func (u *TuitionPaymentUpsertBulk) Update(set func(*TuitionPaymentUpsert)) *TuitionPaymentUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(update *sql.UpdateSet) {
+		set(&TuitionPaymentUpsert{UpdateSet: update})
+	}))
+	return u
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (u *TuitionPaymentUpsertBulk) SetCreatedAt(v time.Time) *TuitionPaymentUpsertBulk {
+	return u.Update(func(s *TuitionPaymentUpsert) {
+		s.SetCreatedAt(v)
+	})
+}
+
+// UpdateCreatedAt sets the "created_at" field to the value that was provided on create.
+func (u *TuitionPaymentUpsertBulk) UpdateCreatedAt() *TuitionPaymentUpsertBulk {
+	return u.Update(func(s *TuitionPaymentUpsert) {
+		s.UpdateCreatedAt()
+	})
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (u *TuitionPaymentUpsertBulk) SetUpdatedAt(v time.Time) *TuitionPaymentUpsertBulk {
+	return u.Update(func(s *TuitionPaymentUpsert) {
+		s.SetUpdatedAt(v)
+	})
+}
+
+// UpdateUpdatedAt sets the "updated_at" field to the value that was provided on create.
+func (u *TuitionPaymentUpsertBulk) UpdateUpdatedAt() *TuitionPaymentUpsertBulk {
+	return u.Update(func(s *TuitionPaymentUpsert) {
+		s.UpdateUpdatedAt()
+	})
+}
+
+// SetYear sets the "year" field.
+func (u *TuitionPaymentUpsertBulk) SetYear(v string) *TuitionPaymentUpsertBulk {
+	return u.Update(func(s *TuitionPaymentUpsert) {
+		s.SetYear(v)
+	})
+}
+
+// UpdateYear sets the "year" field to the value that was provided on create.
+func (u *TuitionPaymentUpsertBulk) UpdateYear() *TuitionPaymentUpsertBulk {
+	return u.Update(func(s *TuitionPaymentUpsert) {
+		s.UpdateYear()
+	})
+}
+
+// SetPaidAmount sets the "paid_amount" field.
+func (u *TuitionPaymentUpsertBulk) SetPaidAmount(v int) *TuitionPaymentUpsertBulk {
+	return u.Update(func(s *TuitionPaymentUpsert) {
+		s.SetPaidAmount(v)
+	})
+}
+
+// UpdatePaidAmount sets the "paid_amount" field to the value that was provided on create.
+func (u *TuitionPaymentUpsertBulk) UpdatePaidAmount() *TuitionPaymentUpsertBulk {
+	return u.Update(func(s *TuitionPaymentUpsert) {
+		s.UpdatePaidAmount()
+	})
+}
+
+// Exec executes the query.
+func (u *TuitionPaymentUpsertBulk) Exec(ctx context.Context) error {
+	for i, b := range u.create.builders {
+		if len(b.conflict) != 0 {
+			return fmt.Errorf("ent: OnConflict was set for builder %d. Set it on the TuitionPaymentCreateBulk instead", i)
+		}
+	}
+	if len(u.create.conflict) == 0 {
+		return errors.New("ent: missing options for TuitionPaymentCreateBulk.OnConflict")
+	}
+	return u.create.Exec(ctx)
+}
+
+// ExecX is like Exec, but panics if an error occurs.
+func (u *TuitionPaymentUpsertBulk) ExecX(ctx context.Context) {
+	if err := u.create.Exec(ctx); err != nil {
 		panic(err)
 	}
 }

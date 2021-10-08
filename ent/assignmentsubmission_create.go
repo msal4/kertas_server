@@ -8,6 +8,8 @@ import (
 	"fmt"
 	"time"
 
+	"entgo.io/ent/dialect"
+	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/google/uuid"
@@ -21,6 +23,7 @@ type AssignmentSubmissionCreate struct {
 	config
 	mutation *AssignmentSubmissionMutation
 	hooks    []Hook
+	conflict []sql.ConflictOption
 }
 
 // SetCreatedAt sets the "created_at" field.
@@ -229,6 +232,7 @@ func (asc *AssignmentSubmissionCreate) createSpec() (*AssignmentSubmission, *sql
 			},
 		}
 	)
+	_spec.OnConflict = asc.conflict
 	if id, ok := asc.mutation.ID(); ok {
 		_node.ID = id
 		_spec.ID.Value = id
@@ -308,10 +312,267 @@ func (asc *AssignmentSubmissionCreate) createSpec() (*AssignmentSubmission, *sql
 	return _node, _spec
 }
 
+// OnConflict allows configuring the `ON CONFLICT` / `ON DUPLICATE KEY` clause
+// of the `INSERT` statement. For example:
+//
+//	client.AssignmentSubmission.Create().
+//		SetCreatedAt(v).
+//		OnConflict(
+//			// Update the row with the new values
+//			// the was proposed for insertion.
+//			sql.ResolveWithNewValues(),
+//		).
+//		// Override some of the fields with custom
+//		// update values.
+//		Update(func(u *ent.AssignmentSubmissionUpsert) {
+//			SetCreatedAt(v+v).
+//		}).
+//		Exec(ctx)
+//
+func (asc *AssignmentSubmissionCreate) OnConflict(opts ...sql.ConflictOption) *AssignmentSubmissionUpsertOne {
+	asc.conflict = opts
+	return &AssignmentSubmissionUpsertOne{
+		create: asc,
+	}
+}
+
+// OnConflictColumns calls `OnConflict` and configures the columns
+// as conflict target. Using this option is equivalent to using:
+//
+//	client.AssignmentSubmission.Create().
+//		OnConflict(sql.ConflictColumns(columns...)).
+//		Exec(ctx)
+//
+func (asc *AssignmentSubmissionCreate) OnConflictColumns(columns ...string) *AssignmentSubmissionUpsertOne {
+	asc.conflict = append(asc.conflict, sql.ConflictColumns(columns...))
+	return &AssignmentSubmissionUpsertOne{
+		create: asc,
+	}
+}
+
+type (
+	// AssignmentSubmissionUpsertOne is the builder for "upsert"-ing
+	//  one AssignmentSubmission node.
+	AssignmentSubmissionUpsertOne struct {
+		create *AssignmentSubmissionCreate
+	}
+
+	// AssignmentSubmissionUpsert is the "OnConflict" setter.
+	AssignmentSubmissionUpsert struct {
+		*sql.UpdateSet
+	}
+)
+
+// SetCreatedAt sets the "created_at" field.
+func (u *AssignmentSubmissionUpsert) SetCreatedAt(v time.Time) *AssignmentSubmissionUpsert {
+	u.Set(assignmentsubmission.FieldCreatedAt, v)
+	return u
+}
+
+// UpdateCreatedAt sets the "created_at" field to the value that was provided on create.
+func (u *AssignmentSubmissionUpsert) UpdateCreatedAt() *AssignmentSubmissionUpsert {
+	u.SetExcluded(assignmentsubmission.FieldCreatedAt)
+	return u
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (u *AssignmentSubmissionUpsert) SetUpdatedAt(v time.Time) *AssignmentSubmissionUpsert {
+	u.Set(assignmentsubmission.FieldUpdatedAt, v)
+	return u
+}
+
+// UpdateUpdatedAt sets the "updated_at" field to the value that was provided on create.
+func (u *AssignmentSubmissionUpsert) UpdateUpdatedAt() *AssignmentSubmissionUpsert {
+	u.SetExcluded(assignmentsubmission.FieldUpdatedAt)
+	return u
+}
+
+// SetFiles sets the "files" field.
+func (u *AssignmentSubmissionUpsert) SetFiles(v []string) *AssignmentSubmissionUpsert {
+	u.Set(assignmentsubmission.FieldFiles, v)
+	return u
+}
+
+// UpdateFiles sets the "files" field to the value that was provided on create.
+func (u *AssignmentSubmissionUpsert) UpdateFiles() *AssignmentSubmissionUpsert {
+	u.SetExcluded(assignmentsubmission.FieldFiles)
+	return u
+}
+
+// SetSubmittedAt sets the "submitted_at" field.
+func (u *AssignmentSubmissionUpsert) SetSubmittedAt(v time.Time) *AssignmentSubmissionUpsert {
+	u.Set(assignmentsubmission.FieldSubmittedAt, v)
+	return u
+}
+
+// UpdateSubmittedAt sets the "submitted_at" field to the value that was provided on create.
+func (u *AssignmentSubmissionUpsert) UpdateSubmittedAt() *AssignmentSubmissionUpsert {
+	u.SetExcluded(assignmentsubmission.FieldSubmittedAt)
+	return u
+}
+
+// ClearSubmittedAt clears the value of the "submitted_at" field.
+func (u *AssignmentSubmissionUpsert) ClearSubmittedAt() *AssignmentSubmissionUpsert {
+	u.SetNull(assignmentsubmission.FieldSubmittedAt)
+	return u
+}
+
+// UpdateNewValues updates the fields using the new values that were set on create except the ID field.
+// Using this option is equivalent to using:
+//
+//	client.AssignmentSubmission.Create().
+//		OnConflict(
+//			sql.ResolveWithNewValues(),
+//			sql.ResolveWith(func(u *sql.UpdateSet) {
+//				u.SetIgnore(assignmentsubmission.FieldID)
+//			}),
+//		).
+//		Exec(ctx)
+//
+func (u *AssignmentSubmissionUpsertOne) UpdateNewValues() *AssignmentSubmissionUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithNewValues())
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(s *sql.UpdateSet) {
+		if _, exists := u.create.mutation.ID(); exists {
+			s.SetIgnore(assignmentsubmission.FieldID)
+		}
+	}))
+	return u
+}
+
+// Ignore sets each column to itself in case of conflict.
+// Using this option is equivalent to using:
+//
+//  client.AssignmentSubmission.Create().
+//      OnConflict(sql.ResolveWithIgnore()).
+//      Exec(ctx)
+//
+func (u *AssignmentSubmissionUpsertOne) Ignore() *AssignmentSubmissionUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithIgnore())
+	return u
+}
+
+// DoNothing configures the conflict_action to `DO NOTHING`.
+// Supported only by SQLite and PostgreSQL.
+func (u *AssignmentSubmissionUpsertOne) DoNothing() *AssignmentSubmissionUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.DoNothing())
+	return u
+}
+
+// Update allows overriding fields `UPDATE` values. See the AssignmentSubmissionCreate.OnConflict
+// documentation for more info.
+func (u *AssignmentSubmissionUpsertOne) Update(set func(*AssignmentSubmissionUpsert)) *AssignmentSubmissionUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(update *sql.UpdateSet) {
+		set(&AssignmentSubmissionUpsert{UpdateSet: update})
+	}))
+	return u
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (u *AssignmentSubmissionUpsertOne) SetCreatedAt(v time.Time) *AssignmentSubmissionUpsertOne {
+	return u.Update(func(s *AssignmentSubmissionUpsert) {
+		s.SetCreatedAt(v)
+	})
+}
+
+// UpdateCreatedAt sets the "created_at" field to the value that was provided on create.
+func (u *AssignmentSubmissionUpsertOne) UpdateCreatedAt() *AssignmentSubmissionUpsertOne {
+	return u.Update(func(s *AssignmentSubmissionUpsert) {
+		s.UpdateCreatedAt()
+	})
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (u *AssignmentSubmissionUpsertOne) SetUpdatedAt(v time.Time) *AssignmentSubmissionUpsertOne {
+	return u.Update(func(s *AssignmentSubmissionUpsert) {
+		s.SetUpdatedAt(v)
+	})
+}
+
+// UpdateUpdatedAt sets the "updated_at" field to the value that was provided on create.
+func (u *AssignmentSubmissionUpsertOne) UpdateUpdatedAt() *AssignmentSubmissionUpsertOne {
+	return u.Update(func(s *AssignmentSubmissionUpsert) {
+		s.UpdateUpdatedAt()
+	})
+}
+
+// SetFiles sets the "files" field.
+func (u *AssignmentSubmissionUpsertOne) SetFiles(v []string) *AssignmentSubmissionUpsertOne {
+	return u.Update(func(s *AssignmentSubmissionUpsert) {
+		s.SetFiles(v)
+	})
+}
+
+// UpdateFiles sets the "files" field to the value that was provided on create.
+func (u *AssignmentSubmissionUpsertOne) UpdateFiles() *AssignmentSubmissionUpsertOne {
+	return u.Update(func(s *AssignmentSubmissionUpsert) {
+		s.UpdateFiles()
+	})
+}
+
+// SetSubmittedAt sets the "submitted_at" field.
+func (u *AssignmentSubmissionUpsertOne) SetSubmittedAt(v time.Time) *AssignmentSubmissionUpsertOne {
+	return u.Update(func(s *AssignmentSubmissionUpsert) {
+		s.SetSubmittedAt(v)
+	})
+}
+
+// UpdateSubmittedAt sets the "submitted_at" field to the value that was provided on create.
+func (u *AssignmentSubmissionUpsertOne) UpdateSubmittedAt() *AssignmentSubmissionUpsertOne {
+	return u.Update(func(s *AssignmentSubmissionUpsert) {
+		s.UpdateSubmittedAt()
+	})
+}
+
+// ClearSubmittedAt clears the value of the "submitted_at" field.
+func (u *AssignmentSubmissionUpsertOne) ClearSubmittedAt() *AssignmentSubmissionUpsertOne {
+	return u.Update(func(s *AssignmentSubmissionUpsert) {
+		s.ClearSubmittedAt()
+	})
+}
+
+// Exec executes the query.
+func (u *AssignmentSubmissionUpsertOne) Exec(ctx context.Context) error {
+	if len(u.create.conflict) == 0 {
+		return errors.New("ent: missing options for AssignmentSubmissionCreate.OnConflict")
+	}
+	return u.create.Exec(ctx)
+}
+
+// ExecX is like Exec, but panics if an error occurs.
+func (u *AssignmentSubmissionUpsertOne) ExecX(ctx context.Context) {
+	if err := u.create.Exec(ctx); err != nil {
+		panic(err)
+	}
+}
+
+// Exec executes the UPSERT query and returns the inserted/updated ID.
+func (u *AssignmentSubmissionUpsertOne) ID(ctx context.Context) (id uuid.UUID, err error) {
+	if u.create.driver.Dialect() == dialect.MySQL {
+		// In case of "ON CONFLICT", there is no way to get back non-numeric ID
+		// fields from the database since MySQL does not support the RETURNING clause.
+		return id, errors.New("ent: AssignmentSubmissionUpsertOne.ID is not supported by MySQL driver. Use AssignmentSubmissionUpsertOne.Exec instead")
+	}
+	node, err := u.create.Save(ctx)
+	if err != nil {
+		return id, err
+	}
+	return node.ID, nil
+}
+
+// IDX is like ID, but panics if an error occurs.
+func (u *AssignmentSubmissionUpsertOne) IDX(ctx context.Context) uuid.UUID {
+	id, err := u.ID(ctx)
+	if err != nil {
+		panic(err)
+	}
+	return id
+}
+
 // AssignmentSubmissionCreateBulk is the builder for creating many AssignmentSubmission entities in bulk.
 type AssignmentSubmissionCreateBulk struct {
 	config
 	builders []*AssignmentSubmissionCreate
+	conflict []sql.ConflictOption
 }
 
 // Save creates the AssignmentSubmission entities in the database.
@@ -338,6 +599,7 @@ func (ascb *AssignmentSubmissionCreateBulk) Save(ctx context.Context) ([]*Assign
 					_, err = mutators[i+1].Mutate(root, ascb.builders[i+1].mutation)
 				} else {
 					spec := &sqlgraph.BatchCreateSpec{Nodes: specs}
+					spec.OnConflict = ascb.conflict
 					// Invoke the actual operation on the latest mutation in the chain.
 					if err = sqlgraph.BatchCreate(ctx, ascb.driver, spec); err != nil {
 						if sqlgraph.IsConstraintError(err) {
@@ -384,6 +646,185 @@ func (ascb *AssignmentSubmissionCreateBulk) Exec(ctx context.Context) error {
 // ExecX is like Exec, but panics if an error occurs.
 func (ascb *AssignmentSubmissionCreateBulk) ExecX(ctx context.Context) {
 	if err := ascb.Exec(ctx); err != nil {
+		panic(err)
+	}
+}
+
+// OnConflict allows configuring the `ON CONFLICT` / `ON DUPLICATE KEY` clause
+// of the `INSERT` statement. For example:
+//
+//	client.AssignmentSubmission.CreateBulk(builders...).
+//		OnConflict(
+//			// Update the row with the new values
+//			// the was proposed for insertion.
+//			sql.ResolveWithNewValues(),
+//		).
+//		// Override some of the fields with custom
+//		// update values.
+//		Update(func(u *ent.AssignmentSubmissionUpsert) {
+//			SetCreatedAt(v+v).
+//		}).
+//		Exec(ctx)
+//
+func (ascb *AssignmentSubmissionCreateBulk) OnConflict(opts ...sql.ConflictOption) *AssignmentSubmissionUpsertBulk {
+	ascb.conflict = opts
+	return &AssignmentSubmissionUpsertBulk{
+		create: ascb,
+	}
+}
+
+// OnConflictColumns calls `OnConflict` and configures the columns
+// as conflict target. Using this option is equivalent to using:
+//
+//	client.AssignmentSubmission.Create().
+//		OnConflict(sql.ConflictColumns(columns...)).
+//		Exec(ctx)
+//
+func (ascb *AssignmentSubmissionCreateBulk) OnConflictColumns(columns ...string) *AssignmentSubmissionUpsertBulk {
+	ascb.conflict = append(ascb.conflict, sql.ConflictColumns(columns...))
+	return &AssignmentSubmissionUpsertBulk{
+		create: ascb,
+	}
+}
+
+// AssignmentSubmissionUpsertBulk is the builder for "upsert"-ing
+// a bulk of AssignmentSubmission nodes.
+type AssignmentSubmissionUpsertBulk struct {
+	create *AssignmentSubmissionCreateBulk
+}
+
+// UpdateNewValues updates the fields using the new values that
+// were set on create. Using this option is equivalent to using:
+//
+//	client.AssignmentSubmission.Create().
+//		OnConflict(
+//			sql.ResolveWithNewValues(),
+//			sql.ResolveWith(func(u *sql.UpdateSet) {
+//				u.SetIgnore(assignmentsubmission.FieldID)
+//			}),
+//		).
+//		Exec(ctx)
+//
+func (u *AssignmentSubmissionUpsertBulk) UpdateNewValues() *AssignmentSubmissionUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithNewValues())
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(s *sql.UpdateSet) {
+		for _, b := range u.create.builders {
+			if _, exists := b.mutation.ID(); exists {
+				s.SetIgnore(assignmentsubmission.FieldID)
+				return
+			}
+		}
+	}))
+	return u
+}
+
+// Ignore sets each column to itself in case of conflict.
+// Using this option is equivalent to using:
+//
+//	client.AssignmentSubmission.Create().
+//		OnConflict(sql.ResolveWithIgnore()).
+//		Exec(ctx)
+//
+func (u *AssignmentSubmissionUpsertBulk) Ignore() *AssignmentSubmissionUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithIgnore())
+	return u
+}
+
+// DoNothing configures the conflict_action to `DO NOTHING`.
+// Supported only by SQLite and PostgreSQL.
+func (u *AssignmentSubmissionUpsertBulk) DoNothing() *AssignmentSubmissionUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.DoNothing())
+	return u
+}
+
+// Update allows overriding fields `UPDATE` values. See the AssignmentSubmissionCreateBulk.OnConflict
+// documentation for more info.
+func (u *AssignmentSubmissionUpsertBulk) Update(set func(*AssignmentSubmissionUpsert)) *AssignmentSubmissionUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(update *sql.UpdateSet) {
+		set(&AssignmentSubmissionUpsert{UpdateSet: update})
+	}))
+	return u
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (u *AssignmentSubmissionUpsertBulk) SetCreatedAt(v time.Time) *AssignmentSubmissionUpsertBulk {
+	return u.Update(func(s *AssignmentSubmissionUpsert) {
+		s.SetCreatedAt(v)
+	})
+}
+
+// UpdateCreatedAt sets the "created_at" field to the value that was provided on create.
+func (u *AssignmentSubmissionUpsertBulk) UpdateCreatedAt() *AssignmentSubmissionUpsertBulk {
+	return u.Update(func(s *AssignmentSubmissionUpsert) {
+		s.UpdateCreatedAt()
+	})
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (u *AssignmentSubmissionUpsertBulk) SetUpdatedAt(v time.Time) *AssignmentSubmissionUpsertBulk {
+	return u.Update(func(s *AssignmentSubmissionUpsert) {
+		s.SetUpdatedAt(v)
+	})
+}
+
+// UpdateUpdatedAt sets the "updated_at" field to the value that was provided on create.
+func (u *AssignmentSubmissionUpsertBulk) UpdateUpdatedAt() *AssignmentSubmissionUpsertBulk {
+	return u.Update(func(s *AssignmentSubmissionUpsert) {
+		s.UpdateUpdatedAt()
+	})
+}
+
+// SetFiles sets the "files" field.
+func (u *AssignmentSubmissionUpsertBulk) SetFiles(v []string) *AssignmentSubmissionUpsertBulk {
+	return u.Update(func(s *AssignmentSubmissionUpsert) {
+		s.SetFiles(v)
+	})
+}
+
+// UpdateFiles sets the "files" field to the value that was provided on create.
+func (u *AssignmentSubmissionUpsertBulk) UpdateFiles() *AssignmentSubmissionUpsertBulk {
+	return u.Update(func(s *AssignmentSubmissionUpsert) {
+		s.UpdateFiles()
+	})
+}
+
+// SetSubmittedAt sets the "submitted_at" field.
+func (u *AssignmentSubmissionUpsertBulk) SetSubmittedAt(v time.Time) *AssignmentSubmissionUpsertBulk {
+	return u.Update(func(s *AssignmentSubmissionUpsert) {
+		s.SetSubmittedAt(v)
+	})
+}
+
+// UpdateSubmittedAt sets the "submitted_at" field to the value that was provided on create.
+func (u *AssignmentSubmissionUpsertBulk) UpdateSubmittedAt() *AssignmentSubmissionUpsertBulk {
+	return u.Update(func(s *AssignmentSubmissionUpsert) {
+		s.UpdateSubmittedAt()
+	})
+}
+
+// ClearSubmittedAt clears the value of the "submitted_at" field.
+func (u *AssignmentSubmissionUpsertBulk) ClearSubmittedAt() *AssignmentSubmissionUpsertBulk {
+	return u.Update(func(s *AssignmentSubmissionUpsert) {
+		s.ClearSubmittedAt()
+	})
+}
+
+// Exec executes the query.
+func (u *AssignmentSubmissionUpsertBulk) Exec(ctx context.Context) error {
+	for i, b := range u.create.builders {
+		if len(b.conflict) != 0 {
+			return fmt.Errorf("ent: OnConflict was set for builder %d. Set it on the AssignmentSubmissionCreateBulk instead", i)
+		}
+	}
+	if len(u.create.conflict) == 0 {
+		return errors.New("ent: missing options for AssignmentSubmissionCreateBulk.OnConflict")
+	}
+	return u.create.Exec(ctx)
+}
+
+// ExecX is like Exec, but panics if an error occurs.
+func (u *AssignmentSubmissionUpsertBulk) ExecX(ctx context.Context) {
+	if err := u.create.Exec(ctx); err != nil {
 		panic(err)
 	}
 }

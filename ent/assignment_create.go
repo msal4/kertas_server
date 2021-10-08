@@ -8,6 +8,8 @@ import (
 	"fmt"
 	"time"
 
+	"entgo.io/ent/dialect"
+	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/google/uuid"
@@ -22,6 +24,7 @@ type AssignmentCreate struct {
 	config
 	mutation *AssignmentMutation
 	hooks    []Hook
+	conflict []sql.ConflictOption
 }
 
 // SetCreatedAt sets the "created_at" field.
@@ -323,6 +326,7 @@ func (ac *AssignmentCreate) createSpec() (*Assignment, *sqlgraph.CreateSpec) {
 			},
 		}
 	)
+	_spec.OnConflict = ac.conflict
 	if id, ok := ac.mutation.ID(); ok {
 		_node.ID = id
 		_spec.ID.Value = id
@@ -460,10 +464,436 @@ func (ac *AssignmentCreate) createSpec() (*Assignment, *sqlgraph.CreateSpec) {
 	return _node, _spec
 }
 
+// OnConflict allows configuring the `ON CONFLICT` / `ON DUPLICATE KEY` clause
+// of the `INSERT` statement. For example:
+//
+//	client.Assignment.Create().
+//		SetCreatedAt(v).
+//		OnConflict(
+//			// Update the row with the new values
+//			// the was proposed for insertion.
+//			sql.ResolveWithNewValues(),
+//		).
+//		// Override some of the fields with custom
+//		// update values.
+//		Update(func(u *ent.AssignmentUpsert) {
+//			SetCreatedAt(v+v).
+//		}).
+//		Exec(ctx)
+//
+func (ac *AssignmentCreate) OnConflict(opts ...sql.ConflictOption) *AssignmentUpsertOne {
+	ac.conflict = opts
+	return &AssignmentUpsertOne{
+		create: ac,
+	}
+}
+
+// OnConflictColumns calls `OnConflict` and configures the columns
+// as conflict target. Using this option is equivalent to using:
+//
+//	client.Assignment.Create().
+//		OnConflict(sql.ConflictColumns(columns...)).
+//		Exec(ctx)
+//
+func (ac *AssignmentCreate) OnConflictColumns(columns ...string) *AssignmentUpsertOne {
+	ac.conflict = append(ac.conflict, sql.ConflictColumns(columns...))
+	return &AssignmentUpsertOne{
+		create: ac,
+	}
+}
+
+type (
+	// AssignmentUpsertOne is the builder for "upsert"-ing
+	//  one Assignment node.
+	AssignmentUpsertOne struct {
+		create *AssignmentCreate
+	}
+
+	// AssignmentUpsert is the "OnConflict" setter.
+	AssignmentUpsert struct {
+		*sql.UpdateSet
+	}
+)
+
+// SetCreatedAt sets the "created_at" field.
+func (u *AssignmentUpsert) SetCreatedAt(v time.Time) *AssignmentUpsert {
+	u.Set(assignment.FieldCreatedAt, v)
+	return u
+}
+
+// UpdateCreatedAt sets the "created_at" field to the value that was provided on create.
+func (u *AssignmentUpsert) UpdateCreatedAt() *AssignmentUpsert {
+	u.SetExcluded(assignment.FieldCreatedAt)
+	return u
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (u *AssignmentUpsert) SetUpdatedAt(v time.Time) *AssignmentUpsert {
+	u.Set(assignment.FieldUpdatedAt, v)
+	return u
+}
+
+// UpdateUpdatedAt sets the "updated_at" field to the value that was provided on create.
+func (u *AssignmentUpsert) UpdateUpdatedAt() *AssignmentUpsert {
+	u.SetExcluded(assignment.FieldUpdatedAt)
+	return u
+}
+
+// SetName sets the "name" field.
+func (u *AssignmentUpsert) SetName(v string) *AssignmentUpsert {
+	u.Set(assignment.FieldName, v)
+	return u
+}
+
+// UpdateName sets the "name" field to the value that was provided on create.
+func (u *AssignmentUpsert) UpdateName() *AssignmentUpsert {
+	u.SetExcluded(assignment.FieldName)
+	return u
+}
+
+// SetDescription sets the "description" field.
+func (u *AssignmentUpsert) SetDescription(v string) *AssignmentUpsert {
+	u.Set(assignment.FieldDescription, v)
+	return u
+}
+
+// UpdateDescription sets the "description" field to the value that was provided on create.
+func (u *AssignmentUpsert) UpdateDescription() *AssignmentUpsert {
+	u.SetExcluded(assignment.FieldDescription)
+	return u
+}
+
+// ClearDescription clears the value of the "description" field.
+func (u *AssignmentUpsert) ClearDescription() *AssignmentUpsert {
+	u.SetNull(assignment.FieldDescription)
+	return u
+}
+
+// SetFile sets the "file" field.
+func (u *AssignmentUpsert) SetFile(v string) *AssignmentUpsert {
+	u.Set(assignment.FieldFile, v)
+	return u
+}
+
+// UpdateFile sets the "file" field to the value that was provided on create.
+func (u *AssignmentUpsert) UpdateFile() *AssignmentUpsert {
+	u.SetExcluded(assignment.FieldFile)
+	return u
+}
+
+// ClearFile clears the value of the "file" field.
+func (u *AssignmentUpsert) ClearFile() *AssignmentUpsert {
+	u.SetNull(assignment.FieldFile)
+	return u
+}
+
+// SetIsExam sets the "is_exam" field.
+func (u *AssignmentUpsert) SetIsExam(v bool) *AssignmentUpsert {
+	u.Set(assignment.FieldIsExam, v)
+	return u
+}
+
+// UpdateIsExam sets the "is_exam" field to the value that was provided on create.
+func (u *AssignmentUpsert) UpdateIsExam() *AssignmentUpsert {
+	u.SetExcluded(assignment.FieldIsExam)
+	return u
+}
+
+// SetDueDate sets the "due_date" field.
+func (u *AssignmentUpsert) SetDueDate(v time.Time) *AssignmentUpsert {
+	u.Set(assignment.FieldDueDate, v)
+	return u
+}
+
+// UpdateDueDate sets the "due_date" field to the value that was provided on create.
+func (u *AssignmentUpsert) UpdateDueDate() *AssignmentUpsert {
+	u.SetExcluded(assignment.FieldDueDate)
+	return u
+}
+
+// SetDuration sets the "duration" field.
+func (u *AssignmentUpsert) SetDuration(v time.Duration) *AssignmentUpsert {
+	u.Set(assignment.FieldDuration, v)
+	return u
+}
+
+// UpdateDuration sets the "duration" field to the value that was provided on create.
+func (u *AssignmentUpsert) UpdateDuration() *AssignmentUpsert {
+	u.SetExcluded(assignment.FieldDuration)
+	return u
+}
+
+// ClearDuration clears the value of the "duration" field.
+func (u *AssignmentUpsert) ClearDuration() *AssignmentUpsert {
+	u.SetNull(assignment.FieldDuration)
+	return u
+}
+
+// SetDeletedAt sets the "deleted_at" field.
+func (u *AssignmentUpsert) SetDeletedAt(v time.Time) *AssignmentUpsert {
+	u.Set(assignment.FieldDeletedAt, v)
+	return u
+}
+
+// UpdateDeletedAt sets the "deleted_at" field to the value that was provided on create.
+func (u *AssignmentUpsert) UpdateDeletedAt() *AssignmentUpsert {
+	u.SetExcluded(assignment.FieldDeletedAt)
+	return u
+}
+
+// ClearDeletedAt clears the value of the "deleted_at" field.
+func (u *AssignmentUpsert) ClearDeletedAt() *AssignmentUpsert {
+	u.SetNull(assignment.FieldDeletedAt)
+	return u
+}
+
+// UpdateNewValues updates the fields using the new values that were set on create except the ID field.
+// Using this option is equivalent to using:
+//
+//	client.Assignment.Create().
+//		OnConflict(
+//			sql.ResolveWithNewValues(),
+//			sql.ResolveWith(func(u *sql.UpdateSet) {
+//				u.SetIgnore(assignment.FieldID)
+//			}),
+//		).
+//		Exec(ctx)
+//
+func (u *AssignmentUpsertOne) UpdateNewValues() *AssignmentUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithNewValues())
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(s *sql.UpdateSet) {
+		if _, exists := u.create.mutation.ID(); exists {
+			s.SetIgnore(assignment.FieldID)
+		}
+	}))
+	return u
+}
+
+// Ignore sets each column to itself in case of conflict.
+// Using this option is equivalent to using:
+//
+//  client.Assignment.Create().
+//      OnConflict(sql.ResolveWithIgnore()).
+//      Exec(ctx)
+//
+func (u *AssignmentUpsertOne) Ignore() *AssignmentUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithIgnore())
+	return u
+}
+
+// DoNothing configures the conflict_action to `DO NOTHING`.
+// Supported only by SQLite and PostgreSQL.
+func (u *AssignmentUpsertOne) DoNothing() *AssignmentUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.DoNothing())
+	return u
+}
+
+// Update allows overriding fields `UPDATE` values. See the AssignmentCreate.OnConflict
+// documentation for more info.
+func (u *AssignmentUpsertOne) Update(set func(*AssignmentUpsert)) *AssignmentUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(update *sql.UpdateSet) {
+		set(&AssignmentUpsert{UpdateSet: update})
+	}))
+	return u
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (u *AssignmentUpsertOne) SetCreatedAt(v time.Time) *AssignmentUpsertOne {
+	return u.Update(func(s *AssignmentUpsert) {
+		s.SetCreatedAt(v)
+	})
+}
+
+// UpdateCreatedAt sets the "created_at" field to the value that was provided on create.
+func (u *AssignmentUpsertOne) UpdateCreatedAt() *AssignmentUpsertOne {
+	return u.Update(func(s *AssignmentUpsert) {
+		s.UpdateCreatedAt()
+	})
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (u *AssignmentUpsertOne) SetUpdatedAt(v time.Time) *AssignmentUpsertOne {
+	return u.Update(func(s *AssignmentUpsert) {
+		s.SetUpdatedAt(v)
+	})
+}
+
+// UpdateUpdatedAt sets the "updated_at" field to the value that was provided on create.
+func (u *AssignmentUpsertOne) UpdateUpdatedAt() *AssignmentUpsertOne {
+	return u.Update(func(s *AssignmentUpsert) {
+		s.UpdateUpdatedAt()
+	})
+}
+
+// SetName sets the "name" field.
+func (u *AssignmentUpsertOne) SetName(v string) *AssignmentUpsertOne {
+	return u.Update(func(s *AssignmentUpsert) {
+		s.SetName(v)
+	})
+}
+
+// UpdateName sets the "name" field to the value that was provided on create.
+func (u *AssignmentUpsertOne) UpdateName() *AssignmentUpsertOne {
+	return u.Update(func(s *AssignmentUpsert) {
+		s.UpdateName()
+	})
+}
+
+// SetDescription sets the "description" field.
+func (u *AssignmentUpsertOne) SetDescription(v string) *AssignmentUpsertOne {
+	return u.Update(func(s *AssignmentUpsert) {
+		s.SetDescription(v)
+	})
+}
+
+// UpdateDescription sets the "description" field to the value that was provided on create.
+func (u *AssignmentUpsertOne) UpdateDescription() *AssignmentUpsertOne {
+	return u.Update(func(s *AssignmentUpsert) {
+		s.UpdateDescription()
+	})
+}
+
+// ClearDescription clears the value of the "description" field.
+func (u *AssignmentUpsertOne) ClearDescription() *AssignmentUpsertOne {
+	return u.Update(func(s *AssignmentUpsert) {
+		s.ClearDescription()
+	})
+}
+
+// SetFile sets the "file" field.
+func (u *AssignmentUpsertOne) SetFile(v string) *AssignmentUpsertOne {
+	return u.Update(func(s *AssignmentUpsert) {
+		s.SetFile(v)
+	})
+}
+
+// UpdateFile sets the "file" field to the value that was provided on create.
+func (u *AssignmentUpsertOne) UpdateFile() *AssignmentUpsertOne {
+	return u.Update(func(s *AssignmentUpsert) {
+		s.UpdateFile()
+	})
+}
+
+// ClearFile clears the value of the "file" field.
+func (u *AssignmentUpsertOne) ClearFile() *AssignmentUpsertOne {
+	return u.Update(func(s *AssignmentUpsert) {
+		s.ClearFile()
+	})
+}
+
+// SetIsExam sets the "is_exam" field.
+func (u *AssignmentUpsertOne) SetIsExam(v bool) *AssignmentUpsertOne {
+	return u.Update(func(s *AssignmentUpsert) {
+		s.SetIsExam(v)
+	})
+}
+
+// UpdateIsExam sets the "is_exam" field to the value that was provided on create.
+func (u *AssignmentUpsertOne) UpdateIsExam() *AssignmentUpsertOne {
+	return u.Update(func(s *AssignmentUpsert) {
+		s.UpdateIsExam()
+	})
+}
+
+// SetDueDate sets the "due_date" field.
+func (u *AssignmentUpsertOne) SetDueDate(v time.Time) *AssignmentUpsertOne {
+	return u.Update(func(s *AssignmentUpsert) {
+		s.SetDueDate(v)
+	})
+}
+
+// UpdateDueDate sets the "due_date" field to the value that was provided on create.
+func (u *AssignmentUpsertOne) UpdateDueDate() *AssignmentUpsertOne {
+	return u.Update(func(s *AssignmentUpsert) {
+		s.UpdateDueDate()
+	})
+}
+
+// SetDuration sets the "duration" field.
+func (u *AssignmentUpsertOne) SetDuration(v time.Duration) *AssignmentUpsertOne {
+	return u.Update(func(s *AssignmentUpsert) {
+		s.SetDuration(v)
+	})
+}
+
+// UpdateDuration sets the "duration" field to the value that was provided on create.
+func (u *AssignmentUpsertOne) UpdateDuration() *AssignmentUpsertOne {
+	return u.Update(func(s *AssignmentUpsert) {
+		s.UpdateDuration()
+	})
+}
+
+// ClearDuration clears the value of the "duration" field.
+func (u *AssignmentUpsertOne) ClearDuration() *AssignmentUpsertOne {
+	return u.Update(func(s *AssignmentUpsert) {
+		s.ClearDuration()
+	})
+}
+
+// SetDeletedAt sets the "deleted_at" field.
+func (u *AssignmentUpsertOne) SetDeletedAt(v time.Time) *AssignmentUpsertOne {
+	return u.Update(func(s *AssignmentUpsert) {
+		s.SetDeletedAt(v)
+	})
+}
+
+// UpdateDeletedAt sets the "deleted_at" field to the value that was provided on create.
+func (u *AssignmentUpsertOne) UpdateDeletedAt() *AssignmentUpsertOne {
+	return u.Update(func(s *AssignmentUpsert) {
+		s.UpdateDeletedAt()
+	})
+}
+
+// ClearDeletedAt clears the value of the "deleted_at" field.
+func (u *AssignmentUpsertOne) ClearDeletedAt() *AssignmentUpsertOne {
+	return u.Update(func(s *AssignmentUpsert) {
+		s.ClearDeletedAt()
+	})
+}
+
+// Exec executes the query.
+func (u *AssignmentUpsertOne) Exec(ctx context.Context) error {
+	if len(u.create.conflict) == 0 {
+		return errors.New("ent: missing options for AssignmentCreate.OnConflict")
+	}
+	return u.create.Exec(ctx)
+}
+
+// ExecX is like Exec, but panics if an error occurs.
+func (u *AssignmentUpsertOne) ExecX(ctx context.Context) {
+	if err := u.create.Exec(ctx); err != nil {
+		panic(err)
+	}
+}
+
+// Exec executes the UPSERT query and returns the inserted/updated ID.
+func (u *AssignmentUpsertOne) ID(ctx context.Context) (id uuid.UUID, err error) {
+	if u.create.driver.Dialect() == dialect.MySQL {
+		// In case of "ON CONFLICT", there is no way to get back non-numeric ID
+		// fields from the database since MySQL does not support the RETURNING clause.
+		return id, errors.New("ent: AssignmentUpsertOne.ID is not supported by MySQL driver. Use AssignmentUpsertOne.Exec instead")
+	}
+	node, err := u.create.Save(ctx)
+	if err != nil {
+		return id, err
+	}
+	return node.ID, nil
+}
+
+// IDX is like ID, but panics if an error occurs.
+func (u *AssignmentUpsertOne) IDX(ctx context.Context) uuid.UUID {
+	id, err := u.ID(ctx)
+	if err != nil {
+		panic(err)
+	}
+	return id
+}
+
 // AssignmentCreateBulk is the builder for creating many Assignment entities in bulk.
 type AssignmentCreateBulk struct {
 	config
 	builders []*AssignmentCreate
+	conflict []sql.ConflictOption
 }
 
 // Save creates the Assignment entities in the database.
@@ -490,6 +920,7 @@ func (acb *AssignmentCreateBulk) Save(ctx context.Context) ([]*Assignment, error
 					_, err = mutators[i+1].Mutate(root, acb.builders[i+1].mutation)
 				} else {
 					spec := &sqlgraph.BatchCreateSpec{Nodes: specs}
+					spec.OnConflict = acb.conflict
 					// Invoke the actual operation on the latest mutation in the chain.
 					if err = sqlgraph.BatchCreate(ctx, acb.driver, spec); err != nil {
 						if sqlgraph.IsConstraintError(err) {
@@ -536,6 +967,276 @@ func (acb *AssignmentCreateBulk) Exec(ctx context.Context) error {
 // ExecX is like Exec, but panics if an error occurs.
 func (acb *AssignmentCreateBulk) ExecX(ctx context.Context) {
 	if err := acb.Exec(ctx); err != nil {
+		panic(err)
+	}
+}
+
+// OnConflict allows configuring the `ON CONFLICT` / `ON DUPLICATE KEY` clause
+// of the `INSERT` statement. For example:
+//
+//	client.Assignment.CreateBulk(builders...).
+//		OnConflict(
+//			// Update the row with the new values
+//			// the was proposed for insertion.
+//			sql.ResolveWithNewValues(),
+//		).
+//		// Override some of the fields with custom
+//		// update values.
+//		Update(func(u *ent.AssignmentUpsert) {
+//			SetCreatedAt(v+v).
+//		}).
+//		Exec(ctx)
+//
+func (acb *AssignmentCreateBulk) OnConflict(opts ...sql.ConflictOption) *AssignmentUpsertBulk {
+	acb.conflict = opts
+	return &AssignmentUpsertBulk{
+		create: acb,
+	}
+}
+
+// OnConflictColumns calls `OnConflict` and configures the columns
+// as conflict target. Using this option is equivalent to using:
+//
+//	client.Assignment.Create().
+//		OnConflict(sql.ConflictColumns(columns...)).
+//		Exec(ctx)
+//
+func (acb *AssignmentCreateBulk) OnConflictColumns(columns ...string) *AssignmentUpsertBulk {
+	acb.conflict = append(acb.conflict, sql.ConflictColumns(columns...))
+	return &AssignmentUpsertBulk{
+		create: acb,
+	}
+}
+
+// AssignmentUpsertBulk is the builder for "upsert"-ing
+// a bulk of Assignment nodes.
+type AssignmentUpsertBulk struct {
+	create *AssignmentCreateBulk
+}
+
+// UpdateNewValues updates the fields using the new values that
+// were set on create. Using this option is equivalent to using:
+//
+//	client.Assignment.Create().
+//		OnConflict(
+//			sql.ResolveWithNewValues(),
+//			sql.ResolveWith(func(u *sql.UpdateSet) {
+//				u.SetIgnore(assignment.FieldID)
+//			}),
+//		).
+//		Exec(ctx)
+//
+func (u *AssignmentUpsertBulk) UpdateNewValues() *AssignmentUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithNewValues())
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(s *sql.UpdateSet) {
+		for _, b := range u.create.builders {
+			if _, exists := b.mutation.ID(); exists {
+				s.SetIgnore(assignment.FieldID)
+				return
+			}
+		}
+	}))
+	return u
+}
+
+// Ignore sets each column to itself in case of conflict.
+// Using this option is equivalent to using:
+//
+//	client.Assignment.Create().
+//		OnConflict(sql.ResolveWithIgnore()).
+//		Exec(ctx)
+//
+func (u *AssignmentUpsertBulk) Ignore() *AssignmentUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithIgnore())
+	return u
+}
+
+// DoNothing configures the conflict_action to `DO NOTHING`.
+// Supported only by SQLite and PostgreSQL.
+func (u *AssignmentUpsertBulk) DoNothing() *AssignmentUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.DoNothing())
+	return u
+}
+
+// Update allows overriding fields `UPDATE` values. See the AssignmentCreateBulk.OnConflict
+// documentation for more info.
+func (u *AssignmentUpsertBulk) Update(set func(*AssignmentUpsert)) *AssignmentUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(update *sql.UpdateSet) {
+		set(&AssignmentUpsert{UpdateSet: update})
+	}))
+	return u
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (u *AssignmentUpsertBulk) SetCreatedAt(v time.Time) *AssignmentUpsertBulk {
+	return u.Update(func(s *AssignmentUpsert) {
+		s.SetCreatedAt(v)
+	})
+}
+
+// UpdateCreatedAt sets the "created_at" field to the value that was provided on create.
+func (u *AssignmentUpsertBulk) UpdateCreatedAt() *AssignmentUpsertBulk {
+	return u.Update(func(s *AssignmentUpsert) {
+		s.UpdateCreatedAt()
+	})
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (u *AssignmentUpsertBulk) SetUpdatedAt(v time.Time) *AssignmentUpsertBulk {
+	return u.Update(func(s *AssignmentUpsert) {
+		s.SetUpdatedAt(v)
+	})
+}
+
+// UpdateUpdatedAt sets the "updated_at" field to the value that was provided on create.
+func (u *AssignmentUpsertBulk) UpdateUpdatedAt() *AssignmentUpsertBulk {
+	return u.Update(func(s *AssignmentUpsert) {
+		s.UpdateUpdatedAt()
+	})
+}
+
+// SetName sets the "name" field.
+func (u *AssignmentUpsertBulk) SetName(v string) *AssignmentUpsertBulk {
+	return u.Update(func(s *AssignmentUpsert) {
+		s.SetName(v)
+	})
+}
+
+// UpdateName sets the "name" field to the value that was provided on create.
+func (u *AssignmentUpsertBulk) UpdateName() *AssignmentUpsertBulk {
+	return u.Update(func(s *AssignmentUpsert) {
+		s.UpdateName()
+	})
+}
+
+// SetDescription sets the "description" field.
+func (u *AssignmentUpsertBulk) SetDescription(v string) *AssignmentUpsertBulk {
+	return u.Update(func(s *AssignmentUpsert) {
+		s.SetDescription(v)
+	})
+}
+
+// UpdateDescription sets the "description" field to the value that was provided on create.
+func (u *AssignmentUpsertBulk) UpdateDescription() *AssignmentUpsertBulk {
+	return u.Update(func(s *AssignmentUpsert) {
+		s.UpdateDescription()
+	})
+}
+
+// ClearDescription clears the value of the "description" field.
+func (u *AssignmentUpsertBulk) ClearDescription() *AssignmentUpsertBulk {
+	return u.Update(func(s *AssignmentUpsert) {
+		s.ClearDescription()
+	})
+}
+
+// SetFile sets the "file" field.
+func (u *AssignmentUpsertBulk) SetFile(v string) *AssignmentUpsertBulk {
+	return u.Update(func(s *AssignmentUpsert) {
+		s.SetFile(v)
+	})
+}
+
+// UpdateFile sets the "file" field to the value that was provided on create.
+func (u *AssignmentUpsertBulk) UpdateFile() *AssignmentUpsertBulk {
+	return u.Update(func(s *AssignmentUpsert) {
+		s.UpdateFile()
+	})
+}
+
+// ClearFile clears the value of the "file" field.
+func (u *AssignmentUpsertBulk) ClearFile() *AssignmentUpsertBulk {
+	return u.Update(func(s *AssignmentUpsert) {
+		s.ClearFile()
+	})
+}
+
+// SetIsExam sets the "is_exam" field.
+func (u *AssignmentUpsertBulk) SetIsExam(v bool) *AssignmentUpsertBulk {
+	return u.Update(func(s *AssignmentUpsert) {
+		s.SetIsExam(v)
+	})
+}
+
+// UpdateIsExam sets the "is_exam" field to the value that was provided on create.
+func (u *AssignmentUpsertBulk) UpdateIsExam() *AssignmentUpsertBulk {
+	return u.Update(func(s *AssignmentUpsert) {
+		s.UpdateIsExam()
+	})
+}
+
+// SetDueDate sets the "due_date" field.
+func (u *AssignmentUpsertBulk) SetDueDate(v time.Time) *AssignmentUpsertBulk {
+	return u.Update(func(s *AssignmentUpsert) {
+		s.SetDueDate(v)
+	})
+}
+
+// UpdateDueDate sets the "due_date" field to the value that was provided on create.
+func (u *AssignmentUpsertBulk) UpdateDueDate() *AssignmentUpsertBulk {
+	return u.Update(func(s *AssignmentUpsert) {
+		s.UpdateDueDate()
+	})
+}
+
+// SetDuration sets the "duration" field.
+func (u *AssignmentUpsertBulk) SetDuration(v time.Duration) *AssignmentUpsertBulk {
+	return u.Update(func(s *AssignmentUpsert) {
+		s.SetDuration(v)
+	})
+}
+
+// UpdateDuration sets the "duration" field to the value that was provided on create.
+func (u *AssignmentUpsertBulk) UpdateDuration() *AssignmentUpsertBulk {
+	return u.Update(func(s *AssignmentUpsert) {
+		s.UpdateDuration()
+	})
+}
+
+// ClearDuration clears the value of the "duration" field.
+func (u *AssignmentUpsertBulk) ClearDuration() *AssignmentUpsertBulk {
+	return u.Update(func(s *AssignmentUpsert) {
+		s.ClearDuration()
+	})
+}
+
+// SetDeletedAt sets the "deleted_at" field.
+func (u *AssignmentUpsertBulk) SetDeletedAt(v time.Time) *AssignmentUpsertBulk {
+	return u.Update(func(s *AssignmentUpsert) {
+		s.SetDeletedAt(v)
+	})
+}
+
+// UpdateDeletedAt sets the "deleted_at" field to the value that was provided on create.
+func (u *AssignmentUpsertBulk) UpdateDeletedAt() *AssignmentUpsertBulk {
+	return u.Update(func(s *AssignmentUpsert) {
+		s.UpdateDeletedAt()
+	})
+}
+
+// ClearDeletedAt clears the value of the "deleted_at" field.
+func (u *AssignmentUpsertBulk) ClearDeletedAt() *AssignmentUpsertBulk {
+	return u.Update(func(s *AssignmentUpsert) {
+		s.ClearDeletedAt()
+	})
+}
+
+// Exec executes the query.
+func (u *AssignmentUpsertBulk) Exec(ctx context.Context) error {
+	for i, b := range u.create.builders {
+		if len(b.conflict) != 0 {
+			return fmt.Errorf("ent: OnConflict was set for builder %d. Set it on the AssignmentCreateBulk instead", i)
+		}
+	}
+	if len(u.create.conflict) == 0 {
+		return errors.New("ent: missing options for AssignmentCreateBulk.OnConflict")
+	}
+	return u.create.Exec(ctx)
+}
+
+// ExecX is like Exec, but panics if an error occurs.
+func (u *AssignmentUpsertBulk) ExecX(ctx context.Context) {
+	if err := u.create.Exec(ctx); err != nil {
 		panic(err)
 	}
 }

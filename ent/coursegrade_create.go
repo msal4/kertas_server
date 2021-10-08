@@ -8,6 +8,8 @@ import (
 	"fmt"
 	"time"
 
+	"entgo.io/ent/dialect"
+	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/google/uuid"
@@ -21,6 +23,7 @@ type CourseGradeCreate struct {
 	config
 	mutation *CourseGradeMutation
 	hooks    []Hook
+	conflict []sql.ConflictOption
 }
 
 // SetCreatedAt sets the "created_at" field.
@@ -329,6 +332,7 @@ func (cgc *CourseGradeCreate) createSpec() (*CourseGrade, *sqlgraph.CreateSpec) 
 			},
 		}
 	)
+	_spec.OnConflict = cgc.conflict
 	if id, ok := cgc.mutation.ID(); ok {
 		_node.ID = id
 		_spec.ID.Value = id
@@ -448,10 +452,449 @@ func (cgc *CourseGradeCreate) createSpec() (*CourseGrade, *sqlgraph.CreateSpec) 
 	return _node, _spec
 }
 
+// OnConflict allows configuring the `ON CONFLICT` / `ON DUPLICATE KEY` clause
+// of the `INSERT` statement. For example:
+//
+//	client.CourseGrade.Create().
+//		SetCreatedAt(v).
+//		OnConflict(
+//			// Update the row with the new values
+//			// the was proposed for insertion.
+//			sql.ResolveWithNewValues(),
+//		).
+//		// Override some of the fields with custom
+//		// update values.
+//		Update(func(u *ent.CourseGradeUpsert) {
+//			SetCreatedAt(v+v).
+//		}).
+//		Exec(ctx)
+//
+func (cgc *CourseGradeCreate) OnConflict(opts ...sql.ConflictOption) *CourseGradeUpsertOne {
+	cgc.conflict = opts
+	return &CourseGradeUpsertOne{
+		create: cgc,
+	}
+}
+
+// OnConflictColumns calls `OnConflict` and configures the columns
+// as conflict target. Using this option is equivalent to using:
+//
+//	client.CourseGrade.Create().
+//		OnConflict(sql.ConflictColumns(columns...)).
+//		Exec(ctx)
+//
+func (cgc *CourseGradeCreate) OnConflictColumns(columns ...string) *CourseGradeUpsertOne {
+	cgc.conflict = append(cgc.conflict, sql.ConflictColumns(columns...))
+	return &CourseGradeUpsertOne{
+		create: cgc,
+	}
+}
+
+type (
+	// CourseGradeUpsertOne is the builder for "upsert"-ing
+	//  one CourseGrade node.
+	CourseGradeUpsertOne struct {
+		create *CourseGradeCreate
+	}
+
+	// CourseGradeUpsert is the "OnConflict" setter.
+	CourseGradeUpsert struct {
+		*sql.UpdateSet
+	}
+)
+
+// SetCreatedAt sets the "created_at" field.
+func (u *CourseGradeUpsert) SetCreatedAt(v time.Time) *CourseGradeUpsert {
+	u.Set(coursegrade.FieldCreatedAt, v)
+	return u
+}
+
+// UpdateCreatedAt sets the "created_at" field to the value that was provided on create.
+func (u *CourseGradeUpsert) UpdateCreatedAt() *CourseGradeUpsert {
+	u.SetExcluded(coursegrade.FieldCreatedAt)
+	return u
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (u *CourseGradeUpsert) SetUpdatedAt(v time.Time) *CourseGradeUpsert {
+	u.Set(coursegrade.FieldUpdatedAt, v)
+	return u
+}
+
+// UpdateUpdatedAt sets the "updated_at" field to the value that was provided on create.
+func (u *CourseGradeUpsert) UpdateUpdatedAt() *CourseGradeUpsert {
+	u.SetExcluded(coursegrade.FieldUpdatedAt)
+	return u
+}
+
+// SetCourse sets the "course" field.
+func (u *CourseGradeUpsert) SetCourse(v coursegrade.Course) *CourseGradeUpsert {
+	u.Set(coursegrade.FieldCourse, v)
+	return u
+}
+
+// UpdateCourse sets the "course" field to the value that was provided on create.
+func (u *CourseGradeUpsert) UpdateCourse() *CourseGradeUpsert {
+	u.SetExcluded(coursegrade.FieldCourse)
+	return u
+}
+
+// SetActivityFirst sets the "activity_first" field.
+func (u *CourseGradeUpsert) SetActivityFirst(v int) *CourseGradeUpsert {
+	u.Set(coursegrade.FieldActivityFirst, v)
+	return u
+}
+
+// UpdateActivityFirst sets the "activity_first" field to the value that was provided on create.
+func (u *CourseGradeUpsert) UpdateActivityFirst() *CourseGradeUpsert {
+	u.SetExcluded(coursegrade.FieldActivityFirst)
+	return u
+}
+
+// ClearActivityFirst clears the value of the "activity_first" field.
+func (u *CourseGradeUpsert) ClearActivityFirst() *CourseGradeUpsert {
+	u.SetNull(coursegrade.FieldActivityFirst)
+	return u
+}
+
+// SetActivitySecond sets the "activity_second" field.
+func (u *CourseGradeUpsert) SetActivitySecond(v int) *CourseGradeUpsert {
+	u.Set(coursegrade.FieldActivitySecond, v)
+	return u
+}
+
+// UpdateActivitySecond sets the "activity_second" field to the value that was provided on create.
+func (u *CourseGradeUpsert) UpdateActivitySecond() *CourseGradeUpsert {
+	u.SetExcluded(coursegrade.FieldActivitySecond)
+	return u
+}
+
+// ClearActivitySecond clears the value of the "activity_second" field.
+func (u *CourseGradeUpsert) ClearActivitySecond() *CourseGradeUpsert {
+	u.SetNull(coursegrade.FieldActivitySecond)
+	return u
+}
+
+// SetWrittenFirst sets the "written_first" field.
+func (u *CourseGradeUpsert) SetWrittenFirst(v int) *CourseGradeUpsert {
+	u.Set(coursegrade.FieldWrittenFirst, v)
+	return u
+}
+
+// UpdateWrittenFirst sets the "written_first" field to the value that was provided on create.
+func (u *CourseGradeUpsert) UpdateWrittenFirst() *CourseGradeUpsert {
+	u.SetExcluded(coursegrade.FieldWrittenFirst)
+	return u
+}
+
+// ClearWrittenFirst clears the value of the "written_first" field.
+func (u *CourseGradeUpsert) ClearWrittenFirst() *CourseGradeUpsert {
+	u.SetNull(coursegrade.FieldWrittenFirst)
+	return u
+}
+
+// SetWrittenSecond sets the "written_second" field.
+func (u *CourseGradeUpsert) SetWrittenSecond(v int) *CourseGradeUpsert {
+	u.Set(coursegrade.FieldWrittenSecond, v)
+	return u
+}
+
+// UpdateWrittenSecond sets the "written_second" field to the value that was provided on create.
+func (u *CourseGradeUpsert) UpdateWrittenSecond() *CourseGradeUpsert {
+	u.SetExcluded(coursegrade.FieldWrittenSecond)
+	return u
+}
+
+// ClearWrittenSecond clears the value of the "written_second" field.
+func (u *CourseGradeUpsert) ClearWrittenSecond() *CourseGradeUpsert {
+	u.SetNull(coursegrade.FieldWrittenSecond)
+	return u
+}
+
+// SetCourseFinal sets the "course_final" field.
+func (u *CourseGradeUpsert) SetCourseFinal(v int) *CourseGradeUpsert {
+	u.Set(coursegrade.FieldCourseFinal, v)
+	return u
+}
+
+// UpdateCourseFinal sets the "course_final" field to the value that was provided on create.
+func (u *CourseGradeUpsert) UpdateCourseFinal() *CourseGradeUpsert {
+	u.SetExcluded(coursegrade.FieldCourseFinal)
+	return u
+}
+
+// ClearCourseFinal clears the value of the "course_final" field.
+func (u *CourseGradeUpsert) ClearCourseFinal() *CourseGradeUpsert {
+	u.SetNull(coursegrade.FieldCourseFinal)
+	return u
+}
+
+// SetYear sets the "year" field.
+func (u *CourseGradeUpsert) SetYear(v string) *CourseGradeUpsert {
+	u.Set(coursegrade.FieldYear, v)
+	return u
+}
+
+// UpdateYear sets the "year" field to the value that was provided on create.
+func (u *CourseGradeUpsert) UpdateYear() *CourseGradeUpsert {
+	u.SetExcluded(coursegrade.FieldYear)
+	return u
+}
+
+// UpdateNewValues updates the fields using the new values that were set on create except the ID field.
+// Using this option is equivalent to using:
+//
+//	client.CourseGrade.Create().
+//		OnConflict(
+//			sql.ResolveWithNewValues(),
+//			sql.ResolveWith(func(u *sql.UpdateSet) {
+//				u.SetIgnore(coursegrade.FieldID)
+//			}),
+//		).
+//		Exec(ctx)
+//
+func (u *CourseGradeUpsertOne) UpdateNewValues() *CourseGradeUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithNewValues())
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(s *sql.UpdateSet) {
+		if _, exists := u.create.mutation.ID(); exists {
+			s.SetIgnore(coursegrade.FieldID)
+		}
+	}))
+	return u
+}
+
+// Ignore sets each column to itself in case of conflict.
+// Using this option is equivalent to using:
+//
+//  client.CourseGrade.Create().
+//      OnConflict(sql.ResolveWithIgnore()).
+//      Exec(ctx)
+//
+func (u *CourseGradeUpsertOne) Ignore() *CourseGradeUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithIgnore())
+	return u
+}
+
+// DoNothing configures the conflict_action to `DO NOTHING`.
+// Supported only by SQLite and PostgreSQL.
+func (u *CourseGradeUpsertOne) DoNothing() *CourseGradeUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.DoNothing())
+	return u
+}
+
+// Update allows overriding fields `UPDATE` values. See the CourseGradeCreate.OnConflict
+// documentation for more info.
+func (u *CourseGradeUpsertOne) Update(set func(*CourseGradeUpsert)) *CourseGradeUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(update *sql.UpdateSet) {
+		set(&CourseGradeUpsert{UpdateSet: update})
+	}))
+	return u
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (u *CourseGradeUpsertOne) SetCreatedAt(v time.Time) *CourseGradeUpsertOne {
+	return u.Update(func(s *CourseGradeUpsert) {
+		s.SetCreatedAt(v)
+	})
+}
+
+// UpdateCreatedAt sets the "created_at" field to the value that was provided on create.
+func (u *CourseGradeUpsertOne) UpdateCreatedAt() *CourseGradeUpsertOne {
+	return u.Update(func(s *CourseGradeUpsert) {
+		s.UpdateCreatedAt()
+	})
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (u *CourseGradeUpsertOne) SetUpdatedAt(v time.Time) *CourseGradeUpsertOne {
+	return u.Update(func(s *CourseGradeUpsert) {
+		s.SetUpdatedAt(v)
+	})
+}
+
+// UpdateUpdatedAt sets the "updated_at" field to the value that was provided on create.
+func (u *CourseGradeUpsertOne) UpdateUpdatedAt() *CourseGradeUpsertOne {
+	return u.Update(func(s *CourseGradeUpsert) {
+		s.UpdateUpdatedAt()
+	})
+}
+
+// SetCourse sets the "course" field.
+func (u *CourseGradeUpsertOne) SetCourse(v coursegrade.Course) *CourseGradeUpsertOne {
+	return u.Update(func(s *CourseGradeUpsert) {
+		s.SetCourse(v)
+	})
+}
+
+// UpdateCourse sets the "course" field to the value that was provided on create.
+func (u *CourseGradeUpsertOne) UpdateCourse() *CourseGradeUpsertOne {
+	return u.Update(func(s *CourseGradeUpsert) {
+		s.UpdateCourse()
+	})
+}
+
+// SetActivityFirst sets the "activity_first" field.
+func (u *CourseGradeUpsertOne) SetActivityFirst(v int) *CourseGradeUpsertOne {
+	return u.Update(func(s *CourseGradeUpsert) {
+		s.SetActivityFirst(v)
+	})
+}
+
+// UpdateActivityFirst sets the "activity_first" field to the value that was provided on create.
+func (u *CourseGradeUpsertOne) UpdateActivityFirst() *CourseGradeUpsertOne {
+	return u.Update(func(s *CourseGradeUpsert) {
+		s.UpdateActivityFirst()
+	})
+}
+
+// ClearActivityFirst clears the value of the "activity_first" field.
+func (u *CourseGradeUpsertOne) ClearActivityFirst() *CourseGradeUpsertOne {
+	return u.Update(func(s *CourseGradeUpsert) {
+		s.ClearActivityFirst()
+	})
+}
+
+// SetActivitySecond sets the "activity_second" field.
+func (u *CourseGradeUpsertOne) SetActivitySecond(v int) *CourseGradeUpsertOne {
+	return u.Update(func(s *CourseGradeUpsert) {
+		s.SetActivitySecond(v)
+	})
+}
+
+// UpdateActivitySecond sets the "activity_second" field to the value that was provided on create.
+func (u *CourseGradeUpsertOne) UpdateActivitySecond() *CourseGradeUpsertOne {
+	return u.Update(func(s *CourseGradeUpsert) {
+		s.UpdateActivitySecond()
+	})
+}
+
+// ClearActivitySecond clears the value of the "activity_second" field.
+func (u *CourseGradeUpsertOne) ClearActivitySecond() *CourseGradeUpsertOne {
+	return u.Update(func(s *CourseGradeUpsert) {
+		s.ClearActivitySecond()
+	})
+}
+
+// SetWrittenFirst sets the "written_first" field.
+func (u *CourseGradeUpsertOne) SetWrittenFirst(v int) *CourseGradeUpsertOne {
+	return u.Update(func(s *CourseGradeUpsert) {
+		s.SetWrittenFirst(v)
+	})
+}
+
+// UpdateWrittenFirst sets the "written_first" field to the value that was provided on create.
+func (u *CourseGradeUpsertOne) UpdateWrittenFirst() *CourseGradeUpsertOne {
+	return u.Update(func(s *CourseGradeUpsert) {
+		s.UpdateWrittenFirst()
+	})
+}
+
+// ClearWrittenFirst clears the value of the "written_first" field.
+func (u *CourseGradeUpsertOne) ClearWrittenFirst() *CourseGradeUpsertOne {
+	return u.Update(func(s *CourseGradeUpsert) {
+		s.ClearWrittenFirst()
+	})
+}
+
+// SetWrittenSecond sets the "written_second" field.
+func (u *CourseGradeUpsertOne) SetWrittenSecond(v int) *CourseGradeUpsertOne {
+	return u.Update(func(s *CourseGradeUpsert) {
+		s.SetWrittenSecond(v)
+	})
+}
+
+// UpdateWrittenSecond sets the "written_second" field to the value that was provided on create.
+func (u *CourseGradeUpsertOne) UpdateWrittenSecond() *CourseGradeUpsertOne {
+	return u.Update(func(s *CourseGradeUpsert) {
+		s.UpdateWrittenSecond()
+	})
+}
+
+// ClearWrittenSecond clears the value of the "written_second" field.
+func (u *CourseGradeUpsertOne) ClearWrittenSecond() *CourseGradeUpsertOne {
+	return u.Update(func(s *CourseGradeUpsert) {
+		s.ClearWrittenSecond()
+	})
+}
+
+// SetCourseFinal sets the "course_final" field.
+func (u *CourseGradeUpsertOne) SetCourseFinal(v int) *CourseGradeUpsertOne {
+	return u.Update(func(s *CourseGradeUpsert) {
+		s.SetCourseFinal(v)
+	})
+}
+
+// UpdateCourseFinal sets the "course_final" field to the value that was provided on create.
+func (u *CourseGradeUpsertOne) UpdateCourseFinal() *CourseGradeUpsertOne {
+	return u.Update(func(s *CourseGradeUpsert) {
+		s.UpdateCourseFinal()
+	})
+}
+
+// ClearCourseFinal clears the value of the "course_final" field.
+func (u *CourseGradeUpsertOne) ClearCourseFinal() *CourseGradeUpsertOne {
+	return u.Update(func(s *CourseGradeUpsert) {
+		s.ClearCourseFinal()
+	})
+}
+
+// SetYear sets the "year" field.
+func (u *CourseGradeUpsertOne) SetYear(v string) *CourseGradeUpsertOne {
+	return u.Update(func(s *CourseGradeUpsert) {
+		s.SetYear(v)
+	})
+}
+
+// UpdateYear sets the "year" field to the value that was provided on create.
+func (u *CourseGradeUpsertOne) UpdateYear() *CourseGradeUpsertOne {
+	return u.Update(func(s *CourseGradeUpsert) {
+		s.UpdateYear()
+	})
+}
+
+// Exec executes the query.
+func (u *CourseGradeUpsertOne) Exec(ctx context.Context) error {
+	if len(u.create.conflict) == 0 {
+		return errors.New("ent: missing options for CourseGradeCreate.OnConflict")
+	}
+	return u.create.Exec(ctx)
+}
+
+// ExecX is like Exec, but panics if an error occurs.
+func (u *CourseGradeUpsertOne) ExecX(ctx context.Context) {
+	if err := u.create.Exec(ctx); err != nil {
+		panic(err)
+	}
+}
+
+// Exec executes the UPSERT query and returns the inserted/updated ID.
+func (u *CourseGradeUpsertOne) ID(ctx context.Context) (id uuid.UUID, err error) {
+	if u.create.driver.Dialect() == dialect.MySQL {
+		// In case of "ON CONFLICT", there is no way to get back non-numeric ID
+		// fields from the database since MySQL does not support the RETURNING clause.
+		return id, errors.New("ent: CourseGradeUpsertOne.ID is not supported by MySQL driver. Use CourseGradeUpsertOne.Exec instead")
+	}
+	node, err := u.create.Save(ctx)
+	if err != nil {
+		return id, err
+	}
+	return node.ID, nil
+}
+
+// IDX is like ID, but panics if an error occurs.
+func (u *CourseGradeUpsertOne) IDX(ctx context.Context) uuid.UUID {
+	id, err := u.ID(ctx)
+	if err != nil {
+		panic(err)
+	}
+	return id
+}
+
 // CourseGradeCreateBulk is the builder for creating many CourseGrade entities in bulk.
 type CourseGradeCreateBulk struct {
 	config
 	builders []*CourseGradeCreate
+	conflict []sql.ConflictOption
 }
 
 // Save creates the CourseGrade entities in the database.
@@ -478,6 +921,7 @@ func (cgcb *CourseGradeCreateBulk) Save(ctx context.Context) ([]*CourseGrade, er
 					_, err = mutators[i+1].Mutate(root, cgcb.builders[i+1].mutation)
 				} else {
 					spec := &sqlgraph.BatchCreateSpec{Nodes: specs}
+					spec.OnConflict = cgcb.conflict
 					// Invoke the actual operation on the latest mutation in the chain.
 					if err = sqlgraph.BatchCreate(ctx, cgcb.driver, spec); err != nil {
 						if sqlgraph.IsConstraintError(err) {
@@ -524,6 +968,283 @@ func (cgcb *CourseGradeCreateBulk) Exec(ctx context.Context) error {
 // ExecX is like Exec, but panics if an error occurs.
 func (cgcb *CourseGradeCreateBulk) ExecX(ctx context.Context) {
 	if err := cgcb.Exec(ctx); err != nil {
+		panic(err)
+	}
+}
+
+// OnConflict allows configuring the `ON CONFLICT` / `ON DUPLICATE KEY` clause
+// of the `INSERT` statement. For example:
+//
+//	client.CourseGrade.CreateBulk(builders...).
+//		OnConflict(
+//			// Update the row with the new values
+//			// the was proposed for insertion.
+//			sql.ResolveWithNewValues(),
+//		).
+//		// Override some of the fields with custom
+//		// update values.
+//		Update(func(u *ent.CourseGradeUpsert) {
+//			SetCreatedAt(v+v).
+//		}).
+//		Exec(ctx)
+//
+func (cgcb *CourseGradeCreateBulk) OnConflict(opts ...sql.ConflictOption) *CourseGradeUpsertBulk {
+	cgcb.conflict = opts
+	return &CourseGradeUpsertBulk{
+		create: cgcb,
+	}
+}
+
+// OnConflictColumns calls `OnConflict` and configures the columns
+// as conflict target. Using this option is equivalent to using:
+//
+//	client.CourseGrade.Create().
+//		OnConflict(sql.ConflictColumns(columns...)).
+//		Exec(ctx)
+//
+func (cgcb *CourseGradeCreateBulk) OnConflictColumns(columns ...string) *CourseGradeUpsertBulk {
+	cgcb.conflict = append(cgcb.conflict, sql.ConflictColumns(columns...))
+	return &CourseGradeUpsertBulk{
+		create: cgcb,
+	}
+}
+
+// CourseGradeUpsertBulk is the builder for "upsert"-ing
+// a bulk of CourseGrade nodes.
+type CourseGradeUpsertBulk struct {
+	create *CourseGradeCreateBulk
+}
+
+// UpdateNewValues updates the fields using the new values that
+// were set on create. Using this option is equivalent to using:
+//
+//	client.CourseGrade.Create().
+//		OnConflict(
+//			sql.ResolveWithNewValues(),
+//			sql.ResolveWith(func(u *sql.UpdateSet) {
+//				u.SetIgnore(coursegrade.FieldID)
+//			}),
+//		).
+//		Exec(ctx)
+//
+func (u *CourseGradeUpsertBulk) UpdateNewValues() *CourseGradeUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithNewValues())
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(s *sql.UpdateSet) {
+		for _, b := range u.create.builders {
+			if _, exists := b.mutation.ID(); exists {
+				s.SetIgnore(coursegrade.FieldID)
+				return
+			}
+		}
+	}))
+	return u
+}
+
+// Ignore sets each column to itself in case of conflict.
+// Using this option is equivalent to using:
+//
+//	client.CourseGrade.Create().
+//		OnConflict(sql.ResolveWithIgnore()).
+//		Exec(ctx)
+//
+func (u *CourseGradeUpsertBulk) Ignore() *CourseGradeUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithIgnore())
+	return u
+}
+
+// DoNothing configures the conflict_action to `DO NOTHING`.
+// Supported only by SQLite and PostgreSQL.
+func (u *CourseGradeUpsertBulk) DoNothing() *CourseGradeUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.DoNothing())
+	return u
+}
+
+// Update allows overriding fields `UPDATE` values. See the CourseGradeCreateBulk.OnConflict
+// documentation for more info.
+func (u *CourseGradeUpsertBulk) Update(set func(*CourseGradeUpsert)) *CourseGradeUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(update *sql.UpdateSet) {
+		set(&CourseGradeUpsert{UpdateSet: update})
+	}))
+	return u
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (u *CourseGradeUpsertBulk) SetCreatedAt(v time.Time) *CourseGradeUpsertBulk {
+	return u.Update(func(s *CourseGradeUpsert) {
+		s.SetCreatedAt(v)
+	})
+}
+
+// UpdateCreatedAt sets the "created_at" field to the value that was provided on create.
+func (u *CourseGradeUpsertBulk) UpdateCreatedAt() *CourseGradeUpsertBulk {
+	return u.Update(func(s *CourseGradeUpsert) {
+		s.UpdateCreatedAt()
+	})
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (u *CourseGradeUpsertBulk) SetUpdatedAt(v time.Time) *CourseGradeUpsertBulk {
+	return u.Update(func(s *CourseGradeUpsert) {
+		s.SetUpdatedAt(v)
+	})
+}
+
+// UpdateUpdatedAt sets the "updated_at" field to the value that was provided on create.
+func (u *CourseGradeUpsertBulk) UpdateUpdatedAt() *CourseGradeUpsertBulk {
+	return u.Update(func(s *CourseGradeUpsert) {
+		s.UpdateUpdatedAt()
+	})
+}
+
+// SetCourse sets the "course" field.
+func (u *CourseGradeUpsertBulk) SetCourse(v coursegrade.Course) *CourseGradeUpsertBulk {
+	return u.Update(func(s *CourseGradeUpsert) {
+		s.SetCourse(v)
+	})
+}
+
+// UpdateCourse sets the "course" field to the value that was provided on create.
+func (u *CourseGradeUpsertBulk) UpdateCourse() *CourseGradeUpsertBulk {
+	return u.Update(func(s *CourseGradeUpsert) {
+		s.UpdateCourse()
+	})
+}
+
+// SetActivityFirst sets the "activity_first" field.
+func (u *CourseGradeUpsertBulk) SetActivityFirst(v int) *CourseGradeUpsertBulk {
+	return u.Update(func(s *CourseGradeUpsert) {
+		s.SetActivityFirst(v)
+	})
+}
+
+// UpdateActivityFirst sets the "activity_first" field to the value that was provided on create.
+func (u *CourseGradeUpsertBulk) UpdateActivityFirst() *CourseGradeUpsertBulk {
+	return u.Update(func(s *CourseGradeUpsert) {
+		s.UpdateActivityFirst()
+	})
+}
+
+// ClearActivityFirst clears the value of the "activity_first" field.
+func (u *CourseGradeUpsertBulk) ClearActivityFirst() *CourseGradeUpsertBulk {
+	return u.Update(func(s *CourseGradeUpsert) {
+		s.ClearActivityFirst()
+	})
+}
+
+// SetActivitySecond sets the "activity_second" field.
+func (u *CourseGradeUpsertBulk) SetActivitySecond(v int) *CourseGradeUpsertBulk {
+	return u.Update(func(s *CourseGradeUpsert) {
+		s.SetActivitySecond(v)
+	})
+}
+
+// UpdateActivitySecond sets the "activity_second" field to the value that was provided on create.
+func (u *CourseGradeUpsertBulk) UpdateActivitySecond() *CourseGradeUpsertBulk {
+	return u.Update(func(s *CourseGradeUpsert) {
+		s.UpdateActivitySecond()
+	})
+}
+
+// ClearActivitySecond clears the value of the "activity_second" field.
+func (u *CourseGradeUpsertBulk) ClearActivitySecond() *CourseGradeUpsertBulk {
+	return u.Update(func(s *CourseGradeUpsert) {
+		s.ClearActivitySecond()
+	})
+}
+
+// SetWrittenFirst sets the "written_first" field.
+func (u *CourseGradeUpsertBulk) SetWrittenFirst(v int) *CourseGradeUpsertBulk {
+	return u.Update(func(s *CourseGradeUpsert) {
+		s.SetWrittenFirst(v)
+	})
+}
+
+// UpdateWrittenFirst sets the "written_first" field to the value that was provided on create.
+func (u *CourseGradeUpsertBulk) UpdateWrittenFirst() *CourseGradeUpsertBulk {
+	return u.Update(func(s *CourseGradeUpsert) {
+		s.UpdateWrittenFirst()
+	})
+}
+
+// ClearWrittenFirst clears the value of the "written_first" field.
+func (u *CourseGradeUpsertBulk) ClearWrittenFirst() *CourseGradeUpsertBulk {
+	return u.Update(func(s *CourseGradeUpsert) {
+		s.ClearWrittenFirst()
+	})
+}
+
+// SetWrittenSecond sets the "written_second" field.
+func (u *CourseGradeUpsertBulk) SetWrittenSecond(v int) *CourseGradeUpsertBulk {
+	return u.Update(func(s *CourseGradeUpsert) {
+		s.SetWrittenSecond(v)
+	})
+}
+
+// UpdateWrittenSecond sets the "written_second" field to the value that was provided on create.
+func (u *CourseGradeUpsertBulk) UpdateWrittenSecond() *CourseGradeUpsertBulk {
+	return u.Update(func(s *CourseGradeUpsert) {
+		s.UpdateWrittenSecond()
+	})
+}
+
+// ClearWrittenSecond clears the value of the "written_second" field.
+func (u *CourseGradeUpsertBulk) ClearWrittenSecond() *CourseGradeUpsertBulk {
+	return u.Update(func(s *CourseGradeUpsert) {
+		s.ClearWrittenSecond()
+	})
+}
+
+// SetCourseFinal sets the "course_final" field.
+func (u *CourseGradeUpsertBulk) SetCourseFinal(v int) *CourseGradeUpsertBulk {
+	return u.Update(func(s *CourseGradeUpsert) {
+		s.SetCourseFinal(v)
+	})
+}
+
+// UpdateCourseFinal sets the "course_final" field to the value that was provided on create.
+func (u *CourseGradeUpsertBulk) UpdateCourseFinal() *CourseGradeUpsertBulk {
+	return u.Update(func(s *CourseGradeUpsert) {
+		s.UpdateCourseFinal()
+	})
+}
+
+// ClearCourseFinal clears the value of the "course_final" field.
+func (u *CourseGradeUpsertBulk) ClearCourseFinal() *CourseGradeUpsertBulk {
+	return u.Update(func(s *CourseGradeUpsert) {
+		s.ClearCourseFinal()
+	})
+}
+
+// SetYear sets the "year" field.
+func (u *CourseGradeUpsertBulk) SetYear(v string) *CourseGradeUpsertBulk {
+	return u.Update(func(s *CourseGradeUpsert) {
+		s.SetYear(v)
+	})
+}
+
+// UpdateYear sets the "year" field to the value that was provided on create.
+func (u *CourseGradeUpsertBulk) UpdateYear() *CourseGradeUpsertBulk {
+	return u.Update(func(s *CourseGradeUpsert) {
+		s.UpdateYear()
+	})
+}
+
+// Exec executes the query.
+func (u *CourseGradeUpsertBulk) Exec(ctx context.Context) error {
+	for i, b := range u.create.builders {
+		if len(b.conflict) != 0 {
+			return fmt.Errorf("ent: OnConflict was set for builder %d. Set it on the CourseGradeCreateBulk instead", i)
+		}
+	}
+	if len(u.create.conflict) == 0 {
+		return errors.New("ent: missing options for CourseGradeCreateBulk.OnConflict")
+	}
+	return u.create.Exec(ctx)
+}
+
+// ExecX is like Exec, but panics if an error occurs.
+func (u *CourseGradeUpsertBulk) ExecX(ctx context.Context) {
+	if err := u.create.Exec(ctx); err != nil {
 		panic(err)
 	}
 }

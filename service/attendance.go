@@ -39,8 +39,13 @@ func (s *Service) Attendances(ctx context.Context, opts AttendancesOptions) (*en
 }
 
 func (s *Service) AddAttendance(ctx context.Context, input model.AddAttendanceInput) (*ent.Attendance, error) {
-	return s.EC.Attendance.Create().SetClassID(input.ClassID).SetStudentID(input.StudentID).
-		SetDate(input.Date).SetState(input.State).Save(ctx)
+	id, err := s.EC.Attendance.Create().SetClassID(input.ClassID).SetStudentID(input.StudentID).
+		SetDate(input.Date).SetState(input.State).OnConflict().UpdateState().ID(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	return s.EC.Attendance.Get(ctx, id)
 }
 
 func (s *Service) UpdateAttendance(ctx context.Context, id uuid.UUID, input model.UpdateAttendanceInput) (*ent.Attendance, error) {

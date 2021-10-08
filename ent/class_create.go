@@ -8,6 +8,8 @@ import (
 	"fmt"
 	"time"
 
+	"entgo.io/ent/dialect"
+	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/google/uuid"
@@ -26,6 +28,7 @@ type ClassCreate struct {
 	config
 	mutation *ClassMutation
 	hooks    []Hook
+	conflict []sql.ConflictOption
 }
 
 // SetCreatedAt sets the "created_at" field.
@@ -334,6 +337,7 @@ func (cc *ClassCreate) createSpec() (*Class, *sqlgraph.CreateSpec) {
 			},
 		}
 	)
+	_spec.OnConflict = cc.conflict
 	if id, ok := cc.mutation.ID(); ok {
 		_node.ID = id
 		_spec.ID.Value = id
@@ -516,10 +520,293 @@ func (cc *ClassCreate) createSpec() (*Class, *sqlgraph.CreateSpec) {
 	return _node, _spec
 }
 
+// OnConflict allows configuring the `ON CONFLICT` / `ON DUPLICATE KEY` clause
+// of the `INSERT` statement. For example:
+//
+//	client.Class.Create().
+//		SetCreatedAt(v).
+//		OnConflict(
+//			// Update the row with the new values
+//			// the was proposed for insertion.
+//			sql.ResolveWithNewValues(),
+//		).
+//		// Override some of the fields with custom
+//		// update values.
+//		Update(func(u *ent.ClassUpsert) {
+//			SetCreatedAt(v+v).
+//		}).
+//		Exec(ctx)
+//
+func (cc *ClassCreate) OnConflict(opts ...sql.ConflictOption) *ClassUpsertOne {
+	cc.conflict = opts
+	return &ClassUpsertOne{
+		create: cc,
+	}
+}
+
+// OnConflictColumns calls `OnConflict` and configures the columns
+// as conflict target. Using this option is equivalent to using:
+//
+//	client.Class.Create().
+//		OnConflict(sql.ConflictColumns(columns...)).
+//		Exec(ctx)
+//
+func (cc *ClassCreate) OnConflictColumns(columns ...string) *ClassUpsertOne {
+	cc.conflict = append(cc.conflict, sql.ConflictColumns(columns...))
+	return &ClassUpsertOne{
+		create: cc,
+	}
+}
+
+type (
+	// ClassUpsertOne is the builder for "upsert"-ing
+	//  one Class node.
+	ClassUpsertOne struct {
+		create *ClassCreate
+	}
+
+	// ClassUpsert is the "OnConflict" setter.
+	ClassUpsert struct {
+		*sql.UpdateSet
+	}
+)
+
+// SetCreatedAt sets the "created_at" field.
+func (u *ClassUpsert) SetCreatedAt(v time.Time) *ClassUpsert {
+	u.Set(class.FieldCreatedAt, v)
+	return u
+}
+
+// UpdateCreatedAt sets the "created_at" field to the value that was provided on create.
+func (u *ClassUpsert) UpdateCreatedAt() *ClassUpsert {
+	u.SetExcluded(class.FieldCreatedAt)
+	return u
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (u *ClassUpsert) SetUpdatedAt(v time.Time) *ClassUpsert {
+	u.Set(class.FieldUpdatedAt, v)
+	return u
+}
+
+// UpdateUpdatedAt sets the "updated_at" field to the value that was provided on create.
+func (u *ClassUpsert) UpdateUpdatedAt() *ClassUpsert {
+	u.SetExcluded(class.FieldUpdatedAt)
+	return u
+}
+
+// SetName sets the "name" field.
+func (u *ClassUpsert) SetName(v string) *ClassUpsert {
+	u.Set(class.FieldName, v)
+	return u
+}
+
+// UpdateName sets the "name" field to the value that was provided on create.
+func (u *ClassUpsert) UpdateName() *ClassUpsert {
+	u.SetExcluded(class.FieldName)
+	return u
+}
+
+// SetActive sets the "active" field.
+func (u *ClassUpsert) SetActive(v bool) *ClassUpsert {
+	u.Set(class.FieldActive, v)
+	return u
+}
+
+// UpdateActive sets the "active" field to the value that was provided on create.
+func (u *ClassUpsert) UpdateActive() *ClassUpsert {
+	u.SetExcluded(class.FieldActive)
+	return u
+}
+
+// SetDeletedAt sets the "deleted_at" field.
+func (u *ClassUpsert) SetDeletedAt(v time.Time) *ClassUpsert {
+	u.Set(class.FieldDeletedAt, v)
+	return u
+}
+
+// UpdateDeletedAt sets the "deleted_at" field to the value that was provided on create.
+func (u *ClassUpsert) UpdateDeletedAt() *ClassUpsert {
+	u.SetExcluded(class.FieldDeletedAt)
+	return u
+}
+
+// ClearDeletedAt clears the value of the "deleted_at" field.
+func (u *ClassUpsert) ClearDeletedAt() *ClassUpsert {
+	u.SetNull(class.FieldDeletedAt)
+	return u
+}
+
+// UpdateNewValues updates the fields using the new values that were set on create except the ID field.
+// Using this option is equivalent to using:
+//
+//	client.Class.Create().
+//		OnConflict(
+//			sql.ResolveWithNewValues(),
+//			sql.ResolveWith(func(u *sql.UpdateSet) {
+//				u.SetIgnore(class.FieldID)
+//			}),
+//		).
+//		Exec(ctx)
+//
+func (u *ClassUpsertOne) UpdateNewValues() *ClassUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithNewValues())
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(s *sql.UpdateSet) {
+		if _, exists := u.create.mutation.ID(); exists {
+			s.SetIgnore(class.FieldID)
+		}
+	}))
+	return u
+}
+
+// Ignore sets each column to itself in case of conflict.
+// Using this option is equivalent to using:
+//
+//  client.Class.Create().
+//      OnConflict(sql.ResolveWithIgnore()).
+//      Exec(ctx)
+//
+func (u *ClassUpsertOne) Ignore() *ClassUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithIgnore())
+	return u
+}
+
+// DoNothing configures the conflict_action to `DO NOTHING`.
+// Supported only by SQLite and PostgreSQL.
+func (u *ClassUpsertOne) DoNothing() *ClassUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.DoNothing())
+	return u
+}
+
+// Update allows overriding fields `UPDATE` values. See the ClassCreate.OnConflict
+// documentation for more info.
+func (u *ClassUpsertOne) Update(set func(*ClassUpsert)) *ClassUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(update *sql.UpdateSet) {
+		set(&ClassUpsert{UpdateSet: update})
+	}))
+	return u
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (u *ClassUpsertOne) SetCreatedAt(v time.Time) *ClassUpsertOne {
+	return u.Update(func(s *ClassUpsert) {
+		s.SetCreatedAt(v)
+	})
+}
+
+// UpdateCreatedAt sets the "created_at" field to the value that was provided on create.
+func (u *ClassUpsertOne) UpdateCreatedAt() *ClassUpsertOne {
+	return u.Update(func(s *ClassUpsert) {
+		s.UpdateCreatedAt()
+	})
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (u *ClassUpsertOne) SetUpdatedAt(v time.Time) *ClassUpsertOne {
+	return u.Update(func(s *ClassUpsert) {
+		s.SetUpdatedAt(v)
+	})
+}
+
+// UpdateUpdatedAt sets the "updated_at" field to the value that was provided on create.
+func (u *ClassUpsertOne) UpdateUpdatedAt() *ClassUpsertOne {
+	return u.Update(func(s *ClassUpsert) {
+		s.UpdateUpdatedAt()
+	})
+}
+
+// SetName sets the "name" field.
+func (u *ClassUpsertOne) SetName(v string) *ClassUpsertOne {
+	return u.Update(func(s *ClassUpsert) {
+		s.SetName(v)
+	})
+}
+
+// UpdateName sets the "name" field to the value that was provided on create.
+func (u *ClassUpsertOne) UpdateName() *ClassUpsertOne {
+	return u.Update(func(s *ClassUpsert) {
+		s.UpdateName()
+	})
+}
+
+// SetActive sets the "active" field.
+func (u *ClassUpsertOne) SetActive(v bool) *ClassUpsertOne {
+	return u.Update(func(s *ClassUpsert) {
+		s.SetActive(v)
+	})
+}
+
+// UpdateActive sets the "active" field to the value that was provided on create.
+func (u *ClassUpsertOne) UpdateActive() *ClassUpsertOne {
+	return u.Update(func(s *ClassUpsert) {
+		s.UpdateActive()
+	})
+}
+
+// SetDeletedAt sets the "deleted_at" field.
+func (u *ClassUpsertOne) SetDeletedAt(v time.Time) *ClassUpsertOne {
+	return u.Update(func(s *ClassUpsert) {
+		s.SetDeletedAt(v)
+	})
+}
+
+// UpdateDeletedAt sets the "deleted_at" field to the value that was provided on create.
+func (u *ClassUpsertOne) UpdateDeletedAt() *ClassUpsertOne {
+	return u.Update(func(s *ClassUpsert) {
+		s.UpdateDeletedAt()
+	})
+}
+
+// ClearDeletedAt clears the value of the "deleted_at" field.
+func (u *ClassUpsertOne) ClearDeletedAt() *ClassUpsertOne {
+	return u.Update(func(s *ClassUpsert) {
+		s.ClearDeletedAt()
+	})
+}
+
+// Exec executes the query.
+func (u *ClassUpsertOne) Exec(ctx context.Context) error {
+	if len(u.create.conflict) == 0 {
+		return errors.New("ent: missing options for ClassCreate.OnConflict")
+	}
+	return u.create.Exec(ctx)
+}
+
+// ExecX is like Exec, but panics if an error occurs.
+func (u *ClassUpsertOne) ExecX(ctx context.Context) {
+	if err := u.create.Exec(ctx); err != nil {
+		panic(err)
+	}
+}
+
+// Exec executes the UPSERT query and returns the inserted/updated ID.
+func (u *ClassUpsertOne) ID(ctx context.Context) (id uuid.UUID, err error) {
+	if u.create.driver.Dialect() == dialect.MySQL {
+		// In case of "ON CONFLICT", there is no way to get back non-numeric ID
+		// fields from the database since MySQL does not support the RETURNING clause.
+		return id, errors.New("ent: ClassUpsertOne.ID is not supported by MySQL driver. Use ClassUpsertOne.Exec instead")
+	}
+	node, err := u.create.Save(ctx)
+	if err != nil {
+		return id, err
+	}
+	return node.ID, nil
+}
+
+// IDX is like ID, but panics if an error occurs.
+func (u *ClassUpsertOne) IDX(ctx context.Context) uuid.UUID {
+	id, err := u.ID(ctx)
+	if err != nil {
+		panic(err)
+	}
+	return id
+}
+
 // ClassCreateBulk is the builder for creating many Class entities in bulk.
 type ClassCreateBulk struct {
 	config
 	builders []*ClassCreate
+	conflict []sql.ConflictOption
 }
 
 // Save creates the Class entities in the database.
@@ -546,6 +833,7 @@ func (ccb *ClassCreateBulk) Save(ctx context.Context) ([]*Class, error) {
 					_, err = mutators[i+1].Mutate(root, ccb.builders[i+1].mutation)
 				} else {
 					spec := &sqlgraph.BatchCreateSpec{Nodes: specs}
+					spec.OnConflict = ccb.conflict
 					// Invoke the actual operation on the latest mutation in the chain.
 					if err = sqlgraph.BatchCreate(ctx, ccb.driver, spec); err != nil {
 						if sqlgraph.IsConstraintError(err) {
@@ -592,6 +880,199 @@ func (ccb *ClassCreateBulk) Exec(ctx context.Context) error {
 // ExecX is like Exec, but panics if an error occurs.
 func (ccb *ClassCreateBulk) ExecX(ctx context.Context) {
 	if err := ccb.Exec(ctx); err != nil {
+		panic(err)
+	}
+}
+
+// OnConflict allows configuring the `ON CONFLICT` / `ON DUPLICATE KEY` clause
+// of the `INSERT` statement. For example:
+//
+//	client.Class.CreateBulk(builders...).
+//		OnConflict(
+//			// Update the row with the new values
+//			// the was proposed for insertion.
+//			sql.ResolveWithNewValues(),
+//		).
+//		// Override some of the fields with custom
+//		// update values.
+//		Update(func(u *ent.ClassUpsert) {
+//			SetCreatedAt(v+v).
+//		}).
+//		Exec(ctx)
+//
+func (ccb *ClassCreateBulk) OnConflict(opts ...sql.ConflictOption) *ClassUpsertBulk {
+	ccb.conflict = opts
+	return &ClassUpsertBulk{
+		create: ccb,
+	}
+}
+
+// OnConflictColumns calls `OnConflict` and configures the columns
+// as conflict target. Using this option is equivalent to using:
+//
+//	client.Class.Create().
+//		OnConflict(sql.ConflictColumns(columns...)).
+//		Exec(ctx)
+//
+func (ccb *ClassCreateBulk) OnConflictColumns(columns ...string) *ClassUpsertBulk {
+	ccb.conflict = append(ccb.conflict, sql.ConflictColumns(columns...))
+	return &ClassUpsertBulk{
+		create: ccb,
+	}
+}
+
+// ClassUpsertBulk is the builder for "upsert"-ing
+// a bulk of Class nodes.
+type ClassUpsertBulk struct {
+	create *ClassCreateBulk
+}
+
+// UpdateNewValues updates the fields using the new values that
+// were set on create. Using this option is equivalent to using:
+//
+//	client.Class.Create().
+//		OnConflict(
+//			sql.ResolveWithNewValues(),
+//			sql.ResolveWith(func(u *sql.UpdateSet) {
+//				u.SetIgnore(class.FieldID)
+//			}),
+//		).
+//		Exec(ctx)
+//
+func (u *ClassUpsertBulk) UpdateNewValues() *ClassUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithNewValues())
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(s *sql.UpdateSet) {
+		for _, b := range u.create.builders {
+			if _, exists := b.mutation.ID(); exists {
+				s.SetIgnore(class.FieldID)
+				return
+			}
+		}
+	}))
+	return u
+}
+
+// Ignore sets each column to itself in case of conflict.
+// Using this option is equivalent to using:
+//
+//	client.Class.Create().
+//		OnConflict(sql.ResolveWithIgnore()).
+//		Exec(ctx)
+//
+func (u *ClassUpsertBulk) Ignore() *ClassUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithIgnore())
+	return u
+}
+
+// DoNothing configures the conflict_action to `DO NOTHING`.
+// Supported only by SQLite and PostgreSQL.
+func (u *ClassUpsertBulk) DoNothing() *ClassUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.DoNothing())
+	return u
+}
+
+// Update allows overriding fields `UPDATE` values. See the ClassCreateBulk.OnConflict
+// documentation for more info.
+func (u *ClassUpsertBulk) Update(set func(*ClassUpsert)) *ClassUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(update *sql.UpdateSet) {
+		set(&ClassUpsert{UpdateSet: update})
+	}))
+	return u
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (u *ClassUpsertBulk) SetCreatedAt(v time.Time) *ClassUpsertBulk {
+	return u.Update(func(s *ClassUpsert) {
+		s.SetCreatedAt(v)
+	})
+}
+
+// UpdateCreatedAt sets the "created_at" field to the value that was provided on create.
+func (u *ClassUpsertBulk) UpdateCreatedAt() *ClassUpsertBulk {
+	return u.Update(func(s *ClassUpsert) {
+		s.UpdateCreatedAt()
+	})
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (u *ClassUpsertBulk) SetUpdatedAt(v time.Time) *ClassUpsertBulk {
+	return u.Update(func(s *ClassUpsert) {
+		s.SetUpdatedAt(v)
+	})
+}
+
+// UpdateUpdatedAt sets the "updated_at" field to the value that was provided on create.
+func (u *ClassUpsertBulk) UpdateUpdatedAt() *ClassUpsertBulk {
+	return u.Update(func(s *ClassUpsert) {
+		s.UpdateUpdatedAt()
+	})
+}
+
+// SetName sets the "name" field.
+func (u *ClassUpsertBulk) SetName(v string) *ClassUpsertBulk {
+	return u.Update(func(s *ClassUpsert) {
+		s.SetName(v)
+	})
+}
+
+// UpdateName sets the "name" field to the value that was provided on create.
+func (u *ClassUpsertBulk) UpdateName() *ClassUpsertBulk {
+	return u.Update(func(s *ClassUpsert) {
+		s.UpdateName()
+	})
+}
+
+// SetActive sets the "active" field.
+func (u *ClassUpsertBulk) SetActive(v bool) *ClassUpsertBulk {
+	return u.Update(func(s *ClassUpsert) {
+		s.SetActive(v)
+	})
+}
+
+// UpdateActive sets the "active" field to the value that was provided on create.
+func (u *ClassUpsertBulk) UpdateActive() *ClassUpsertBulk {
+	return u.Update(func(s *ClassUpsert) {
+		s.UpdateActive()
+	})
+}
+
+// SetDeletedAt sets the "deleted_at" field.
+func (u *ClassUpsertBulk) SetDeletedAt(v time.Time) *ClassUpsertBulk {
+	return u.Update(func(s *ClassUpsert) {
+		s.SetDeletedAt(v)
+	})
+}
+
+// UpdateDeletedAt sets the "deleted_at" field to the value that was provided on create.
+func (u *ClassUpsertBulk) UpdateDeletedAt() *ClassUpsertBulk {
+	return u.Update(func(s *ClassUpsert) {
+		s.UpdateDeletedAt()
+	})
+}
+
+// ClearDeletedAt clears the value of the "deleted_at" field.
+func (u *ClassUpsertBulk) ClearDeletedAt() *ClassUpsertBulk {
+	return u.Update(func(s *ClassUpsert) {
+		s.ClearDeletedAt()
+	})
+}
+
+// Exec executes the query.
+func (u *ClassUpsertBulk) Exec(ctx context.Context) error {
+	for i, b := range u.create.builders {
+		if len(b.conflict) != 0 {
+			return fmt.Errorf("ent: OnConflict was set for builder %d. Set it on the ClassCreateBulk instead", i)
+		}
+	}
+	if len(u.create.conflict) == 0 {
+		return errors.New("ent: missing options for ClassCreateBulk.OnConflict")
+	}
+	return u.create.Exec(ctx)
+}
+
+// ExecX is like Exec, but panics if an error occurs.
+func (u *ClassUpsertBulk) ExecX(ctx context.Context) {
+	if err := u.create.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
