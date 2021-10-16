@@ -59,23 +59,25 @@ func (s *Service) Assignments(ctx context.Context, opts AssignmentsOptions) (*en
 
 func (s *Service) AddAssignment(ctx context.Context, input model.AddAssignmentInput) (*ent.Assignment, error) {
 	stg, err := s.EC.Class.Query().Where(class.ID(input.ClassID)).QueryStage().Only(ctx)
-	info, err := s.putFile(ctx, path.Join(stg.Directory, s.FormatFilename(input.File.Filename, "")), input.File)
 	if err != nil {
 		return nil, err
 	}
 
-	b := s.EC.Assignment.Create().SetName(input.Name).SetIsExam(input.IsExam).SetClassID(input.ClassID).
-		SetFile(info.Key).SetDueDate(input.DueDate)
-
-	if input.Description != nil {
-		b = b.SetDescription(*input.Description)
+	var filename string
+	if input.File != nil {
+		filename = s.FormatFilename(input.File.Filename, "")
 	}
 
-	if input.Duration != nil {
-		b = b.SetDuration(*input.Duration)
+	info, err := s.putFile(ctx, path.Join(stg.Directory, filename), input.File)
+	if err != nil {
+		return nil, err
 	}
 
-	return b.Save(ctx)
+	return s.EC.Assignment.Create().SetName(input.Name).SetIsExam(input.IsExam).SetClassID(input.ClassID).
+		SetFile(info.Key).SetDueDate(input.DueDate).
+		SetNillableDescription(input.Description).
+		SetNillableDuration(input.Duration).
+		Save(ctx)
 }
 
 func (s *Service) UpdateAssignment(ctx context.Context, id uuid.UUID, input model.UpdateAssignmentInput) (*ent.Assignment, error) {
@@ -125,6 +127,10 @@ func (s *Service) UpdateAssignment(ctx context.Context, id uuid.UUID, input mode
 }
 
 func (s *Service) putFile(ctx context.Context, name string, f *graphql.Upload) (minio.UploadInfo, error) {
+	if f == nil {
+		return minio.UploadInfo{}, nil
+	}
+
 	return s.MC.PutObject(ctx, s.Config.RootBucket, name, f.File, f.Size, minio.PutObjectOptions{UserMetadata: defaultMetadata})
 }
 
