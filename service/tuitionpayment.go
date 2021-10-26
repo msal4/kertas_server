@@ -5,6 +5,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/msal4/hassah_school_server/ent"
+	"github.com/msal4/hassah_school_server/ent/school"
 	"github.com/msal4/hassah_school_server/ent/stage"
 	"github.com/msal4/hassah_school_server/ent/tuitionpayment"
 	"github.com/msal4/hassah_school_server/ent/user"
@@ -21,6 +22,7 @@ type TuitionPaymentsOptions struct {
 
 	StageID   *uuid.UUID
 	StudentID *uuid.UUID
+	SchoolID  *uuid.UUID
 }
 
 func (s *Service) TuitionPayments(ctx context.Context, opts TuitionPaymentsOptions) (*ent.TuitionPaymentConnection, error) {
@@ -32,6 +34,10 @@ func (s *Service) TuitionPayments(ctx context.Context, opts TuitionPaymentsOptio
 
 	if opts.StudentID != nil {
 		b = b.Where(tuitionpayment.HasStudentWith(user.ID(*opts.StudentID)))
+	}
+
+	if opts.SchoolID != nil {
+		b = b.Where(tuitionpayment.HasStageWith(stage.HasSchoolWith(school.ID(*opts.SchoolID))))
 	}
 
 	return b.Paginate(ctx, opts.After, opts.First, opts.Before, opts.Last,
