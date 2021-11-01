@@ -632,15 +632,12 @@ func (r *queryResolver) TuitionPayments(ctx context.Context, studentID *uuid.UUI
 	case user.RoleStudent:
 		opts.StudentID = &u.ID
 
-	case user.RoleSchoolAdmin:
+	case user.RoleSchoolAdmin, user.RoleTeacher:
 		schoolID, err := r.s.EC.User.Query().Where(user.ID(u.ID)).QuerySchool().OnlyID(ctx)
 		if err != nil {
 			return nil, err
 		}
 		opts.SchoolID = &schoolID
-
-	default:
-		return nil, auth.UnauthorizedErr
 	}
 
 	return r.s.TuitionPayments(ctx, opts)
