@@ -10,5 +10,5 @@ RUN ["go", "build", "-o", "server", "cmd/server/main.go"]
 FROM alpine
 
 WORKDIR /app
-COPY --from=build-env /src/server .
+COPY --from=build-env /src/server ./app/server
 CMD ["./server"]
