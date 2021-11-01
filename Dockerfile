@@ -4,10 +4,11 @@ WORKDIR /src
 COPY go.mod .
 COPY go.sum .
 RUN go mod download
-RUN go build cmd/server -o server
+COPY . .
+RUN ["go", "build", "-o", "server", "cmd/server/main.go"]
 
 FROM alpine
 
 WORKDIR /app
 COPY --from=build-env /src/server .
-ENTRYPOINT ./server
+CMD ["./server"]
