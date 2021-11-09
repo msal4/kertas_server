@@ -72,7 +72,7 @@ func NewDefaultServer(cfg Config) (*http.ServeMux, error) {
 	}
 
 	if err := createDefaultAdminIfNotExists(context.Background(), s, cfg); err != nil {
-		return nil, fmt.Errorf("creating super admin: %v", err)
+		log.Printf("creating super admin: %v\n", err)
 	}
 
 	return NewServer(s, cfg.Debug), nil
