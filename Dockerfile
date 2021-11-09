@@ -10,9 +10,8 @@ RUN ["go", "build", "-o", "build/server", "cmd/server/main.go"]
 
 FROM node:14.18 as node-env
 
-ENV PUBLIC_URL=/dashboard
-ENV REACT_APP_GRAPHQL_URL=
-ENV REACT_APP_CDN_URL=
+ARG REACT_APP_GRAPHQL_URL
+ARG REACT_APP_CDN_URL
 
 WORKDIR /src/dashboard
 
@@ -23,7 +22,7 @@ RUN yarn
 
 COPY --from=build-env /src/dashboard .
 
-RUN PUBLIC_URL=${PUBLIC_URL} REACT_APP_GRAPHQL_URL=${REACT_APP_GRAPHQL_URL} REACT_APP_GRAPHQL_URL=${REACT_APP_GRAPHQL_URL} yarn build
+RUN PUBLIC_URL=/dashboard REACT_APP_GRAPHQL_URL=${REACT_APP_GRAPHQL_URL} REACT_APP_GRAPHQL_URL=${REACT_APP_GRAPHQL_URL} yarn build
 
 FROM alpine
 
