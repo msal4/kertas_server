@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"regexp"
 	"time"
 
 	"entgo.io/contrib/entgql"
@@ -60,7 +61,7 @@ func NewDefaultServer(cfg Config) (*http.ServeMux, error) {
 	}
 
 	if err = ec.Schema.Create(context.Background()); err != nil {
-		return nil, fmt.Errorf("creating schema: %v\n", err)
+		log.Printf("creating schema: %v\n", err)
 	}
 
 	mc, err := minio.New(cfg.Minio.Endpoint, &minio.Options{
@@ -106,6 +107,16 @@ func createDefaultAdminIfNotExists(ctx context.Context, s *service.Service, cfg 
 
 func NewServer(s *service.Service, debg bool) *http.ServeMux {
 	r := http.NewServeMux()
+	fileServer := http.StripPrefix("/dashboard/", http.FileServer(http.Dir("dashboard/build")))
+	fileMatcher := regexp.MustCompile(`\.[a-zA-Z]*$`)
+	r.HandleFunc("/dashboard/", func(w http.ResponseWriter, r *http.Request) {
+		if !fileMatcher.MatchString(r.URL.Path) {
+			http.ServeFile(w, r, "dashboard/build/index.html")
+			return
+		}
+		fileServer.ServeHTTP(w, r)
+	})
+
 	srv := handler.New(
 		generated.NewExecutableSchema(generated.Config{
 			Resolvers: &Resolver{s: s},
@@ -139,7 +150,7 @@ func NewServer(s *service.Service, debg bool) *http.ServeMux {
 	if debg {
 		srv.Use(&debug.Tracer{})
 	}
-	r.Handle("/", playground.Handler("Hassah School", "/graphql"))
+	r.Handle("/playground/", playground.Handler("Hassah School", "/graphql"))
 	r.Handle("/graphql", auth.Middleware(srv, s.Config.AccessSecretKey))
 
 	return r
