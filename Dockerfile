@@ -27,8 +27,13 @@ RUN PUBLIC_URL=${PUBLIC_URL} REACT_APP_GRAPHQL_URL=${REACT_APP_GRAPHQL_URL} REAC
 
 FROM alpine
 
+ENV PORT=3000
+
 WORKDIR /app
 COPY --from=build-env /src/build/* ./
 COPY --from=build-env /src/config.yml .
 COPY --from=node-env /src/dashboard/build ./dashboard/build
+
+EXPOSE $PORT
+
 CMD ["./server"]
