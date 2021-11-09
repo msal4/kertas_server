@@ -36,7 +36,7 @@ func loadConfig() server.Config {
 	var cfg server.Config
 	err = yaml.NewDecoder(f).Decode(&cfg)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal("unmarshling yaml:", err)
 	}
 
 	if err := godotenv.Load(); err != nil {
@@ -44,7 +44,7 @@ func loadConfig() server.Config {
 	}
 
 	if _, err := env.UnmarshalFromEnviron(&cfg); err != nil {
-		log.Fatal(err)
+		log.Fatal("unmarshling environment:", err)
 	}
 
 	if cfg.Port == 0 {
