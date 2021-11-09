@@ -51,9 +51,7 @@ func loadConfig() server.Config {
 		cfg.Port = 3000
 	}
 
-	if *debg {
-		cfg.Debug = true
-	}
+	cfg.Debug = *debg
 
 	return cfg
 }
