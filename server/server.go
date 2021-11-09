@@ -59,6 +59,10 @@ func NewDefaultServer(cfg Config) (*http.ServeMux, error) {
 		return nil, fmt.Errorf("establishing db connection: %v", err)
 	}
 
+	if err = ec.Schema.Create(context.Background()); err != nil {
+		return nil, fmt.Errorf("creating schema: %v\n", err)
+	}
+
 	mc, err := minio.New(cfg.Minio.Endpoint, &minio.Options{
 		Creds: credentials.NewStaticV4(cfg.Minio.AccessKey, cfg.Minio.Token, ""),
 	})
@@ -72,7 +76,7 @@ func NewDefaultServer(cfg Config) (*http.ServeMux, error) {
 	}
 
 	if err := createDefaultAdminIfNotExists(context.Background(), s, cfg); err != nil {
-		log.Printf("creating super admin: %v\n", err)
+		return nil, fmt.Errorf("creating super admin: %v\n", err)
 	}
 
 	return NewServer(s, cfg.Debug), nil
