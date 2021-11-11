@@ -41,6 +41,7 @@ func (s *Service) Groups(ctx context.Context, opts GroupsOptions) (*ent.GroupCon
 					group.HasUsersWith(user.ID(u.ID)),
 					group.HasClassWith(
 						class.HasStageWith(stage.ID(u.Edges.Stage.ID)),
+						class.DeletedAtIsNil(),
 					),
 				),
 			)
@@ -50,6 +51,7 @@ func (s *Service) Groups(ctx context.Context, opts GroupsOptions) (*ent.GroupCon
 					group.HasUsersWith(user.ID(u.ID)),
 					group.HasClassWith(
 						class.HasTeacherWith(user.ID(u.ID)),
+						class.DeletedAtIsNil(),
 					),
 				),
 			)
@@ -61,6 +63,7 @@ func (s *Service) Groups(ctx context.Context, opts GroupsOptions) (*ent.GroupCon
 						class.HasStageWith(
 							stage.HasSchoolWith(school.ID(u.Edges.School.ID)),
 						),
+						class.DeletedAtIsNil(),
 					),
 					group.HasUsersWith(
 						user.HasSchoolWith(school.ID(u.Edges.School.ID)),
