@@ -91,9 +91,16 @@ func (s *Service) notifyParticipants(ctx context.Context, sender *ent.User, grp 
 
 	var err error
 	if grp.GroupType == group.GroupTypePrivate {
-		receivers, err = grp.QueryUsers().Select(user.FieldPushTokens).All(ctx)
+		receivers, err = grp.QueryUsers().Where(user.IDNEQ(sender.ID)).Select(user.FieldPushTokens).All(ctx)
 	} else {
-		receivers, err = grp.QueryClass().QueryStage().QueryStudents().Select(user.FieldID, user.FieldPushTokens).All(ctx)
+		receivers, err = grp.QueryClass().QueryStage().QueryStudents().Where(user.IDNEQ(sender.ID)).
+			Select(user.FieldID, user.FieldPushTokens).All(ctx)
+		teacher, err := grp.QueryClass().QueryTeacher().Where(user.IDNEQ(sender.ID)).
+			Select(user.FieldID, user.FieldPushTokens).Only(ctx)
+		if err != nil && !ent.IsNotFound(err) {
+			return
+		}
+		receivers = append(receivers, teacher)
 	}
 	if err != nil {
 		return
