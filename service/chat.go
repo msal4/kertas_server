@@ -95,12 +95,11 @@ func (s *Service) notifyParticipants(ctx context.Context, sender *ent.User, grp 
 	} else {
 		receivers, err = grp.QueryClass().QueryStage().QueryStudents().Where(user.IDNEQ(sender.ID)).
 			Select(user.FieldID, user.FieldPushTokens).All(ctx)
-		teacher, err := grp.QueryClass().QueryTeacher().Where(user.IDNEQ(sender.ID)).
+		teacher, _ := grp.QueryClass().QueryTeacher().Where(user.IDNEQ(sender.ID)).
 			Select(user.FieldID, user.FieldPushTokens).Only(ctx)
-		if err != nil && !ent.IsNotFound(err) {
-			return
+		if teacher != nil {
+			receivers = append(receivers, teacher)
 		}
-		receivers = append(receivers, teacher)
 	}
 	if err != nil {
 		return
