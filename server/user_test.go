@@ -339,8 +339,8 @@ func TestLoginAdmin(t *testing.T) {
 	}{
 		{"super admin is allowed", suAdmin, nil},
 		{"school admin is allowed", schAdmin, nil},
-		{"teacher is not allowed", teacher, ptr.Str(service.NotAllowedErr.Error())},
-		{"student is not allowed", student, ptr.Str(service.NotAllowedErr.Error())},
+		{"teacher is not allowed", teacher, ptr.Str(service.ErrNotAllowed.Error())},
+		{"student is not allowed", student, ptr.Str(service.ErrNotAllowed.Error())},
 	}
 
 	for _, c := range cases {
@@ -400,8 +400,8 @@ func TestLoginUser(t *testing.T) {
 	}{
 		{"teacher is allowed", teacher, nil},
 		{"student is allowed", student, nil},
-		{"super admin is not allowed", suAdmin, ptr.Str(service.NotAllowedErr.Error())},
-		{"school admin is not allowed", schAdmin, ptr.Str(service.NotAllowedErr.Error())},
+		{"super admin is not allowed", suAdmin, ptr.Str(service.ErrNotAllowed.Error())},
+		{"school admin is not allowed", schAdmin, ptr.Str(service.ErrNotAllowed.Error())},
 	}
 
 	for _, c := range cases {

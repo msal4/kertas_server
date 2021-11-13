@@ -173,7 +173,7 @@ func (s *Service) CheckAllowedToParticipateInChat(ctx context.Context, groupID u
 	if grp.GroupType == group.GroupTypePrivate {
 		_, err := grp.QueryUsers().Where(user.ID(prt.ID)).Only(ctx)
 		if err != nil {
-			return NotAllowedErr
+			return ErrNotAllowed
 		}
 	} else if prt.Role == user.RoleStudent {
 		stg, err := grp.QueryClass().QueryStage().Only(ctx)
@@ -182,7 +182,7 @@ func (s *Service) CheckAllowedToParticipateInChat(ctx context.Context, groupID u
 		}
 
 		if pStg, err := prt.Stage(ctx); err != nil || pStg.ID.String() != stg.ID.String() {
-			return NotAllowedErr
+			return ErrNotAllowed
 		}
 	} else if prt.Role == user.RoleTeacher {
 		sch, err := grp.QueryClass().QueryStage().QuerySchool().Only(ctx)
@@ -191,7 +191,7 @@ func (s *Service) CheckAllowedToParticipateInChat(ctx context.Context, groupID u
 		}
 
 		if pSch, err := prt.School(ctx); err != nil || pSch.ID.String() != sch.ID.String() {
-			return NotAllowedErr
+			return ErrNotAllowed
 		}
 	}
 

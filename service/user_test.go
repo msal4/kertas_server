@@ -226,7 +226,7 @@ func TestAddUser(t *testing.T) {
 		require.Equal(t, stage.ID, gotStage.ID)
 		require.Equal(t, stage.ID, gotStage.ID)
 
-		gotSchool, err := got.School(ctx)
+		gotSchool, _ := got.School(ctx)
 		require.Equal(t, sch.ID, gotSchool.ID)
 		require.Equal(t, sch.ID, gotSchool.ID)
 	})
@@ -424,7 +424,7 @@ func TestLoginAdmin(t *testing.T) {
 		})
 		require.Error(t, err)
 		require.Nil(t, resp)
-		require.ErrorIs(t, err, service.InvalidCredsErr)
+		require.ErrorIs(t, err, service.ErrInvalidCreds)
 	})
 
 	t.Run("invalid username", func(t *testing.T) {
@@ -434,7 +434,7 @@ func TestLoginAdmin(t *testing.T) {
 		})
 		require.Error(t, err)
 		require.Nil(t, resp)
-		require.ErrorIs(t, err, service.NotFoundErr)
+		require.ErrorIs(t, err, service.ErrNotFound)
 	})
 
 	t.Run("disabled user", func(t *testing.T) {
@@ -456,7 +456,7 @@ func TestLoginAdmin(t *testing.T) {
 		})
 		require.Error(t, err)
 		require.Nil(t, resp)
-		require.ErrorIs(t, err, service.UserDisabledErr)
+		require.ErrorIs(t, err, service.ErrUserDisabled)
 	})
 
 	t.Run("deleted user", func(t *testing.T) {
@@ -480,7 +480,7 @@ func TestLoginAdmin(t *testing.T) {
 		})
 		require.Error(t, err)
 		require.Nil(t, resp)
-		require.ErrorIs(t, err, service.NotFoundErr)
+		require.ErrorIs(t, err, service.ErrNotFound)
 	})
 
 	t.Run("super admin", func(t *testing.T) {
@@ -584,7 +584,7 @@ func TestLoginAdmin(t *testing.T) {
 		})
 		require.Error(t, err)
 		require.Nil(t, resp)
-		require.ErrorIs(t, err, service.SchoolDisabledErr)
+		require.ErrorIs(t, err, service.ErrSchoolDisabled)
 
 		sch.Update().SetDeletedAt(time.Now()).SetActive(true).SaveX(ctx)
 
@@ -594,7 +594,7 @@ func TestLoginAdmin(t *testing.T) {
 		})
 		require.Error(t, err)
 		require.Nil(t, resp)
-		require.ErrorIs(t, err, service.NotFoundErr)
+		require.ErrorIs(t, err, service.ErrNotFound)
 	})
 
 	t.Run("teacher & student", func(t *testing.T) {
@@ -620,7 +620,7 @@ func TestLoginAdmin(t *testing.T) {
 		})
 		require.Error(t, err)
 		require.Nil(t, resp)
-		require.ErrorIs(t, err, service.NotAllowedErr)
+		require.ErrorIs(t, err, service.ErrNotAllowed)
 
 		stage := s.EC.Stage.Create().SetName("1st").SetTuitionAmount(1000).SetActive(true).SetSchool(sch).SetDirectory("ifidsfksd").SaveX(ctx)
 		u.Update().SetStage(stage).SaveX(ctx)
@@ -631,7 +631,7 @@ func TestLoginAdmin(t *testing.T) {
 		})
 		require.Error(t, err)
 		require.Nil(t, resp)
-		require.ErrorIs(t, err, service.NotAllowedErr)
+		require.ErrorIs(t, err, service.ErrNotAllowed)
 	})
 }
 
@@ -665,7 +665,7 @@ func TestLoginUser(t *testing.T) {
 		})
 		require.Error(t, err)
 		require.Nil(t, resp)
-		require.ErrorIs(t, err, service.InvalidCredsErr)
+		require.ErrorIs(t, err, service.ErrInvalidCreds)
 	})
 
 	t.Run("invalid username", func(t *testing.T) {
@@ -675,7 +675,7 @@ func TestLoginUser(t *testing.T) {
 		})
 		require.Error(t, err)
 		require.Nil(t, resp)
-		require.ErrorIs(t, err, service.NotFoundErr)
+		require.ErrorIs(t, err, service.ErrNotFound)
 	})
 
 	t.Run("disabled user", func(t *testing.T) {
@@ -698,7 +698,7 @@ func TestLoginUser(t *testing.T) {
 		})
 		require.Error(t, err)
 		require.Nil(t, resp)
-		require.ErrorIs(t, err, service.UserDisabledErr)
+		require.ErrorIs(t, err, service.ErrUserDisabled)
 	})
 
 	t.Run("deleted user", func(t *testing.T) {
@@ -723,7 +723,7 @@ func TestLoginUser(t *testing.T) {
 		})
 		require.Error(t, err)
 		require.Nil(t, resp)
-		require.ErrorIs(t, err, service.NotFoundErr)
+		require.ErrorIs(t, err, service.ErrNotFound)
 	})
 
 	t.Run("student", func(t *testing.T) {
@@ -825,7 +825,7 @@ func TestLoginUser(t *testing.T) {
 		})
 		require.Error(t, err)
 		require.Nil(t, resp)
-		require.ErrorIs(t, err, service.SchoolDisabledErr)
+		require.ErrorIs(t, err, service.ErrSchoolDisabled)
 
 		sch.Update().SetDeletedAt(time.Now()).SetActive(true).SaveX(ctx)
 
@@ -835,7 +835,7 @@ func TestLoginUser(t *testing.T) {
 		})
 		require.Error(t, err)
 		require.Nil(t, resp)
-		require.ErrorIs(t, err, service.NotFoundErr)
+		require.ErrorIs(t, err, service.ErrNotFound)
 	})
 
 	t.Run("disabled stage", func(t *testing.T) {
@@ -859,7 +859,7 @@ func TestLoginUser(t *testing.T) {
 		})
 		require.Error(t, err)
 		require.Nil(t, resp)
-		require.ErrorIs(t, err, service.StageDisabledErr)
+		require.ErrorIs(t, err, service.ErrStageDisabled)
 
 		stage.Update().SetDeletedAt(time.Now()).SetActive(true).SaveX(ctx)
 
@@ -869,7 +869,7 @@ func TestLoginUser(t *testing.T) {
 		})
 		require.Error(t, err)
 		require.Nil(t, resp)
-		require.ErrorIs(t, err, service.NotFoundErr)
+		require.ErrorIs(t, err, service.ErrNotFound)
 	})
 
 	t.Run("super admin & school admin", func(t *testing.T) {
@@ -894,7 +894,7 @@ func TestLoginUser(t *testing.T) {
 		})
 		require.Error(t, err)
 		require.Nil(t, resp)
-		require.ErrorIs(t, err, service.NotAllowedErr)
+		require.ErrorIs(t, err, service.ErrNotAllowed)
 
 		u.Update().SetRole(user.RoleSuperAdmin).SetSchool(sch).SaveX(ctx)
 
@@ -904,7 +904,7 @@ func TestLoginUser(t *testing.T) {
 		})
 		require.Error(t, err)
 		require.Nil(t, resp)
-		require.ErrorIs(t, err, service.NotAllowedErr)
+		require.ErrorIs(t, err, service.ErrNotAllowed)
 	})
 }
 
@@ -1016,13 +1016,13 @@ func TestRefreshTokens(t *testing.T) {
 		data, err := s.RefreshTokens(ctx, resp.RefreshToken)
 		require.Error(t, err)
 		require.Nil(t, data)
-		require.ErrorIs(t, err, service.UserDisabledErr)
+		require.ErrorIs(t, err, service.ErrUserDisabled)
 
 		u.Update().SetActive(true).SetDeletedAt(time.Now()).SaveX(ctx)
 		data, err = s.RefreshTokens(ctx, resp.RefreshToken)
 		require.Error(t, err)
 		require.Nil(t, data)
-		require.ErrorIs(t, err, service.NotFoundErr)
+		require.ErrorIs(t, err, service.ErrNotFound)
 	})
 
 	t.Run("token version mismatch", func(t *testing.T) {

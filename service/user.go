@@ -66,8 +66,7 @@ func (s *Service) AddUser(ctx context.Context, input model.AddUserInput) (*ent.U
 	}
 
 	if input.StageID != nil && input.Role == user.RoleStudent {
-		stage, err := s.EC.Stage.Get(ctx, *input.StageID)
-		sch, err := stage.School(ctx)
+		sch, err := s.EC.Stage.Query().Where(stage.ID(*input.StageID)).QuerySchool().Only(ctx)
 		if err != nil {
 			return nil, err
 		}
@@ -171,11 +170,11 @@ func (s *Service) DeleteUserPermanently(ctx context.Context, id uuid.UUID) error
 
 func (s *Service) verifyUser(ctx context.Context, u ent.User) (*model.AuthData, error) {
 	if !u.Active {
-		return nil, UserDisabledErr
+		return nil, ErrUserDisabled
 	}
 
 	if u.DeletedAt != nil {
-		return nil, NotFoundErr
+		return nil, ErrNotFound
 	}
 
 	if u.Role == user.RoleSuperAdmin {
@@ -188,11 +187,11 @@ func (s *Service) verifyUser(ctx context.Context, u ent.User) (*model.AuthData, 
 	}
 
 	if !sch.Active {
-		return nil, SchoolDisabledErr
+		return nil, ErrSchoolDisabled
 	}
 
 	if sch.DeletedAt != nil {
-		return nil, NotFoundErr
+		return nil, ErrNotFound
 	}
 
 	if u.Role == user.RoleStudent {
@@ -202,11 +201,11 @@ func (s *Service) verifyUser(ctx context.Context, u ent.User) (*model.AuthData, 
 		}
 
 		if !stage.Active {
-			return nil, StageDisabledErr
+			return nil, ErrStageDisabled
 		}
 
 		if stage.DeletedAt != nil {
-			return nil, NotFoundErr
+			return nil, ErrNotFound
 		}
 	}
 
@@ -214,30 +213,30 @@ func (s *Service) verifyUser(ctx context.Context, u ent.User) (*model.AuthData, 
 }
 
 var (
-	SchoolDisabledErr = errors.New("school is disabled")
-	StageDisabledErr  = errors.New("stage is disabled")
-	UserDisabledErr   = errors.New("user is disabled")
-	InvalidCredsErr   = errors.New("invalid credentials")
-	NotAllowedErr     = errors.New("not allowed")
-	NotFoundErr       = errors.New("not found")
-	InvalidTokenErr   = errors.New("invalid token")
+	ErrSchoolDisabled = errors.New("school is disabled")
+	ErrStageDisabled  = errors.New("stage is disabled")
+	ErrUserDisabled   = errors.New("user is disabled")
+	ErrInvalidCreds   = errors.New("invalid credentials")
+	ErrNotAllowed     = errors.New("not allowed")
+	ErrNotFound       = errors.New("not found")
+	ErrInvalidToken   = errors.New("invalid token")
 )
 
 func (s *Service) LoginAdmin(ctx context.Context, input model.LoginInput) (*model.AuthData, error) {
 	u, err := s.EC.User.Query().Where(user.Username(input.Username), user.DeletedAtIsNil()).Only(ctx)
 	if err != nil {
 		if ent.IsNotFound(err) {
-			return nil, NotFoundErr
+			return nil, ErrNotFound
 		}
 		return nil, err
 	}
 
 	if u.Role != user.RoleSuperAdmin && u.Role != user.RoleSchoolAdmin {
-		return nil, NotAllowedErr
+		return nil, ErrNotAllowed
 	}
 
 	if input.Password != u.Password {
-		return nil, InvalidCredsErr
+		return nil, ErrInvalidCreds
 	}
 
 	return s.verifyUser(ctx, *u)
@@ -247,17 +246,17 @@ func (s *Service) LoginUser(ctx context.Context, input model.LoginInput) (*model
 	u, err := s.EC.User.Query().Where(user.Username(input.Username), user.DeletedAtIsNil()).Only(ctx)
 	if err != nil {
 		if ent.IsNotFound(err) {
-			return nil, NotFoundErr
+			return nil, ErrNotFound
 		}
 		return nil, err
 	}
 
 	if u.Role != user.RoleTeacher && u.Role != user.RoleStudent {
-		return nil, NotAllowedErr
+		return nil, ErrNotAllowed
 	}
 
 	if input.Password != u.Password {
-		return nil, InvalidCredsErr
+		return nil, ErrInvalidCreds
 	}
 
 	authData, err := s.verifyUser(ctx, *u)
@@ -299,7 +298,7 @@ func (s *Service) RefreshTokens(ctx context.Context, refreshToken string) (*mode
 	}
 
 	if u.TokenVersion != claims.TokenVersion {
-		return nil, InvalidTokenErr
+		return nil, ErrInvalidToken
 	}
 
 	return s.verifyUser(ctx, *u)

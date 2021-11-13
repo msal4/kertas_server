@@ -805,11 +805,11 @@ func getLoginErrs(ctx context.Context, err error) error {
 	exts := map[string]interface{}{}
 
 	switch err {
-	case service.NotFoundErr:
+	case service.ErrNotFound:
 		exts["code"] = "NOT_FOUND"
-	case service.InvalidCredsErr:
+	case service.ErrInvalidCreds:
 		exts["code"] = "INVALID_CREDS"
-	case service.NotAllowedErr:
+	case service.ErrNotAllowed:
 		exts["code"] = "NOT_ALLOWED"
 	}
 

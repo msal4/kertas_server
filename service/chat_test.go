@@ -247,7 +247,7 @@ func TestRegisterGroupObserver(t *testing.T) {
 		cancel()
 		<-cancelableCtx.Done()
 
-		got, ok := <-msgCh
+		_, ok := <-msgCh
 
 		require.False(ok)
 	})

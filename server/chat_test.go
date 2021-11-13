@@ -45,7 +45,7 @@ func TestMessages(t *testing.T) {
 		{"school admin is allowed", schAdmin, nil},
 		{"teacher is allowed", teacher, nil},
 		{"student is allowed", student, nil},
-		{"outsider student is not allowd", outsiderStudent, ptr.Str(service.NotAllowedErr.Error())},
+		{"outsider student is not allowd", outsiderStudent, ptr.Str(service.ErrNotAllowed.Error())},
 	}
 
 	for _, c := range cases {
@@ -104,7 +104,7 @@ func TestPostMessage(t *testing.T) {
 		{"school admin is allowed", schAdmin, nil},
 		{"teacher is allowed", teacher, nil},
 		{"student is allowed", student, nil},
-		{"outsider student is not allowed", outsiderStudent, ptr.Str(service.NotAllowedErr.Error())},
+		{"outsider student is not allowed", outsiderStudent, ptr.Str(service.ErrNotAllowed.Error())},
 	}
 
 	f := testutil.OpenFile(t, "../testfiles/harvard.jpg")
@@ -168,7 +168,7 @@ func TestMessagePosted(t *testing.T) {
 		{"school admin is allowed", schAdmin, nil},
 		{"teacher is allowed", teacher, nil},
 		{"student is allowed", student, nil},
-		{"outsider student is not allowed", outsiderStudent, ptr.Str(service.NotAllowedErr.Error())},
+		{"outsider student is not allowed", outsiderStudent, ptr.Str(service.ErrNotAllowed.Error())},
 	}
 
 	operationsMsg := []byte(fmt.Sprintf(`{
